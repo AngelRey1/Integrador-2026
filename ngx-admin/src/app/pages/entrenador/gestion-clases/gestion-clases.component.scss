@@ -1,0 +1,102 @@
+.page-title {
+  margin-bottom: 0.5rem;
+}
+
+.text-hint {
+  color: #8f9bb3;
+  font-size: 0.875rem;
+}
+
+.label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #222b45;
+  font-size: 0.875rem;
+}
+
+.char-counter {
+  display: block;
+  text-align: right;
+  color: #8f9bb3;
+  font-size: 0.8125rem;
+  margin-top: 0.25rem;
+}
+
+nb-card.inactive {
+  opacity: 0.6;
+}
+
+.clase-info {
+  .deporte-badge {
+    display: inline-block;
+    background: #3366ff;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+  }
+
+  .descripcion {
+    color: #8f9bb3;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+  }
+
+  .clase-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #222b45;
+      font-size: 0.875rem;
+
+      nb-icon {
+        font-size: 16px;
+        color: #3366ff;
+      }
+    }
+  }
+
+  .clase-badges {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+}
+
+.d-flex {
+  display: flex;
+}
+
+.justify-content-between {
+  justify-content: space-between;
+}
+
+.justify-content-end {
+  justify-content: flex-end;
+}
+
+.align-items-center {
+  align-items: center;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.mb-3 {
+  margin-bottom: 1rem;
+}
+
+.mb-4 {
+  margin-bottom: 1.5rem;
+}

@@ -1,0 +1,51 @@
+<div class="container-fluid">
+  <div class="row mb-4">
+    <div class="col-12"><h3 class="page-title">Mis Ingresos</h3></div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-md-4 mb-3">
+      <nb-card>
+        <nb-card-body class="stat-card">
+          <span class="label">Ingresos Totales</span>
+          <h4 class="value">{{ ingresosTotales }}€</h4>
+        </nb-card-body>
+      </nb-card>
+    </div>
+    <div class="col-md-4 mb-3">
+      <nb-card>
+        <nb-card-body class="stat-card">
+          <span class="label">Comisión Plataforma (10%)</span>
+          <h4 class="value">{{ comisionPlataforma }}€</h4>
+        </nb-card-body>
+      </nb-card>
+    </div>
+    <div class="col-md-4 mb-3">
+      <nb-card>
+        <nb-card-body class="stat-card">
+          <span class="label">Ingresos Netos</span>
+          <h4 class="value">{{ ingresosNetos }}€</h4>
+        </nb-card-body>
+      </nb-card>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <nb-card>
+        <nb-card-header>Evolución Mensual</nb-card-header>
+        <nb-card-body>
+          <div class="chart-bars">
+            <div *ngFor="let item of estadisticas" class="bar-wrapper">
+              <div class="bar-value">{{ item.ingresos }}€</div>
+              <div class="bar" [style.height.%]="getBarHeight(item.ingresos)">
+                <div class="bar-fill"></div>
+              </div>
+              <div class="bar-label">{{ item.mes }}</div>
+            </div>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+  </div>
+</div>

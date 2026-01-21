@@ -1,0 +1,181 @@
+<div class="entrenadores-page">
+  <!-- Carrusel de Destacados -->
+  <section class="destacados-carousel">
+    <div class="container">
+      <h2 class="section-title">⭐ Entrenadores Destacados</h2>
+      
+      <div class="carousel-container">
+        <button class="carousel-btn prev" (click)="anteriorDestacado()">
+          ❮
+        </button>
+
+        <div class="carousel-content">
+          <div 
+            *ngFor="let entrenador of entrenadoresDestacados; let i = index"
+            class="carousel-item"
+            [class.active]="i === carruselIndex"
+          >
+            <div class="carousel-card">
+              <div class="carousel-image">
+                <img [src]="entrenador.foto" [alt]="entrenador.nombre" />
+                <span class="badge-destacado">⭐ Destacado</span>
+              </div>
+              <div class="carousel-info">
+                <h3 class="carousel-nombre">{{ entrenador.nombre }}</h3>
+                <p class="carousel-ubicacion">📍 {{ entrenador.ubicacion }}</p>
+                <p class="carousel-especialidad">{{ entrenador.especialidad }}</p>
+                <div class="carousel-rating">
+                  <span *ngFor="let star of getEstrellas(entrenador.calificacion)" class="star">
+                    {{ star === 'full' ? '⭐' : '☆' }}
+                  </span>
+                  <span class="rating-text">{{ entrenador.calificacion }} ({{ entrenador.totalResenas }} opiniones)</span>
+                </div>
+                <p class="carousel-precio">${{ entrenador.precioHora }}/hora</p>
+                <button class="btn-ver-perfil" (click)="verPerfil(entrenador)">
+                  Ver Perfil
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button class="carousel-btn next" (click)="siguienteDestacado()">
+          ❯
+        </button>
+      </div>
+
+      <!-- Indicadores -->
+      <div class="carousel-indicators">
+        <span 
+          *ngFor="let entrenador of entrenadoresDestacados; let i = index"
+          class="indicator"
+          [class.active]="i === carruselIndex"
+          (click)="irADestacado(i)"
+        ></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Filtros y Búsqueda -->
+  <section class="filtros-section">
+    <div class="container">
+      <div class="filtros-header">
+        <h2>Encuentra tu entrenador perfecto</h2>
+        <p>{{ entrenadoresFiltrados.length }} entrenadores disponibles</p>
+      </div>
+
+      <div class="filtros-container">
+        <!-- Búsqueda -->
+        <div class="filtro-item">
+          <label>🔍 Buscar</label>
+          <input 
+            type="text" 
+            [(ngModel)]="searchQuery"
+            (ngModelChange)="aplicarFiltros()"
+            placeholder="Nombre, deporte..."
+            class="filtro-input"
+          />
+        </div>
+
+        <!-- Deporte -->
+        <div class="filtro-item">
+          <label>⚽ Deporte</label>
+          <select 
+            [(ngModel)]="filtros.deporte"
+            (ngModelChange)="aplicarFiltros()"
+            class="filtro-select"
+          >
+            <option value="todos">Todos</option>
+            <option *ngFor="let deporte of deportes.slice(1)" [value]="deporte.toLowerCase()">
+              {{ deporte }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Precio Máximo -->
+        <div class="filtro-item">
+          <label>💰 Precio máximo: ${{ filtros.precioMax }}/h</label>
+          <input 
+            type="range" 
+            [(ngModel)]="filtros.precioMax"
+            (ngModelChange)="aplicarFiltros()"
+            min="10"
+            max="100"
+            class="filtro-range"
+          />
+        </div>
+
+        <!-- Calificación Mínima -->
+        <div class="filtro-item">
+          <label>⭐ Calificación mínima</label>
+          <select 
+            [(ngModel)]="filtros.calificacionMin"
+            (ngModelChange)="aplicarFiltros()"
+            class="filtro-select"
+          >
+            <option [value]="0">Todas</option>
+            <option [value]="4">4+ estrellas</option>
+            <option [value]="4.5">4.5+ estrellas</option>
+            <option [value]="4.8">4.8+ estrellas</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Lista de Entrenadores -->
+  <section class="lista-section">
+    <div class="container">
+      <div class="entrenadores-grid">
+        <div 
+          *ngFor="let entrenador of entrenadoresFiltrados"
+          class="entrenador-card"
+          (click)="verPerfil(entrenador)"
+        >
+          <div class="card-image">
+            <img [src]="entrenador.foto" [alt]="entrenador.nombre" />
+            <span *ngIf="entrenador.destacado" class="badge-card">⭐ Destacado</span>
+            <span class="badge-nivel" [class.elite]="entrenador.nivel === 'ELITE'">
+              {{ entrenador.nivel }}
+            </span>
+          </div>
+
+          <div class="card-content">
+            <h3 class="card-nombre">{{ entrenador.nombre }}</h3>
+            <p class="card-ubicacion">📍 {{ entrenador.ubicacion }}</p>
+
+            <div class="card-rating">
+              <span *ngFor="let star of getEstrellas(entrenador.calificacion)" class="star">
+                {{ star === 'full' ? '⭐' : '☆' }}
+              </span>
+              <span class="rating-number">{{ entrenador.calificacion }}</span>
+              <span class="rating-count">({{ entrenador.totalResenas }})</span>
+            </div>
+
+            <p class="card-especialidad">{{ entrenador.especialidad }}</p>
+            <p class="card-descripcion">{{ entrenador.descripcion }}</p>
+
+            <div class="card-modalidad">
+              <span *ngFor="let mod of entrenador.modalidad" class="modalidad-badge">
+                {{ mod }}
+              </span>
+            </div>
+
+            <div class="card-footer">
+              <span class="card-precio">${{ entrenador.precioHora }}/hora</span>
+              <button class="btn-contactar">Contactar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mensaje si no hay resultados -->
+      <div *ngIf="entrenadoresFiltrados.length === 0" class="sin-resultados">
+        <p>😕 No encontramos entrenadores con esos criterios</p>
+        <button class="btn-limpiar" (click)="filtros = { deporte: 'todos', precioMax: 100, modalidad: 'todos', nivel: 'todos', calificacionMin: 0 }; aplicarFiltros()">
+          Limpiar filtros
+        </button>
+      </div>
+    </div>
+  </section>
+</div>

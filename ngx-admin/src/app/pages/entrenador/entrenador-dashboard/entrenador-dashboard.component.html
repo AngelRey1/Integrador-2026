@@ -1,0 +1,260 @@
+<div class="container-fluid">
+  <!-- Encabezado -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center flex-wrap">
+        <div>
+          <h3 class="page-title">Dashboard Entrenador</h3>
+          <p class="text-hint">Visión general de tu actividad</p>
+        </div>
+        <div class="header-actions">
+          <button nbButton status="primary" (click)="irACalendario()">
+            <nb-icon icon="calendar-outline"></nb-icon>
+            Ver Calendario
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Métricas principales -->
+  <div class="row mb-4">
+    <div class="col-12 col-sm-6 col-lg-3 mb-3">
+      <nb-card (click)="irAClases()" class="metric-card clickable">
+        <nb-card-body class="stat-card">
+          <div class="stat-icon clients">
+            <nb-icon icon="people-outline"></nb-icon>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Clientes Activos</span>
+            <h4 class="stat-value">{{ clientesActivos }}</h4>
+            <span class="stat-trend positive">+3 este mes</span>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+
+    <div class="col-12 col-sm-6 col-lg-3 mb-3">
+      <nb-card class="metric-card">
+        <nb-card-body class="stat-card">
+          <div class="stat-icon sessions">
+            <nb-icon icon="activity-outline"></nb-icon>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Sesiones Este Mes</span>
+            <h4 class="stat-value">{{ sesionesMes }}</h4>
+            <span class="stat-trend neutral">+2 vs mes anterior</span>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+
+    <div class="col-12 col-sm-6 col-lg-3 mb-3">
+      <nb-card (click)="irAIngresos()" class="metric-card clickable">
+        <nb-card-body class="stat-card">
+          <div class="stat-icon income">
+            <nb-icon icon="trending-up-outline"></nb-icon>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Ingresos Este Mes</span>
+            <h4 class="stat-value">{{ formatearMoneda(ingresosMes) }}</h4>
+            <span class="stat-trend negative">-6% vs mes anterior</span>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+
+    <div class="col-12 col-sm-6 col-lg-3 mb-3">
+      <nb-card class="metric-card">
+        <nb-card-body class="stat-card">
+          <div class="stat-icon rating">
+            <nb-icon icon="star"></nb-icon>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Calificación</span>
+            <h4 class="stat-value">{{ calificacionPromedio }} ⭐</h4>
+            <span class="stat-trend positive">{{ tasaAsistencia }}% asistencia</span>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+  </div>
+
+  <!-- Contenido principal -->
+  <div class="row">
+    <!-- Columna izquierda: Sesiones de hoy y próximas -->
+    <div class="col-12 col-lg-8 mb-4">
+      <!-- Sesiones de hoy -->
+      <nb-card class="mb-4">
+        <nb-card-header>
+          <div class="d-flex justify-content-between align-items-center">
+            <span>Sesiones de Hoy ({{ sesionesHoy.length }})</span>
+            <nb-badge [text]="sesionesHoy.length.toString()" status="primary"></nb-badge>
+          </div>
+        </nb-card-header>
+        <nb-card-body>
+          <div *ngIf="sesionesHoy.length > 0" class="sesiones-list">
+            <div *ngFor="let sesion of sesionesHoy" class="sesion-item">
+              <div class="sesion-time">
+                <div class="time-badge">{{ sesion.hora }}</div>
+                <div class="duration">{{ sesion.duracion }}min</div>
+              </div>
+              <div class="sesion-info">
+                <div class="d-flex align-items-center mb-2">
+                  <img [src]="sesion.cliente.avatar" [alt]="sesion.cliente.nombre" class="cliente-avatar">
+                  <div class="ml-2">
+                    <strong class="cliente-nombre">{{ sesion.cliente.nombre }}</strong>
+                    <p class="sesion-deporte mb-0">{{ sesion.deporte }}</p>
+                  </div>
+                </div>
+                <div class="sesion-meta">
+                  <nb-badge 
+                    [text]="sesion.modalidad" 
+                    [status]="sesion.modalidad === 'online' ? 'info' : 'success'"
+                  ></nb-badge>
+                  <span *ngIf="sesion.ubicacion" class="ubicacion">
+                    <nb-icon icon="pin-outline"></nb-icon>
+                    {{ sesion.ubicacion }}
+                  </span>
+                </div>
+              </div>
+              <div class="sesion-actions">
+                <button nbButton size="tiny" status="info" (click)="verCliente(sesion)" nbTooltip="Ver cliente">
+                  <nb-icon icon="person-outline"></nb-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="sesionesHoy.length === 0" class="empty-state-small">
+            <nb-icon icon="calendar-outline"></nb-icon>
+            <p>No tienes sesiones programadas para hoy</p>
+          </div>
+        </nb-card-body>
+      </nb-card>
+
+      <!-- Próximas sesiones -->
+      <nb-card>
+        <nb-card-header>
+          <div class="d-flex justify-content-between align-items-center">
+            <span>Próximas Sesiones</span>
+            <button nbButton size="small" status="basic" (click)="irACalendario()">
+              Ver todas
+            </button>
+          </div>
+        </nb-card-header>
+        <nb-card-body>
+          <div class="table-responsive">
+            <table class="sesiones-table">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Hora</th>
+                  <th>Cliente</th>
+                  <th>Deporte</th>
+                  <th>Modalidad</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let sesion of proximasSesiones">
+                  <td>{{ formatearFecha(sesion.fecha) }}</td>
+                  <td class="hora">{{ sesion.hora }}</td>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <img [src]="sesion.cliente.avatar" [alt]="sesion.cliente.nombre" class="avatar-small">
+                      <span class="ml-2">{{ sesion.cliente.nombre }}</span>
+                    </div>
+                  </td>
+                  <td>{{ sesion.deporte }}</td>
+                  <td>
+                    <nb-badge 
+                      [text]="sesion.modalidad" 
+                      [status]="sesion.modalidad === 'online' ? 'info' : 'success'"
+                      size="tiny"
+                    ></nb-badge>
+                  </td>
+                  <td>
+                    <nb-badge 
+                      [text]="sesion.estado" 
+                      [status]="getEstadoBadgeStatus(sesion.estado)"
+                      size="tiny"
+                    ></nb-badge>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+
+    <!-- Columna derecha: Estadísticas -->
+    <div class="col-12 col-lg-4">
+      <!-- Estadísticas mensuales -->
+      <nb-card class="mb-4">
+        <nb-card-header>Rendimiento Mensual</nb-card-header>
+        <nb-card-body>
+          <div class="estadisticas-section mb-4">
+            <h6 class="section-title">Sesiones</h6>
+            <div class="chart-bars">
+              <div *ngFor="let item of estadisticasMensuales" class="bar-wrapper">
+                <div class="bar-value">{{ item.sesiones }}</div>
+                <div class="bar" [style.height.%]="getBarHeight(item.sesiones, 'sesiones')">
+                  <div class="bar-fill sessions"></div>
+                </div>
+                <div class="bar-label">{{ item.mes }}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="estadisticas-section">
+            <h6 class="section-title">Ingresos</h6>
+            <div class="chart-bars">
+              <div *ngFor="let item of estadisticasMensuales" class="bar-wrapper">
+                <div class="bar-value">{{ formatearMoneda(item.ingresos) }}</div>
+                <div class="bar" [style.height.%]="getBarHeight(item.ingresos, 'ingresos')">
+                  <div class="bar-fill income"></div>
+                </div>
+                <div class="bar-label">{{ item.mes }}</div>
+              </div>
+            </div>
+          </div>
+        </nb-card-body>
+      </nb-card>
+
+      <!-- Acciones rápidas -->
+      <nb-card>
+        <nb-card-header>Acciones Rápidas</nb-card-header>
+        <nb-card-body>
+          <div class="quick-actions">
+            <button nbButton fullWidth status="primary" (click)="irAClases()">
+              <nb-icon icon="plus-outline"></nb-icon>
+              Nueva Clase
+            </button>
+            <button nbButton fullWidth status="info" (click)="irACalendario()">
+              <nb-icon icon="calendar-outline"></nb-icon>
+              Gestionar Disponibilidad
+            </button>
+            <button nbButton fullWidth status="success" (click)="irAIngresos()">
+              <nb-icon icon="pie-chart-outline"></nb-icon>
+              Ver Ingresos
+            </button>
+          </div>
+        </nb-card-body>
+      </nb-card>
+
+      <!-- Notificaciones -->
+      <nb-card accent="warning" *ngIf="notificacionesPendientes > 0">
+        <nb-card-body>
+          <div class="notification-banner">
+            <nb-icon icon="bell-outline"></nb-icon>
+            <div>
+              <strong>{{ notificacionesPendientes }} notificaciones pendientes</strong>
+              <p class="mb-0 text-hint">Tienes reservas por confirmar</p>
+            </div>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+  </div>
+</div>

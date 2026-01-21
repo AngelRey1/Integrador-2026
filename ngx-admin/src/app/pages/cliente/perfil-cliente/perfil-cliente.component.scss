@@ -1,0 +1,405 @@
+.page-title {
+  margin-bottom: 0.5rem;
+}
+
+.text-hint {
+  color: #8f9bb3;
+  font-size: 0.875rem;
+}
+
+// Perfil Header
+.perfil-header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 2rem;
+  align-items: center;
+
+  @media (max-width: 992px) {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 1.5rem;
+  }
+
+  .avatar-section {
+    .avatar-wrapper {
+      position: relative;
+      width: 120px;
+      height: 120px;
+
+      @media (max-width: 992px) {
+        margin: 0 auto;
+      }
+
+      .avatar-image {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid #edf1f7;
+      }
+
+      .avatar-upload {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 36px;
+        height: 36px;
+        background: #3366ff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        opacity: 0;
+
+        &.editing {
+          opacity: 1;
+        }
+
+        input {
+          display: none;
+        }
+
+        nb-icon {
+          color: white;
+          font-size: 18px;
+        }
+
+        &:hover {
+          background: #5a8aff;
+          transform: scale(1.1);
+        }
+      }
+    }
+  }
+
+  .perfil-info {
+    @media (max-width: 992px) {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .nombre {
+      margin: 0 0 0.5rem 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #222b45;
+    }
+
+    .email {
+      margin: 0 0 0.75rem 0;
+      color: #8f9bb3;
+      font-size: 0.9375rem;
+    }
+
+    .badges {
+      display: flex;
+      gap: 0.5rem;
+
+      @media (max-width: 992px) {
+        justify-content: center;
+      }
+    }
+  }
+
+  .perfil-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+
+    @media (max-width: 992px) {
+      justify-content: center;
+    }
+  }
+}
+
+// Forms
+.perfil-form,
+.preferencias-form,
+.configuracion-form {
+  .label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #222b45;
+    font-size: 0.875rem;
+  }
+
+  .error-message {
+    color: #ff3d71;
+    font-size: 0.8125rem;
+    margin-top: 0.25rem;
+  }
+}
+
+// Sección cambiar contraseña
+.cambiar-password-section {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 2px solid #edf1f7;
+
+  .section-title {
+    margin-bottom: 1.5rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #222b45;
+  }
+}
+
+// Section Title
+.section-title {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #222b45;
+
+  &.danger {
+    color: #ff3d71;
+  }
+}
+
+.form-section {
+  margin-bottom: 2rem;
+}
+
+// Deportes Grid
+.deportes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 1rem;
+
+  .deporte-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem 1rem;
+    border: 2px solid #edf1f7;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: white;
+
+    .deporte-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .deporte-label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #222b45;
+      text-align: center;
+    }
+
+    .check-icon {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      font-size: 20px;
+      color: #00d68f;
+    }
+
+    &:hover {
+      border-color: #3366ff;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(51, 102, 255, 0.15);
+    }
+
+    &.selected {
+      border-color: #3366ff;
+      background: linear-gradient(135deg, #f0f4ff 0%, #e8f0ff 100%);
+    }
+  }
+}
+
+// Objetivos List
+.objetivos-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+// Días Grid
+.dias-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+// Presupuesto Input
+.presupuesto-input {
+  position: relative;
+  max-width: 300px;
+
+  input {
+    padding-right: 40px;
+  }
+
+  .currency {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-weight: 600;
+    color: #222b45;
+    font-size: 1rem;
+  }
+}
+
+// Notificaciones List
+.notificaciones-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  .notificacion-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: #f7f9fc;
+    border-radius: 8px;
+    gap: 1rem;
+
+    .notificacion-info {
+      flex: 1;
+
+      strong {
+        display: block;
+        color: #222b45;
+        font-size: 0.9375rem;
+        margin-bottom: 0.25rem;
+      }
+
+      p {
+        margin: 0;
+        font-size: 0.8125rem;
+      }
+    }
+  }
+}
+
+// Form Actions
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 1rem;
+
+  @media (max-width: 576px) {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+// Danger Zone
+.danger-zone {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 2px solid #edf1f7;
+
+  .danger-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: flex-start;
+
+      button {
+        width: 100%;
+      }
+    }
+
+    strong {
+      display: block;
+      color: #222b45;
+      margin-bottom: 0.25rem;
+    }
+  }
+}
+
+// Utility Classes
+.mb-0 {
+  margin-bottom: 0 !important;
+}
+
+.mb-3 {
+  margin-bottom: 1rem;
+}
+
+.mb-4 {
+  margin-bottom: 1.5rem;
+}
+
+.mb-5 {
+  margin-bottom: 2rem;
+}
+
+.mt-2 {
+  margin-top: 0.5rem;
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .deportes-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+
+    .deporte-card {
+      padding: 1rem 0.5rem;
+
+      .deporte-icon {
+        font-size: 2rem;
+      }
+
+      .deporte-label {
+        font-size: 0.75rem;
+      }
+    }
+  }
+
+  .objetivos-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Override Nebular Tabset styles
+::ng-deep {
+  nb-tabset .tabset {
+    ul.tabs {
+      padding: 0 1rem;
+      
+      @media (max-width: 768px) {
+        padding: 0 0.5rem;
+        
+        li {
+          a {
+            padding: 0.75rem 0.5rem;
+            font-size: 0.8125rem;
+          }
+        }
+      }
+    }
+  }
+
+  nb-radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  nb-toggle {
+    .toggle {
+      min-width: 48px;
+    }
+  }
+}

@@ -1,0 +1,481 @@
+.entrenadores-page {
+  background: #f8f9fa;
+  min-height: 100vh;
+  padding-bottom: 60px;
+}
+
+// ===== CARRUSEL DE DESTACADOS (REDISEÑADO) =====
+.destacados-carousel {
+  background: #F8FAFC;
+  padding: 4rem 1.5rem;
+  color: #0F172A;
+  border-bottom: 1px solid #E2E8F0;
+}
+
+.section-title {
+  font-size: 2rem;
+  font-weight: 900;
+  text-align: center;
+  margin-bottom: 2.5rem;
+  color: #0F172A;
+}
+
+.carousel-container {
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.carousel-content {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+.carousel-item {
+  position: static;
+  width: 100%;
+  opacity: 1;
+  transform: none;
+  transition: all 0.3s ease;
+}
+
+.carousel-card {
+  background: white;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  border: 1px solid #E2E8F0;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+    border-color: #00D09C;
+  }
+}
+
+.carousel-image {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  overflow: hidden;
+  background: #E2E8F0;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  &:hover img {
+    transform: scale(1.05);
+  }
+}
+
+.badge-destacado {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: linear-gradient(135deg, #00D09C, #1ADBAF);
+  color: #0F172A;
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  box-shadow: 0 4px 12px rgba(0, 208, 156, 0.3);
+}
+
+.carousel-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.2rem;
+  color: #0F172A;
+}
+
+.carousel-nombre {
+  font-size: 1.1rem;
+  font-weight: 900;
+  margin-bottom: 0.4rem;
+  color: #0F172A;
+}
+
+.carousel-ubicacion {
+  font-size: 0.9rem;
+  color: #64748B;
+  margin-bottom: 0.5rem;
+}
+
+.carousel-especialidad {
+  font-size: 0.95rem;
+  color: #00D09C;
+  font-weight: 700;
+  margin-bottom: 0.8rem;
+  letter-spacing: 0.03em;
+}
+
+.carousel-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.8rem;
+
+  .star {
+    font-size: 1rem;
+  }
+
+  .rating-text {
+    color: #64748B;
+    font-size: 0.8rem;
+  }
+}
+
+.carousel-precio {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #00D09C;
+  margin-bottom: 0.8rem;
+}
+
+.btn-ver-perfil {
+  background: #00D09C;
+  color: #0F172A;
+  border: none;
+  padding: 0.9rem 1.2rem;
+  border-radius: 50px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  align-self: flex-start;
+  box-shadow: 0 4px 12px rgba(0, 208, 156, 0.2);
+
+  &:hover {
+    background: #1ADBAF;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 208, 156, 0.3);
+  }
+}
+
+.carousel-btn {
+  display: none;
+}
+
+.carousel-indicators {
+  display: none;
+}
+
+// ===== FILTROS =====
+.filtros-section {
+  background: white;
+  padding: 40px 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.filtros-header {
+  text-align: center;
+  margin-bottom: 30px;
+  
+  h2 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 10px;
+  }
+  
+  p {
+    color: #7f8c8d;
+    font-size: 16px;
+  }
+}
+
+.filtros-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.filtro-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  
+  label {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 14px;
+  }
+  
+  .filtro-input,
+  .filtro-select {
+    padding: 12px 16px;
+    border: 2px solid #e4e9f2;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s;
+    
+    &:focus {
+      outline: none;
+      border-color: var(--color-primary, #00D09C);
+    }
+  }
+  
+  .filtro-range {
+    width: 100%;
+    height: 8px;
+    border-radius: 5px;
+    background: #e4e9f2;
+    outline: none;
+    
+    &::-webkit-slider-thumb {
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--color-primary, #00D09C);
+      cursor: pointer;
+    }
+  }
+}
+
+// ===== LISTA DE ENTRENADORES =====
+.lista-section {
+  padding: 3rem 1.5rem;
+  background: #F8FAFC;
+}
+
+.entrenadores-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.entrenador-card {
+  background: white;
+  border-radius: 24px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  border: 1px solid #E2E8F0;
+
+  &:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1);
+    border-color: #00D09C;
+  }
+}
+
+.card-image {
+  position: relative;
+  height: 240px;
+  overflow: hidden;
+  background: #E2E8F0;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+  }
+
+  &:hover img {
+    transform: scale(1.08);
+  }
+}
+
+.badge-card {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: linear-gradient(135deg, #00D09C, #1ADBAF);
+  color: #0F172A;
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 0.65rem;
+  letter-spacing: 0.05em;
+  box-shadow: 0 4px 12px rgba(0, 208, 156, 0.3);
+}
+
+.badge-nivel {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: #0F172A;
+  color: #00D09C;
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.65rem;
+  letter-spacing: 0.05em;
+
+  &.elite {
+    background: linear-gradient(135deg, #00D09C, #1ADBAF);
+    color: #0F172A;
+  }
+}
+
+.card-content {
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.card-nombre {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #0F172A;
+  margin: 0;
+}
+
+.card-ubicacion {
+  color: #64748B;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.card-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.3rem 0;
+
+  .star {
+    font-size: 0.9rem;
+  }
+
+  .rating-number {
+    font-weight: 700;
+    color: #0F172A;
+    font-size: 0.9rem;
+  }
+
+  .rating-count {
+    color: #64748B;
+    font-size: 0.8rem;
+  }
+}
+
+.card-especialidad {
+  color: #00D09C;
+  font-weight: 700;
+  margin: 0;
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+}
+
+.card-descripcion {
+  color: #64748B;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  margin: 0.4rem 0 0 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-modalidad {
+  display: flex;
+  gap: 0.4rem;
+  margin: 0.6rem 0;
+  flex-wrap: wrap;
+}
+
+.modalidad-badge {
+  background: #E2E8F0;
+  color: #0F172A;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid #CBD5E1;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0.8rem;
+  margin-top: 0.6rem;
+  border-top: 1px solid #E2E8F0;
+  gap: 0.8rem;
+}
+
+.card-precio {
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: #00D09C;
+  margin: 0;
+}
+
+.btn-contactar {
+  background: #00D09C;
+  color: #0F172A;
+  border: none;
+  padding: 0.7rem 1.2rem;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 208, 156, 0.2);
+
+  &:hover {
+    background: #1ADBAF;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 208, 156, 0.3);
+  }
+}
+
+// Sin resultados
+.sin-resultados {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  background: white;
+  border-radius: 24px;
+  margin: 1rem auto;
+  max-width: 600px;
+
+  p {
+    font-size: 1.1rem;
+    color: #64748B;
+    margin-bottom: 1.5rem;
+  }
+}
+
+.btn-limpiar {
+  background: #00D09C;
+  color: #0F172A;
+  border: none;
+  padding: 0.9rem 1.8rem;
+  border-radius: 50px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 12px rgba(0, 208, 156, 0.2);
+
+  &:hover {
+    background: #1ADBAF;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 208, 156, 0.3);
+  }
+}

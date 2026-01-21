@@ -1,0 +1,60 @@
+<div class="container-fluid">
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between">
+        <h3 class="page-title">Mi Perfil Profesional</h3>
+        <button nbButton [status]="editando ? 'success' : 'primary'" (click)="editando ? guardar() : toggleEditar()">
+          <nb-icon [icon]="editando ? 'save-outline' : 'edit-outline'"></nb-icon>
+          {{ editando ? 'Guardar' : 'Editar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-8">
+      <nb-card>
+        <nb-card-body>
+          <form [formGroup]="perfilForm">
+            <div class="mb-3">
+              <label class="label">Nombre Completo</label>
+              <input nbInput fullWidth formControlName="nombre">
+            </div>
+            <div class="mb-3">
+              <label class="label">Biografía</label>
+              <textarea nbInput fullWidth formControlName="bio" rows="4"></textarea>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="label">Años de Experiencia</label>
+                <input nbInput fullWidth type="number" formControlName="experiencia">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="label">Tarifa Base (€/hora)</label>
+                <input nbInput fullWidth type="number" formControlName="tarifa_base">
+              </div>
+            </div>
+          </form>
+        </nb-card-body>
+      </nb-card>
+    </div>
+
+    <div class="col-md-4">
+      <nb-card>
+        <nb-card-header>Especialidades</nb-card-header>
+        <nb-card-body>
+          <nb-badge *ngFor="let esp of especialidades" [text]="esp" status="primary" class="mr-2 mb-2"></nb-badge>
+        </nb-card-body>
+      </nb-card>
+
+      <nb-card>
+        <nb-card-header>Certificaciones</nb-card-header>
+        <nb-card-body>
+          <ul class="cert-list">
+            <li *ngFor="let cert of certificaciones">{{ cert }}</li>
+          </ul>
+        </nb-card-body>
+      </nb-card>
+    </div>
+  </div>
+</div>

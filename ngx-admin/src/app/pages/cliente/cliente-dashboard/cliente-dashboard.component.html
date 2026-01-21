@@ -1,0 +1,152 @@
+<div class="row">
+  <!-- SECCIÓN 1: ESTADÍSTICAS RÁPIDAS -->
+  <div class="col-xxxl-3 col-md-6" *ngFor="let stat of statsCards">
+    <nb-card [ngClass]="stat.class">
+      <nb-card-body>
+        <div class="icon-container">
+          <div class="icon {{stat.iconClass}}">
+            <nb-icon [icon]="stat.icon" [status]="stat.status"></nb-icon>
+          </div>
+        </div>
+        <div class="details">
+          <div class="title h5">{{stat.title}}</div>
+          <div class="status paragraph-2">{{stat.value}}</div>
+        </div>
+      </nb-card-body>
+    </nb-card>
+  </div>
+</div>
+
+<div class="row">
+  <!-- SECCIÓN 2: BÚSQUEDA RÁPIDA -->
+  <div class="col-lg-8">
+    <nb-card>
+      <nb-card-header>
+        <nb-icon icon="search-outline"></nb-icon>
+        Búsqueda Rápida de Entrenadores
+      </nb-card-header>
+      <nb-card-body>
+        <form class="busqueda-form">
+          <div class="row">
+            <div class="col-md-4">
+              <input nbInput fullWidth placeholder="Deporte (ej: Yoga, CrossFit)" [(ngModel)]="busquedaRapida.deporte" name="deporte">
+            </div>
+            <div class="col-md-3">
+              <input nbInput fullWidth type="date" placeholder="Fecha" [(ngModel)]="busquedaRapida.fecha" name="fecha">
+            </div>
+            <div class="col-md-3">
+              <input nbInput fullWidth type="number" placeholder="Precio máximo (€)" [(ngModel)]="busquedaRapida.precioMaximo" name="precio">
+            </div>
+            <div class="col-md-2">
+              <button nbButton status="primary" fullWidth (click)="buscarEntrenadores()">
+                <nb-icon icon="search-outline"></nb-icon>
+                Buscar
+              </button>
+            </div>
+          </div>
+        </form>
+      </nb-card-body>
+    </nb-card>
+
+    <!-- SECCIÓN 3: PRÓXIMAS SESIONES -->
+    <nb-card>
+      <nb-card-header>
+        <nb-icon icon="calendar-outline"></nb-icon>
+        Próximas Sesiones
+      </nb-card-header>
+      <nb-card-body>
+        <div *ngIf="proximasSesiones.length === 0" class="no-data">
+          <nb-icon icon="calendar-outline" style="font-size: 3rem; opacity: 0.3;"></nb-icon>
+          <p>No tienes sesiones programadas</p>
+          <button nbButton status="success" (click)="buscarEntrenadores()">Buscar Entrenador</button>
+        </div>
+
+        <table *ngIf="proximasSesiones.length > 0" class="table">
+          <thead>
+            <tr>
+              <th>Fecha/Hora</th>
+              <th>Entrenador</th>
+              <th>Deporte</th>
+              <th>Duración</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let sesion of proximasSesiones">
+              <td>
+                <div class="fecha">
+                  <strong>{{sesion.fecha_hora | date:'shortDate'}}</strong><br>
+                  <small>{{sesion.fecha_hora | date:'shortTime'}}</small>
+                </div>
+              </td>
+              <td>
+                <div class="entrenador-info">
+                  <img [src]="sesion.entrenador.foto" alt="{{sesion.entrenador.nombre}}" class="avatar">
+                  <span>{{sesion.entrenador.nombre}}</span>
+                </div>
+              </td>
+              <td>{{sesion.deporte}}</td>
+              <td>{{sesion.duracion}} min</td>
+              <td>
+                <nb-badge [status]="getEstadoBadgeStatus(sesion.estado)" [text]="sesion.estado"></nb-badge>
+              </td>
+              <td>
+                <button nbButton size="tiny" status="info" (click)="verSesion(sesion)">
+                  <nb-icon icon="eye-outline"></nb-icon>
+                  Ver
+                </button>
+                <button nbButton size="tiny" status="danger" (click)="cancelarSesion(sesion)" *ngIf="sesion.estado !== 'CANCELADA'">
+                  <nb-icon icon="close-outline"></nb-icon>
+                  Cancelar
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </nb-card-body>
+    </nb-card>
+  </div>
+
+  <!-- SECCIÓN 4: ENTRENADORES FAVORITOS -->
+  <div class="col-lg-4">
+    <nb-card>
+      <nb-card-header>
+        <nb-icon icon="star-outline"></nb-icon>
+        Tus Entrenadores Favoritos
+      </nb-card-header>
+      <nb-card-body>
+        <div *ngIf="entrenadoresFavoritos.length === 0" class="no-data">
+          <nb-icon icon="star-outline" style="font-size: 3rem; opacity: 0.3;"></nb-icon>
+          <p>Aún no tienes entrenadores favoritos</p>
+        </div>
+
+        <div class="entrenador-card" *ngFor="let entrenador of entrenadoresFavoritos">
+          <div class="entrenador-header">
+            <img [src]="entrenador.foto_url" alt="{{entrenador.nombre_completo}}" class="entrenador-avatar">
+            <div class="entrenador-info">
+              <h6>{{entrenador.nombre_completo}}</h6>
+              <p class="especialidad">{{entrenador.especialidad}}</p>
+            </div>
+          </div>
+          <div class="entrenador-body">
+            <div class="rating">
+              <nb-icon icon="star" status="warning"></nb-icon>
+              <strong>{{entrenador.calificacion}}</strong>
+              <small>({{entrenador.total_resenas}} reseñas)</small>
+            </div>
+            <div class="precio">
+              <strong>{{entrenador.tarifa_por_hora}}€</strong>/hora
+            </div>
+          </div>
+          <div class="entrenador-actions">
+            <button nbButton status="success" fullWidth (click)="agendarConEntrenador(entrenador)">
+              <nb-icon icon="calendar-outline"></nb-icon>
+              Agendar Sesión
+            </button>
+          </div>
+        </div>
+      </nb-card-body>
+    </nb-card>
+  </div>
+</div>
