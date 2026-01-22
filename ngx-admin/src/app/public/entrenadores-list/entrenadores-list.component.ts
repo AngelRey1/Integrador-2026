@@ -28,7 +28,7 @@ export class EntrenadoresListComponent implements OnInit {
   
   filtros = {
     deporte: 'todos',
-    precioMax: 100,
+    precioMax: 500,
     modalidad: 'todos',
     nivel: 'todos',
     calificacionMin: 0
@@ -43,36 +43,43 @@ export class EntrenadoresListComponent implements OnInit {
     'Running',
     'Boxeo',
     'Ciclismo',
-    'Tenis'
+    'Tenis',
+    'Pilates',
+    'Zumba',
+    'Functional Training',
+    'Spinning',
+    'Artes Marciales',
+    'Ballet Fitness',
+    'Calistenia'
   ];
 
-  // Carrusel de destacados
-  entrenadoresDestacados: Entrenador[] = [
+  // Lista completa de entrenadores (sincronizada con home)
+  entrenadores: Entrenador[] = [
     {
       id: 1,
       nombre: 'Carlos Méndez',
-      ubicacion: 'Ciudad de México',
-      foto: 'https://i.pravatar.cc/400?img=12',
-      especialidad: 'CrossFit',
-      deportes: ['CrossFit', 'Funcional'],
-      calificacion: 5,
-      totalResenas: 89,
-      precioHora: 35,
+      ubicacion: 'Mérida',
+      foto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
+      especialidad: 'Fútbol',
+      deportes: ['Fútbol'],
+      calificacion: 4.9,
+      totalResenas: 127,
+      precioHora: 350,
       destacado: true,
       nivel: 'ELITE',
-      modalidad: ['Presencial', 'Online'],
+      modalidad: ['Presencial'],
       descripcion: 'Entrenador certificado con 10 años de experiencia'
     },
     {
       id: 2,
-      nombre: 'Ana Rodríguez',
-      ubicacion: 'Guadalajara',
-      foto: 'https://i.pravatar.cc/400?img=47',
+      nombre: 'Ana García',
+      ubicacion: 'Mérida',
+      foto: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop',
       especialidad: 'Yoga',
       deportes: ['Yoga', 'Pilates'],
-      calificacion: 5,
-      totalResenas: 124,
-      precioHora: 28,
+      calificacion: 4.95,
+      totalResenas: 89,
+      precioHora: 280,
       destacado: true,
       nivel: 'PROFESIONAL',
       modalidad: ['Presencial', 'Online'],
@@ -80,70 +87,202 @@ export class EntrenadoresListComponent implements OnInit {
     },
     {
       id: 3,
-      nombre: 'Miguel Torres',
-      ubicacion: 'Monterrey',
-      foto: 'https://i.pravatar.cc/400?img=33',
-      especialidad: 'Fútbol',
-      deportes: ['Fútbol'],
-      calificacion: 5,
-      totalResenas: 67,
-      precioHora: 40,
+      nombre: 'Jorge Sánchez',
+      ubicacion: 'Mérida',
+      foto: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop',
+      especialidad: 'CrossFit',
+      deportes: ['CrossFit', 'Funcional'],
+      calificacion: 4.8,
+      totalResenas: 156,
+      precioHora: 420,
       destacado: true,
       nivel: 'ELITE',
-      modalidad: ['Presencial'],
-      descripcion: 'Ex-futbolista profesional, entrenador UEFA Pro'
-    }
-  ];
-
-  entrenadores: Entrenador[] = [
-    ...this.entrenadoresDestacados,
+      modalidad: ['Presencial', 'Online'],
+      descripcion: 'Entrenador certificado CrossFit Level 3'
+    },
     {
       id: 4,
-      nombre: 'Laura Sánchez',
-      ubicacion: 'Puebla',
-      foto: 'https://i.pravatar.cc/400?img=45',
+      nombre: 'María López',
+      ubicacion: 'Mérida',
+      foto: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop',
       especialidad: 'Running',
-      deportes: ['Running', 'Atletismo'],
-      calificacion: 4.8,
-      totalResenas: 52,
-      precioHora: 25,
-      destacado: false,
+      deportes: ['Running'],
+      calificacion: 4.92,
+      totalResenas: 103,
+      precioHora: 300,
+      destacado: true,
       nivel: 'PROFESIONAL',
       modalidad: ['Presencial', 'Online'],
-      descripcion: 'Corredora de maratones, especialista en técnica'
+      descripcion: 'Especialista en running y maratones'
     },
     {
       id: 5,
-      nombre: 'Roberto Jiménez',
-      ubicacion: 'Ciudad de México',
-      foto: 'https://i.pravatar.cc/400?img=15',
-      especialidad: 'Natación',
-      deportes: ['Natación'],
-      calificacion: 4.9,
-      totalResenas: 43,
-      precioHora: 32,
-      destacado: false,
-      nivel: 'PROFESIONAL',
+      nombre: 'Roberto Hernández',
+      ubicacion: 'Mérida',
+      foto: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop',
+      especialidad: 'Boxeo',
+      deportes: ['Boxeo'],
+      calificacion: 4.88,
+      totalResenas: 142,
+      precioHora: 380,
+      destacado: true,
+      nivel: 'ELITE',
       modalidad: ['Presencial'],
-      descripcion: 'Entrenador olímpico, especialista en técnica de nado'
+      descripcion: 'Boxeador profesional con 12 años de experiencia'
     },
     {
       id: 6,
-      nombre: 'Sofia Martínez',
-      ubicacion: 'Querétaro',
-      foto: 'https://i.pravatar.cc/400?img=48',
-      especialidad: 'Boxeo',
-      deportes: ['Boxeo', 'Defensa personal'],
-      calificacion: 4.7,
-      totalResenas: 38,
-      precioHora: 30,
+      nombre: 'Laura Martínez',
+      ubicacion: 'Mérida',
+      foto: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop',
+      especialidad: 'Natación',
+      deportes: ['Natación'],
+      calificacion: 4.93,
+      totalResenas: 98,
+      precioHora: 320,
       destacado: false,
       nivel: 'PROFESIONAL',
       modalidad: ['Presencial'],
-      descripcion: 'Boxeadora profesional con 8 años de experiencia'
+      descripcion: 'Nadadora profesional y entrenadora certificada'
+    },
+    {
+      id: 7,
+      nombre: 'Diego Ramírez',
+      ubicacion: 'Mérida',
+      foto: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=400&h=400&fit=crop',
+      especialidad: 'Tenis',
+      deportes: ['Tenis'],
+      calificacion: 4.87,
+      totalResenas: 76,
+      precioHora: 400,
+      destacado: false,
+      nivel: 'ELITE',
+      modalidad: ['Presencial'],
+      descripcion: 'Ex-tenista profesional, entrenador certificado'
+    },
+    {
+      id: 8,
+      nombre: 'Sofia Torres',
+      ubicacion: 'Mérida',
+      foto: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop',
+      especialidad: 'Pilates',
+      deportes: ['Pilates', 'Yoga'],
+      calificacion: 4.91,
+      totalResenas: 112,
+      precioHora: 290,
+      destacado: false,
+      nivel: 'PROFESIONAL',
+      modalidad: ['Presencial', 'Online'],
+      descripcion: 'Instructora certificada de Pilates Mat y Reformer'
+    },
+    {
+      id: 9,
+      nombre: 'Luis Fernández',
+      ubicacion: 'Mérida',
+      foto: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=400&fit=crop',
+      especialidad: 'Ciclismo',
+      deportes: ['Ciclismo'],
+      calificacion: 4.85,
+      totalResenas: 134,
+      precioHora: 340,
+      destacado: false,
+      nivel: 'PROFESIONAL',
+      modalidad: ['Presencial'],
+      descripcion: 'Ciclista profesional y entrenador de ruta y montaña'
+    },
+    {
+      id: 10,
+      nombre: 'Valeria Rojas',
+      ubicacion: 'Mérida',
+      foto: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=400&fit=crop',
+      especialidad: 'Zumba',
+      deportes: ['Zumba', 'Baile'],
+      calificacion: 4.94,
+      totalResenas: 187,
+      precioHora: 250,
+      destacado: false,
+      nivel: 'PROFESIONAL',
+      modalidad: ['Presencial', 'Online'],
+      descripcion: 'Instructora certificada de Zumba y baile fitness'
+    },
+    {
+      id: 11,
+      nombre: 'Eduardo Morales',
+      ubicacion: 'Mérida',
+      foto: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop',
+      especialidad: 'Functional Training',
+      deportes: ['Functional Training', 'CrossFit'],
+      calificacion: 4.89,
+      totalResenas: 121,
+      precioHora: 370,
+      destacado: false,
+      nivel: 'ELITE',
+      modalidad: ['Presencial'],
+      descripcion: 'Especialista en entrenamiento funcional y acondicionamiento'
+    },
+    {
+      id: 12,
+      nombre: 'Patricia Silva',
+      ubicacion: 'Mérida',
+      foto: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&h=400&fit=crop',
+      especialidad: 'Spinning',
+      deportes: ['Spinning', 'Ciclismo'],
+      calificacion: 4.86,
+      totalResenas: 95,
+      precioHora: 310,
+      destacado: false,
+      nivel: 'PROFESIONAL',
+      modalidad: ['Presencial'],
+      descripcion: 'Instructora certificada de spinning y cycling indoor'
+    },
+    {
+      id: 13,
+      nombre: 'Andrés Castillo',
+      ubicacion: 'Mérida',
+      foto: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop',
+      especialidad: 'Artes Marciales',
+      deportes: ['Artes Marciales', 'Boxeo'],
+      calificacion: 4.9,
+      totalResenas: 108,
+      precioHora: 390,
+      destacado: false,
+      nivel: 'ELITE',
+      modalidad: ['Presencial'],
+      descripcion: 'Maestro de artes marciales mixtas y defensa personal'
+    },
+    {
+      id: 14,
+      nombre: 'Camila Reyes',
+      ubicacion: 'Mérida',
+      foto: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=400&fit=crop',
+      especialidad: 'Ballet Fitness',
+      deportes: ['Ballet Fitness', 'Baile'],
+      calificacion: 4.92,
+      totalResenas: 84,
+      precioHora: 330,
+      destacado: false,
+      nivel: 'PROFESIONAL',
+      modalidad: ['Presencial', 'Online'],
+      descripcion: 'Bailarina profesional e instructora de ballet fitness'
+    },
+    {
+      id: 15,
+      nombre: 'Miguel Ángel Ortiz',
+      ubicacion: 'Mérida',
+      foto: 'https://images.unsplash.com/photo-1463453091185-61582044d556?w=400&h=400&fit=crop',
+      especialidad: 'Calistenia',
+      deportes: ['Calistenia', 'Funcional'],
+      calificacion: 4.88,
+      totalResenas: 147,
+      precioHora: 280,
+      destacado: false,
+      nivel: 'PROFESIONAL',
+      modalidad: ['Presencial', 'Online'],
+      descripcion: 'Especialista en calistenia y entrenamiento con peso corporal'
     }
   ];
 
+  entrenadoresDestacados: Entrenador[] = [];
   entrenadoresFiltrados: Entrenador[] = [];
 
   // Control del carrusel
@@ -155,12 +294,37 @@ export class EntrenadoresListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.entrenadoresDestacados = this.entrenadores.filter(e => e.destacado);
+    this.entrenadoresFiltrados = [...this.entrenadores];
+
     this.route.queryParams.subscribe(params => {
       if (params['deporte']) {
-        this.filtros.deporte = params['deporte'];
+        const normalizado = params['deporte'].toLowerCase();
+        const mapaDeportes: Record<string, string> = {
+          futbol: 'Fútbol',
+          fútbol: 'Fútbol',
+          crossfit: 'CrossFit',
+          yoga: 'Yoga',
+          natacion: 'Natación',
+          natación: 'Natación',
+          running: 'Running',
+          boxeo: 'Boxeo',
+          ciclismo: 'Ciclismo',
+          tenis: 'Tenis',
+          pilates: 'Pilates',
+          zumba: 'Zumba',
+          funcional: 'Functional Training',
+          functional: 'Functional Training',
+          spinning: 'Spinning',
+          artes: 'Artes Marciales',
+          'artes marciales': 'Artes Marciales',
+          ballet: 'Ballet Fitness',
+          calistenia: 'Calistenia'
+        };
+        this.filtros.deporte = mapaDeportes[normalizado] || params['deporte'];
       }
       if (params['q']) {
-        this.searchQuery = params['q'];
+        this.searchQuery = (params['q'] as string).trim();
       }
       this.aplicarFiltros();
     });

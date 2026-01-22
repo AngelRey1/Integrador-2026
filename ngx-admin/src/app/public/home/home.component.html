@@ -1,7 +1,10 @@
 <div class="public-landing">
-  <!-- HERO CON FLOATING AVATARS -->
-  <section class="hero">
-    <!-- Floating Avatars Background -->
+  <!-- HERO IMMERSIVE CON MESH GRADIENT -->
+  <section class="hero-premium">
+    <!-- Mesh Gradient Background -->
+    <div class="mesh-gradient"></div>
+    
+    <!-- Floating Avatars Background (Subtle) -->
     <div class="floating-avatars-container">
       <div class="floating-avatar" 
         *ngFor="let avatar of avatarsFlotantes"
@@ -13,211 +16,226 @@
       </div>
     </div>
 
-    <div class="container">
-      <div class="hero-content">
-        <div class="pill">SportConnect · Entrena mejor, sin fricción</div>
-        <h1>Encuentra a tu <span class="text-primary">Coach Ideal</span><br/>en Mérida</h1>
-        <p class="lede">
-          Reserva por WhatsApp, paga seguro y entrena de inmediato.
-          Sin formularios. Sin esperas.
+    <div class="hero-overlay"></div>
+    
+    <div class="hero-content-wrapper">
+      <div class="hero-inner">
+        
+        <h1 class="hero-title">
+          Encuentra a tu <span class="highlight-neon">Coach</span>
+          <br/>en <span class="highlight-neon">Mérida</span>
+        </h1>
+        
+        <p class="hero-subtitle">
+          La plataforma más rápida para conectar con entrenadores de élite.
+          <br/>Reserva, paga y entrena sin fricción.
         </p>
 
-        <!-- Barra de Búsqueda Pill-Shape -->
-        <div class="search-box-hero">
+        <!-- Barra de Búsqueda FLOTANTE con ICONO -->
+        <div class="search-hero-premium">
           <input
             type="text"
             [(ngModel)]="searchQuery"
-            placeholder="¿Qué quieres aprender? (Ej: Fútbol, Yoga...)"
+            placeholder="Fútbol, Yoga, Natación, Box..."
             (keyup.enter)="buscarEntrenadores()"
-            class="search-input-pill"
+            class="search-input-premium"
           />
-          <button class="btn-search-pill" (click)="buscarEntrenadores()">Buscar</button>
+          <button class="btn-search-icon" (click)="buscarEntrenadores()">
+            <i eva-icon="search" fill="#FFFFFF"></i>
+          </button>
         </div>
 
-        <!-- Chips de Categorías -->
-        <div class="category-chips">
-          <div class="chip-item" *ngFor="let deporte of deportes | slice:0:6"
+        <!-- Quick Category Chips - Carrusel Automático -->
+        <div class="quick-categories">
+          <div class="quick-chip" *ngFor="let deporte of deportesVisibles"
             (click)="verEntrenadoresPorDeporte(deporte)">
-            <span class="chip-icon">{{ deporte.icon }}</span>
-            <span class="chip-text">{{ deporte.nombre }}</span>
+            {{ deporte.icon }} {{ deporte.nombre }}
           </div>
         </div>
 
-        <!-- Stats -->
-        <div class="hero-stats">
-          <div class="stat">
-            <span class="label">Entrenadores validados</span>
-            <span class="value">500+</span>
+        <!-- Hero Stats (Minimalist) -->
+        <div class="hero-stats-minimal">
+          <div class="stat-minimal">
+            <span class="stat-value">500+</span>
+            <span class="stat-label">Coaches</span>
           </div>
-          <div class="stat">
-            <span class="label">Sesiones agendadas</span>
-            <span class="value">42K</span>
+          <div class="stat-divider"></div>
+          <div class="stat-minimal">
+            <span class="stat-value">42K</span>
+            <span class="stat-label">Sesiones</span>
           </div>
-          <div class="stat">
-            <span class="label">Satisfacción</span>
-            <span class="value">4.9/5</span>
+          <div class="stat-divider"></div>
+          <div class="stat-minimal">
+            <span class="stat-value">4.9★</span>
+            <span class="stat-label">Rating</span>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- TOP ENTRENADORES EN MÉRIDA (NUEVO) -->
-  <section class="top-trainers">
-    <div class="container">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">✨ Top Entrenadores</p>
-          <h2>Los mejores coaches en Mérida</h2>
-          <p class="muted">Seleccionados por calificación, disponibilidad y experiencia verificada.</p>
-        </div>
-        <button class="link" (click)="buscarEntrenadores()">Ver todos →</button>
+  <!-- CATEGORIAS EXPLORADOR PREMIUM -->
+  <section class="explorer-section">
+    <div class="container-premium">
+      <div class="section-header">
+        <h2 class="section-title">Explora por Disciplina</h2>
+        <p class="section-subtitle">Encuentra coaches especializados en cada deporte</p>
       </div>
 
-      <div class="trainers-grid">
-        <div class="trainer-card" *ngFor="let entrenador of entrenadoresDestacados"
+      <div class="category-grid-premium">
+        <div class="category-card-modern"
+          *ngFor="let deporte of deportes"
+          (click)="verEntrenadoresPorDeporte(deporte)">
+          <div class="category-icon-box">{{ deporte.icon }}</div>
+          <h4 class="category-name">{{ deporte.nombre }}</h4>
+          <p class="category-count">{{ deporte.entrenadores }} coaches</p>
+          <div class="category-arrow">→</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOP ELITE COACHES GLASSMORPHISM -->
+  <section class="elite-coaches">
+    <div class="container-premium">
+      <div class="section-header">
+        <h2 class="section-title">Los Mejores Coaches en Mérida</h2>
+        <p class="section-subtitle">Seleccionados por excelencia, verificación y disponibilidad inmediata</p>
+      </div>
+
+      <div class="coaches-grid-premium">
+        <div class="coach-card-glass" *ngFor="let entrenador of entrenadoresDestacados"
           (click)="irAlPerfil(entrenador)">
-          <!-- Badge -->
-          <div class="badge-verified" *ngIf="entrenador.verificado">
-            ✓ VERIFICADO
+          
+          <!-- Verified Badge (Corner) -->
+          <div class="badge-elite" *ngIf="entrenador.verificado">
+            <i eva-icon="checkmark-circle-2-outline" eva-pack="outline"></i> ELITE
           </div>
 
-          <!-- Foto -->
-          <div class="trainer-image">
+          <!-- Coach Image (Large Circle/Rounded) -->
+          <div class="coach-image-premium">
             <img [src]="entrenador.foto" [alt]="entrenador.nombre" />
           </div>
 
-          <!-- Info -->
-          <div class="trainer-info">
-            <h3>{{ entrenador.nombre }}</h3>
-            <p class="sport-name">{{ entrenador.deporte }}</p>
+          <!-- Info Block (Glass Background) -->
+          <div class="coach-details-glass">
+            <h3 class="coach-name">{{ entrenador.nombre }}</h3>
+            <p class="coach-discipline">{{ entrenador.deporte }}</p>
             
-            <!-- Rating -->
-            <div class="rating">
-              <span class="stars">⭐ {{ entrenador.estrellas }}</span>
-              <span class="reviews">({{ entrenador.reviews }})</span>
+            <!-- Location -->
+            <p class="coach-location"><i eva-icon="pin-outline" eva-pack="outline"></i> Mérida</p>
+            
+            <!-- Rating Stars -->
+            <div class="rating-premium">
+              <span class="stars-neon"><i eva-icon="star" eva-pack="outline"></i> {{ entrenador.estrellas }}</span>
+              <span class="review-count">({{ entrenador.reviews }} reviews)</span>
             </div>
 
-            <!-- Precio -->
-            <div class="price-section">
-              <span class="price">${{ entrenador.precio }} MXN</span>
-              <span class="per-hour">/hora</span>
+            <!-- Price Display (Large & Clear) -->
+            <div class="price-display-premium">
+              <span class="price-large">${{ entrenador.precio }}</span>
+              <span class="price-currency">MXN/hora</span>
             </div>
 
-            <!-- CTA -->
-            <button class="btn-contact">Contactar</button>
+            <!-- CTA Button (Gradient) -->
+            <button class="btn-cta-elite" (click)="irAlPerfil(entrenador); $event.stopPropagation()">
+              Ver Perfil
+            </button>
           </div>
         </div>
       </div>
-    </div>
-  </section>
 
-  <!-- CATEGORIAS DESTACADAS -->
-  <section class="categories">
-    <div class="container">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">Especialidades</p>
-          <h2>Explora entrenadores por disciplina</h2>
-          <p class="muted">Filtra por deporte, precio y calificación.</p>
-        </div>
-        <button class="link" (click)="buscarEntrenadores()">Ver todos →</button>
-      </div>
-
-      <div class="category-grid">
-        <div
-          class="category-card"
-          *ngFor="let deporte of deportes"
-          (click)="verEntrenadoresPorDeporte(deporte)"
-        >
-          <div class="icon-bubble">{{ deporte.icon }}</div>
-          <div>
-            <h3>{{ deporte.nombre }}</h3>
-            <p class="muted">{{ deporte.entrenadores }} entrenadores</p>
-          </div>
-          <span class="chevron">→</span>
-        </div>
+      <!-- Link to See All -->
+      <div class="see-all-section">
+        <button class="btn-see-all" (click)="buscarEntrenadores()">Ver todos los coaches →</button>
       </div>
     </div>
   </section>
 
-  <!-- VALUE PROPS -->
-  <section class="value">
-    <div class="container">
-      <div class="section-head center">
-        <p class="eyebrow">Lo que obtienes</p>
-        <h2>Una experiencia de reserva senior-level</h2>
-        <p class="muted">Conversión rápida, pagos seguros y comunicación directa.</p>
+  <!-- VALUE PROPS PREMIUM -->
+  <section class="value-premium">
+    <div class="container-premium">
+      <div class="value-header">
+        <h2 class="section-title">Por Qué SportConnect es Diferente</h2>
+        <p class="section-subtitle">La experiencia de nivel profesional que los coaches de élite merecen</p>
       </div>
 
-      <div class="value-grid">
-        <div class="value-card">
-          <div class="icon">⚡</div>
-          <h3>Sin fricción</h3>
-          <p>Reserva por WhatsApp/Telegram y recibe código de acceso en minutos.</p>
+      <div class="value-cards-grid">
+        <div class="value-card-premium">
+          <div class="icon-premium"><i eva-icon="bolt-outline" eva-pack="outline"></i></div>
+          <h3>Reserva Instantánea</h3>
+          <p>WhatsApp, pago seguro y código de acceso en menos de 5 minutos.</p>
         </div>
-        <div class="value-card">
-          <div class="icon">🛡️</div>
-          <h3>Pago seguro</h3>
-          <p>Links de pago verificados y factura inmediata tras la reserva.</p>
+        <div class="value-card-premium">
+          <div class="icon-premium"><i eva-icon="shield-outline" eva-pack="outline"></i></div>
+          <h3>100% Seguro</h3>
+          <p>Escrow de pagos, facturación inmediata y cobertura de cancelación.</p>
         </div>
-        <div class="value-card">
-          <div class="icon">🌎</div>
-          <h3>Presencial u online</h3>
-          <p>Filtra por cercanía, modalidad y precio sin perder calidad.</p>
+        <div class="value-card-premium">
+          <div class="icon-premium"><i eva-icon="target-outline" eva-pack="outline"></i></div>
+          <h3>Presencial + Online</h3>
+          <p>Flexible: elige modalidad, horario y ubicación sin restricciones.</p>
         </div>
-        <div class="value-card">
-          <div class="icon">⭐</div>
-          <h3>Ranking transparente</h3>
-          <p>Calificaciones verificadas, badges de nivel y entrenadores destacados.</p>
+        <div class="value-card-premium">
+          <div class="icon-premium">⭐</div>
+          <h3>Transparencia Total</h3>
+          <p>Ratings verificados, badges de experiencia y reseñas auténticas.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- PASOS -->
-  <section class="steps">
-    <div class="container">
-      <div class="section-head center">
-        <p class="eyebrow">Flow</p>
-        <h2>Del chat al entrenamiento en 4 pasos</h2>
-      </div>
-      <div class="steps-row">
-        <div class="step">
-          <div class="step-number">1</div>
-          <h3>Elige tu deporte</h3>
-          <p>Filtra y encuentra el perfil ideal.</p>
+  <!-- FLOW 4 PASOS MINIMALIST -->
+  <section class="flow-section">
+    <div class="container-premium">
+      <h2 class="section-title center-text">De Búsqueda a Entrenamiento en 4 Pasos</h2>
+      
+      <div class="steps-flow">
+        <div class="flow-step">
+          <div class="step-number-circle">1</div>
+          <h4>Busca tu Disciplina</h4>
+          <p>Fútbol, Yoga, Box, Natación...</p>
         </div>
-        <div class="step">
-          <div class="step-number">2</div>
-          <h3>Escribe por WhatsApp</h3>
-          <p>Coordina horarios en segundos.</p>
+        
+        <div class="flow-arrow">→</div>
+        
+        <div class="flow-step">
+          <div class="step-number-circle">2</div>
+          <h4>Elige tu Coach</h4>
+          <p>Por rating, ubicación y precio</p>
         </div>
-        <div class="step">
-          <div class="step-number">3</div>
-          <h3>Pago seguro</h3>
-          <p>Recibe tu comprobante y clave.</p>
+        
+        <div class="flow-arrow">→</div>
+        
+        <div class="flow-step">
+          <div class="step-number-circle">3</div>
+          <h4>Paga Seguro</h4>
+          <p>WhatsApp + Enlace de pago</p>
         </div>
-        <div class="step">
-          <div class="step-number">4</div>
-          <h3>Accede al panel</h3>
-          <p>Gestiona reservas y reseñas.</p>
+        
+        <div class="flow-arrow">→</div>
+        
+        <div class="flow-step">
+          <div class="step-number-circle">4</div>
+          <h4>Entrena Hoy</h4>
+          <p>Acceso inmediato al panel</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- CTA FINAL -->
-  <section class="cta">
-    <div class="container cta-box">
-      <div>
-        <p class="eyebrow">Listo para empezar</p>
-        <h2>Reserva hoy y recibe tu código en minutos</h2>
-        <p class="muted">Sin registro previo. Solo elige, paga y entrena.</p>
-      </div>
-      <div class="cta-actions">
-        <button class="btn primary" (click)="buscarEntrenadores()">Ver entrenadores</button>
-        <button class="btn ghost" routerLink="/entrenadores">Explorar categorías</button>
+  <!-- CTA FINAL PREMIUM -->
+  <section class="cta-premium">
+    <div class="cta-inner">
+      <h2>Reserva Tu Primera Sesión Hoy</h2>
+      <p>Acceso instantáneo a coaches verificados sin trámites previos</p>
+      <div class="cta-buttons">
+        <button class="btn-primary-large" (click)="buscarEntrenadores()">
+          <i eva-icon="search-outline" eva-pack="outline"></i> Explorar Coaches
+        </button>
+        <button class="btn-secondary-large" routerLink="/entrenadores">
+          Ver Categorías
+        </button>
       </div>
     </div>
   </section>

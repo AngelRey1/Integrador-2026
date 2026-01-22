@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 
 interface Deporte {
@@ -24,8 +24,11 @@ interface EntrenadorDestacado {
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
-export class PublicHomeComponent implements OnInit {
+export class PublicHomeComponent implements OnInit, OnDestroy {
   searchQuery = '';
+  deportesVisibles: Deporte[] = [];
+  private carouselInterval: any;
+  private currentIndex = 0;
   
   deportes: Deporte[] = [
     { nombre: 'Fútbol', icon: '⚽', slug: 'futbol', entrenadores: 152 },
@@ -85,12 +88,158 @@ export class PublicHomeComponent implements OnInit {
       reviews: 103,
       precio: 300,
       verificado: true
+    },
+    {
+      id: 5,
+      nombre: 'Roberto Hernández',
+      deporte: 'Boxeo',
+      foto: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop',
+      estrellas: 4.88,
+      reviews: 142,
+      precio: 380,
+      verificado: true
+    },
+    {
+      id: 6,
+      nombre: 'Laura Martínez',
+      deporte: 'Natación',
+      foto: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop',
+      estrellas: 4.93,
+      reviews: 98,
+      precio: 320,
+      verificado: true
+    },
+    {
+      id: 7,
+      nombre: 'Diego Ramírez',
+      deporte: 'Tenis',
+      foto: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=400&h=400&fit=crop',
+      estrellas: 4.87,
+      reviews: 76,
+      precio: 400,
+      verificado: true
+    },
+    {
+      id: 8,
+      nombre: 'Sofia Torres',
+      deporte: 'Pilates',
+      foto: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop',
+      estrellas: 4.91,
+      reviews: 112,
+      precio: 290,
+      verificado: true
+    },
+    {
+      id: 9,
+      nombre: 'Luis Fernández',
+      deporte: 'Ciclismo',
+      foto: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=400&fit=crop',
+      estrellas: 4.85,
+      reviews: 134,
+      precio: 340,
+      verificado: true
+    },
+    {
+      id: 10,
+      nombre: 'Valeria Rojas',
+      deporte: 'Zumba',
+      foto: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=400&fit=crop',
+      estrellas: 4.94,
+      reviews: 187,
+      precio: 250,
+      verificado: true
+    },
+    {
+      id: 11,
+      nombre: 'Eduardo Morales',
+      deporte: 'Functional Training',
+      foto: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop',
+      estrellas: 4.89,
+      reviews: 121,
+      precio: 370,
+      verificado: true
+    },
+    {
+      id: 12,
+      nombre: 'Patricia Silva',
+      deporte: 'Spinning',
+      foto: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&h=400&fit=crop',
+      estrellas: 4.86,
+      reviews: 95,
+      precio: 310,
+      verificado: true
+    },
+    {
+      id: 13,
+      nombre: 'Andrés Castillo',
+      deporte: 'Artes Marciales',
+      foto: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop',
+      estrellas: 4.9,
+      reviews: 108,
+      precio: 390,
+      verificado: true
+    },
+    {
+      id: 14,
+      nombre: 'Camila Reyes',
+      deporte: 'Ballet Fitness',
+      foto: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=400&fit=crop',
+      estrellas: 4.92,
+      reviews: 84,
+      precio: 330,
+      verificado: true
+    },
+    {
+      id: 15,
+      nombre: 'Miguel Ángel Ortiz',
+      deporte: 'Calistenia',
+      foto: 'https://images.unsplash.com/photo-1463453091185-61582044d556?w=400&h=400&fit=crop',
+      estrellas: 4.88,
+      reviews: 147,
+      precio: 280,
+      verificado: true
     }
   ];
 
   constructor(private router: Router) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    // Aleatorizar el orden de deportes al iniciar (para que sea diferente cada vez)
+    this.deportes = this.shuffleArray([...this.deportes]);
+    
+    // Iniciar con las primeras 5 categorías
+    this.actualizarDeportesVisibles();
+    
+    // Rotar categorías cada 20 segundos
+    this.carouselInterval = setInterval(() => {
+      this.currentIndex = (this.currentIndex + 1) % this.deportes.length;
+      this.actualizarDeportesVisibles();
+    }, 20000);
+  }
+
+  ngOnDestroy(): void {
+    // Limpiar interval al destruir el componente
+    if (this.carouselInterval) {
+      clearInterval(this.carouselInterval);
+    }
+  }
+
+  shuffleArray<T>(array: T[]): T[] {
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
+  }
+
+  actualizarDeportesVisibles(): void {
+    this.deportesVisibles = [];
+    for (let i = 0; i < 5; i++) {
+      const index = (this.currentIndex + i) % this.deportes.length;
+      this.deportesVisibles.push(this.deportes[index]);
+    }
+  }
 
   buscarEntrenadores() {
     this.router.navigate(['/entrenadores'], {
