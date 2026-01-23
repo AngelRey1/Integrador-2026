@@ -1,0 +1,112 @@
+<div class="reserva-container">
+  <div class="reserva-header">
+    <h2 class="reserva-title">Reservar con {{ data?.entrenador?.nombre || 'Entrenador' }}</h2>
+    <p class="reserva-subtitle">{{ data?.entrenador?.especialidad }}</p>
+  </div>
+
+  <div *ngIf="!enviado" class="formulario-reserva">
+    <div class="form-group">
+      <label>Nombre Completo *</label>
+      <input 
+        type="text" 
+        [(ngModel)]="formulario.nombreCliente" 
+        placeholder="Tu nombre"
+        class="form-input"
+      />
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Email *</label>
+        <input 
+          type="email" 
+          [(ngModel)]="formulario.email" 
+          placeholder="tu@email.com"
+          class="form-input"
+        />
+      </div>
+      <div class="form-group">
+        <label>Teléfono *</label>
+        <input 
+          type="tel" 
+          [(ngModel)]="formulario.telefono" 
+          placeholder="+52 999 123 4567"
+          class="form-input"
+        />
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Fecha Preferida *</label>
+        <input 
+          type="date" 
+          [(ngModel)]="formulario.fechaPreferida"
+          class="form-input"
+        />
+      </div>
+      <div class="form-group">
+        <label>Hora Preferida *</label>
+        <input 
+          type="time" 
+          [(ngModel)]="formulario.horaPreferida"
+          class="form-input"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Modalidad</label>
+      <div class="modalidad-options">
+        <label class="radio-option">
+          <input 
+            type="radio" 
+            [(ngModel)]="formulario.modalidad" 
+            value="presencial"
+            name="modalidad"
+          />
+          <span>Presencial</span>
+        </label>
+        <label class="radio-option">
+          <input 
+            type="radio" 
+            [(ngModel)]="formulario.modalidad" 
+            value="online"
+            name="modalidad"
+          />
+          <span>Online</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Notas Adicionales</label>
+      <textarea 
+        [(ngModel)]="formulario.notas" 
+        placeholder="Cuéntale al entrenador tus objetivos..."
+        class="form-textarea"
+        rows="3"
+      ></textarea>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn-enviar" (click)="enviarReserva()" [disabled]="enviando">
+        {{ enviando ? 'Enviando...' : 'Enviar Reserva' }}
+      </button>
+      <button class="btn-cancelar" (click)="cancelar()">Cancelar</button>
+    </div>
+  </div>
+
+  <div *ngIf="enviado" class="mensaje-exito">
+    <div class="exito-icon">✓</div>
+    <h3>¡Reserva Enviada!</h3>
+    <p>
+      Hemos recibido tu solicitud. El entrenador te contactará por WhatsApp en los próximos minutos.
+    </p>
+    <p class="detalles">
+      <strong>Entrenador:</strong> {{ data?.entrenador?.nombre }}<br/>
+      <strong>Fecha:</strong> {{ formulario.fechaPreferida }}<br/>
+      <strong>Hora:</strong> {{ formulario.horaPreferida }}
+    </p>
+  </div>
+</div>

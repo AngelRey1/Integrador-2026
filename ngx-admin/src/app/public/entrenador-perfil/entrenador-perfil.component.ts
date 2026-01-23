@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { ReservaModalComponent } from '../reserva-modal/reserva-modal.component';
 
 interface Resena {
   id: number;
@@ -316,7 +318,7 @@ export class EntrenadorPerfilComponent implements OnInit {
 
   tabActiva = 'sobre-mi';
 
-  constructor(private route: ActivatedRoute, private router: Router) {}
+  constructor(private route: ActivatedRoute, private router: Router, private dialog: MatDialog) {}
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
@@ -332,6 +334,12 @@ export class EntrenadorPerfilComponent implements OnInit {
       this.router.navigate(['/entrenadores']);
       return;
     }
+
+    // Scroll al top de la página suavemente
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
 
     // Genera datos ampliados para el perfil a partir del entrenador base
     const prefijo = encontrado.nombre.split(' ')[0].toLowerCase();
@@ -394,5 +402,15 @@ export class EntrenadorPerfilComponent implements OnInit {
       navigator.clipboard.writeText(url);
       alert('¡Enlace copiado al portapapeles!');
     }
+  }
+
+  abrirModalReserva() {
+    if (!this.entrenador) return;
+    this.dialog.open(ReservaModalComponent, {
+      width: '600px',
+      maxWidth: '90vw',
+      data: { entrenador: this.entrenador },
+      disableClose: false
+    });
   }
 }

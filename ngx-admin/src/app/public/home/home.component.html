@@ -1,4 +1,8 @@
-<div class="public-landing">
+<nb-layout>
+  <nb-layout-column class="no-layout-padding">
+    <app-shared-header></app-shared-header>
+
+    <div class="public-landing">
   <!-- HERO IMMERSIVE CON MESH GRADIENT -->
   <section class="hero-premium">
     <!-- Mesh Gradient Background -->
@@ -20,7 +24,6 @@
     
     <div class="hero-content-wrapper">
       <div class="hero-inner">
-        
         <h1 class="hero-title">
           Encuentra a tu <span class="highlight-neon">Coach</span>
           <br/>en <span class="highlight-neon">Mérida</span>
@@ -227,16 +230,37 @@
   <!-- CTA FINAL PREMIUM -->
   <section class="cta-premium">
     <div class="cta-inner">
-      <h2>Reserva Tu Primera Sesión Hoy</h2>
-      <p>Acceso instantáneo a coaches verificados sin trámites previos</p>
+      <div class="cta-badge">🚀 COMIENZA HOY</div>
+      <h2>Reserva Tu Primera Sesión</h2>
+      <p>Acceso instantáneo a coaches verificados. Sin trámites, sin complicaciones.</p>
+      
+      <div class="cta-features">
+        <div class="feature-item">
+          <span class="feature-icon">✓</span>
+          <span class="feature-text">Coaches Verificados</span>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon">✓</span>
+          <span class="feature-text">Pago Seguro</span>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon">✓</span>
+          <span class="feature-text">Entrena Hoy Mismo</span>
+        </div>
+      </div>
+      
       <div class="cta-buttons">
         <button class="btn-primary-large" (click)="buscarEntrenadores()">
           <i eva-icon="search-outline" eva-pack="outline"></i> Explorar Coaches
         </button>
         <button class="btn-secondary-large" routerLink="/entrenadores">
-          Ver Categorías
+          <i eva-icon="list-outline" eva-pack="outline"></i> Ver Categorías
         </button>
       </div>
     </div>
   </section>
 </div>
+
+<app-shared-footer></app-shared-footer>
+  </nb-layout-column>
+</nb-layout>

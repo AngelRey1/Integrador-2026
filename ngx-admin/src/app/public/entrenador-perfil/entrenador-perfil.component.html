@@ -1,12 +1,18 @@
-<div class="perfil-container">
+<nb-layout>
+  <nb-layout-column class="no-layout-padding">
+    <app-shared-header></app-shared-header>
+
+    <div class="perfil-container">
   <!-- Hero Section -->
   <section class="perfil-hero">
-    <div class="container">
-      <button class="btn-volver" routerLink="/entrenadores">
-        ← Volver a entrenadores
+    <div class="hero-header">
+      <button class="btn-volver" routerLink="/entrenadores" title="Volver a entrenadores">
+        <i eva-icon="arrow-back-outline" eva-pack="outline"></i> Volver
       </button>
+      <h1 class="hero-title" *ngIf="entrenador">{{ entrenador.nombre }}</h1>
+    </div>
 
-      <div class="hero-content">
+    <div class="hero-content" *ngIf="entrenador">
         <div class="hero-left">
           <div class="foto-principal">
             <img [src]="entrenador.foto" [alt]="entrenador.nombre" />
@@ -76,9 +82,13 @@
               <span class="precio-label">Precio por hora</span>
               <span class="precio-valor">${{ entrenador.precioHora }}</span>
             </div>
+            <button class="btn-reservar" (click)="abrirModalReserva()">
+              <i eva-icon="calendar-outline" eva-pack="outline"></i>
+              Reservar
+            </button>
             <button class="btn-whatsapp" (click)="contactarWhatsApp()">
               <span class="whatsapp-icon">💬</span>
-              Reservar por WhatsApp
+              WhatsApp
             </button>
           </div>
 
@@ -87,8 +97,7 @@
           </button>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
   <!-- Tabs Section -->
   <section class="tabs-section">
@@ -230,13 +239,10 @@
   <!-- CTA Flotante -->
   <div class="cta-flotante">
     <div class="cta-content">
-      <div class="cta-info">
-        <span class="cta-precio">${{ entrenador.precioHora }}/hora</span>
-        <span class="cta-text">Empieza tu transformación hoy</span>
-      </div>
-      <button class="btn-reservar-flotante" (click)="contactarWhatsApp()">
-        💬 Reservar por WhatsApp
-      </button>
     </div>
   </div>
 </div>
+
+<app-shared-footer></app-shared-footer>
+  </nb-layout-column>
+</nb-layout>

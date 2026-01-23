@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 interface Entrenador {
@@ -23,6 +23,7 @@ interface Entrenador {
   styleUrls: ['./entrenadores-list.component.scss']
 })
 export class EntrenadoresListComponent implements OnInit {
+  @ViewChild('filtrosSectionRef') filtrosSection: ElementRef;
   searchQuery = '';
   ubicacionQuery = '';
   
@@ -298,6 +299,10 @@ export class EntrenadoresListComponent implements OnInit {
     this.entrenadoresFiltrados = [...this.entrenadores];
 
     this.route.queryParams.subscribe(params => {
+      // Reset filtros
+      this.filtros.deporte = 'todos';
+      this.searchQuery = '';
+
       if (params['deporte']) {
         const normalizado = params['deporte'].toLowerCase();
         const mapaDeportes: Record<string, string> = {
@@ -315,6 +320,7 @@ export class EntrenadoresListComponent implements OnInit {
           zumba: 'Zumba',
           funcional: 'Functional Training',
           functional: 'Functional Training',
+          'functional training': 'Functional Training',
           spinning: 'Spinning',
           artes: 'Artes Marciales',
           'artes marciales': 'Artes Marciales',
@@ -365,6 +371,20 @@ export class EntrenadoresListComponent implements OnInit {
 
       return true;
     });
+
+    // Scroll suave a la sección de filtros/resultados después de un pequeño delay
+    setTimeout(() => {
+      this.scrollToFiltros();
+    }, 100);
+  }
+
+  scrollToFiltros() {
+    if (this.filtrosSection) {
+      this.filtrosSection.nativeElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
   }
 
   verPerfil(entrenador: Entrenador) {
