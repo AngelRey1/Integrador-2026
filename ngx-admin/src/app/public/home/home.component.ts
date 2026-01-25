@@ -29,6 +29,7 @@ export class PublicHomeComponent implements OnInit, OnDestroy {
   deportesVisibles: Deporte[] = [];
   private carouselInterval: any;
   private currentIndex = 0;
+  
   pasosEntrenador = [
     {
       numero: '1',

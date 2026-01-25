@@ -243,6 +243,17 @@ export class AgendarSesionComponent implements OnInit {
     this.router.navigate(['/pages/cliente/buscar-entrenadores']);
   }
 
+  cerrarModal(): void {
+    // Confirmar si tiene datos sin guardar
+    if (this.pasoActual > 0 && !this.reservaConfirmada) {
+      if (confirm('¿Seguro que deseas salir? Perderás los datos ingresados.')) {
+        this.router.navigate(['/pages/cliente/cliente-dashboard']);
+      }
+    } else {
+      this.router.navigate(['/pages/cliente/cliente-dashboard']);
+    }
+  }
+
   // Utilidades
   getEstrellas(calificacion: number): number[] {
     return Array(Math.floor(calificacion)).fill(0);

@@ -1,8 +1,8 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogModule } from '@angular/material/dialog';
-import { NbLayoutModule } from '@nebular/theme';
+import { NbLayoutModule, NbIconModule } from '@nebular/theme';
 import { EntrenadoresListComponent } from '../entrenadores-list/entrenadores-list.component';
 import { EntrenadorPerfilComponent } from '../entrenador-perfil/entrenador-perfil.component';
 import { ReservaModalComponent } from '../reserva-modal/reserva-modal.component';
@@ -18,8 +18,10 @@ import { SharedModule } from '../shared/shared.module';
   imports: [
     CommonModule,
     FormsModule,
+    ReactiveFormsModule,
     MatDialogModule,
     NbLayoutModule,
+    NbIconModule,
     ClientRoutingModule,
     SharedModule,
   ],

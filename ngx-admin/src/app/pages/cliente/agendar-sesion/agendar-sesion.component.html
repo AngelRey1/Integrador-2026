@@ -2,7 +2,12 @@
   <!-- Stepper Principal -->
   <nb-card>
     <nb-card-header>
-      <h4>Agendar Nueva Sesión</h4>
+      <div class="header-wrapper">
+        <h4>Agendar Nueva Sesión</h4>
+        <button nbButton ghost status="basic" class="btn-close" (click)="cerrarModal()">
+          <nb-icon icon="close-outline"></nb-icon>
+        </button>
+      </div>
     </nb-card-header>
     <nb-card-body>
       <nb-stepper [linear]="true" [(selectedIndex)]="pasoActual">

@@ -407,10 +407,11 @@ export class EntrenadorPerfilComponent implements OnInit {
   abrirModalReserva() {
     if (!this.entrenador) return;
     this.dialog.open(ReservaModalComponent, {
-      width: '600px',
-      maxWidth: '90vw',
+      width: '750px',
+      maxWidth: '95vw',
       data: { entrenador: this.entrenador },
-      disableClose: false
+      disableClose: false,
+      panelClass: 'modal-reserva-panel'
     });
   }
 }

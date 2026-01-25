@@ -58,33 +58,26 @@ $border-color: #E2E8F0;
 
 // ===== 2. CARRUSEL DESTACADOS - LAYOUT HORIZONTAL =====
 .destacados-carousel {
-  background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
-  padding: 3rem 1.5rem;
+  background: #F3F4F6;
+  padding: 3rem 0.5rem 2rem;
   color: white;
 }
 
 .container {
-  max-width: 1280px;
+  max-width: 1600px;
   margin: 0 auto;
-}
-
-.section-title {
-  font-size: 1.8rem;
-  font-weight: 900;
-  text-align: center;
-  margin-bottom: 2rem;
-  color: white;
+  padding: 0;
 }
 
 .carousel-container {
   position: relative;
   overflow: hidden;
-  padding: 0 50px;
+  padding: 0 80px;
 }
 
 .carousel-content {
   position: relative;
-  height: 380px;
+  height: 470px;
 }
 
 .carousel-item {
@@ -105,24 +98,13 @@ $border-color: #E2E8F0;
 // CARD HORIZONTAL
 .carousel-card-horizontal {
   display: flex;
-  background: white;
+  background: linear-gradient(135deg, #0A7B8A 0%, #00F0FF 100%);
   border-radius: 24px;
-  overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0, 240, 255, 0.25), 0 10px 40px rgba(0, 0, 0, 0.15);
-  height: 360px;
+  overflow: visible;
+  box-shadow: 0 12px 40px rgba(0, 240, 255, 0.25);
+  height: 450px;
   position: relative;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #FFD700, #FFA500, #FFD700);
-    background-size: 200% 100%;
-    animation: shimmer 2s infinite;
-  }
+  padding: 3.5rem 4rem;
 }
 
 @keyframes shimmer {
@@ -132,39 +114,36 @@ $border-color: #E2E8F0;
 
 .carousel-left {
   flex: 1;
-  padding: 2.5rem 2.5rem 3rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 1rem;
-  background: white;
-  color: $secondary-color;
+  color: white;
   position: relative;
   overflow: visible;
 }
 
+.carousel-title {
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: white;
+  margin: 0 0 1.5rem 0;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
 .badge-destacado {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FFD700 100%);
-  background-size: 200% 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #FFD700;
   color: #111827;
   padding: 0.6rem 1.2rem;
-  border-radius: 25px;
-  font-size: 0.8rem;
+  border-radius: 0 0 16px 0;
+  font-size: 0.75rem;
   font-weight: 900;
-  width: fit-content;
-  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  animation: goldShine 3s ease-in-out infinite;
-  
-  &::before {
-    content: '⭐';
-    font-size: 1rem;
-    animation: starPulse 2s ease-in-out infinite;
-  }
+  letter-spacing: 1px;
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+  z-index: 10;
 }
 
 @keyframes goldShine {
@@ -178,38 +157,11 @@ $border-color: #E2E8F0;
 }
 
 .carousel-right {
-  flex: 0 0 42%;
-  background: linear-gradient(135deg, $primary-color 0%, #00D9B5 50%, #1ADBAF 100%);
+  flex: 0 0 280px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
   position: relative;
-  overflow: hidden;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    width: 300px;
-    height: 300px;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-    border-radius: 50%;
-    top: -50px;
-    right: -50px;
-    animation: floatBubble 6s ease-in-out infinite;
-  }
-  
-  &::after {
-    content: '';
-    position: absolute;
-    width: 200px;
-    height: 200px;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
-    border-radius: 50%;
-    bottom: -30px;
-    left: -30px;
-    animation: floatBubble 8s ease-in-out infinite reverse;
-  }
 }
 
 @keyframes floatBubble {
@@ -218,43 +170,36 @@ $border-color: #E2E8F0;
 }
 
 .photo-wrapper {
-  width: 220px;
-  height: 220px;
+  width: 280px;
+  height: 280px;
   border-radius: 50%;
   overflow: hidden;
-  border: 5px solid white;
-  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.35), 0 0 0 12px rgba(255, 255, 255, 0.1);
+  border: 6px solid white;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
   position: relative;
   z-index: 10;
-  transition: transform 0.3s ease;
-  
-  &:hover {
-    transform: scale(1.05);
-  }
   
   img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: center top;
+    object-position: center;
   }
 }
 
 .carousel-nombre {
-  font-size: 2.2rem;
+  font-size: 2rem;
   font-weight: 900;
   margin: 0;
-  background: linear-gradient(135deg, $secondary-color, darken($secondary-color, 10%));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: white;
   line-height: 1.2;
 }
 
 .carousel-ubicacion {
-  font-size: 0.95rem;
-  color: $text-gray;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.95);
   margin: 0;
+  font-weight: 600;
 }
 
 .carousel-especialidad {
@@ -267,79 +212,48 @@ $border-color: #E2E8F0;
 .carousel-rating {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  padding: 0.8rem 1.2rem;
-  background: linear-gradient(135deg, #FFF7ED, #FFFBEB);
-  border-radius: 12px;
-  border: 2px solid #FEF3C7;
-  width: fit-content;
+  gap: 0.8rem;
   
   .star {
-    font-size: 1.3rem;
-    filter: drop-shadow(0 2px 4px rgba(255, 215, 0, 0.3));
+    font-size: 1.2rem;
+    color: #FFD700;
   }
   
   .rating-text {
-    font-size: 0.95rem;
-    color: #92400E;
+    font-size: 1rem;
+    color: white;
     font-weight: 700;
   }
 }
 
 .carousel-precio {
-  font-size: 2rem;
+  font-size: 2.8rem;
   font-weight: 900;
-  background: linear-gradient(135deg, $primary-color, $secondary-color);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin: 0.5rem 0;
-  line-height: 1.3;
-  display: inline-block;
-  filter: drop-shadow(0 2px 8px rgba(0, 240, 255, 0.3));
+  color: #00F0FF;
+  margin: 1rem 0;
+  text-shadow: 0 2px 12px rgba(0, 240, 255, 0.4);
 }
 
 .btn-ver-perfil {
-  background: linear-gradient(135deg, $primary-color 0%, $secondary-color 100%);
-  background-size: 200% 100%;
+  background: #00F0FF;
   color: #111827;
   border: none;
-  padding: 1.1rem 2.5rem;
-  border-radius: 35px;
+  padding: 1rem 2.5rem;
+  border-radius: 12px;
   font-weight: 900;
   font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 6px 20px rgba(0, 240, 255, 0.4);
+  box-shadow: 0 8px 24px rgba(0, 240, 255, 0.4);
   width: fit-content;
-  position: relative;
-  overflow: hidden;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-    transition: left 0.5s ease;
-  }
+  margin-top: 0.5rem;
   
   &:hover {
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 12px 35px rgba(0, 240, 255, 0.5);
-    background-position: 100% 0;
-    
-    &::before {
-      left: 100%;
-    }
-  }
-  
-  &:active {
-    transform: translateY(-1px) scale(0.98);
+    background: #00D09C;
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(0, 240, 255, 0.6);
   }
 }
 
@@ -348,21 +262,23 @@ $border-color: #E2E8F0;
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: white;
-  color: $secondary-color;
+  background: rgba(0, 240, 255, 0.15);
+  backdrop-filter: blur(10px);
+  color: #00F0FF;
   border: none;
-  width: 40px;
-  height: 40px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   cursor: pointer;
   z-index: 10;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   
   &:hover {
-    background: $primary-color;
-    color: white;
+    background: rgba(0, 240, 255, 0.25);
     transform: translateY(-50%) scale(1.1);
   }
   
@@ -377,24 +293,21 @@ $border-color: #E2E8F0;
 
 // INDICADORES
 .carousel-indicators {
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-top: 1.5rem;
+  display: none;
 }
 
 .indicator {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(0, 240, 255, 0.3);
   cursor: pointer;
   transition: all 0.3s ease;
   
   &.active {
-    background: white;
-    width: 28px;
-    border-radius: 5px;
+    background: #00F0FF;
+    width: 32px;
+    border-radius: 6px;
   }
   
   &:hover {

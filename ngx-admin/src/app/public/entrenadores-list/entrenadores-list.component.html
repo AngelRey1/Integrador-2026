@@ -14,7 +14,6 @@
   <!-- Carrusel de Destacados -->
   <section class="destacados-carousel">
     <div class="container">
-      <h2 class="section-title">⭐ Entrenadores Destacados</h2>
       
       <div class="carousel-container">
         <button class="carousel-btn prev" (click)="anteriorDestacado()">
@@ -28,11 +27,15 @@
             [class.active]="i === carruselIndex"
           >
             <div class="carousel-card-horizontal">
+              <!-- Badge DESTACADO en esquina superior izquierda -->
+              <div class="badge-destacado">
+                ⭐ DESTACADO
+              </div>
+
               <div class="carousel-left">
-                <span class="badge-destacado">⭐ Destacado</span>
+                <h2 class="carousel-title">Entrenadores Destacados</h2>
                 <h3 class="carousel-nombre">{{ entrenador.nombre }}</h3>
                 <p class="carousel-ubicacion">📍 {{ entrenador.ubicacion }}</p>
-                <p class="carousel-especialidad">{{ entrenador.especialidad }}</p>
                 <div class="carousel-rating">
                   <span *ngFor="let star of getEstrellas(entrenador.calificacion)" class="star">
                     {{ star === 'full' ? '⭐' : '☆' }}
@@ -41,7 +44,7 @@
                 </div>
                 <p class="carousel-precio">${{ entrenador.precioHora }}/hora</p>
                 <button class="btn-ver-perfil" (click)="verPerfil(entrenador)">
-                  Ver Perfil
+                  VER PERFIL
                 </button>
               </div>
               <div class="carousel-right">
