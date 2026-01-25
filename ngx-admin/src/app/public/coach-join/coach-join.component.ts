@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-coach-join',
+  selector: 'ngx-coach-join',
   templateUrl: './coach-join.component.html',
   styleUrls: ['./coach-join.component.scss']
 })

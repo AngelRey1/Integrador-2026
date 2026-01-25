@@ -45,7 +45,7 @@ type EntrenadorPerfil = Entrenador & {
 };
 
 @Component({
-  selector: 'app-entrenador-perfil',
+  selector: 'ngx-entrenador-perfil',
   templateUrl: './entrenador-perfil.component.html',
   styleUrls: ['./entrenador-perfil.component.scss']
 })

@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../@core/services/auth.service';
 
 @Component({
-  selector: 'app-solicitud-rechazada',
+  selector: 'ngx-solicitud-rechazada',
   template: `
     <div style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 20px;">
       <div style="background: white; border-radius: 12px; padding: 40px; max-width: 500px; width: 100%; box-shadow: 0 10px 40px rgba(0,0,0,0.3); text-align: center;">

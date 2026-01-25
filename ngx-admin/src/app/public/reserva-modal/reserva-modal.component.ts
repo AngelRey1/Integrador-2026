@@ -2,7 +2,7 @@ import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 @Component({
-  selector: 'app-reserva-modal',
+  selector: 'ngx-reserva-modal',
   templateUrl: './reserva-modal.component.html',
   styleUrls: ['./reserva-modal.component.scss']
 })

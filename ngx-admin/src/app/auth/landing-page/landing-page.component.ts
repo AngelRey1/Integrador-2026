@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-landing-page',
+  selector: 'ngx-landing-page',
   template: `
     <div style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px;">
       <div style="background: white; border-radius: 8px; padding: 40px; max-width: 800px; width: 100%; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">

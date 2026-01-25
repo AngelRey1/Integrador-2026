@@ -18,7 +18,7 @@ interface Entrenador {
 }
 
 @Component({
-  selector: 'app-entrenadores-list',
+  selector: 'ngx-entrenadores-list',
   templateUrl: './entrenadores-list.component.html',
   styleUrls: ['./entrenadores-list.component.scss']
 })

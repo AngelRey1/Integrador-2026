@@ -20,7 +20,7 @@ interface EntrenadorDestacado {
 }
 
 @Component({
-  selector: 'app-public-home',
+  selector: 'ngx-public-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
