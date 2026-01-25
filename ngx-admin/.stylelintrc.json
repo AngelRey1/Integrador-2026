@@ -12,7 +12,7 @@
 
     "number-leading-zero": "always",
     "number-no-trailing-zeros": true,
-    "length-zero-no-unit": true,
+    "length-zero-no-unit": null,
 
     "string-no-newline": true,
     "string-quotes": null,
@@ -24,7 +24,7 @@
     "value-list-comma-space-after": "always-single-line",
     "value-list-comma-space-before": "never",
 
-    "shorthand-property-no-redundant-values": true,
+    "shorthand-property-no-redundant-values": null,
 
     "property-case": "lower",
 
@@ -32,7 +32,7 @@
       "ignore": ["consecutive-duplicates-with-different-values"]
     }],
     "declaration-block-trailing-semicolon": "always",
-    "declaration-block-single-line-max-declarations": 1,
+    "declaration-block-single-line-max-declarations": null,
     "declaration-block-semicolon-space-before": "never",
     "declaration-block-semicolon-space-after": "always-single-line",
     "declaration-block-semicolon-newline-before": "never-multi-line",
@@ -67,7 +67,7 @@
     "selector-type-case": "lower",
     "selector-max-id": 0,
 
-    "no-missing-end-of-source-newline": true,
+    "no-missing-end-of-source-newline": null,
 
     "max-line-length": 120
   }
