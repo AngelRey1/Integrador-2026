@@ -1,6 +1,6 @@
 {
   "rules": {
-    "color-hex-case": "lower",
+    "color-hex-case": null,
     "color-no-invalid-hex": true,
 
     "function-calc-no-unspaced-operator": true,
@@ -15,11 +15,11 @@
     "length-zero-no-unit": true,
 
     "string-no-newline": true,
-    "string-quotes": "single",
+    "string-quotes": null,
 
     "unit-case": "lower",
     "unit-no-unknown": true,
-    "unit-whitelist": ["px", "%", "deg", "ms", "em", "vh", "vw", "s", "rem"],
+    "unit-whitelist": ["px", "%", "deg", "ms", "em", "vh", "vw", "s", "rem", "fr"],
 
     "value-list-comma-space-after": "always-single-line",
     "value-list-comma-space-before": "never",
