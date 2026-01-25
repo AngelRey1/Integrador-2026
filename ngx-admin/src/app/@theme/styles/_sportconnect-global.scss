@@ -1,0 +1,255 @@
+// ============================================
+// SPORTCONNECT GLOBAL STYLES
+// Estilos globales para toda la aplicación
+// ============================================
+
+// Importar GoogleFonts para Space Grotesk e Inter
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+// Variables SportConnect
+$color-primary: #00D09C;
+$color-primary-dark: #00B386;
+$color-primary-light: #D4F8F0;
+$color-secondary: #0A7B8A;
+$color-neon: #00F0FF;
+$color-background: #F8FAFC;
+$color-surface: #FFFFFF;
+$color-text-primary: #111827;
+$color-text-secondary: #6B7280;
+$color-accent: #E5E7EB;
+
+$shadow-sm: 0 4px 12px rgba(15, 23, 42, 0.08);
+$shadow-md: 0 8px 24px rgba(0, 240, 255, 0.12);
+$shadow-lg: 0 20px 40px rgba(0, 240, 255, 0.15);
+$shadow-card: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+@mixin sportconnect-global-styles() {
+  // Tipografía global
+  body, html {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+    color: $color-text-primary !important;
+    background: $color-background !important;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+    font-weight: 700;
+  }
+
+  // Cards Nebular con estilo premium
+  nb-card {
+    background: $color-surface !important;
+    border-radius: 16px !important;
+    box-shadow: $shadow-card !important;
+    border: 1px solid rgba(0, 0, 0, 0.05) !important;
+    transition: all 0.3s ease !important;
+
+    &:hover {
+      box-shadow: $shadow-md !important;
+      transform: translateY(-2px);
+    }
+
+    nb-card-header {
+      background: $color-surface !important;
+      border-bottom: 1px solid $color-accent !important;
+      padding: 1.5rem !important;
+      color: $color-text-primary !important;
+      font-weight: 600 !important;
+    }
+
+    nb-card-body {
+      padding: 1.5rem !important;
+      color: $color-text-primary !important;
+    }
+
+    nb-card-footer {
+      background: #FAFBFC !important;
+      border-top: 1px solid $color-accent !important;
+      padding: 1rem 1.5rem !important;
+    }
+  }
+
+  // Botones Nebular con estilo premium
+  button[nbButton] {
+    border-radius: 12px !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+    text-transform: none !important;
+
+    &[status="primary"] {
+      background: linear-gradient(135deg, $color-primary 0%, $color-primary-dark 100%) !important;
+      border: none !important;
+      color: white !important;
+      box-shadow: 0 4px 12px rgba(0, 208, 156, 0.25) !important;
+
+      &:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 20px rgba(0, 208, 156, 0.35) !important;
+      }
+    }
+
+    &[status="success"] {
+      background: linear-gradient(135deg, $color-primary 0%, $color-primary-dark 100%) !important;
+      border: none !important;
+      color: white !important;
+
+      &:hover {
+        transform: translateY(-2px) !important;
+      }
+    }
+
+    &[status="info"] {
+      background: linear-gradient(135deg, $color-secondary 0%, lighten($color-secondary, 10%) 100%) !important;
+      border: none !important;
+      color: white !important;
+
+      &:hover {
+        transform: translateY(-2px) !important;
+      }
+    }
+  }
+
+  // Inputs Nebular con estilo premium
+  input[nbInput], textarea[nbInput], select[nbInput] {
+    background: $color-background !important;
+    border: 1px solid $color-accent !important;
+    border-radius: 12px !important;
+    color: $color-text-primary !important;
+    padding: 0.75rem 1rem !important;
+    transition: all 0.3s ease !important;
+
+    &:focus {
+      border-color: $color-primary !important;
+      background: $color-surface !important;
+      box-shadow: 0 0 0 3px rgba(0, 208, 156, 0.1) !important;
+      outline: none !important;
+    }
+
+    &::placeholder {
+      color: $color-text-secondary !important;
+      opacity: 0.7 !important;
+    }
+  }
+
+  // Badges con estilo neon (como landing)
+  nb-badge {
+    border-radius: 20px !important;
+    padding: 0.25rem 0.75rem !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+
+    &[status="primary"] {
+      background: rgba(0, 208, 156, 0.1) !important;
+      color: $color-primary !important;
+      border: 1px solid rgba(0, 208, 156, 0.3) !important;
+    }
+
+    &[status="success"] {
+      background: rgba(16, 185, 129, 0.1) !important;
+      color: #10B981 !important;
+      border: 1px solid rgba(16, 185, 129, 0.3) !important;
+    }
+
+    &[status="warning"] {
+      background: rgba(255, 193, 7, 0.1) !important;
+      color: #FFD700 !important;
+      border: 1px solid rgba(255, 193, 7, 0.3) !important;
+    }
+
+    &[status="danger"] {
+      background: rgba(239, 68, 68, 0.1) !important;
+      color: #EF4444 !important;
+      border: 1px solid rgba(239, 68, 68, 0.3) !important;
+    }
+
+    &[status="info"] {
+      background: rgba(0, 240, 255, 0.1) !important;
+      color: $color-neon !important;
+      border: 1px solid rgba(0, 240, 255, 0.3) !important;
+    }
+  }
+
+  // Iconos Nebular
+  nb-icon {
+    transition: all 0.3s ease !important;
+  }
+
+  // Tablas
+  table {
+    border-collapse: collapse;
+
+    thead {
+      tr {
+        border-bottom: 2px solid $color-accent;
+
+        th {
+          padding: 0.75rem;
+          text-align: left;
+          font-weight: 600;
+          color: $color-text-secondary;
+          font-size: 0.875rem;
+          background: #FAFBFC;
+        }
+      }
+    }
+
+    tbody {
+      tr {
+        border-bottom: 1px solid $color-accent;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background: rgba(0, 208, 156, 0.03);
+        }
+
+        td {
+          padding: 0.75rem;
+          color: $color-text-primary;
+        }
+      }
+    }
+  }
+
+  // Layout Nebular
+  nb-layout {
+    background: $color-background !important;
+  }
+
+  nb-sidebar {
+    background: $color-surface !important;
+    border-right: 1px solid $color-accent !important;
+  }
+
+  // Selectores
+  nb-select {
+    .selected-item {
+      color: $color-text-primary !important;
+    }
+
+    button {
+      background: $color-background !important;
+      border: 1px solid $color-accent !important;
+      border-radius: 12px !important;
+      color: $color-text-primary !important;
+
+      &:focus {
+        border-color: $color-primary !important;
+        box-shadow: 0 0 0 3px rgba(0, 208, 156, 0.1) !important;
+      }
+    }
+  }
+
+  // Dialog Backgrounds
+  .cdk-overlay-backdrop {
+    background: rgba(0, 0, 0, 0.5) !important;
+  }
+
+  .cdk-overlay-pane {
+    .mat-dialog-container {
+      background: $color-surface !important;
+      border-radius: 16px !important;
+      box-shadow: $shadow-lg !important;
+    }
+  }
+}

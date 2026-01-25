@@ -1,4 +1,5 @@
 @import './themes';
+@import './sportconnect-global';
 
 @mixin nb-overrides() {
   nb-select.size-medium button {
@@ -8,4 +9,8 @@
       right: 0.41rem !important;
     }
   }
+}
+
+@mixin ngx-sportconnect() {
+  @include sportconnect-global-styles();
 }

@@ -32,14 +32,19 @@ export class EntrenadorDashboardComponent implements OnInit {
   clientesActivos = 24;
   sesionesMes = 42;
   ingresosMes = 1890;
+  ingresosSemanales = 450;
   calificacionPromedio = 4.8;
   tasaAsistencia = 94;
+  totalResenas = 127;
 
   // Próximas sesiones
   proximasSesiones: Sesion[] = [];
   
   // Sesiones de hoy
   sesionesHoy: Sesion[] = [];
+
+  // Últimos clientes
+  ultimosClientes: any[] = [];
 
   // Estadísticas mensuales
   estadisticasMensuales: Estadistica[] = [
@@ -60,6 +65,14 @@ export class EntrenadorDashboardComponent implements OnInit {
 
   cargarDatos(): void {
     const ahora = new Date();
+    
+    // Mock data clientes
+    this.ultimosClientes = [
+      { nombre: 'María González', foto: 'https://i.pravatar.cc/150?img=5', sesiones: 12 },
+      { nombre: 'Carlos Mendez', foto: 'https://i.pravatar.cc/150?img=6', sesiones: 8 },
+      { nombre: 'Ana López', foto: 'https://i.pravatar.cc/150?img=7', sesiones: 5 },
+      { nombre: 'Juan Pérez', foto: 'https://i.pravatar.cc/150?img=8', sesiones: 3 }
+    ];
     
     // Mock data sesiones
     const todasSesiones: Sesion[] = [
@@ -222,9 +235,9 @@ export class EntrenadorDashboardComponent implements OnInit {
   }
 
   formatearMoneda(monto: number): string {
-    return new Intl.NumberFormat('es-ES', {
+    return new Intl.NumberFormat('es-MX', {
       style: 'currency',
-      currency: 'EUR'
+      currency: 'MXN'
     }).format(monto);
   }
 }

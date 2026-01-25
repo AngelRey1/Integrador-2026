@@ -1,0 +1,182 @@
+// ============================================
+// SHARED PREMIUM STYLES - SPORTCONNECT
+// Estilos compartidos entre landing y paneles
+// ============================================
+
+// Variables Premium (Landing Page)
+$color-primary: #00D09C;
+$color-primary-dark: #00B386;
+$color-primary-light: #D4F8F0;
+$color-secondary: #0A7B8A;
+$color-neon: #00F0FF;
+$color-background: #F8FAFC;
+$color-surface: #FFFFFF;
+$color-text-primary: #111827;
+$color-text-secondary: #6B7280;
+$color-accent: #E5E7EB;
+
+// Shadows Premium
+$shadow-sm: 0 4px 12px rgba(15, 23, 42, 0.08);
+$shadow-md: 0 8px 24px rgba(0, 240, 255, 0.12);
+$shadow-lg: 0 20px 40px rgba(0, 240, 255, 0.15);
+$shadow-card: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+// Typography
+$font-primary: 'Space Grotesk', 'Inter', sans-serif;
+$font-secondary: 'Inter', sans-serif;
+
+// Cards Premium
+@mixin card-premium {
+  background: $color-surface;
+  border-radius: 16px;
+  box-shadow: $shadow-card;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    box-shadow: $shadow-md;
+    transform: translateY(-2px);
+  }
+}
+
+// Buttons Premium
+@mixin btn-primary-premium {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-dark 100%);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 208, 156, 0.25);
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 208, 156, 0.35);
+  }
+}
+
+// Badge Premium (estilo neon como landing)
+@mixin badge-premium {
+  background: rgba(0, 240, 255, 0.1);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  color: $color-neon;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+// Price Display Premium (con MXN)
+@mixin price-display-premium {
+  .price-large {
+    font-size: 2rem;
+    font-weight: 700;
+    color: $color-primary;
+    font-family: $font-primary;
+  }
+  
+  .price-currency {
+    font-size: 0.875rem;
+    color: $color-text-secondary;
+    margin-left: 0.25rem;
+  }
+}
+
+// Stats Card Premium
+@mixin stat-card-premium {
+  @include card-premium;
+  padding: 1.5rem;
+  
+  .stat-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    margin-bottom: 1rem;
+    
+    &.clients {
+      background: rgba(0, 208, 156, 0.1);
+      color: $color-primary;
+    }
+    
+    &.sessions {
+      background: rgba(10, 123, 138, 0.1);
+      color: $color-secondary;
+    }
+    
+    &.income {
+      background: rgba(0, 240, 255, 0.1);
+      color: $color-neon;
+    }
+    
+    &.rating {
+      background: rgba(255, 193, 7, 0.1);
+      color: #FFC107;
+    }
+  }
+  
+  .stat-label {
+    font-size: 0.875rem;
+    color: $color-text-secondary;
+    font-weight: 500;
+  }
+  
+  .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: $color-text-primary;
+    margin: 0.5rem 0;
+    font-family: $font-primary;
+  }
+  
+  .stat-trend {
+    font-size: 0.75rem;
+    font-weight: 600;
+    
+    &.positive {
+      color: #10B981;
+    }
+    
+    &.negative {
+      color: #EF4444;
+    }
+    
+    &.neutral {
+      color: $color-text-secondary;
+    }
+  }
+}
+
+// Input Premium
+@mixin input-premium {
+  background: $color-background;
+  border: 1px solid $color-accent;
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  font-size: 0.9375rem;
+  transition: all 0.3s ease;
+  
+  &:focus {
+    border-color: $color-primary;
+    background: $color-surface;
+    box-shadow: 0 0 0 3px rgba(0, 208, 156, 0.1);
+    outline: none;
+  }
+}
+
+// Badge Status (unificado con landing)
+@mixin badge-status($color) {
+  background: rgba($color, 0.1);
+  color: $color;
+  border: 1px solid rgba($color, 0.3);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
