@@ -29,6 +29,23 @@ export class PublicHomeComponent implements OnInit, OnDestroy {
   deportesVisibles: Deporte[] = [];
   private carouselInterval: any;
   private currentIndex = 0;
+  pasosEntrenador = [
+    {
+      numero: '1',
+      titulo: 'Publica tu perfil',
+      descripcion: 'Elige disciplinas, zona de cobertura y agrega tu portafolio.'
+    },
+    {
+      numero: '2',
+      titulo: 'Recibe clientes verificados',
+      descripcion: 'Te llegan solicitudes filtradas con pago seguro y chat directo.'
+    },
+    {
+      numero: '3',
+      titulo: 'Cobra sin fricción',
+      descripcion: 'Define tus tarifas y cobra con respaldo, sin comisiones ocultas.'
+    }
+  ];
   
   deportes: Deporte[] = [
     { nombre: 'Fútbol', icon: '⚽', slug: 'futbol', entrenadores: 152 },
@@ -255,5 +272,18 @@ export class PublicHomeComponent implements OnInit, OnDestroy {
 
   irAlPerfil(entrenador: EntrenadorDestacado) {
     this.router.navigate(['/entrenador', entrenador.id]);
+  }
+
+  irAInfoEntrenadores() {
+    this.router.navigate(['/coach-join']);
+  }
+
+  irAUneteEntrenadores(registrarme = false) {
+    this.router.navigate(['/auth/register'], {
+      queryParams: {
+        role: 'coach',
+        action: registrarme ? 'signup' : 'learn-more'
+      }
+    });
   }
 }

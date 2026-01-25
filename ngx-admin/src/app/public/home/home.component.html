@@ -227,40 +227,86 @@
     </div>
   </section>
 
-  <!-- CTA FINAL PREMIUM -->
-  <section class="cta-premium">
-    <div class="cta-inner">
-      <div class="cta-badge">🚀 COMIENZA HOY</div>
-      <h2>Reserva Tu Primera Sesión</h2>
-      <p>Acceso instantáneo a coaches verificados. Sin trámites, sin complicaciones.</p>
-      
-      <div class="cta-features">
-        <div class="feature-item">
-          <span class="feature-icon">✓</span>
-          <span class="feature-text">Coaches Verificados</span>
+  <!-- CTA: ÚNETE COMO ENTRENADOR -->
+  <section class="join-coaches">
+    <div class="join-overlay"></div>
+    <div class="join-container">
+      <div class="join-copy">
+        <span class="pill">¿Eres entrenador?</span>
+        <h2>Únete a SportConnect y gana más</h2>
+        <p class="join-lead">Recibe alumnos verificados, cobra seguro y haz crecer tu agenda sin comisiones ocultas.</p>
+
+        <div class="join-bullets">
+          <div class="join-bullet">
+            <span class="bullet-icon">✓</span>
+            <div>
+              <h4>Define tus tarifas</h4>
+              <p>Control total de precio, modalidades y disponibilidad.</p>
+            </div>
+          </div>
+          <div class="join-bullet">
+            <span class="bullet-icon">✓</span>
+            <div>
+              <h4>Clientes listos para reservar</h4>
+              <p>Solicitudes filtradas con pago seguro y chat directo.</p>
+            </div>
+          </div>
+          <div class="join-bullet">
+            <span class="bullet-icon">✓</span>
+            <div>
+              <h4>Soporte y visibilidad</h4>
+              <p>Badge verificado, reseñas y posicionamiento destacado.</p>
+            </div>
+          </div>
         </div>
-        <div class="feature-item">
-          <span class="feature-icon">✓</span>
-          <span class="feature-text">Pago Seguro</span>
+
+        <div class="join-actions">
+          <button class="btn-primary-large" (click)="irAInfoEntrenadores()">
+            <i eva-icon="flash-outline" eva-pack="outline"></i>
+            Más información
+          </button>
+          <button class="btn-secondary-large" (click)="irAUneteEntrenadores(true)">
+            <i eva-icon="person-add-outline" eva-pack="outline"></i>
+            Registrarme ahora
+          </button>
         </div>
-        <div class="feature-item">
-          <span class="feature-icon">✓</span>
-          <span class="feature-text">Entrena Hoy Mismo</span>
+
+        <div class="join-stats">
+          <div class="stat-block">
+            <span class="stat-value">500+</span>
+            <span class="stat-label">coaches activos</span>
+          </div>
+          <div class="stat-block">
+            <span class="stat-value">4.9★</span>
+            <span class="stat-label">calificación promedio</span>
+          </div>
+          <div class="stat-block">
+            <span class="stat-value">48h</span>
+            <span class="stat-label">tiempo medio para conseguir alumnos</span>
+          </div>
         </div>
       </div>
-      
-      <div class="cta-buttons">
-        <button class="btn-primary-large" (click)="buscarEntrenadores()">
-          <i eva-icon="search-outline" eva-pack="outline"></i> Explorar Coaches
-        </button>
-        <button class="btn-secondary-large" routerLink="/entrenadores">
-          <i eva-icon="list-outline" eva-pack="outline"></i> Ver Categorías
-        </button>
+
+      <div class="join-steps-card">
+        <h3>Así te unes</h3>
+        <div class="steps-list">
+          <div class="step-card" *ngFor="let paso of pasosEntrenador">
+            <span class="step-number">{{ paso.numero }}</span>
+            <div>
+              <h4>{{ paso.titulo }}</h4>
+              <p>{{ paso.descripcion }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="cta-inline">
+          <span>¿Listo para empezar?</span>
+          <button class="btn-ghost" (click)="irAUneteEntrenadores(true)">Crear mi perfil</button>
+        </div>
       </div>
     </div>
   </section>
-</div>
-
-<app-shared-footer></app-shared-footer>
+ </div>
+ 
+ <app-shared-footer></app-shared-footer>
   </nb-layout-column>
 </nb-layout>

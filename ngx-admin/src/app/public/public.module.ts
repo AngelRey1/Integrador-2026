@@ -3,14 +3,24 @@ import { RouterModule, Routes } from '@angular/router';
 
 const routes: Routes = [
   {
-    path: '',
+    path: 'coach-join',
     loadChildren: () =>
-      import('./landing/landing.module').then((m) => m.LandingModule),
+      import('./coach-join/coach-join.module').then((m) => m.CoachJoinModule),
+  },
+  {
+    path: 'entrenador',
+    loadChildren: () =>
+      import('./client/client.module').then((m) => m.ClientModule),
+  },
+  {
+    path: 'entrenadores',
+    loadChildren: () =>
+      import('./client/client.module').then((m) => m.ClientModule),
   },
   {
     path: '',
     loadChildren: () =>
-      import('./client/client.module').then((m) => m.ClientModule),
+      import('./landing/landing.module').then((m) => m.LandingModule),
   },
 ];
 

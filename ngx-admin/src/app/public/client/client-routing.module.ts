@@ -5,12 +5,17 @@ import { EntrenadorPerfilComponent } from '../entrenador-perfil/entrenador-perfi
 
 const routes: Routes = [
   {
-    path: 'entrenadores',
-    component: EntrenadoresListComponent,
-  },
-  {
-    path: 'entrenador/:id',
-    component: EntrenadorPerfilComponent,
+    path: '',
+    children: [
+      {
+        path: '',
+        component: EntrenadoresListComponent,
+      },
+      {
+        path: ':id',
+        component: EntrenadorPerfilComponent,
+      },
+    ],
   },
 ];
 
