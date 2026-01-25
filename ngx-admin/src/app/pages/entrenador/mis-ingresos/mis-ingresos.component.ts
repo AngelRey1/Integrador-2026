@@ -1,11 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'ngx-mis-ingresos',
   templateUrl: './mis-ingresos.component.html',
   styleUrls: ['./mis-ingresos.component.scss']
 })
-export class MisIngresosComponent implements OnInit {
+export class MisIngresosComponent {
   ingresosTotales = 1890;
   comisionPlataforma = 189;
   ingresosNetos = 1701;
@@ -17,8 +17,6 @@ export class MisIngresosComponent implements OnInit {
     { mes: 'Oct', ingresos: 2025 },
     { mes: 'Nov', ingresos: 1890 }
   ];
-
-  ngOnInit(): void {}
 
   getMaxIngreso(): number {
     return Math.max(...this.estadisticas.map(e => e.ingresos));

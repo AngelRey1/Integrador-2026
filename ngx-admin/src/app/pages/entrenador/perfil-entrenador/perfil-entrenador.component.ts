@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NbToastrService } from '@nebular/theme';
 
@@ -7,7 +7,7 @@ import { NbToastrService } from '@nebular/theme';
   templateUrl: './perfil-entrenador.component.html',
   styleUrls: ['./perfil-entrenador.component.scss']
 })
-export class PerfilEntrenadorComponent implements OnInit {
+export class PerfilEntrenadorComponent {
   perfilForm: FormGroup;
   editando = false;
 
@@ -25,8 +25,6 @@ export class PerfilEntrenadorComponent implements OnInit {
       tarifa_base: [{ value: 30, disabled: true }, Validators.required]
     });
   }
-
-  ngOnInit(): void {}
 
   toggleEditar(): void {
     this.editando = !this.editando;

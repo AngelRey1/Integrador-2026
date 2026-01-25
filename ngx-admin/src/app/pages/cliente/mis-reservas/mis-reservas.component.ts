@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { NbDialogService } from '@nebular/theme';
 
 type EstadoReserva = 'PENDIENTE' | 'CONFIRMADA' | 'COMPLETADA' | 'CANCELADA';
@@ -26,7 +26,7 @@ interface Reserva {
   templateUrl: './mis-reservas.component.html',
   styleUrls: ['./mis-reservas.component.scss']
 })
-export class MisReservasComponent implements OnInit {
+export class MisReservasComponent {
   tabSeleccionado = 0;
   
   // Filtros
@@ -122,8 +122,6 @@ export class MisReservasComponent implements OnInit {
   ];
 
   constructor(private dialogService: NbDialogService) {}
-
-  ngOnInit(): void {}
 
   // Filtrado por estado
   get reservasPendientes(): Reserva[] {

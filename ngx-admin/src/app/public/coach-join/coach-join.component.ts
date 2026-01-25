@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
   templateUrl: './coach-join.component.html',
   styleUrls: ['./coach-join.component.scss']
 })
-export class CoachJoinComponent implements OnInit {
+export class CoachJoinComponent {
   pasosEntrenador = [
     {
       numero: '1',
@@ -26,8 +26,6 @@ export class CoachJoinComponent implements OnInit {
   ];
 
   constructor(private router: Router) {}
-
-  ngOnInit(): void {}
 
   irARegistro() {
     this.router.navigate(['/auth/register'], {
