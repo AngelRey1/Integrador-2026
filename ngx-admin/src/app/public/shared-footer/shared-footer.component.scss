@@ -79,9 +79,18 @@
   transition: all 0.3s ease;
   cursor: pointer;
   text-decoration: none;
+  padding: 0;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
 
-  i[eva-icon] {
-    font-size: 1.1rem;
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: all 0.3s ease;
+    pointer-events: none;
   }
 
   &:hover {
@@ -106,7 +115,7 @@
   margin: 0;
   line-height: 1.5;
 
-  i[eva-icon] {
+  nb-icon {
     font-size: 1.1rem;
     color: #00F0FF;
     flex-shrink: 0;
