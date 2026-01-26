@@ -431,6 +431,147 @@
   }
 }
 
+// Paso de Pago
+.pago {
+  .resumen-pago {
+    background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    text-align: center;
+
+    .resumen-precio-grande {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+
+      .label {
+        font-size: 0.9rem;
+        color: #64748B;
+        font-weight: 600;
+      }
+
+      .precio {
+        font-size: 2.5rem;
+        font-weight: 900;
+        color: #3B82F6;
+      }
+    }
+  }
+
+  .metodo-pago-selector {
+    margin-bottom: 1.5rem;
+
+    .radio-label {
+      display: flex;
+      align-items: center;
+      padding: 1.2rem;
+      border: 2px solid #E2E8F0;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: #F8FAFC;
+
+      input[type="radio"] {
+        margin-right: 1rem;
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+      }
+
+      .radio-content {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        flex: 1;
+
+        nb-icon {
+          font-size: 1.5rem;
+          color: #64748B;
+        }
+
+        span {
+          font-weight: 700;
+          color: #0F172A;
+        }
+      }
+
+      &:hover {
+        border-color: #00D09C;
+        background: #FFFFFF;
+      }
+
+      input[type="radio"]:checked ~ .radio-content {
+        nb-icon {
+          color: #00D09C;
+        }
+      }
+    }
+  }
+
+  .error-text {
+    color: #EF4444;
+    font-size: 0.85rem;
+    margin-top: 0.3rem;
+    display: block;
+  }
+
+  .info-seguridad {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 1rem;
+    background: #F0FDF4;
+    border: 1px solid #86EFAC;
+    border-radius: 8px;
+    color: #166534;
+    font-size: 0.9rem;
+    margin-top: 1rem;
+
+    nb-icon {
+      font-size: 1.3rem;
+      color: #10B981;
+    }
+  }
+
+  .btn-pagar {
+    width: 100%;
+    padding: 1.2rem;
+    background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+    color: #FFFFFF;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 900;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    margin-top: 1.5rem;
+
+    nb-icon {
+      font-size: 1.3rem;
+    }
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+    }
+
+    &:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+}
+
 // Confirmación / Éxito
 .confirmacion {
   .btn-confirmar {

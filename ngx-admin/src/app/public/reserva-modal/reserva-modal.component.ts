@@ -16,20 +16,22 @@ interface Paso {
 })
 export class ReservaModalComponent implements OnInit {
   pasoActual = 1;
-  totalPasos = 4;
+  totalPasos = 5;
   fechaMinima: string;
   
   pasos: Paso[] = [
     { numero: 1, titulo: 'Fecha y Hora', icono: 'calendar-outline', completado: false },
     { numero: 2, titulo: 'Modalidad', icono: 'options-outline', completado: false },
     { numero: 3, titulo: 'Tus Datos', icono: 'person-outline', completado: false },
-    { numero: 4, titulo: 'Confirmación', icono: 'checkmark-circle-outline', completado: false }
+    { numero: 4, titulo: 'Pago', icono: 'credit-card-outline', completado: false },
+    { numero: 5, titulo: 'Confirmación', icono: 'checkmark-circle-outline', completado: false }
   ];
 
   // Forms por paso
   paso1Form: FormGroup;
   paso2Form: FormGroup;
   paso3Form: FormGroup;
+  paso4Form: FormGroup;
 
   // Opciones
   horariosDisponibles: string[] = [];
@@ -48,6 +50,8 @@ export class ReservaModalComponent implements OnInit {
   enviando = false;
   reservaConfirmada = false;
   numeroReserva = '';
+  pagoCompletado = false;
+  procesandoPago = false;
 
   constructor(
     public dialogRef: MatDialogRef<ReservaModalComponent>,
@@ -73,6 +77,15 @@ export class ReservaModalComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       telefono: ['', Validators.required],
       aceptaTerminos: [false, Validators.requiredTrue]
+    });
+
+    this.paso4Form = this.fb.group({
+      metodoPago: ['tarjeta', Validators.required],
+      numeroTarjeta: ['', [Validators.required, Validators.pattern(/^\d{16}$/)]],
+      nombreTitular: ['', Validators.required],
+      fechaExpiracion: ['', [Validators.required, Validators.pattern(/^(0[1-9]|1[0-2])\/\d{2}$/)]],
+      cvv: ['', [Validators.required, Validators.pattern(/^\d{3,4}$/)]],
+      aceptaPoliticas: [false, Validators.requiredTrue]
     });
   }
 
@@ -135,34 +148,70 @@ export class ReservaModalComponent implements OnInit {
         return this.paso2Form.valid;
       case 3:
         return this.paso3Form.valid;
+      case 4:
+        return this.paso4Form.valid;
       default:
         return true;
     }
   }
 
+  procesarPago() {
+    if (!this.paso4Form.valid) {
+      alert('Por favor completa todos los datos de pago');
+      return;
+    }
+
+    this.procesandoPago = true;
+
+    // Simular procesamiento de pago con Stripe
+    setTimeout(() => {
+      // En producción, aquí se haría la llamada real a Stripe
+      // const stripe = await loadStripe('tu-clave-publica-stripe');
+      // const result = await stripe.confirmCardPayment(...);
+      
+      console.log('Procesando pago:', {
+        monto: this.calcularPrecioTotal(),
+        metodo: this.paso4Form.get('metodoPago')?.value,
+        // En producción, no se enviarían los datos de tarjeta completos
+        ultimosDigitos: this.paso4Form.get('numeroTarjeta')?.value.slice(-4)
+      });
+
+      // Simular éxito del pago
+      this.procesandoPago = false;
+      this.pagoCompletado = true;
+      this.pasos[3].completado = true;
+      this.pasoActual = 5; // Ir a confirmación
+    }, 2000);
+  }
+
   confirmarReserva() {
-    if (!this.paso3Form.valid) {
-      alert('Por favor completa todos los campos');
+    if (!this.pagoCompletado) {
+      alert('Por favor completa el pago primero');
       return;
     }
 
     this.enviando = true;
 
-    // Simular envío
+    // Simular envío de reserva después del pago
     setTimeout(() => {
       const reservaData = {
         entrenador: this.data.entrenador,
         ...this.paso1Form.value,
         ...this.paso2Form.value,
-        ...this.paso3Form.value
+        ...this.paso3Form.value,
+        pago: {
+          monto: this.calcularPrecioTotal(),
+          metodo: this.paso4Form.get('metodoPago')?.value,
+          completado: true,
+          fecha: new Date().toISOString()
+        }
       };
       
-      console.log('Reserva enviada:', reservaData);
+      console.log('Reserva confirmada con pago:', reservaData);
       
       this.enviando = false;
       this.reservaConfirmada = true;
       this.numeroReserva = 'RSV-' + Math.random().toString(36).substr(2, 9).toUpperCase();
-      this.pasoActual = 4;
     }, 1500);
   }
 
@@ -181,6 +230,31 @@ export class ReservaModalComponent implements OnInit {
       }
     } else {
       this.dialogRef.close();
+    }
+  }
+
+  formatearTarjeta(event: any) {
+    let value = event.target.value.replace(/\s/g, '');
+    if (value.length > 16) value = value.slice(0, 16);
+    const formatted = value.replace(/(.{4})/g, '$1 ').trim();
+    this.paso4Form.patchValue({ numeroTarjeta: value }, { emitEvent: false });
+    // Actualizar el valor visual del input
+    if (event.target.value !== formatted) {
+      event.target.value = formatted;
+    }
+  }
+
+  formatearFechaExpiracion(event: any) {
+    let value = event.target.value.replace(/\D/g, '');
+    if (value.length > 4) value = value.slice(0, 4);
+    let formatted = value;
+    if (value.length >= 2) {
+      formatted = value.slice(0, 2) + '/' + value.slice(2, 4);
+    }
+    this.paso4Form.patchValue({ fechaExpiracion: formatted }, { emitEvent: false });
+    // Actualizar el valor visual del input
+    if (event.target.value !== formatted) {
+      event.target.value = formatted;
     }
   }
 

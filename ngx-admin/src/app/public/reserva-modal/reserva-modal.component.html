@@ -170,8 +170,111 @@
       </form>
     </div>
 
-    <!-- PASO 4: Confirmación / Resumen -->
-    <div class="paso-container confirmacion" *ngIf="pasoActual === 4 && !reservaConfirmada">
+    <!-- PASO 4: Pago -->
+    <div class="paso-container pago" *ngIf="pasoActual === 4">
+      <h3 class="paso-titulo">
+        <nb-icon icon="credit-card-outline"></nb-icon>
+        Método de pago
+      </h3>
+
+      <div class="resumen-pago">
+        <div class="resumen-precio-grande">
+          <span class="label">Total a pagar</span>
+          <span class="precio">${{ calcularPrecioTotal() }} MXN</span>
+        </div>
+      </div>
+
+      <form [formGroup]="paso4Form" class="paso-form">
+        <div class="metodo-pago-selector">
+          <label class="radio-label">
+            <input type="radio" formControlName="metodoPago" value="tarjeta" />
+            <div class="radio-content">
+              <nb-icon icon="credit-card-outline"></nb-icon>
+              <span>Tarjeta de crédito o débito</span>
+            </div>
+          </label>
+        </div>
+
+        <div class="form-group" *ngIf="paso4Form.get('metodoPago')?.value === 'tarjeta'">
+          <label>Número de tarjeta *</label>
+          <input 
+            type="text" 
+            formControlName="numeroTarjeta"
+            placeholder="1234 5678 9012 3456"
+            class="form-input"
+            maxlength="19"
+            (input)="formatearTarjeta($event)"
+          />
+          <small class="error-text" *ngIf="paso4Form.get('numeroTarjeta')?.invalid && paso4Form.get('numeroTarjeta')?.touched">
+            Ingresa un número de tarjeta válido (16 dígitos)
+          </small>
+        </div>
+
+        <div class="form-group" *ngIf="paso4Form.get('metodoPago')?.value === 'tarjeta'">
+          <label>Nombre del titular *</label>
+          <input 
+            type="text" 
+            formControlName="nombreTitular"
+            placeholder="Como aparece en la tarjeta"
+            class="form-input"
+          />
+        </div>
+
+        <div class="form-row" *ngIf="paso4Form.get('metodoPago')?.value === 'tarjeta'">
+          <div class="form-group">
+            <label>Fecha de expiración *</label>
+            <input 
+              type="text" 
+              formControlName="fechaExpiracion"
+              placeholder="MM/AA"
+              class="form-input"
+              maxlength="5"
+              (input)="formatearFechaExpiracion($event)"
+            />
+            <small class="error-text" *ngIf="paso4Form.get('fechaExpiracion')?.invalid && paso4Form.get('fechaExpiracion')?.touched">
+              Formato: MM/AA
+            </small>
+          </div>
+          <div class="form-group">
+            <label>CVV *</label>
+            <input 
+              type="text" 
+              formControlName="cvv"
+              placeholder="123"
+              class="form-input"
+              maxlength="4"
+            />
+            <small class="error-text" *ngIf="paso4Form.get('cvv')?.invalid && paso4Form.get('cvv')?.touched">
+              Código de seguridad (3-4 dígitos)
+            </small>
+          </div>
+        </div>
+
+        <div class="terminos-wrapper">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="aceptaPoliticas" />
+            <span>Acepto las <a href="/politicas-pago" target="_blank">políticas de pago</a> y <a href="/terminos" target="_blank">términos y condiciones</a></span>
+          </label>
+        </div>
+
+        <div class="info-seguridad">
+          <nb-icon icon="lock-outline"></nb-icon>
+          <span>Tu información está protegida con encriptación SSL</span>
+        </div>
+      </form>
+
+      <button 
+        class="btn-pagar" 
+        (click)="procesarPago()" 
+        [disabled]="procesandoPago || !paso4Form.valid"
+      >
+        <nb-icon icon="card-outline" *ngIf="!procesandoPago"></nb-icon>
+        {{ procesandoPago ? 'Procesando pago...' : 'Pagar $' + calcularPrecioTotal() + ' MXN' }}
+      </button>
+    </div>
+
+    <!-- PASO 5: Confirmación / Resumen -->
+    <div class="paso-container confirmacion" *ngIf="pasoActual === 5 && !reservaConfirmada">
       <h3 class="paso-titulo">
         <nb-icon icon="checkmark-circle-outline"></nb-icon>
         Confirma tu reserva
@@ -213,8 +316,16 @@
           </div>
         </div>
 
+        <div class="resumen-item" *ngIf="pagoCompletado">
+          <nb-icon icon="checkmark-circle-outline" style="color: #10B981;"></nb-icon>
+          <div>
+            <strong>Pago</strong>
+            <p style="color: #10B981;">Pagado - ${{ calcularPrecioTotal() }} MXN</p>
+          </div>
+        </div>
+
         <div class="resumen-precio">
-          <strong>Total a pagar:</strong>
+          <strong>Total pagado:</strong>
           <span class="precio">${{ calcularPrecioTotal() }} MXN</span>
         </div>
       </div>
@@ -222,9 +333,9 @@
       <button 
         class="btn-confirmar" 
         (click)="confirmarReserva()" 
-        [disabled]="enviando"
+        [disabled]="enviando || !pagoCompletado"
       >
-        {{ enviando ? 'Procesando...' : 'Confirmar y Reservar' }}
+        {{ enviando ? 'Confirmando...' : 'Confirmar Reserva' }}
       </button>
     </div>
 
@@ -259,7 +370,7 @@
   </div>
 
   <!-- Botones de navegación -->
-  <div class="navigation-buttons" *ngIf="pasoActual < 4 && !reservaConfirmada">
+  <div class="navigation-buttons" *ngIf="pasoActual < 5 && !reservaConfirmada && pasoActual !== 4">
     <button 
       class="btn-anterior" 
       (click)="anterior()" 
