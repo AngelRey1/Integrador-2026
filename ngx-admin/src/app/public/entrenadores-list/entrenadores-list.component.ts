@@ -285,6 +285,7 @@ export class EntrenadoresListComponent implements OnInit {
 
   entrenadoresDestacados: Entrenador[] = [];
   entrenadoresFiltrados: Entrenador[] = [];
+  deporteActual: string = '';
 
   // Control del carrusel
   carruselIndex = 0;
@@ -295,13 +296,13 @@ export class EntrenadoresListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.entrenadoresDestacados = this.entrenadores.filter(e => e.destacado);
     this.entrenadoresFiltrados = [...this.entrenadores];
 
     this.route.queryParams.subscribe(params => {
       // Reset filtros
       this.filtros.deporte = 'todos';
       this.searchQuery = '';
+      this.deporteActual = '';
 
       if (params['deporte']) {
         const normalizado = params['deporte'].toLowerCase();
@@ -328,10 +329,12 @@ export class EntrenadoresListComponent implements OnInit {
           calistenia: 'Calistenia'
         };
         this.filtros.deporte = mapaDeportes[normalizado] || params['deporte'];
+        this.deporteActual = this.filtros.deporte;
       }
       if (params['q']) {
         this.searchQuery = (params['q'] as string).trim();
       }
+      this.actualizarDestacados();
       this.aplicarFiltros();
     });
 
@@ -341,7 +344,35 @@ export class EntrenadoresListComponent implements OnInit {
     }, 5000);
   }
 
+  actualizarDestacados() {
+    // Filtrar destacados por el deporte actual
+    if (this.deporteActual && this.deporteActual !== 'todos') {
+      this.entrenadoresDestacados = this.entrenadores.filter(e => 
+        e.destacado && e.deportes.some(d => d.toLowerCase() === this.deporteActual.toLowerCase())
+      );
+    } else {
+      // Si no hay deporte específico, mostrar todos los destacados
+      this.entrenadoresDestacados = this.entrenadores.filter(e => e.destacado);
+    }
+    
+    // Resetear el índice del carrusel si no hay destacados
+    if (this.entrenadoresDestacados.length === 0) {
+      this.carruselIndex = 0;
+    } else if (this.carruselIndex >= this.entrenadoresDestacados.length) {
+      this.carruselIndex = 0;
+    }
+  }
+
   aplicarFiltros() {
+    // Actualizar deporte actual si cambió el filtro
+    if (this.filtros.deporte !== 'todos' && this.filtros.deporte !== this.deporteActual) {
+      this.deporteActual = this.filtros.deporte;
+      this.actualizarDestacados();
+    } else if (this.filtros.deporte === 'todos' && this.deporteActual !== '') {
+      this.deporteActual = '';
+      this.actualizarDestacados();
+    }
+
     this.entrenadoresFiltrados = this.entrenadores.filter(e => {
       // Filtro de búsqueda
       if (this.searchQuery) {
@@ -410,5 +441,40 @@ export class EntrenadoresListComponent implements OnInit {
 
   irADestacado(index: number) {
     this.carruselIndex = index;
+  }
+
+  getImagenDeporte(): string {
+    if (!this.deporteActual || this.deporteActual === 'todos') {
+      return '';
+    }
+    
+    const imagenesDeportes: Record<string, string> = {
+      'Fútbol': 'assets/images/deportes/futbol.jpg',
+      'CrossFit': 'assets/images/deportes/crossfit.jpg',
+      'Yoga': 'assets/images/deportes/yoga.jpg',
+      'Natación': 'assets/images/deportes/natacion.jpg',
+      'Running': 'assets/images/deportes/running.jpg',
+      'Boxeo': 'assets/images/deportes/boxeo.jpg',
+      'Ciclismo': 'assets/images/deportes/ciclismo.jpg',
+      'Tenis': 'assets/images/deportes/tenis.jpg',
+      'Pilates': 'assets/images/deportes/pilates.jpg',
+      'Zumba': 'assets/images/deportes/zumba.jpg',
+      'Functional Training': 'assets/images/deportes/funcional.jpg',
+      'Spinning': 'assets/images/deportes/spinning.jpg',
+      'Artes Marciales': 'assets/images/deportes/artes-marciales.jpg',
+      'Ballet Fitness': 'assets/images/deportes/ballet.jpg',
+      'Calistenia': 'assets/images/deportes/calistenia.jpg'
+    };
+
+    return imagenesDeportes[this.deporteActual] || '';
+  }
+
+  getDeporteEntrenador(entrenador: Entrenador): string {
+    // Si hay un deporte actual filtrado, usar ese
+    if (this.deporteActual && this.deporteActual !== 'todos') {
+      return this.deporteActual;
+    }
+    // Si no, usar la especialidad del entrenador
+    return entrenador.especialidad;
   }
 }

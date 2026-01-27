@@ -12,7 +12,7 @@
   </div>
 
   <!-- Carrusel de Destacados -->
-  <section class="destacados-carousel">
+  <section class="destacados-carousel" *ngIf="entrenadoresDestacados.length > 0">
     <div class="container">
       
       <div class="carousel-container">
@@ -26,16 +26,13 @@
             class="carousel-item"
             [class.active]="i === carruselIndex"
           >
-            <div class="carousel-card-horizontal">
-              <!-- Badge DESTACADO en esquina superior izquierda -->
-              <div class="badge-destacado">
-                ⭐ DESTACADO
-              </div>
-
+            <div class="carousel-card-horizontal" [style.background-image]="getImagenDeporte() ? 'url(' + getImagenDeporte() + ')' : ''">
               <div class="carousel-left">
-                <h2 class="carousel-title">Entrenadores Destacados</h2>
+                <h2 class="carousel-title">
+                  Entrenadores Destacados
+                </h2>
                 <h3 class="carousel-nombre">{{ entrenador.nombre }}</h3>
-                <p class="carousel-ubicacion">📍 {{ entrenador.ubicacion }}</p>
+                <p class="carousel-ubicacion">📍 {{ entrenador.ubicacion }} | {{ getDeporteEntrenador(entrenador) }}</p>
                 <div class="carousel-rating">
                   <span *ngFor="let star of getEstrellas(entrenador.calificacion)" class="star">
                     {{ star === 'full' ? '⭐' : '☆' }}
