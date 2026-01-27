@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Location } from '@angular/common';
 
 interface Entrenador {
   id: number;
@@ -292,7 +293,8 @@ export class EntrenadoresListComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private location: Location,
   ) {}
 
   ngOnInit(): void {
@@ -335,7 +337,8 @@ export class EntrenadoresListComponent implements OnInit {
         this.searchQuery = (params['q'] as string).trim();
       }
       this.actualizarDestacados();
-      this.aplicarFiltros();
+      // No hacer scroll en el primer render, solo aplicar filtros
+      this.aplicarFiltros(false);
     });
 
     // Auto-scroll del carrusel cada 5 segundos
@@ -363,7 +366,7 @@ export class EntrenadoresListComponent implements OnInit {
     }
   }
 
-  aplicarFiltros() {
+  aplicarFiltros(triggerScroll: boolean = true) {
     // Actualizar deporte actual si cambió el filtro
     if (this.filtros.deporte !== 'todos' && this.filtros.deporte !== this.deporteActual) {
       this.deporteActual = this.filtros.deporte;
@@ -403,10 +406,12 @@ export class EntrenadoresListComponent implements OnInit {
       return true;
     });
 
-    // Scroll suave a la sección de filtros/resultados después de un pequeño delay
-    setTimeout(() => {
-      this.scrollToFiltros();
-    }, 100);
+    // Scroll suave a la sección de filtros/resultados solo cuando viene de interacción del usuario
+    if (triggerScroll) {
+      setTimeout(() => {
+        this.scrollToFiltros();
+      }, 100);
+    }
   }
 
   scrollToFiltros() {
@@ -415,6 +420,16 @@ export class EntrenadoresListComponent implements OnInit {
         behavior: 'smooth',
         block: 'start'
       });
+    }
+  }
+
+  irAtras() {
+    // Intentar regresar en el historial
+    if (window.history.length > 1) {
+      this.location.back();
+    } else {
+      // Fallback: ir al home público
+      this.router.navigate(['/']);
     }
   }
 
@@ -447,23 +462,23 @@ export class EntrenadoresListComponent implements OnInit {
     if (!this.deporteActual || this.deporteActual === 'todos') {
       return '';
     }
-    
+
     const imagenesDeportes: Record<string, string> = {
       'Fútbol': 'assets/images/deportes/futbol.jpg',
       'CrossFit': 'assets/images/deportes/crossfit.jpg',
-      'Yoga': 'assets/images/deportes/yoga.jpg',
+      'Yoga': 'assets/images/deportes/yoga.webp',
       'Natación': 'assets/images/deportes/natacion.jpg',
       'Running': 'assets/images/deportes/running.jpg',
-      'Boxeo': 'assets/images/deportes/boxeo.jpg',
+      'Boxeo': 'assets/images/deportes/boxeo.webp',
       'Ciclismo': 'assets/images/deportes/ciclismo.jpg',
       'Tenis': 'assets/images/deportes/tenis.jpg',
       'Pilates': 'assets/images/deportes/pilates.jpg',
       'Zumba': 'assets/images/deportes/zumba.jpg',
-      'Functional Training': 'assets/images/deportes/funcional.jpg',
+      'Functional Training': 'assets/images/deportes/funcional.png',
       'Spinning': 'assets/images/deportes/spinning.jpg',
-      'Artes Marciales': 'assets/images/deportes/artes-marciales.jpg',
-      'Ballet Fitness': 'assets/images/deportes/ballet.jpg',
-      'Calistenia': 'assets/images/deportes/calistenia.jpg'
+      'Artes Marciales': 'assets/images/deportes/artes-marciales.webp',
+      'Ballet Fitness': 'assets/images/deportes/ballet.webp',
+      'Calistenia': 'assets/images/deportes/calistenia.avif'
     };
 
     return imagenesDeportes[this.deporteActual] || '';

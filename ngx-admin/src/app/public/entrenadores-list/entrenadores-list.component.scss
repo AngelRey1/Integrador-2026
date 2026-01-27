@@ -29,7 +29,7 @@ $border-color: #E2E8F0;
 .back-link-minimal {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 1rem 2rem 0;
+  padding: 1.25rem 2rem 0.25rem;
 }
 
 .link-volver {
@@ -37,22 +37,40 @@ $border-color: #E2E8F0;
   align-items: center;
   gap: 0.4rem;
   color: $text-gray;
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-size: 0.95rem;
+  font-weight: 600;
   text-decoration: none;
   transition: all 0.2s ease;
+  padding: 0.55rem 1.1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
+  cursor: pointer;
+  outline: none;
+
+  span {
+    letter-spacing: 0.02em;
+  }
   
   i[eva-icon] {
-    font-size: 1rem;
+    font-size: 1.1rem;
     transition: transform 0.2s ease;
   }
   
   &:hover {
-    color: $primary-color;
+    color: darken($text-gray, 10%);
+    border-color: rgba(148, 163, 184, 0.7);
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
     
     i[eva-icon] {
-      transform: translateX(-3px);
+      transform: translateX(-4px);
     }
+  }
+
+  &:active {
+    transform: translateY(1px);
+    box-shadow: 0 4px 10px rgba(15, 23, 42, 0.16);
   }
 }
 

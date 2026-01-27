@@ -5,10 +5,10 @@
     <div class="entrenadores-page">
   <!-- Enlace Volver Minimalista -->
   <div class="back-link-minimal">
-    <a routerLink="/" class="link-volver">
+    <button type="button" class="link-volver" (click)="irAtras()">
       <i eva-icon="arrow-back-outline" eva-pack="outline"></i>
       <span>Volver</span>
-    </a>
+    </button>
   </div>
 
   <!-- Carrusel de Destacados -->
@@ -85,7 +85,7 @@
           <input 
             type="text" 
             [(ngModel)]="searchQuery"
-            (ngModelChange)="aplicarFiltros()"
+            (ngModelChange)="aplicarFiltros(true)"
             placeholder="Buscar por nombre o deporte..."
             class="input-pill"
           />
@@ -96,7 +96,7 @@
           <i eva-icon="heart-outline" eva-pack="outline" class="icon-filter"></i>
           <select 
             [(ngModel)]="filtros.deporte"
-            (ngModelChange)="aplicarFiltros()"
+            (ngModelChange)="aplicarFiltros(true)"
             class="select-pill"
           >
             <option value="todos">Todos los deportes</option>
@@ -114,7 +114,7 @@
             <input 
               type="range" 
               [(ngModel)]="filtros.precioMax"
-              (ngModelChange)="aplicarFiltros()"
+              (ngModelChange)="aplicarFiltros(true)"
               min="10"
               max="100"
               class="range-pill"
@@ -127,7 +127,7 @@
           <i eva-icon="star-outline" eva-pack="outline" class="icon-filter"></i>
           <select 
             [(ngModel)]="filtros.calificacionMin"
-            (ngModelChange)="aplicarFiltros()"
+            (ngModelChange)="aplicarFiltros(true)"
             class="select-pill"
           >
             <option [value]="0">Todas las calificaciones</option>
