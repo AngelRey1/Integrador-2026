@@ -108,8 +108,11 @@
       font-size: 2rem;
       flex-shrink: 0;
 
-      nb-icon {
-        color: white;
+      .icon {
+        width: 32px;
+        height: 32px;
+        stroke: white;
+        stroke-width: 1.5;
       }
 
       background: linear-gradient(135deg, $color-primary 0%, $color-secondary 100%);

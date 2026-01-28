@@ -9,6 +9,9 @@ import { MisClientesComponent } from './mis-clientes/mis-clientes.component';
 import { MisIngresosComponent } from './mis-ingresos/mis-ingresos.component';
 import { PerfilEntrenadorComponent } from './perfil-entrenador/perfil-entrenador.component';
 
+// Custom Icons
+import { SportIconsModule } from '../../@theme/components/sport-icons/sport-icons.module';
+
 // Nebular Modules
 import {
   NbCardModule,
@@ -33,6 +36,7 @@ import {
   NbCalendarRangeModule,
   NbToastrModule
 } from '@nebular/theme';
+import { NbEvaIconsModule } from '@nebular/eva-icons';
 
 @NgModule({
   declarations: [
@@ -52,6 +56,7 @@ import {
     NbCardModule,
     NbButtonModule,
     NbIconModule,
+    NbEvaIconsModule,
     NbInputModule,
     NbBadgeModule,
     NbSelectModule,

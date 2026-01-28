@@ -180,3 +180,81 @@ $font-secondary: 'Inter', sans-serif;
   font-size: 0.75rem;
   font-weight: 600;
 }
+
+// ============================================
+// SVG ICON STYLES - Professional Icons
+// ============================================
+
+// Icono base
+.icon {
+  width: 24px;
+  height: 24px;
+  stroke: currentColor;
+  fill: none;
+  flex-shrink: 0;
+}
+
+// Icono pequeño (botones de acción)
+.icon-sm {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  fill: none;
+  flex-shrink: 0;
+}
+
+// Icono grande (estados vacíos)
+.icon-large {
+  width: 48px;
+  height: 48px;
+  stroke: $color-text-secondary;
+  fill: none;
+  opacity: 0.5;
+}
+
+// Icono inline (dentro de texto)
+.icon-inline {
+  width: 20px;
+  height: 20px;
+  vertical-align: middle;
+  margin-left: 0.25rem;
+}
+
+// Icono para títulos de sección
+.icon-title {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  fill: none;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+}
+
+// Estrella rellena (para calificaciones)
+.star-filled {
+  fill: #FFC107;
+  stroke: none;
+}
+
+// Icono en metric-icon (dentro de las tarjetas de métricas)
+.metric-icon {
+  .icon {
+    width: 32px;
+    height: 32px;
+    stroke: white;
+    stroke-width: 1.5;
+  }
+}
+
+// Estilos de iconos en botones
+button, .btn-action-hero, .btn-small, .btn-view-all {
+  .icon, .icon-sm {
+    transition: transform 0.2s ease;
+  }
+  
+  &:hover {
+    .icon, .icon-sm {
+      transform: scale(1.1);
+    }
+  }
+}

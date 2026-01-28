@@ -51,7 +51,7 @@ const routes: Routes = [
       },
       {
         path: '',
-        redirectTo: 'dashboard',
+        redirectTo: 'mis-reservas',
         pathMatch: 'full'
       }
     ]

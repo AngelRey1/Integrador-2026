@@ -72,8 +72,10 @@
       font-size: 1.75rem;
       flex-shrink: 0;
 
-      nb-icon {
-        color: white;
+      .icon {
+        width: 28px;
+        height: 28px;
+        stroke: white;
       }
     }
 
@@ -97,42 +99,42 @@
     }
 
     // Color variants
-    &.stat-success {
+    &.stat-success, &.stat-calendar {
       .stat-icon {
         background: rgba(0, 208, 156, 0.1);
         
-        nb-icon {
-          color: $color-primary;
+        .icon {
+          stroke: $color-primary;
         }
       }
     }
 
-    &.stat-primary {
+    &.stat-primary, &.stat-people {
       .stat-icon {
         background: rgba(10, 123, 138, 0.1);
         
-        nb-icon {
-          color: $color-secondary;
+        .icon {
+          stroke: $color-secondary;
         }
       }
     }
 
-    &.stat-warning {
+    &.stat-warning, &.stat-star {
       .stat-icon {
         background: rgba(255, 193, 7, 0.1);
         
-        nb-icon {
-          color: #FFC107;
+        .icon {
+          stroke: #FFC107;
         }
       }
     }
 
-    &.stat-info {
+    &.stat-info, &.stat-clock {
       .stat-icon {
         background: rgba(0, 240, 255, 0.1);
         
-        nb-icon {
-          color: $color-neon;
+        .icon {
+          stroke: $color-neon;
         }
       }
     }

@@ -16,7 +16,7 @@
         <div class="hero-left">
           <div class="foto-principal">
             <img [src]="entrenador.foto" [alt]="entrenador.nombre" />
-            <span *ngIf="entrenador.destacado" class="badge-destacado">⭐ Destacado</span>
+            <span *ngIf="entrenador.destacado" class="badge-destacado"><nb-icon icon="star"></nb-icon> Destacado</span>
             <span class="badge-nivel" [class.elite]="entrenador.nivel === 'ELITE'">
               {{ entrenador.nivel }}
             </span>
@@ -34,12 +34,12 @@
 
         <div class="hero-right">
           <h1 class="entrenador-nombre">{{ entrenador.nombre }}</h1>
-          <p class="entrenador-ubicacion">📍 {{ entrenador.ubicacion }}</p>
+          <p class="entrenador-ubicacion"><nb-icon icon="pin-outline"></nb-icon> {{ entrenador.ubicacion }}</p>
 
           <div class="rating-section">
             <div class="estrellas">
               <span *ngFor="let star of getEstrellas(entrenador.calificacion)" class="star">
-                {{ star === 'full' ? '⭐' : '☆' }}
+                <nb-icon [icon]="star === 'full' ? 'star' : 'star-outline'"></nb-icon>
               </span>
             </div>
             <span class="rating-text">{{ entrenador.calificacion }} ({{ entrenador.totalResenas }} opiniones)</span>
@@ -53,7 +53,7 @@
 
           <div class="info-grid">
             <div class="info-item">
-              <span class="info-icon">💼</span>
+              <span class="info-icon"><nb-icon icon="briefcase-outline"></nb-icon></span>
               <div>
                 <span class="info-label">Experiencia</span>
                 <span class="info-value">{{ entrenador.experiencia }} años</span>
@@ -61,7 +61,7 @@
             </div>
 
             <div class="info-item">
-              <span class="info-icon">🌍</span>
+              <span class="info-icon"><nb-icon icon="globe-2-outline"></nb-icon></span>
               <div>
                 <span class="info-label">Idiomas</span>
                 <span class="info-value">{{ entrenador.idiomas.join(', ') }}</span>
@@ -69,7 +69,7 @@
             </div>
 
             <div class="info-item">
-              <span class="info-icon">📍</span>
+              <span class="info-icon"><nb-icon icon="pin-outline"></nb-icon></span>
               <div>
                 <span class="info-label">Modalidad</span>
                 <span class="info-value">{{ entrenador.modalidad.join(' / ') }}</span>
@@ -87,7 +87,7 @@
               Reservar
             </button>
             <button class="btn-whatsapp" (click)="contactarWhatsApp()">
-              <span class="whatsapp-icon">💬</span>
+              <span class="whatsapp-icon"><nb-icon icon="message-circle-outline"></nb-icon></span>
               WhatsApp
             </button>
           </div>
@@ -199,13 +199,13 @@
       <!-- Tab: Reseñas -->
       <div class="tab-content" *ngIf="tabActiva === 'resenas'">
         <div class="resenas-header">
-          <h2>⭐ Reseñas de clientes</h2>
+          <h2><nb-icon icon="star"></nb-icon> Reseñas de clientes</h2>
           <div class="resumen-rating">
             <div class="rating-grande">{{ entrenador.calificacion }}</div>
             <div class="rating-info">
               <div class="estrellas-grandes">
                 <span *ngFor="let star of getEstrellas(entrenador.calificacion)" class="star">
-                  {{ star === 'full' ? '⭐' : '☆' }}
+                  <nb-icon [icon]="star === 'full' ? 'star' : 'star-outline'"></nb-icon>
                 </span>
               </div>
               <p>{{ entrenador.totalResenas }} opiniones</p>
@@ -223,7 +223,7 @@
                 <h4 class="cliente-nombre">{{ resena.cliente }}</h4>
                 <div class="resena-rating">
                   <span *ngFor="let star of getEstrellas(resena.calificacion)" class="star">
-                    {{ star === 'full' ? '⭐' : '☆' }}
+                    <nb-icon [icon]="star === 'full' ? 'star' : 'star-outline'"></nb-icon>
                   </span>
                 </div>
               </div>

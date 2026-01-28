@@ -1,154 +1,431 @@
-<!-- HERO SECTION - Bienvenida Premium -->
-<section class="hero-dashboard">
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<!-- SPORTCONNECT - CLIENTE DASHBOARD - HUB PERSONAL PREMIUM                     -->
+<!-- Arquitectura: Dashboard personal (NO Discovery - eso está en Landing)       -->
+<!-- Diseño: Glassmorphism + 3D Cards + Premium animations                       -->
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+
+<!-- HERO - Bienvenida Personalizada con Stats en tiempo real -->
+<section class="personal-hero-glass">
+  <div class="hero-backdrop"></div>
   <div class="hero-content">
-    <h1 class="hero-title">Bienvenido de Vuelta</h1>
-    <p class="hero-subtitle">Continúa tu viaje con los mejores entrenadores de Mérida</p>
+    <div class="welcome-section">
+      <div class="welcome-avatar">
+        <div class="avatar-ring">
+          <img [src]="cliente?.foto_url || 'assets/images/default-avatar.png'" 
+               [alt]="cliente?.nombre" 
+               class="avatar-img"
+               (error)="$event.target.src='assets/images/default-avatar.png'">
+        </div>
+        <div class="status-indicator online"></div>
+      </div>
+      <div class="welcome-text">
+        <span class="greeting-small">{{ getGreeting() }} 👋</span>
+        <h1 class="welcome-name">{{ cliente?.nombre || 'Atleta' }}</h1>
+        <p class="member-since">
+          <sport-icon name="calendar" [size]="14" color="rgba(255,255,255,0.7)"></sport-icon>
+          Miembro desde {{ cliente?.fecha_registro | date:'MMMM yyyy' }}
+        </p>
+      </div>
+    </div>
+    
+    <!-- Quick Stats en Hero -->
+    <div class="hero-quick-stats">
+      <div class="quick-stat-pill">
+        <sport-icon name="fire" [size]="18" color="#ff6b35"></sport-icon>
+        <span class="stat-num">{{ racha || 0 }}</span>
+        <span class="stat-label">días racha</span>
+      </div>
+      <div class="quick-stat-pill">
+        <sport-icon name="trophy" [size]="18" color="#ffd700"></sport-icon>
+        <span class="stat-num">{{ logrosDesbloqueados || 0 }}</span>
+        <span class="stat-label">logros</span>
+      </div>
+      <div class="quick-stat-pill accent">
+        <sport-icon name="trending-up" [size]="18" color="#00d9a5"></sport-icon>
+        <span class="stat-num">+{{ progresoMes || 0 }}%</span>
+        <span class="stat-label">este mes</span>
+      </div>
+    </div>
   </div>
 </section>
 
-<!-- QUICK STATS - Estadísticas Premium -->
-<div class="stats-premium-grid">
-  <div class="stat-premium-card" *ngFor="let stat of statsCards" [ngClass]="'stat-' + stat.iconClass.toLowerCase()">
-    <div class="stat-icon">
-      <nb-icon [icon]="stat.icon"></nb-icon>
-    </div>
-    <div class="stat-content">
-      <span class="stat-label">{{stat.title}}</span>
-      <span class="stat-value">{{stat.value}}</span>
-    </div>
-  </div>
-</div>
-
-<!-- MAIN CONTENT -->
-<div class="dashboard-container">
-  <!-- SECCIÓN IZQUIERDA: PRÓXIMAS SESIONES Y BÚSQUEDA -->
-  <div class="dashboard-main">
-    <!-- BÚSQUEDA PREMIUM CON HERO -->
-    <div class="search-hero-section">
-      <div class="search-content">
-        <h2 class="search-title">Encuentra tu siguiente Coach</h2>
-        <p class="search-subtitle">Búsqueda rápida y fácil</p>
+<!-- LAYOUT PRINCIPAL: 2 columnas -->
+<div class="dashboard-grid-layout">
+  
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- COLUMNA PRINCIPAL (70%) -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div class="main-column">
+    
+    <!-- PRÓXIMA SESIÓN DESTACADA -->
+    <section class="next-session-highlight" *ngIf="proximaSesion">
+      <div class="section-glass-header">
+        <div class="header-left">
+          <span class="live-indicator">
+            <span class="pulse-dot"></span>
+            PRÓXIMA
+          </span>
+          <h2 class="section-title-premium">Tu Próxima Sesión</h2>
+        </div>
+        <div class="countdown-badge" *ngIf="tiempoRestante">
+          <sport-icon name="timer" [size]="16" color="#ff6b35"></sport-icon>
+          <span>{{ tiempoRestante }}</span>
+        </div>
+      </div>
+      
+      <div class="featured-session-card">
+        <div class="session-visual">
+          <div class="session-sport-bg" [ngClass]="'sport-' + (proximaSesion.deporte | lowercase)">
+            <sport-icon [name]="getDeporteIcon(proximaSesion.deporte)" [size]="48" color="rgba(255,255,255,0.3)"></sport-icon>
+          </div>
+          <div class="session-date-block">
+            <span class="day-big">{{ proximaSesion.fecha_hora | date:'dd' }}</span>
+            <span class="month-abbr">{{ proximaSesion.fecha_hora | date:'MMM' | uppercase }}</span>
+            <span class="time-highlight">{{ proximaSesion.fecha_hora | date:'HH:mm' }}</span>
+          </div>
+        </div>
         
-        <form class="busqueda-form-premium">
-          <div class="search-inputs-row">
-            <div class="search-input-group">
-              <label>Deporte o Especialidad</label>
-              <input type="text" placeholder="Yoga, CrossFit, Box..." [(ngModel)]="busquedaRapida.deporte" name="deporte">
+        <div class="session-details-premium">
+          <div class="trainer-featured">
+            <div class="trainer-avatar-ring">
+              <img [src]="proximaSesion.entrenador?.foto" 
+                   [alt]="proximaSesion.entrenador?.nombre"
+                   class="trainer-img">
             </div>
-            <div class="search-input-group">
-              <label>Disponibilidad</label>
-              <input type="date" [(ngModel)]="busquedaRapida.fecha" name="fecha">
-            </div>
-            <div class="search-input-group">
-              <label>Presupuesto Máximo</label>
-              <div class="input-with-currency">
-                <input type="number" placeholder="5000" [(ngModel)]="busquedaRapida.precioMaximo" name="precio">
-                <span class="currency-badge">MXN</span>
+            <div class="trainer-info-column">
+              <h3 class="trainer-name-lg">{{ proximaSesion.entrenador?.nombre }}</h3>
+              <div class="trainer-meta">
+                <span class="sport-tag">
+                  <sport-icon [name]="getDeporteIcon(proximaSesion.deporte)" [size]="14"></sport-icon>
+                  {{ proximaSesion.deporte }}
+                </span>
+                <span class="duration-tag">
+                  <sport-icon name="clock" [size]="14"></sport-icon>
+                  {{ proximaSesion.duracion }} min
+                </span>
               </div>
             </div>
-            <button class="btn-search-premium" (click)="buscarEntrenadores()">
-              <nb-icon icon="search-outline"></nb-icon>
-              <span>Buscar Coaches</span>
+          </div>
+          
+          <div class="session-location" *ngIf="proximaSesion.ubicacion">
+            <sport-icon name="map-pin" [size]="16" color="#00d9a5"></sport-icon>
+            <span>{{ proximaSesion.ubicacion }}</span>
+          </div>
+          
+          <div class="session-actions-row">
+            <button class="btn-session-action primary" (click)="verSesion(proximaSesion)">
+              <sport-icon name="eye" [size]="18"></sport-icon>
+              Ver Detalles
+            </button>
+            <button class="btn-session-action" (click)="contactarEntrenador(proximaSesion.entrenador)">
+              <sport-icon name="message" [size]="18"></sport-icon>
+              Mensaje
+            </button>
+            <button class="btn-session-action danger" (click)="cancelarSesion(proximaSesion)" title="Cancelar">
+              <sport-icon name="x" [size]="18"></sport-icon>
             </button>
           </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- PRÓXIMAS SESIONES - Card Premium -->
-    <div class="section-premium">
-      <div class="section-header">
-        <h3 class="section-title">Tus Próximas Sesiones</h3>
-        <span class="sessions-count">{{ proximasSesiones.length }} sesiones</span>
-      </div>
-
-      <div class="sessions-content">
-        <div *ngIf="proximasSesiones.length === 0" class="no-sessions-state">
-          <div class="empty-state-icon">
-            <nb-icon icon="calendar-outline"></nb-icon>
-          </div>
-          <h4>Sin sesiones programadas</h4>
-          <p>¡Encuentra un coach y agenda tu primera sesión!</p>
-          <button class="btn-cta-premium" (click)="buscarEntrenadores()">
-            Explorar Coaches →
-          </button>
-        </div>
-
-        <div *ngIf="proximasSesiones.length > 0" class="sessions-list">
-          <div class="session-item-premium" *ngFor="let sesion of proximasSesiones">
-            <div class="session-left">
-              <div class="session-date">
-                <span class="date-day">{{ sesion.fecha_hora | date:'dd' }}</span>
-                <span class="date-month">{{ sesion.fecha_hora | date:'MMM' }}</span>
-              </div>
-            </div>
-            <div class="session-middle">
-              <div class="session-trainer">
-                <img [src]="sesion.entrenador.foto" alt="{{sesion.entrenador.nombre}}" class="trainer-avatar">
-                <div class="trainer-info">
-                  <h5>{{ sesion.entrenador.nombre }}</h5>
-                  <p>{{ sesion.deporte }} • {{ sesion.duracion }} min</p>
-                </div>
-              </div>
-              <div class="session-time">
-                <nb-icon icon="clock-outline"></nb-icon>
-                <span>{{ sesion.fecha_hora | date:'HH:mm' }}</span>
-              </div>
-            </div>
-            <div class="session-right">
-              <span class="status-badge" [ngClass]="'status-' + sesion.estado.toLowerCase()">
-                {{ sesion.estado }}
-              </span>
-              <div class="session-actions">
-                <button class="btn-action" (click)="verSesion(sesion)">
-                  <nb-icon icon="eye-outline"></nb-icon>
-                </button>
-                <button class="btn-action btn-danger" (click)="cancelarSesion(sesion)" *ngIf="sesion.estado !== 'CANCELADA'">
-                  <nb-icon icon="close-outline"></nb-icon>
-                </button>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
-    </div>
-  </div>
-
-  <!-- SECCIÓN DERECHA: ENTRENADORES FAVORITOS -->
-  <div class="dashboard-sidebar">
-    <div class="favorites-section">
-      <div class="section-header">
-        <h3 class="section-title">⭐ Favoritos</h3>
-      </div>
-
-      <div *ngIf="entrenadoresFavoritos.length === 0" class="no-favorites-state">
-        <nb-icon icon="star-outline"></nb-icon>
-        <p>Sin entrenadores favoritos</p>
-        <button class="btn-cta-secondary" (click)="buscarEntrenadores()">
-          Agregar Favoritos
+    </section>
+    
+    <!-- ESTADO VACÍO: Sin próxima sesión -->
+    <section class="empty-next-session" *ngIf="!proximaSesion">
+      <div class="empty-glass-card">
+        <div class="empty-illustration">
+          <div class="floating-icons">
+            <sport-icon name="calendar" [size]="28" color="rgba(0,217,165,0.4)" class="float-icon i1"></sport-icon>
+            <sport-icon name="futbol" [size]="24" color="rgba(255,107,53,0.4)" class="float-icon i2"></sport-icon>
+            <sport-icon name="yoga" [size]="22" color="rgba(138,43,226,0.4)" class="float-icon i3"></sport-icon>
+            <sport-icon name="running" [size]="26" color="rgba(0,149,255,0.4)" class="float-icon i4"></sport-icon>
+          </div>
+          <div class="main-empty-icon">
+            <sport-icon name="calendar" [size]="56" color="currentColor"></sport-icon>
+          </div>
+        </div>
+        <h3 class="empty-title">No tienes sesiones programadas</h3>
+        <p class="empty-description">Explora nuestros entrenadores de élite y agenda tu primera sesión</p>
+        <button class="btn-cta-gradient" (click)="buscarEntrenadores()">
+          <sport-icon name="search" [size]="20"></sport-icon>
+          Explorar Entrenadores
         </button>
       </div>
+    </section>
 
-      <div *ngIf="entrenadoresFavoritos.length > 0" class="favorites-list">
-        <div class="favorite-card-mini" *ngFor="let entrenador of entrenadoresFavoritos">
-          <img [src]="entrenador.foto_url" alt="{{entrenador.nombre_completo}}" class="trainer-photo">
-          <div class="trainer-details">
-            <h6 class="trainer-name">{{entrenador.nombre_completo}}</h6>
-            <p class="trainer-specialty">{{entrenador.especialidad}}</p>
-            <div class="trainer-rating">
-              <span class="rating-stars">⭐ {{entrenador.calificacion}}</span>
-              <span class="rating-count">({{entrenador.total_resenas}})</span>
-            </div>
-            <div class="trainer-price">
-              <strong>${{ entrenador.tarifa_por_hora }}</strong>
-              <span>MXN/hora</span>
-            </div>
-          </div>
-          <button class="btn-mini-cta" (click)="agendarConEntrenador(entrenador)">
-            <nb-icon icon="calendar-outline"></nb-icon>
+    <!-- HISTORIAL DE SESIONES -->
+    <section class="sessions-history-section">
+      <div class="section-glass-header">
+        <h2 class="section-title-premium">
+          <sport-icon name="calendar" [size]="22" color="#00d9a5"></sport-icon>
+          Todas tus Sesiones
+        </h2>
+        <div class="view-controls">
+          <button class="view-toggle" [class.active]="vistaActiva === 'proximas'" (click)="vistaActiva = 'proximas'">
+            Próximas ({{ proximasSesiones?.length || 0 }})
+          </button>
+          <button class="view-toggle" [class.active]="vistaActiva === 'pasadas'" (click)="vistaActiva = 'pasadas'">
+            Historial
           </button>
         </div>
       </div>
-    </div>
+      
+      <!-- Lista de Sesiones Próximas -->
+      <div class="sessions-grid" *ngIf="vistaActiva === 'proximas'">
+        <div class="session-card-compact" *ngFor="let sesion of proximasSesiones; let i = index"
+             [class.featured]="i === 0">
+          <div class="card-date-strip" [ngClass]="'sport-' + (sesion.deporte | lowercase)">
+            <span class="strip-day">{{ sesion.fecha_hora | date:'dd' }}</span>
+            <span class="strip-month">{{ sesion.fecha_hora | date:'MMM' }}</span>
+          </div>
+          
+          <div class="card-main-content">
+            <div class="trainer-row">
+              <img [src]="sesion.entrenador?.foto" [alt]="sesion.entrenador?.nombre" class="mini-avatar">
+              <div class="trainer-compact-info">
+                <span class="name">{{ sesion.entrenador?.nombre }}</span>
+                <span class="meta">{{ sesion.deporte }} • {{ sesion.duracion }}min</span>
+              </div>
+            </div>
+            <div class="time-badge">
+              <sport-icon name="clock" [size]="14"></sport-icon>
+              {{ sesion.fecha_hora | date:'HH:mm' }}
+            </div>
+          </div>
+          
+          <div class="card-actions">
+            <span class="status-chip" [ngClass]="'status-' + sesion.estado?.toLowerCase()">
+              {{ sesion.estado }}
+            </span>
+            <button class="icon-btn" (click)="verSesion(sesion)" title="Ver detalles">
+              <sport-icon name="eye" [size]="16"></sport-icon>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Estado vacío para próximas -->
+        <div class="empty-state-inline" *ngIf="!proximasSesiones || proximasSesiones.length === 0">
+          <sport-icon name="calendar" [size]="32" color="rgba(255,255,255,0.3)"></sport-icon>
+          <p>No hay sesiones programadas</p>
+        </div>
+      </div>
+      
+      <!-- Lista de Historial -->
+      <div class="sessions-grid history" *ngIf="vistaActiva === 'pasadas'">
+        <div class="session-card-compact past" *ngFor="let sesion of historialSesiones; let i = index">
+          <div class="card-date-strip past">
+            <span class="strip-day">{{ sesion.fecha_hora | date:'dd' }}</span>
+            <span class="strip-month">{{ sesion.fecha_hora | date:'MMM' }}</span>
+          </div>
+          
+          <div class="card-main-content">
+            <div class="trainer-row">
+              <img [src]="sesion.entrenador?.foto" [alt]="sesion.entrenador?.nombre" class="mini-avatar">
+              <div class="trainer-compact-info">
+                <span class="name">{{ sesion.entrenador?.nombre }}</span>
+                <span class="meta">{{ sesion.deporte }} • {{ sesion.duracion }}min</span>
+              </div>
+            </div>
+            <!-- Calificación dada -->
+            <div class="rating-given" *ngIf="sesion.calificacion">
+              <sport-icon name="star-filled" [size]="14" color="#ffd700"></sport-icon>
+              {{ sesion.calificacion }}
+            </div>
+          </div>
+          
+          <div class="card-actions">
+            <button class="btn-rebook" (click)="reagendarSesion(sesion)" title="Volver a agendar">
+              <sport-icon name="refresh" [size]="16"></sport-icon>
+              Reagendar
+            </button>
+          </div>
+        </div>
+        
+        <!-- Estado vacío para historial -->
+        <div class="empty-state-inline" *ngIf="!historialSesiones || historialSesiones.length === 0">
+          <sport-icon name="clock" [size]="32" color="rgba(255,255,255,0.3)"></sport-icon>
+          <p>Aún no tienes sesiones completadas</p>
+        </div>
+      </div>
+    </section>
+    
+    <!-- MI PROGRESO - Cards de estadísticas -->
+    <section class="progress-section">
+      <div class="section-glass-header">
+        <h2 class="section-title-premium">
+          <sport-icon name="activity" [size]="22" color="#ff6b35"></sport-icon>
+          Mi Progreso
+        </h2>
+        <span class="period-label">Este mes</span>
+      </div>
+      
+      <div class="progress-cards-grid">
+        <div class="progress-card-3d">
+          <div class="card-icon-circle sessions">
+            <sport-icon name="calendar" [size]="24" color="#fff"></sport-icon>
+          </div>
+          <div class="card-metric">
+            <span class="metric-value">{{ totalSesionesMes || 0 }}</span>
+            <span class="metric-label">Sesiones</span>
+          </div>
+          <div class="metric-trend up" *ngIf="tendenciaSesiones > 0">
+            <sport-icon name="trending-up" [size]="14" color="#00d9a5"></sport-icon>
+            +{{ tendenciaSesiones }}%
+          </div>
+        </div>
+        
+        <div class="progress-card-3d">
+          <div class="card-icon-circle hours">
+            <sport-icon name="clock" [size]="24" color="#fff"></sport-icon>
+          </div>
+          <div class="card-metric">
+            <span class="metric-value">{{ totalHorasMes || 0 }}</span>
+            <span class="metric-label">Horas</span>
+          </div>
+          <div class="metric-trend">
+            <sport-icon name="fire" [size]="14" color="#ff6b35"></sport-icon>
+            {{ caloriasQuemadas || 0 }} kcal
+          </div>
+        </div>
+        
+        <div class="progress-card-3d">
+          <div class="card-icon-circle coaches">
+            <sport-icon name="users" [size]="24" color="#fff"></sport-icon>
+          </div>
+          <div class="card-metric">
+            <span class="metric-value">{{ entrenadoresUnicos || 0 }}</span>
+            <span class="metric-label">Coaches</span>
+          </div>
+          <div class="metric-trend">
+            <span class="mini-text">diferentes</span>
+          </div>
+        </div>
+        
+        <div class="progress-card-3d">
+          <div class="card-icon-circle sports">
+            <sport-icon name="trophy" [size]="24" color="#fff"></sport-icon>
+          </div>
+          <div class="card-metric">
+            <span class="metric-value">{{ deportesPracticados || 0 }}</span>
+            <span class="metric-label">Deportes</span>
+          </div>
+          <div class="sports-mini-icons">
+            <sport-icon *ngFor="let d of deportesLista?.slice(0,3)" 
+                        [name]="getDeporteIcon(d)" 
+                        [size]="12" 
+                        color="rgba(255,255,255,0.6)">
+            </sport-icon>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- COLUMNA LATERAL (30%) -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div class="side-column">
+    
+    <!-- FAVORITOS - Acceso Rápido -->
+    <section class="favorites-panel">
+      <div class="panel-header-glass">
+        <h3 class="panel-title">
+          <sport-icon name="heart" [size]="18" color="#ff6b35" [filled]="true"></sport-icon>
+          Mis Favoritos
+        </h3>
+        <span class="count-badge">{{ entrenadoresFavoritos?.length || 0 }}</span>
+      </div>
+      
+      <div class="favorites-scroll">
+        <!-- Estado vacío -->
+        <div class="empty-favorites" *ngIf="!entrenadoresFavoritos || entrenadoresFavoritos.length === 0">
+          <div class="empty-heart-icon">
+            <sport-icon name="heart" [size]="36" color="rgba(255,107,53,0.3)"></sport-icon>
+          </div>
+          <p>Guarda tus entrenadores favoritos para acceso rápido</p>
+          <button class="btn-outline-small" (click)="buscarEntrenadores()">
+            <sport-icon name="search" [size]="14"></sport-icon>
+            Explorar
+          </button>
+        </div>
+        
+        <!-- Lista de favoritos -->
+        <div class="favorite-coach-card" *ngFor="let coach of entrenadoresFavoritos">
+          <div class="coach-visual">
+            <img [src]="coach.foto_url" [alt]="coach.nombre_completo" class="coach-photo">
+            <div class="online-dot" *ngIf="coach.disponible"></div>
+          </div>
+          
+          <div class="coach-details">
+            <h4 class="coach-name">{{ coach.nombre_completo }}</h4>
+            <div class="coach-specialty">
+              <sport-icon [name]="getDeporteIcon(coach.especialidad)" [size]="12"></sport-icon>
+              {{ coach.especialidad }}
+            </div>
+            <div class="coach-rating-price">
+              <span class="rating">
+                <sport-icon name="star-filled" [size]="12" color="#ffd700"></sport-icon>
+                {{ coach.calificacion }}
+              </span>
+              <span class="price">${{ coach.tarifa_por_hora }} MXN</span>
+            </div>
+          </div>
+          
+          <button class="btn-quick-book" (click)="agendarConEntrenador(coach)" title="Agendar rápido">
+            <sport-icon name="calendar" [size]="16"></sport-icon>
+          </button>
+        </div>
+      </div>
+    </section>
+    
+    <!-- ACCIONES RÁPIDAS -->
+    <section class="quick-actions-panel">
+      <h3 class="panel-title-small">Acciones Rápidas</h3>
+      
+      <div class="action-buttons-stack">
+        <button class="action-btn-glass" (click)="buscarEntrenadores()">
+          <div class="action-icon search">
+            <sport-icon name="search" [size]="20" color="#fff"></sport-icon>
+          </div>
+          <span class="action-text">Buscar Entrenadores</span>
+          <sport-icon name="chevron-right" [size]="16" color="rgba(255,255,255,0.5)"></sport-icon>
+        </button>
+        
+        <button class="action-btn-glass" (click)="verHistorial()">
+          <div class="action-icon history">
+            <sport-icon name="clock" [size]="20" color="#fff"></sport-icon>
+          </div>
+          <span class="action-text">Historial Completo</span>
+          <sport-icon name="chevron-right" [size]="16" color="rgba(255,255,255,0.5)"></sport-icon>
+        </button>
+        
+        <button class="action-btn-glass" (click)="verPerfil()">
+          <div class="action-icon profile">
+            <sport-icon name="user" [size]="20" color="#fff"></sport-icon>
+          </div>
+          <span class="action-text">Mi Perfil</span>
+          <sport-icon name="chevron-right" [size]="16" color="rgba(255,255,255,0.5)"></sport-icon>
+        </button>
+      </div>
+    </section>
+    
+    <!-- LOGROS RECIENTES -->
+    <section class="achievements-teaser" *ngIf="logrosRecientes?.length > 0">
+      <div class="panel-header-glass">
+        <h3 class="panel-title">
+          <sport-icon name="award" [size]="18" color="#ffd700"></sport-icon>
+          Logros Recientes
+        </h3>
+      </div>
+      
+      <div class="achievements-row">
+        <div class="achievement-badge" *ngFor="let logro of logrosRecientes?.slice(0,3)"
+             [title]="logro.nombre">
+          <div class="badge-icon" [ngClass]="logro.tipo">
+            <sport-icon [name]="logro.icono || 'trophy'" [size]="20" color="#fff"></sport-icon>
+          </div>
+          <span class="badge-label">{{ logro.nombre }}</span>
+        </div>
+      </div>
+    </section>
   </div>
 </div>

@@ -49,14 +49,14 @@ export class PublicHomeComponent implements OnInit, OnDestroy {
   ];
   
   deportes: Deporte[] = [
-    { nombre: 'Fútbol', icon: '⚽', slug: 'futbol', entrenadores: 152 },
-    { nombre: 'CrossFit', icon: '🏋️', slug: 'crossfit', entrenadores: 98 },
-    { nombre: 'Yoga', icon: '🧘', slug: 'yoga', entrenadores: 124 },
-    { nombre: 'Natación', icon: '🏊', slug: 'natacion', entrenadores: 76 },
-    { nombre: 'Running', icon: '🏃', slug: 'running', entrenadores: 89 },
-    { nombre: 'Boxeo', icon: '🥊', slug: 'boxeo', entrenadores: 65 },
-    { nombre: 'Ciclismo', icon: '🚴', slug: 'ciclismo', entrenadores: 54 },
-    { nombre: 'Tenis', icon: '🎾', slug: 'tenis', entrenadores: 43 },
+    { nombre: 'Fútbol', icon: 'futbol', slug: 'futbol', entrenadores: 152 },
+    { nombre: 'CrossFit', icon: 'crossfit', slug: 'crossfit', entrenadores: 98 },
+    { nombre: 'Yoga', icon: 'yoga', slug: 'yoga', entrenadores: 124 },
+    { nombre: 'Natación', icon: 'natacion', slug: 'natacion', entrenadores: 76 },
+    { nombre: 'Running', icon: 'running', slug: 'running', entrenadores: 89 },
+    { nombre: 'Boxeo', icon: 'boxeo', slug: 'boxeo', entrenadores: 65 },
+    { nombre: 'Ciclismo', icon: 'ciclismo', slug: 'ciclismo', entrenadores: 54 },
+    { nombre: 'Tenis', icon: 'tenis', slug: 'tenis', entrenadores: 43 },
   ];
 
   avatarsFlotantes = [

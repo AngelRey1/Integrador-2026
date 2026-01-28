@@ -10,6 +10,9 @@ import { MisResenasComponent } from './mis-resenas/mis-resenas.component';
 import { PerfilClienteComponent } from './perfil-cliente/perfil-cliente.component';
 import { CatalogosClienteComponent } from './catalogos-cliente/catalogos-cliente.component';
 
+// Custom Icons
+import { SportIconsModule } from '../../@theme/components/sport-icons/sport-icons.module';
+
 // Nebular Modules
 import {
   NbCardModule,
@@ -32,6 +35,7 @@ import {
   NbDialogModule,
   NbToggleModule
 } from '@nebular/theme';
+import { NbEvaIconsModule } from '@nebular/eva-icons';
 
 import { ClienteRoutingModule } from './cliente-routing.module';
 
@@ -51,10 +55,13 @@ import { ClienteRoutingModule } from './cliente-routing.module';
     ReactiveFormsModule,
     FormsModule,
     ClienteRoutingModule,
+    // Custom Icons
+    SportIconsModule,
     // Nebular Modules
     NbCardModule,
     NbButtonModule,
     NbIconModule,
+    NbEvaIconsModule,
     NbInputModule,
     NbBadgeModule,
     NbSelectModule,

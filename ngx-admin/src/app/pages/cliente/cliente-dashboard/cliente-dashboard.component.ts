@@ -1,62 +1,51 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Router } from '@angular/router';
 import { ClienteService } from '../../../@core/services/cliente.service';
 import { catchError, finalize } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { of, interval, Subscription } from 'rxjs';
 
 @Component({
   selector: 'ngx-cliente-dashboard',
   templateUrl: './cliente-dashboard.component.html',
   styleUrls: ['./cliente-dashboard.component.scss']
 })
-export class ClienteDashboardComponent implements OnInit {
+export class ClienteDashboardComponent implements OnInit, OnDestroy {
   loading = false;
-  // Stats cards para la fila superior
-  statsCards = [
-    {
-      title: 'Sesiones Completadas',
-      value: '12',
-      icon: 'checkmark-circle-2-outline',
-      status: 'success',
-      iconClass: 'success',
-      class: 'stat-card'
-    },
-    {
-      title: 'Próxima Sesión',
-      value: '15 Nov - 10:00',
-      icon: 'clock-outline',
-      status: 'primary',
-      iconClass: 'primary',
-      class: 'stat-card'
-    },
-    {
-      title: 'Reservas Pendientes',
-      value: '2',
-      icon: 'calendar-outline',
-      status: 'warning',
-      iconClass: 'warning',
-      class: 'stat-card'
-    },
-    {
-      title: 'Gasto del Mes',
-      value: '120€',
-      icon: 'credit-card-outline',
-      status: 'info',
-      iconClass: 'info',
-      class: 'stat-card'
-    }
+  
+  // === DATOS DEL CLIENTE ===
+  cliente: any = null;
+  
+  // === NUEVA ARQUITECTURA: HUB PERSONAL ===
+  vistaActiva: 'proximas' | 'pasadas' = 'proximas';
+  
+  // === ESTADÍSTICAS RÁPIDAS DEL HERO ===
+  racha = 7;
+  logrosDesbloqueados = 3;
+  progresoMes = 15;
+  
+  // === PRÓXIMA SESIÓN DESTACADA ===
+  proximaSesion: any = null;
+  tiempoRestante: string = '';
+  private timerSubscription: Subscription | null = null;
+  
+  // === PROGRESO MENSUAL ===
+  totalSesionesMes = 8;
+  totalHorasMes = 12;
+  tendenciaSesiones = 20;
+  caloriasQuemadas = 2400;
+  entrenadoresUnicos = 3;
+  deportesPracticados = 4;
+  deportesLista: string[] = ['Yoga', 'CrossFit', 'Running', 'Natación'];
+  
+  // === HISTORIAL ===
+  historialSesiones: any[] = [];
+  
+  // === LOGROS ===
+  logrosRecientes: any[] = [
+    { nombre: 'Primera Sesión', tipo: 'bronce', icono: 'award' },
+    { nombre: 'Racha de 7 días', tipo: 'plata', icono: 'fire' },
+    { nombre: 'Explorador', tipo: 'oro', icono: 'trophy' }
   ];
-
-  // Estadísticas superiores
-  stats = {
-    sesionesCompletadas: 12,
-    proximaSesion: {
-      fecha: new Date('2025-11-15T10:00:00'),
-      entrenador: 'Ana Pérez',
-      deporte: 'Yoga'
-    },
-    reservasPendientes: 2,
-    gastoMes: 120
-  };
 
   // Próximas sesiones
   proximasSesiones = [
@@ -124,10 +113,90 @@ export class ClienteDashboardComponent implements OnInit {
     precioMaximo: null
   };
 
-  constructor(private clienteService: ClienteService) { }
+  constructor(
+    private clienteService: ClienteService,
+    private router: Router
+  ) { }
 
   ngOnInit(): void {
     this.cargarDatos();
+    this.iniciarContador();
+  }
+  
+  ngOnDestroy(): void {
+    if (this.timerSubscription) {
+      this.timerSubscription.unsubscribe();
+    }
+  }
+  
+  // === MÉTODOS UTILITARIOS ===
+  
+  getGreeting(): string {
+    const hora = new Date().getHours();
+    if (hora < 12) return 'Buenos días';
+    if (hora < 19) return 'Buenas tardes';
+    return 'Buenas noches';
+  }
+  
+  getDeporteIcon(deporte: string): string {
+    if (!deporte) return 'activity';
+    const iconMap: { [key: string]: string } = {
+      'futbol': 'futbol', 'fútbol': 'futbol', 'soccer': 'futbol',
+      'crossfit': 'crossfit', 'pesas': 'crossfit', 'gym': 'crossfit',
+      'yoga': 'yoga', 'pilates': 'yoga', 'meditación': 'yoga',
+      'natacion': 'natacion', 'natación': 'natacion', 'swimming': 'natacion',
+      'running': 'running', 'correr': 'running', 'atletismo': 'running',
+      'boxeo': 'boxeo', 'box': 'boxeo', 'boxing': 'boxeo',
+      'ciclismo': 'ciclismo', 'cycling': 'ciclismo', 'bicicleta': 'ciclismo',
+      'tenis': 'tenis', 'tennis': 'tenis', 'padel': 'tenis'
+    };
+    return iconMap[deporte.toLowerCase()] || 'activity';
+  }
+  
+  private iniciarContador(): void {
+    this.timerSubscription = interval(1000).subscribe(() => {
+      if (this.proximaSesion?.fecha_hora) {
+        this.tiempoRestante = this.calcularTiempoRestante(this.proximaSesion.fecha_hora);
+      }
+    });
+  }
+  
+  private calcularTiempoRestante(fecha: Date): string {
+    const ahora = new Date();
+    const diff = new Date(fecha).getTime() - ahora.getTime();
+    
+    if (diff <= 0) return '¡Ahora!';
+    
+    const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const horas = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutos = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    
+    if (dias > 0) return `${dias}d ${horas}h`;
+    if (horas > 0) return `${horas}h ${minutos}m`;
+    return `${minutos} min`;
+  }
+  
+  // === ACCIONES DE NAVEGACIÓN ===
+  
+  verHistorial(): void {
+    // Cambiar a vista de historial o navegar
+    this.vistaActiva = 'pasadas';
+  }
+  
+  verPerfil(): void {
+    this.router.navigate(['/pages/cliente/perfil']);
+  }
+  
+  contactarEntrenador(entrenador: any): void {
+    console.log('Contactar entrenador:', entrenador);
+    // TODO: Abrir chat o modal de mensaje
+  }
+  
+  reagendarSesion(sesion: any): void {
+    console.log('Reagendar sesión con:', sesion.entrenador);
+    if (sesion.entrenador) {
+      this.agendarConEntrenador(sesion.entrenador);
+    }
   }
 
   cargarDatos(): void {
@@ -155,76 +224,76 @@ export class ClienteDashboardComponent implements OnInit {
       })
     ).subscribe(reservas => {
       if (reservas && reservas.length > 0) {
-        this.proximasSesiones = reservas
-          .filter((r: any) => r.estado === 'CONFIRMADA' || r.estado === 'PENDIENTE')
-          .slice(0, 5)
+        const sesionesFormateadas = reservas
           .map((r: any) => ({
             id: r.id,
             fecha_hora: new Date(r.fecha_hora),
             entrenador: {
+              id: r.entrenador?.id,
               nombre: r.entrenador?.nombre_completo || r.entrenador?.nombre || 'Entrenador',
               foto: r.entrenador?.foto_url || 'assets/images/avatar-default.png'
             },
             deporte: r.deporte || r.clase?.deporte || 'General',
             duracion: r.duracion || 60,
             estado: r.estado,
-            ubicacion: r.ubicacion || r.modalidad || 'No especificada'
+            ubicacion: r.ubicacion || r.modalidad || 'No especificada',
+            calificacion: r.calificacion
           }));
+        
+        // Separar próximas de historial
+        const ahora = new Date();
+        this.proximasSesiones = sesionesFormateadas
+          .filter((s: any) => new Date(s.fecha_hora) >= ahora && 
+                  (s.estado === 'CONFIRMADA' || s.estado === 'PENDIENTE'))
+          .sort((a: any, b: any) => new Date(a.fecha_hora).getTime() - new Date(b.fecha_hora).getTime())
+          .slice(0, 5);
+        
+        this.historialSesiones = sesionesFormateadas
+          .filter((s: any) => new Date(s.fecha_hora) < ahora || s.estado === 'COMPLETADA')
+          .sort((a: any, b: any) => new Date(b.fecha_hora).getTime() - new Date(a.fecha_hora).getTime())
+          .slice(0, 10);
+        
+        // Establecer próxima sesión destacada
+        if (this.proximasSesiones.length > 0) {
+          this.proximaSesion = this.proximasSesiones[0];
+        }
       }
     });
   }
 
   private actualizarDatosDesdeAPI(data: any): void {
-    // Actualizar stats cards desde la API
+    // Actualizar estadísticas del HUB personal
     if (data.estadisticas) {
-      this.statsCards = [
-        {
-          title: 'Sesiones Completadas',
-          value: data.estadisticas.sesionesCompletadas?.toString() || '0',
-          icon: 'checkmark-circle-2-outline',
-          status: 'success',
-          iconClass: 'success',
-          class: 'stat-card'
-        },
-        {
-          title: 'Próxima Sesión',
-          value: data.estadisticas.proximaSesion 
-            ? this.formatearFecha(data.estadisticas.proximaSesion.fecha)
-            : 'Sin sesiones',
-          icon: 'clock-outline',
-          status: 'primary',
-          iconClass: 'primary',
-          class: 'stat-card'
-        },
-        {
-          title: 'Reservas Pendientes',
-          value: data.estadisticas.reservasPendientes?.toString() || '0',
-          icon: 'calendar-outline',
-          status: 'warning',
-          iconClass: 'warning',
-          class: 'stat-card'
-        },
-        {
-          title: 'Gasto del Mes',
-          value: `€${data.estadisticas.gastoMes || 0}`,
-          icon: 'credit-card-outline',
-          status: 'info',
-          iconClass: 'info',
-          class: 'stat-card'
-        }
-      ];
-
-      this.stats = {
-        sesionesCompletadas: data.estadisticas.sesionesCompletadas || 0,
-        proximaSesion: data.estadisticas.proximaSesion || null,
-        reservasPendientes: data.estadisticas.reservasPendientes || 0,
-        gastoMes: data.estadisticas.gastoMes || 0
-      };
+      // Progreso mensual
+      this.totalSesionesMes = data.estadisticas.sesionesCompletadas || 0;
+      this.totalHorasMes = data.estadisticas.horasTotales || Math.round(this.totalSesionesMes * 1.2);
+      this.tendenciaSesiones = data.estadisticas.tendencia || 0;
+      this.caloriasQuemadas = data.estadisticas.calorias || (this.totalHorasMes * 200);
+      
+      // Racha y logros
+      this.racha = data.estadisticas.racha || 0;
+      this.logrosDesbloqueados = data.estadisticas.logros || 0;
+      this.progresoMes = data.estadisticas.progresoMes || 0;
+      
+      // Coaches y deportes
+      this.entrenadoresUnicos = data.estadisticas.entrenadoresUnicos || 0;
+      this.deportesPracticados = data.estadisticas.deportesPracticados || 0;
+      this.deportesLista = data.estadisticas.deportesLista || [];
+    }
+    
+    // Actualizar datos del cliente
+    if (data.cliente) {
+      this.cliente = data.cliente;
     }
 
     // Actualizar entrenadores favoritos
     if (data.entrenadoresFavoritos && data.entrenadoresFavoritos.length > 0) {
       this.entrenadoresFavoritos = data.entrenadoresFavoritos;
+    }
+    
+    // Actualizar logros recientes
+    if (data.logrosRecientes) {
+      this.logrosRecientes = data.logrosRecientes;
     }
   }
 

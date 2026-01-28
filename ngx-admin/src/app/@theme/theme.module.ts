@@ -39,6 +39,7 @@ import { COSMIC_THEME } from './styles/theme.cosmic';
 import { CORPORATE_THEME } from './styles/theme.corporate';
 import { DARK_THEME } from './styles/theme.dark';
 import { SPORTCONNECT_THEME } from './styles/theme.sportconnect';
+import { SportIconsModule } from './components/sport-icons/sport-icons.module';
 
 const NB_MODULES = [
   NbLayoutModule,
@@ -53,6 +54,7 @@ const NB_MODULES = [
   NbSelectModule,
   NbIconModule,
   NbEvaIconsModule,
+  SportIconsModule,
 ];
 const COMPONENTS = [
   HeaderComponent,
