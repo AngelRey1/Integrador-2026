@@ -394,7 +394,7 @@ $text-muted: #718096;
         gap: 5px;
         padding: 8px 14px;
         background: $dark-surface;
-        border: 1px solid rgba(255,255,255,0.1);
+        border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 8px;
         font-size: 0.8rem;
         font-weight: 500;
@@ -403,7 +403,7 @@ $text-muted: #718096;
         transition: all 0.2s;
 
         &:hover {
-          background: rgba(255,255,255,0.1);
+          background: rgba(255, 255, 255, 0.1);
           color: $text-primary;
         }
 
@@ -436,7 +436,7 @@ $text-muted: #718096;
 .empty-next-session {
   .empty-glass-card {
     background: $dark-card;
-    border: 1px dashed rgba(255,255,255,0.15);
+    border: 1px dashed rgba(255, 255, 255, 0.15);
     border-radius: 16px;
     padding: 2rem;
     text-align: center;
@@ -512,7 +512,7 @@ $text-muted: #718096;
 // ═══════════════════════════════════════════
 .sessions-history-section {
   background: $dark-card;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
   padding: 1.25rem;
 }
@@ -530,12 +530,12 @@ $text-muted: #718096;
   align-items: center;
   padding: 12px 14px;
   background: $dark-surface;
-  border: 1px solid rgba(255,255,255,0.06);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 10px;
   transition: all 0.2s;
 
   &:hover {
-    background: rgba(255,255,255,0.06);
+    background: rgba(255, 255, 255, 0.06);
     border-color: rgba($primary, 0.3);
   }
 
@@ -568,7 +568,7 @@ $text-muted: #718096;
 
     &.past {
       background: $dark;
-      border: 1px solid rgba(255,255,255,0.1);
+      border: 1px solid rgba(255, 255, 255, 0.1);
 
       .strip-day { color: $text-secondary; }
       .strip-month { color: $text-muted; }
@@ -630,7 +630,7 @@ $text-muted: #718096;
       align-items: center;
       gap: 4px;
       padding: 4px 10px;
-      background: rgba(255,255,255,0.06);
+      background: rgba(255, 255, 255, 0.06);
       border-radius: 15px;
       font-size: 0.8rem;
       color: $text-secondary;
@@ -662,8 +662,8 @@ $text-muted: #718096;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 8px;
       color: $text-muted;
       cursor: pointer;
@@ -713,7 +713,7 @@ $text-muted: #718096;
 // ═══════════════════════════════════════════
 .progress-section {
   background: $dark-card;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
   padding: 1.25rem;
 }
@@ -731,7 +731,7 @@ $text-muted: #718096;
 .progress-card-3d {
   padding: 1rem;
   background: $dark-surface;
-  border: 1px solid rgba(255,255,255,0.06);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 12px;
   text-align: center;
   transition: all 0.2s;
@@ -838,7 +838,7 @@ $text-muted: #718096;
 // ═══════════════════════════════════════════
 .favorites-panel {
   background: $dark-card;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
   padding: 1rem;
 }
@@ -867,7 +867,7 @@ $text-muted: #718096;
     gap: 5px;
     padding: 8px 14px;
     background: transparent;
-    border: 1px solid rgba(255,255,255,0.15);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 8px;
     font-size: 0.8rem;
     color: $text-secondary;
@@ -888,12 +888,12 @@ $text-muted: #718096;
   align-items: center;
   padding: 10px;
   background: $dark-surface;
-  border: 1px solid rgba(255,255,255,0.06);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 10px;
   transition: all 0.2s;
 
   &:hover {
-    background: rgba(255,255,255,0.06);
+    background: rgba(255, 255, 255, 0.06);
   }
 
   .coach-visual {
@@ -985,7 +985,7 @@ $text-muted: #718096;
 // ═══════════════════════════════════════════
 .quick-actions-panel {
   background: $dark-card;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
   padding: 1rem;
 }
@@ -1002,7 +1002,7 @@ $text-muted: #718096;
   gap: 10px;
   padding: 10px 12px;
   background: $dark-surface;
-  border: 1px solid rgba(255,255,255,0.06);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 10px;
   cursor: pointer;
   transition: all 0.2s;
@@ -1010,7 +1010,7 @@ $text-muted: #718096;
   text-align: left;
 
   &:hover {
-    background: rgba(255,255,255,0.08);
+    background: rgba(255, 255, 255, 0.08);
 
     .action-icon { transform: scale(1.1); }
   }
@@ -1043,7 +1043,7 @@ $text-muted: #718096;
 // ═══════════════════════════════════════════
 .achievements-teaser {
   background: $dark-card;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
   padding: 1rem;
 }
