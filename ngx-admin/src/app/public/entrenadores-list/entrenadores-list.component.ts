@@ -424,13 +424,8 @@ export class EntrenadoresListComponent implements OnInit {
   }
 
   irAtras() {
-    // Intentar regresar en el historial
-    if (window.history.length > 1) {
-      this.location.back();
-    } else {
-      // Fallback: ir al home público
-      this.router.navigate(['/']);
-    }
+    // Siempre enviar al home público
+    this.router.navigate(['/']);
   }
 
   verPerfil(entrenador: Entrenador) {
