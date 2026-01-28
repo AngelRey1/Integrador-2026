@@ -44,7 +44,7 @@
             class="search-input-premium"
           />
           <button class="btn-search-icon" (click)="buscarEntrenadores()">
-            <sport-icon name="search" [size]="20"></sport-icon>
+            <ngx-sport-icon name="search" [size]="20"></ngx-sport-icon>
           </button>
         </div>
 
@@ -52,7 +52,7 @@
         <div class="quick-categories">
           <div class="quick-chip" *ngFor="let deporte of deportesVisibles"
             (click)="verEntrenadoresPorDeporte(deporte)">
-            <sport-icon [name]="deporte.icon" [size]="18"></sport-icon>
+            <ngx-sport-icon [name]="deporte.icon" [size]="18"></ngx-sport-icon>
             {{ deporte.nombre }}
           </div>
         </div>
@@ -91,12 +91,12 @@
           *ngFor="let deporte of deportes"
           (click)="verEntrenadoresPorDeporte(deporte)">
           <div class="category-icon-box">
-            <sport-icon [name]="deporte.icon" [size]="32"></sport-icon>
+            <ngx-sport-icon [name]="deporte.icon" [size]="32"></ngx-sport-icon>
           </div>
           <h4 class="category-name">{{ deporte.nombre }}</h4>
           <p class="category-count">{{ deporte.entrenadores }} coaches</p>
           <div class="category-arrow">
-            <sport-icon name="chevron-right" [size]="20"></sport-icon>
+            <ngx-sport-icon name="chevron-right" [size]="20"></ngx-sport-icon>
           </div>
         </div>
       </div>
@@ -117,7 +117,7 @@
           
           <!-- Verified Badge (Corner) -->
           <div class="badge-elite" *ngIf="entrenador.verificado">
-            <sport-icon name="check-circle" [size]="14"></sport-icon> ELITE
+            <ngx-sport-icon name="check-circle" [size]="14"></ngx-sport-icon> ELITE
           </div>
 
           <!-- Coach Image (Large Circle/Rounded) -->
@@ -131,11 +131,11 @@
             <p class="coach-discipline">{{ entrenador.deporte }}</p>
             
             <!-- Location -->
-            <p class="coach-location"><sport-icon name="map-pin" [size]="14"></sport-icon> Mérida</p>
+            <p class="coach-location"><ngx-sport-icon name="map-pin" [size]="14"></ngx-sport-icon> Mérida</p>
             
             <!-- Rating Stars -->
             <div class="rating-premium">
-              <span class="stars-neon"><sport-icon name="star-filled" [size]="14"></sport-icon> {{ entrenador.estrellas }}</span>
+              <span class="stars-neon"><ngx-sport-icon name="star-filled" [size]="14"></ngx-sport-icon> {{ entrenador.estrellas }}</span>
               <span class="review-count">({{ entrenador.reviews }} reviews)</span>
             </div>
 
@@ -170,22 +170,22 @@
 
       <div class="value-cards-grid">
         <div class="value-card-premium">
-          <div class="icon-premium"><sport-icon name="activity" [size]="32"></sport-icon></div>
+          <div class="icon-premium"><ngx-sport-icon name="activity" [size]="32"></ngx-sport-icon></div>
           <h3>Reserva Instantánea</h3>
           <p>WhatsApp, pago seguro y código de acceso en menos de 5 minutos.</p>
         </div>
         <div class="value-card-premium">
-          <div class="icon-premium"><sport-icon name="shield" [size]="32"></sport-icon></div>
+          <div class="icon-premium"><ngx-sport-icon name="shield" [size]="32"></ngx-sport-icon></div>
           <h3>100% Seguro</h3>
           <p>Escrow de pagos, facturación inmediata y cobertura de cancelación.</p>
         </div>
         <div class="value-card-premium">
-          <div class="icon-premium"><sport-icon name="globe" [size]="32"></sport-icon></div>
+          <div class="icon-premium"><ngx-sport-icon name="globe" [size]="32"></ngx-sport-icon></div>
           <h3>Presencial + Online</h3>
           <p>Flexible: elige modalidad, horario y ubicación sin restricciones.</p>
         </div>
         <div class="value-card-premium">
-          <div class="icon-premium"><sport-icon name="star-filled" [size]="32"></sport-icon></div>
+          <div class="icon-premium"><ngx-sport-icon name="star-filled" [size]="32"></ngx-sport-icon></div>
           <h3>Transparencia Total</h3>
           <p>Ratings verificados, badges de experiencia y reseñas auténticas.</p>
         </div>
@@ -267,11 +267,11 @@
 
         <div class="join-actions">
           <button class="btn-primary-large" (click)="irAInfoEntrenadores()">
-            <sport-icon name="activity" [size]="18"></sport-icon>
+            <ngx-sport-icon name="activity" [size]="18"></ngx-sport-icon>
             Más información
           </button>
           <button class="btn-secondary-large" (click)="irAUneteEntrenadores(true)">
-            <sport-icon name="users" [size]="18"></sport-icon>
+            <ngx-sport-icon name="users" [size]="18"></ngx-sport-icon>
             Registrarme ahora
           </button>
         </div>

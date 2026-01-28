@@ -4,10 +4,10 @@ import { Component, Input, OnInit } from '@angular/core';
  * Componente de iconos SVG ENTERPRISE para SportConnect
  * Nivel: Senior/Enterprise - Iconos con volumen 3D, gradientes, sombras y detalles premium
  * Estilo: Solid + Gradient con profundidad visual real
- * Uso: <sport-icon name="futbol" [size]="24"></sport-icon>
+ * Uso: <ngx-sport-icon name="futbol" [size]="24"></ngx-sport-icon>
  */
 @Component({
-  selector: 'sport-icon',
+  selector: 'ngx-sport-icon',
   template: `
     <svg 
       [attr.width]="size" 
