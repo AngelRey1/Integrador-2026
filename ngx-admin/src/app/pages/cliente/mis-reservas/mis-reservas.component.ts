@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-import { NbDialogService } from '@nebular/theme';
+import { Router } from '@angular/router';
+import { NbDialogService, NbToastrService } from '@nebular/theme';
 
 type EstadoReserva = 'PENDIENTE' | 'CONFIRMADA' | 'COMPLETADA' | 'CANCELADA';
 
@@ -34,7 +35,7 @@ export class MisReservasComponent {
   filtroEntrenador = '';
   filtroBusqueda = '';
 
-  // Todas las reservas
+  // Todas las reservas (datos mock - precios en MXN)
   todasReservas: Reserva[] = [
     {
       id: 1,
@@ -44,14 +45,14 @@ export class MisReservasComponent {
         foto_url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop&crop=face',
         especialidad: 'Yoga & Pilates'
       },
-      fecha: new Date(2025, 10, 20),
+      fecha: new Date(2026, 1, 20),
       hora: '10:00',
       duracion: 1,
       modalidad: 'Presencial',
       estado: 'CONFIRMADA',
-      precio_total: 33,
+      precio_total: 450,
       notas: 'Primera sesión de yoga',
-      fecha_creacion: new Date(2025, 10, 13)
+      fecha_creacion: new Date(2026, 1, 13)
     },
     {
       id: 2,
@@ -61,13 +62,13 @@ export class MisReservasComponent {
         foto_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face',
         especialidad: 'CrossFit & Funcional'
       },
-      fecha: new Date(2025, 10, 15),
+      fecha: new Date(2026, 1, 15),
       hora: '18:00',
       duracion: 1.5,
       modalidad: 'Presencial',
       estado: 'PENDIENTE',
-      precio_total: 57.75,
-      fecha_creacion: new Date(2025, 10, 12)
+      precio_total: 675,
+      fecha_creacion: new Date(2026, 1, 12)
     },
     {
       id: 3,
@@ -77,14 +78,14 @@ export class MisReservasComponent {
         foto_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop&crop=face',
         especialidad: 'Running & Atletismo'
       },
-      fecha: new Date(2025, 10, 5),
+      fecha: new Date(2026, 0, 25),
       hora: '07:00',
       duracion: 1,
       modalidad: 'Online',
       estado: 'COMPLETADA',
-      precio_total: 27.5,
+      precio_total: 350,
       notas: 'Sesión de técnica de carrera',
-      fecha_creacion: new Date(2025, 10, 1)
+      fecha_creacion: new Date(2026, 0, 20)
     },
     {
       id: 4,
@@ -94,14 +95,14 @@ export class MisReservasComponent {
         foto_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&crop=face',
         especialidad: 'Boxeo'
       },
-      fecha: new Date(2025, 9, 28),
+      fecha: new Date(2026, 0, 18),
       hora: '16:00',
       duracion: 1,
       modalidad: 'Presencial',
       estado: 'CANCELADA',
-      precio_total: 44,
+      precio_total: 500,
       notas: 'Cancelada por el cliente',
-      fecha_creacion: new Date(2025, 9, 25)
+      fecha_creacion: new Date(2026, 0, 15)
     },
     {
       id: 5,
@@ -111,17 +112,21 @@ export class MisReservasComponent {
         foto_url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop&crop=face',
         especialidad: 'Yoga & Pilates'
       },
-      fecha: new Date(2025, 9, 15),
+      fecha: new Date(2026, 0, 10),
       hora: '10:00',
       duracion: 1,
       modalidad: 'Online',
       estado: 'COMPLETADA',
-      precio_total: 33,
-      fecha_creacion: new Date(2025, 9, 10)
+      precio_total: 400,
+      fecha_creacion: new Date(2026, 0, 5)
     }
   ];
 
-  constructor(private dialogService: NbDialogService) {}
+  constructor(
+    private dialogService: NbDialogService,
+    private router: Router,
+    private toastr: NbToastrService
+  ) {}
 
   // Filtrado por estado
   get reservasPendientes(): Reserva[] {
@@ -168,35 +173,63 @@ export class MisReservasComponent {
 
   // Acciones
   verDetalles(reserva: Reserva): void {
-    console.log('Ver detalles de:', reserva);
-    // TODO: Abrir modal con detalles
+    // Mostrar detalles en toast por ahora (en producción sería un modal)
+    this.toastr.info(
+      `${reserva.entrenador.especialidad} · ${this.formatearFecha(reserva.fecha)} a las ${reserva.hora}`,
+      `Reserva ${reserva.numero_reserva}`,
+      { duration: 5000, icon: 'info-outline' }
+    );
   }
 
   confirmarReserva(reserva: Reserva): void {
     reserva.estado = 'CONFIRMADA';
-    console.log('Reserva confirmada:', reserva);
+    this.toastr.success(
+      `Tu sesión con ${reserva.entrenador.nombre} ha sido confirmada`,
+      '¡Reserva Confirmada!',
+      { duration: 4000, icon: 'checkmark-circle-outline' }
+    );
   }
 
   cancelarReserva(reserva: Reserva): void {
     if (confirm(`¿Estás seguro de cancelar la reserva ${reserva.numero_reserva}?`)) {
       reserva.estado = 'CANCELADA';
-      console.log('Reserva cancelada:', reserva);
+      this.toastr.warning(
+        'Tu reserva ha sido cancelada exitosamente',
+        'Reserva Cancelada',
+        { duration: 4000, icon: 'close-circle-outline' }
+      );
     }
   }
 
   reprogramarReserva(reserva: Reserva): void {
-    console.log('Reprogramar reserva:', reserva);
-    // TODO: Navegar a agendar con datos precargados
+    // Navegar a agendar sesión con parámetros
+    this.router.navigate(['/pages/cliente/agendar-sesion'], {
+      queryParams: { 
+        reprogramar: reserva.id,
+        entrenador: reserva.entrenador.nombre 
+      }
+    });
   }
 
   dejarResena(reserva: Reserva): void {
-    console.log('Dejar reseña para:', reserva);
-    // TODO: Navegar a crear reseña
+    // Navegar a reseñas con el entrenador preseleccionado
+    this.router.navigate(['/pages/cliente/mis-resenas'], {
+      queryParams: { 
+        nueva: true,
+        entrenador: reserva.entrenador.nombre,
+        sesion: reserva.id
+      }
+    });
   }
 
   descargarRecibo(reserva: Reserva): void {
-    console.log('Descargar recibo:', reserva);
-    // TODO: Generar PDF
+    // Simular descarga de recibo
+    this.toastr.primary(
+      `Descargando recibo de la reserva ${reserva.numero_reserva}...`,
+      'Descarga Iniciada',
+      { duration: 3000, icon: 'download-outline' }
+    );
+    // En producción: llamar a un servicio que genere el PDF
   }
 
   limpiarFiltros(): void {
@@ -217,7 +250,7 @@ export class MisReservasComponent {
   }
 
   formatearFecha(fecha: Date): string {
-    return new Intl.DateTimeFormat('es-ES', {
+    return new Intl.DateTimeFormat('es-MX', {
       weekday: 'short',
       year: 'numeric',
       month: 'short',

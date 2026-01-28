@@ -51,7 +51,7 @@ export class ClienteDashboardComponent implements OnInit, OnDestroy {
   proximasSesiones = [
     {
       id: 1,
-      fecha_hora: new Date('2025-11-15T10:00:00'),
+      fecha_hora: new Date('2026-02-01T10:00:00'),
       entrenador: {
         nombre: 'Ana Pérez',
         foto: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop&crop=face'
@@ -59,11 +59,11 @@ export class ClienteDashboardComponent implements OnInit, OnDestroy {
       deporte: 'Yoga',
       duracion: 60,
       estado: 'CONFIRMADA',
-      ubicacion: 'Gym Centro'
+      ubicacion: 'Gym Centro, Mérida'
     },
     {
       id: 2,
-      fecha_hora: new Date('2025-11-18T16:00:00'),
+      fecha_hora: new Date('2026-02-05T16:00:00'),
       entrenador: {
         nombre: 'Carlos Ruiz',
         foto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face'
@@ -83,7 +83,7 @@ export class ClienteDashboardComponent implements OnInit, OnDestroy {
       especialidad: 'Yoga & Pilates',
       calificacion: 4.8,
       total_resenas: 45,
-      tarifa_por_hora: 30,
+      tarifa_por_hora: 450,
       foto_url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop&crop=face'
     },
     {
@@ -92,7 +92,7 @@ export class ClienteDashboardComponent implements OnInit, OnDestroy {
       especialidad: 'CrossFit',
       calificacion: 4.9,
       total_resenas: 67,
-      tarifa_por_hora: 35,
+      tarifa_por_hora: 550,
       foto_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face'
     },
     {
@@ -101,7 +101,7 @@ export class ClienteDashboardComponent implements OnInit, OnDestroy {
       especialidad: 'Running',
       calificacion: 4.7,
       total_resenas: 32,
-      tarifa_por_hora: 25,
+      tarifa_por_hora: 400,
       foto_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop&crop=face'
     }
   ];
@@ -188,15 +188,21 @@ export class ClienteDashboardComponent implements OnInit, OnDestroy {
   }
   
   contactarEntrenador(entrenador: any): void {
-    console.log('Contactar entrenador:', entrenador);
-    // TODO: Abrir chat o modal de mensaje
+    // Por ahora navegar a agendar sesión con el entrenador
+    // En el futuro: implementar sistema de mensajería
+    this.router.navigate(['/pages/cliente/agendar-sesion'], {
+      queryParams: { entrenador: entrenador.nombre, mensaje: true }
+    });
   }
   
   reagendarSesion(sesion: any): void {
-    console.log('Reagendar sesión con:', sesion.entrenador);
-    if (sesion.entrenador) {
-      this.agendarConEntrenador(sesion.entrenador);
-    }
+    // Navegar a agendar sesión con datos para reagendar
+    this.router.navigate(['/pages/cliente/agendar-sesion'], {
+      queryParams: { 
+        reagendar: sesion.id,
+        entrenador: sesion.entrenador?.nombre 
+      }
+    });
   }
 
   cargarDatos(): void {
@@ -314,23 +320,36 @@ export class ClienteDashboardComponent implements OnInit, OnDestroy {
   }
 
   buscarEntrenadores() {
-    console.log('Buscar con filtros:', this.busquedaRapida);
-    // TODO: Navegar a buscar-entrenadores con filtros
+    // Navegar al landing público con la búsqueda de entrenadores
+    this.router.navigate(['/entrenadores']);
   }
 
   verSesion(sesion: any) {
-    console.log('Ver sesión:', sesion);
-    // TODO: Abrir modal con detalles
+    // Navegar a mis sesiones con la sesión destacada
+    this.router.navigate(['/pages/cliente/mis-reservas'], {
+      queryParams: { sesion: sesion.id }
+    });
   }
 
   cancelarSesion(sesion: any) {
-    console.log('Cancelar sesión:', sesion);
-    // TODO: Confirmar y cancelar
+    if (confirm('¿Estás seguro de que deseas cancelar esta sesión?')) {
+      // Actualizar estado local
+      sesion.estado = 'CANCELADA';
+      // Remover de próximas sesiones
+      this.proximasSesiones = this.proximasSesiones.filter((s: any) => s.id !== sesion.id);
+      if (this.proximaSesion?.id === sesion.id) {
+        this.proximaSesion = this.proximasSesiones.length > 0 ? this.proximasSesiones[0] : null;
+      }
+    }
   }
 
   agendarConEntrenador(entrenador: any) {
-    console.log('Agendar con:', entrenador);
-    // TODO: Navegar a agendar-sesion
+    // Navegar a agendar sesión con el entrenador preseleccionado
+    this.router.navigate(['/pages/cliente/agendar-sesion'], {
+      queryParams: { 
+        entrenador: entrenador.id || entrenador.nombre 
+      }
+    });
   }
 
   getEstadoBadgeStatus(estado: string): string {

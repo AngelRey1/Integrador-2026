@@ -1,22 +1,22 @@
 import { NbMenuItem } from '@nebular/theme';
 
 // Menú para CLIENTES
-// Orden lógico: Lo más usado primero, descubrimiento ya está en landing
+// Arquitectura UX: Inicio unificado → Gestión → Historial → Perfil
 const CLIENTE_MENU: NbMenuItem[] = [
   {
-    title: 'MI ÁREA',
+    title: 'PRINCIPAL',
     group: true,
   },
   {
-    title: 'Mis Reservas',
-    icon: 'calendar-outline',
-    link: '/pages/cliente/mis-reservas',
-    home: true,  // Página principal después del login
+    title: 'Inicio',
+    icon: 'home-outline',
+    link: '/pages/cliente/dashboard',
+    home: true,  // Vista unificada: próxima sesión + stats + acceso rápido
   },
   {
-    title: 'Mi Dashboard',
-    icon: 'grid-outline',
-    link: '/pages/cliente/dashboard',
+    title: 'Mis Sesiones',
+    icon: 'calendar-outline',
+    link: '/pages/cliente/mis-reservas',
   },
   {
     title: 'ACCIONES',
@@ -28,37 +28,27 @@ const CLIENTE_MENU: NbMenuItem[] = [
     link: '/pages/cliente/agendar-sesion',
   },
   {
-    title: 'Buscar Entrenadores',
-    icon: 'search-outline',
-    link: '/pages/cliente/buscar-entrenadores',
-  },
-  {
     title: 'HISTORIAL',
     group: true,
   },
   {
-    title: 'Mis Pagos',
+    title: 'Pagos',
     icon: 'credit-card-outline',
     link: '/pages/cliente/mis-pagos',
   },
   {
-    title: 'Mis Reseñas',
+    title: 'Reseñas',
     icon: 'star-outline',
     link: '/pages/cliente/mis-resenas',
   },
   {
-    title: 'CONFIGURACIÓN',
+    title: 'CUENTA',
     group: true,
   },
   {
     title: 'Mi Perfil',
     icon: 'person-outline',
     link: '/pages/cliente/perfil',
-  },
-  {
-    title: 'Catálogos',
-    icon: 'book-outline',
-    link: '/pages/cliente/catalogos',
   },
 ];
 

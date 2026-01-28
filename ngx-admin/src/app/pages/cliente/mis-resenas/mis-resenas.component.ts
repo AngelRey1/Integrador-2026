@@ -92,15 +92,15 @@ export class MisResenasComponent implements OnInit {
           especialidad: 'Yoga & Pilates'
         },
         sesion: {
-          fecha: new Date(2025, 10, 10),
+          fecha: new Date(2026, 1, 10),
           deporte: 'Yoga'
         },
         calificacion: 5,
         comentario: 'Excelente entrenadora, muy profesional y atenta. Las sesiones son dinámicas y efectivas.',
-        fecha_creacion: new Date(2025, 10, 11),
+        fecha_creacion: new Date(2026, 1, 11),
         respuesta_entrenador: {
           texto: '¡Muchas gracias por tus palabras! Es un placer trabajar contigo.',
-          fecha: new Date(2025, 10, 12)
+          fecha: new Date(2026, 1, 12)
         }
       },
       {
@@ -111,12 +111,12 @@ export class MisResenasComponent implements OnInit {
           especialidad: 'CrossFit & HIIT'
         },
         sesion: {
-          fecha: new Date(2025, 10, 5),
+          fecha: new Date(2026, 1, 5),
           deporte: 'CrossFit'
         },
         calificacion: 4,
         comentario: 'Muy buenos entrenamientos, aunque a veces un poco intensos para principiantes.',
-        fecha_creacion: new Date(2025, 10, 6)
+        fecha_creacion: new Date(2026, 1, 6)
       },
       {
         id: 3,
@@ -126,15 +126,15 @@ export class MisResenasComponent implements OnInit {
           especialidad: 'Running & Atletismo'
         },
         sesion: {
-          fecha: new Date(2025, 9, 28),
+          fecha: new Date(2026, 0, 28),
           deporte: 'Running'
         },
         calificacion: 5,
         comentario: 'Súper recomendada. Me ayudó a mejorar mi técnica de carrera significativamente.',
-        fecha_creacion: new Date(2025, 9, 29),
+        fecha_creacion: new Date(2026, 0, 29),
         respuesta_entrenador: {
           texto: 'Gracias por tu confianza. Sigue así, vas muy bien!',
-          fecha: new Date(2025, 9, 30)
+          fecha: new Date(2026, 0, 30)
         }
       },
       {
@@ -145,12 +145,12 @@ export class MisResenasComponent implements OnInit {
           especialidad: 'Boxeo & Artes Marciales'
         },
         sesion: {
-          fecha: new Date(2025, 9, 20),
+          fecha: new Date(2026, 0, 20),
           deporte: 'Boxeo'
         },
         calificacion: 3,
         comentario: 'Buen entrenador, pero las instalaciones donde entrena podrían mejorar.',
-        fecha_creacion: new Date(2025, 9, 21)
+        fecha_creacion: new Date(2026, 0, 21)
       }
     ];
 
@@ -277,7 +277,7 @@ export class MisResenasComponent implements OnInit {
   }
 
   formatearFecha(fecha: Date): string {
-    return new Intl.DateTimeFormat('es-ES', {
+    return new Intl.DateTimeFormat('es-MX', {
       day: '2-digit',
       month: 'short',
       year: 'numeric'

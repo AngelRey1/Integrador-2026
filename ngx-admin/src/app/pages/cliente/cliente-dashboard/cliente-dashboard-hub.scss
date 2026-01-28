@@ -1,39 +1,54 @@
 // ============================================
-// CLIENTE DASHBOARD - REDISEÑO COMPLETO
-// Diseño compacto, colores sólidos, alta legibilidad
+// CLIENTE DASHBOARD - INICIO UNIFICADO
+// Diseño limpio y profesional para tema claro
+// Compatible con ngx-admin Nebular theme
 // ============================================
 
-// === PALETA DE COLORES SÓLIDOS ===
+// === PALETA DE COLORES - TEMA CLARO ===
 $primary: #00d9a5;
 $primary-dark: #00b386;
+$primary-light: #e6fff8;
 $secondary: #0a7b8a;
 $accent: #ff6b35;
-$dark: #1a1f36;
-$dark-card: #232942;
-$dark-surface: #2d3352;
-$text-primary: #ffffff;
-$text-secondary: #a0aec0;
+$accent-light: #fff0eb;
+
+// Fondos y superficies
+$bg-page: #f7f9fc;
+$bg-card: #ffffff;
+$bg-card-hover: #f8fafc;
+$bg-muted: #edf2f7;
+
+// Textos
+$text-dark: #1a202c;
+$text-body: #4a5568;
 $text-muted: #718096;
+$text-light: #a0aec0;
+
+// Bordes y sombras
+$border-light: #e2e8f0;
+$shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+$shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.12);
 
 // === RESET BASE ===
 :host {
   display: block;
-  background: $dark;
+  background: $bg-page;
   min-height: 100vh;
   padding: 1.5rem;
 }
 
 // ═══════════════════════════════════════════
-// HERO COMPACTO - SIN TRANSPARENCIAS ROTAS
+// HERO - BIENVENIDA COMPACTA
 // ═══════════════════════════════════════════
 .personal-hero-glass {
-  background: linear-gradient(135deg, $dark-card 0%, $secondary 100%);
+  background: linear-gradient(135deg, $primary 0%, $secondary 100%);
   border-radius: 16px;
   padding: 1.5rem 2rem;
   margin-bottom: 1.5rem;
-  border: 1px solid rgba($primary, 0.2);
+  box-shadow: $shadow-md;
 
-  .hero-backdrop { display: none; } // Eliminar fondo problemático
+  .hero-backdrop { display: none; }
 
   .hero-content {
     display: flex;
@@ -58,15 +73,15 @@ $text-muted: #718096;
       height: 64px;
       border-radius: 50%;
       padding: 3px;
-      background: linear-gradient(135deg, $primary, $accent);
+      background: rgba(255, 255, 255, 0.3);
 
       .avatar-img {
         width: 100%;
         height: 100%;
         border-radius: 50%;
         object-fit: cover;
-        border: 2px solid $dark-card;
-        background: $dark-surface;
+        border: 2px solid white;
+        background: $bg-card;
       }
     }
 
@@ -77,19 +92,21 @@ $text-muted: #718096;
       width: 14px;
       height: 14px;
       border-radius: 50%;
-      border: 2px solid $dark-card;
+      border: 2px solid white;
 
       &.online {
-        background: $primary;
-        box-shadow: 0 0 8px $primary;
+        background: #10b981;
+        box-shadow: 0 0 8px #10b981;
       }
     }
   }
 
   .welcome-text {
+    color: white;
+
     .greeting-small {
       font-size: 0.85rem;
-      color: $text-secondary;
+      opacity: 0.9;
       display: block;
       margin-bottom: 2px;
     }
@@ -97,7 +114,6 @@ $text-muted: #718096;
     .welcome-name {
       font-size: 1.5rem;
       font-weight: 700;
-      color: $text-primary;
       margin: 0 0 4px 0;
     }
 
@@ -106,7 +122,7 @@ $text-muted: #718096;
       align-items: center;
       gap: 6px;
       font-size: 0.8rem;
-      color: $text-muted;
+      opacity: 0.85;
       margin: 0;
     }
   }
@@ -114,37 +130,37 @@ $text-muted: #718096;
   .hero-quick-stats {
     display: flex;
     gap: 0.75rem;
+    flex-wrap: wrap;
 
     .quick-stat-pill {
       display: flex;
       align-items: center;
       gap: 6px;
       padding: 8px 14px;
-      background: rgba($dark, 0.5);
-      border: 1px solid rgba($primary, 0.3);
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
       border-radius: 25px;
+      color: white;
 
       .stat-num {
         font-size: 1.1rem;
         font-weight: 700;
-        color: $text-primary;
       }
 
       .stat-label {
         font-size: 0.75rem;
-        color: $text-secondary;
+        opacity: 0.9;
       }
 
       &.accent {
-        border-color: rgba($primary, 0.5);
-        background: rgba($primary, 0.15);
+        background: rgba(255, 255, 255, 0.3);
       }
     }
   }
 }
 
 // ═══════════════════════════════════════════
-// LAYOUT PRINCIPAL - 2 COLUMNAS COMPACTAS
+// LAYOUT PRINCIPAL - 2 COLUMNAS
 // ═══════════════════════════════════════════
 .dashboard-grid-layout {
   display: grid;
@@ -169,7 +185,7 @@ $text-muted: #718096;
 }
 
 // ═══════════════════════════════════════════
-// CARDS BASE - SÓLIDOS Y LEGIBLES
+// SECTION HEADERS
 // ═══════════════════════════════════════════
 .section-glass-header {
   display: flex;
@@ -186,7 +202,7 @@ $text-muted: #718096;
   .section-title-premium {
     font-size: 1.1rem;
     font-weight: 600;
-    color: $text-primary;
+    color: $text-dark;
     margin: 0;
     display: flex;
     align-items: center;
@@ -198,8 +214,8 @@ $text-muted: #718096;
     align-items: center;
     gap: 5px;
     padding: 4px 10px;
-    background: rgba($accent, 0.2);
-    border: 1px solid rgba($accent, 0.4);
+    background: $accent-light;
+    border: 1px solid rgba($accent, 0.3);
     border-radius: 15px;
     font-size: 0.65rem;
     font-weight: 700;
@@ -221,8 +237,8 @@ $text-muted: #718096;
     align-items: center;
     gap: 5px;
     padding: 6px 12px;
-    background: rgba($accent, 0.15);
-    border: 1px solid rgba($accent, 0.3);
+    background: $accent-light;
+    border: 1px solid rgba($accent, 0.2);
     border-radius: 8px;
     font-size: 0.85rem;
     font-weight: 600;
@@ -236,7 +252,7 @@ $text-muted: #718096;
 
   .view-controls {
     display: flex;
-    background: $dark-surface;
+    background: $bg-muted;
     border-radius: 8px;
     padding: 3px;
 
@@ -253,11 +269,11 @@ $text-muted: #718096;
 
       &.active {
         background: $primary;
-        color: $dark;
+        color: white;
       }
 
       &:hover:not(.active) {
-        color: $text-primary;
+        color: $text-dark;
       }
     }
   }
@@ -267,18 +283,19 @@ $text-muted: #718096;
 // PRÓXIMA SESIÓN - CARD DESTACADA
 // ═══════════════════════════════════════════
 .next-session-highlight {
-  background: $dark-card;
-  border: 1px solid rgba($primary, 0.2);
+  background: $bg-card;
+  border: 1px solid $border-light;
   border-radius: 16px;
   padding: 1.25rem;
+  box-shadow: $shadow-sm;
 }
 
 .featured-session-card {
   display: grid;
   grid-template-columns: auto 1fr;
   gap: 1.25rem;
-  background: linear-gradient(135deg, rgba($primary, 0.1) 0%, rgba($secondary, 0.1) 100%);
-  border: 1px solid rgba($primary, 0.25);
+  background: $primary-light;
+  border: 1px solid rgba($primary, 0.2);
   border-radius: 12px;
   padding: 1.25rem;
 
@@ -297,29 +314,28 @@ $text-muted: #718096;
       background: $primary;
       border-radius: 12px;
       min-width: 80px;
+      color: white;
 
       .day-big {
         font-size: 2rem;
         font-weight: 800;
-        color: $dark;
         line-height: 1;
       }
 
       .month-abbr {
         font-size: 0.75rem;
         font-weight: 600;
-        color: rgba($dark, 0.7);
+        opacity: 0.9;
         text-transform: uppercase;
       }
 
       .time-highlight {
         margin-top: 6px;
         padding: 3px 10px;
-        background: rgba($dark, 0.2);
+        background: rgba(255, 255, 255, 0.2);
         border-radius: 12px;
         font-size: 0.8rem;
         font-weight: 600;
-        color: $dark;
       }
     }
   }
@@ -347,7 +363,7 @@ $text-muted: #718096;
           height: 100%;
           border-radius: 50%;
           object-fit: cover;
-          background: $dark-surface;
+          background: $bg-card;
         }
       }
 
@@ -355,7 +371,7 @@ $text-muted: #718096;
         .trainer-name-lg {
           font-size: 1.1rem;
           font-weight: 600;
-          color: $text-primary;
+          color: $text-dark;
           margin: 0 0 4px 0;
         }
 
@@ -368,7 +384,7 @@ $text-muted: #718096;
             align-items: center;
             gap: 4px;
             font-size: 0.8rem;
-            color: $text-secondary;
+            color: $text-body;
           }
         }
       }
@@ -379,7 +395,7 @@ $text-muted: #718096;
       align-items: center;
       gap: 6px;
       font-size: 0.85rem;
-      color: $text-secondary;
+      color: $text-body;
     }
 
     .session-actions-row {
@@ -393,24 +409,24 @@ $text-muted: #718096;
         align-items: center;
         gap: 5px;
         padding: 8px 14px;
-        background: $dark-surface;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: $bg-card;
+        border: 1px solid $border-light;
         border-radius: 8px;
         font-size: 0.8rem;
         font-weight: 500;
-        color: $text-secondary;
+        color: $text-body;
         cursor: pointer;
         transition: all 0.2s;
 
         &:hover {
-          background: rgba(255, 255, 255, 0.1);
-          color: $text-primary;
+          background: $bg-muted;
+          color: $text-dark;
         }
 
         &.primary {
           background: $primary;
           border: none;
-          color: $dark;
+          color: white;
 
           &:hover {
             background: $primary-dark;
@@ -422,7 +438,7 @@ $text-muted: #718096;
           color: $accent;
 
           &:hover {
-            background: rgba($accent, 0.15);
+            background: $accent-light;
           }
         }
       }
@@ -431,15 +447,16 @@ $text-muted: #718096;
 }
 
 // ═══════════════════════════════════════════
-// EMPTY STATE - COMPACTO
+// EMPTY STATE
 // ═══════════════════════════════════════════
 .empty-next-session {
   .empty-glass-card {
-    background: $dark-card;
-    border: 1px dashed rgba(255, 255, 255, 0.15);
+    background: $bg-card;
+    border: 1px dashed $border-light;
     border-radius: 16px;
     padding: 2rem;
     text-align: center;
+    box-shadow: $shadow-sm;
 
     .empty-illustration {
       position: relative;
@@ -468,14 +485,14 @@ $text-muted: #718096;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        color: $text-muted;
+        color: $text-light;
       }
     }
 
     .empty-title {
       font-size: 1.1rem;
       font-weight: 600;
-      color: $text-primary;
+      color: $text-dark;
       margin: 0 0 6px 0;
     }
 
@@ -495,26 +512,29 @@ $text-muted: #718096;
       border-radius: 10px;
       font-size: 0.95rem;
       font-weight: 600;
-      color: $dark;
+      color: white;
       cursor: pointer;
       transition: all 0.2s;
+      box-shadow: $shadow-sm;
 
       &:hover {
         background: $primary-dark;
         transform: translateY(-2px);
+        box-shadow: $shadow-md;
       }
     }
   }
 }
 
 // ═══════════════════════════════════════════
-// SESSIONS GRID - LISTA COMPACTA
+// SESSIONS LIST
 // ═══════════════════════════════════════════
 .sessions-history-section {
-  background: $dark-card;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: $bg-card;
+  border: 1px solid $border-light;
   border-radius: 16px;
   padding: 1.25rem;
+  box-shadow: $shadow-sm;
 }
 
 .sessions-grid {
@@ -529,19 +549,20 @@ $text-muted: #718096;
   gap: 12px;
   align-items: center;
   padding: 12px 14px;
-  background: $dark-surface;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: $bg-page;
+  border: 1px solid $border-light;
   border-radius: 10px;
   transition: all 0.2s;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.06);
+    background: $bg-card-hover;
     border-color: rgba($primary, 0.3);
+    box-shadow: $shadow-sm;
   }
 
   &.featured {
     border-color: rgba($primary, 0.3);
-    background: rgba($primary, 0.08);
+    background: $primary-light;
   }
 
   .card-date-strip {
@@ -552,25 +573,24 @@ $text-muted: #718096;
     background: $primary;
     border-radius: 8px;
     min-width: 44px;
+    color: white;
 
     .strip-day {
       font-size: 1.1rem;
       font-weight: 700;
-      color: $dark;
       line-height: 1;
     }
 
     .strip-month {
       font-size: 0.65rem;
-      color: rgba($dark, 0.7);
+      opacity: 0.9;
       text-transform: uppercase;
     }
 
     &.past {
-      background: $dark;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: $bg-muted;
 
-      .strip-day { color: $text-secondary; }
+      .strip-day { color: $text-body; }
       .strip-month { color: $text-muted; }
     }
 
@@ -578,8 +598,8 @@ $text-muted: #718096;
     &.sport-crossfit { background: $accent; }
     &.sport-yoga { background: #8a2be2; }
     &.sport-natacion, &.sport-natación { background: #0095ff; }
-    &.sport-running { background: #ffc107; .strip-day, .strip-month { color: $dark; } }
-    &.sport-boxeo { background: #ff3b30; }
+    &.sport-running { background: #f59e0b; }
+    &.sport-boxeo { background: #ef4444; }
   }
 
   .card-main-content {
@@ -601,7 +621,7 @@ $text-muted: #718096;
         border-radius: 50%;
         object-fit: cover;
         flex-shrink: 0;
-        background: $dark;
+        background: $bg-muted;
       }
 
       .trainer-compact-info {
@@ -611,7 +631,7 @@ $text-muted: #718096;
           display: block;
           font-size: 0.9rem;
           font-weight: 600;
-          color: $text-primary;
+          color: $text-dark;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -630,10 +650,10 @@ $text-muted: #718096;
       align-items: center;
       gap: 4px;
       padding: 4px 10px;
-      background: rgba(255, 255, 255, 0.06);
+      background: $bg-muted;
       border-radius: 15px;
       font-size: 0.8rem;
-      color: $text-secondary;
+      color: $text-body;
       flex-shrink: 0;
     }
   }
@@ -650,10 +670,10 @@ $text-muted: #718096;
       font-weight: 600;
       text-transform: uppercase;
 
-      &.status-confirmada { background: rgba($primary, 0.2); color: $primary; }
-      &.status-pendiente { background: rgba(#ffc107, 0.2); color: #ffc107; }
-      &.status-cancelada { background: rgba(#ff3b30, 0.2); color: #ff3b30; }
-      &.status-completada { background: rgba(#0095ff, 0.2); color: #0095ff; }
+      &.status-confirmada { background: rgba($primary, 0.15); color: $primary-dark; }
+      &.status-pendiente { background: rgba(#f59e0b, 0.15); color: #d97706; }
+      &.status-cancelada { background: rgba(#ef4444, 0.15); color: #dc2626; }
+      &.status-completada { background: rgba(#0095ff, 0.15); color: #0077cc; }
     }
 
     .icon-btn {
@@ -662,16 +682,17 @@ $text-muted: #718096;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: $bg-muted;
+      border: 1px solid $border-light;
       border-radius: 8px;
       color: $text-muted;
       cursor: pointer;
       transition: all 0.2s;
 
       &:hover {
-        background: rgba($primary, 0.2);
+        background: $primary-light;
         color: $primary;
+        border-color: rgba($primary, 0.3);
       }
     }
 
@@ -680,17 +701,17 @@ $text-muted: #718096;
       align-items: center;
       gap: 5px;
       padding: 6px 12px;
-      background: rgba($primary, 0.15);
-      border: 1px solid rgba($primary, 0.3);
+      background: $primary-light;
+      border: 1px solid rgba($primary, 0.2);
       border-radius: 8px;
       font-size: 0.8rem;
       font-weight: 500;
-      color: $primary;
+      color: $primary-dark;
       cursor: pointer;
       transition: all 0.2s;
 
       &:hover {
-        background: rgba($primary, 0.25);
+        background: rgba($primary, 0.2);
       }
     }
   }
@@ -709,13 +730,14 @@ $text-muted: #718096;
 }
 
 // ═══════════════════════════════════════════
-// PROGRESS SECTION - CARDS 3D COMPACTAS
+// PROGRESS SECTION
 // ═══════════════════════════════════════════
 .progress-section {
-  background: $dark-card;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: $bg-card;
+  border: 1px solid $border-light;
   border-radius: 16px;
   padding: 1.25rem;
+  box-shadow: $shadow-sm;
 }
 
 .progress-cards-grid {
@@ -730,8 +752,8 @@ $text-muted: #718096;
 
 .progress-card-3d {
   padding: 1rem;
-  background: $dark-surface;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: $bg-page;
+  border: 1px solid $border-light;
   border-radius: 12px;
   text-align: center;
   transition: all 0.2s;
@@ -739,6 +761,7 @@ $text-muted: #718096;
   &:hover {
     transform: translateY(-3px);
     border-color: rgba($primary, 0.3);
+    box-shadow: $shadow-sm;
   }
 
   .card-icon-circle {
@@ -749,6 +772,7 @@ $text-muted: #718096;
     display: flex;
     align-items: center;
     justify-content: center;
+    color: white;
 
     &.sessions { background: $primary; }
     &.hours { background: #0095ff; }
@@ -761,7 +785,7 @@ $text-muted: #718096;
       display: block;
       font-size: 1.5rem;
       font-weight: 800;
-      color: $text-primary;
+      color: $text-dark;
       line-height: 1;
     }
 
@@ -782,7 +806,7 @@ $text-muted: #718096;
     font-size: 0.75rem;
     color: $text-muted;
 
-    &.up { color: $primary; }
+    &.up { color: $primary-dark; }
 
     .mini-text { font-size: 0.7rem; }
   }
@@ -810,17 +834,17 @@ $text-muted: #718096;
     gap: 6px;
     font-size: 0.95rem;
     font-weight: 600;
-    color: $text-primary;
+    color: $text-dark;
     margin: 0;
   }
 
   .count-badge {
     padding: 2px 8px;
-    background: $dark-surface;
+    background: $bg-muted;
     border-radius: 12px;
     font-size: 0.75rem;
     font-weight: 600;
-    color: $text-secondary;
+    color: $text-body;
   }
 }
 
@@ -837,10 +861,11 @@ $text-muted: #718096;
 // FAVORITES PANEL
 // ═══════════════════════════════════════════
 .favorites-panel {
-  background: $dark-card;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: $bg-card;
+  border: 1px solid $border-light;
   border-radius: 16px;
   padding: 1rem;
+  box-shadow: $shadow-sm;
 }
 
 .favorites-scroll {
@@ -855,6 +880,10 @@ $text-muted: #718096;
   text-align: center;
   padding: 1.5rem 1rem;
 
+  .empty-heart-icon {
+    margin-bottom: 0.5rem;
+  }
+
   p {
     font-size: 0.8rem;
     color: $text-muted;
@@ -867,10 +896,10 @@ $text-muted: #718096;
     gap: 5px;
     padding: 8px 14px;
     background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border: 1px solid $border-light;
     border-radius: 8px;
     font-size: 0.8rem;
-    color: $text-secondary;
+    color: $text-body;
     cursor: pointer;
     transition: all 0.2s;
 
@@ -887,13 +916,14 @@ $text-muted: #718096;
   gap: 10px;
   align-items: center;
   padding: 10px;
-  background: $dark-surface;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: $bg-page;
+  border: 1px solid $border-light;
   border-radius: 10px;
   transition: all 0.2s;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.06);
+    background: $bg-card-hover;
+    border-color: rgba($primary, 0.3);
   }
 
   .coach-visual {
@@ -904,7 +934,7 @@ $text-muted: #718096;
       height: 44px;
       border-radius: 50%;
       object-fit: cover;
-      background: $dark;
+      background: $bg-muted;
     }
 
     .online-dot {
@@ -913,8 +943,8 @@ $text-muted: #718096;
       right: 0;
       width: 10px;
       height: 10px;
-      background: $primary;
-      border: 2px solid $dark-surface;
+      background: #10b981;
+      border: 2px solid $bg-card;
       border-radius: 50%;
     }
   }
@@ -925,7 +955,7 @@ $text-muted: #718096;
     .coach-name {
       font-size: 0.9rem;
       font-weight: 600;
-      color: $text-primary;
+      color: $text-dark;
       margin: 0 0 2px 0;
       white-space: nowrap;
       overflow: hidden;
@@ -950,11 +980,11 @@ $text-muted: #718096;
         display: flex;
         align-items: center;
         gap: 2px;
-        color: $text-secondary;
+        color: $text-body;
       }
 
       .price {
-        color: $primary;
+        color: $primary-dark;
         font-weight: 600;
       }
     }
@@ -969,7 +999,7 @@ $text-muted: #718096;
     background: $primary;
     border: none;
     border-radius: 8px;
-    color: $dark;
+    color: white;
     cursor: pointer;
     transition: all 0.2s;
 
@@ -984,10 +1014,11 @@ $text-muted: #718096;
 // QUICK ACTIONS
 // ═══════════════════════════════════════════
 .quick-actions-panel {
-  background: $dark-card;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: $bg-card;
+  border: 1px solid $border-light;
   border-radius: 16px;
   padding: 1rem;
+  box-shadow: $shadow-sm;
 }
 
 .action-buttons-stack {
@@ -1001,8 +1032,8 @@ $text-muted: #718096;
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
-  background: $dark-surface;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: $bg-page;
+  border: 1px solid $border-light;
   border-radius: 10px;
   cursor: pointer;
   transition: all 0.2s;
@@ -1010,7 +1041,8 @@ $text-muted: #718096;
   text-align: left;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: $bg-card-hover;
+    border-color: rgba($primary, 0.3);
 
     .action-icon { transform: scale(1.1); }
   }
@@ -1022,6 +1054,7 @@ $text-muted: #718096;
     align-items: center;
     justify-content: center;
     border-radius: 8px;
+    color: white;
     transition: transform 0.2s;
 
     &.search { background: $primary; }
@@ -1034,7 +1067,7 @@ $text-muted: #718096;
     flex: 1;
     font-size: 0.85rem;
     font-weight: 500;
-    color: $text-secondary;
+    color: $text-body;
   }
 }
 
@@ -1042,10 +1075,11 @@ $text-muted: #718096;
 // ACHIEVEMENTS
 // ═══════════════════════════════════════════
 .achievements-teaser {
-  background: $dark-card;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: $bg-card;
+  border: 1px solid $border-light;
   border-radius: 16px;
   padding: 1rem;
+  box-shadow: $shadow-sm;
 }
 
 .achievements-row {
@@ -1059,7 +1093,7 @@ $text-muted: #718096;
   align-items: center;
   gap: 4px;
   padding: 10px 8px;
-  background: $dark-surface;
+  background: $bg-page;
   border-radius: 10px;
   flex: 1;
   min-width: 0;
@@ -1071,6 +1105,7 @@ $text-muted: #718096;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
+    color: white;
 
     &.bronce { background: linear-gradient(135deg, #cd7f32, #8b4513); }
     &.plata { background: linear-gradient(135deg, #c0c0c0, #808080); }

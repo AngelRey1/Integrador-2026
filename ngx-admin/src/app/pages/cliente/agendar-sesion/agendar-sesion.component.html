@@ -45,7 +45,7 @@
                       <span class="reviews">({{ entrenador.total_resenas }})</span>
                     </div>
                     <div class="precio">
-                      <strong>{{ entrenador.tarifa_por_hora }}€</strong>/hora
+                      <strong>${{ entrenador.tarifa_por_hora }} MXN</strong>/hora
                     </div>
                   </div>
                   <nb-icon 
@@ -256,7 +256,7 @@
                 </div>
                 <div class="resumen-item total">
                   <span class="label">Total pagado:</span>
-                  <span class="value">{{ totalFinal.toFixed(2) }}€</span>
+                  <span class="value">{{ totalFinal.toFixed(2) }} MXN</span>
                 </div>
               </nb-card-body>
             </nb-card>
@@ -317,15 +317,15 @@
       <div class="resumen-precios">
         <div class="precio-item">
           <span>Sesión</span>
-          <span>{{ precioTotal.toFixed(2) }}€</span>
+          <span>{{ precioTotal.toFixed(2) }} MXN</span>
         </div>
         <div class="precio-item">
           <span>Comisión plataforma (10%)</span>
-          <span>{{ comision.toFixed(2) }}€</span>
+          <span>{{ comision.toFixed(2) }} MXN</span>
         </div>
         <div class="precio-item total">
           <strong>Total</strong>
-          <strong>{{ totalFinal.toFixed(2) }}€</strong>
+          <strong>{{ totalFinal.toFixed(2) }} MXN</strong>
         </div>
       </div>
     </nb-card-body>

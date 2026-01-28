@@ -14,11 +14,11 @@ const routes: Routes = [
     path: '',
     children: [
       {
-        path: 'dashboard',
+        path: 'dashboard',  // Ahora es "Inicio" - vista unificada
         component: ClienteDashboardComponent
       },
       {
-        path: 'buscar-entrenadores',
+        path: 'buscar-entrenadores',  // Mantener por si hay enlaces directos
         component: BuscarEntrenadoresComponent
       },
       {
@@ -30,7 +30,7 @@ const routes: Routes = [
         component: AgendarSesionComponent
       },
       {
-        path: 'mis-reservas',
+        path: 'mis-reservas',  // Ahora es "Mis Sesiones"
         component: MisReservasComponent
       },
       {
@@ -42,7 +42,7 @@ const routes: Routes = [
         component: MisResenasComponent
       },
       {
-        path: 'catalogos',
+        path: 'catalogos',  // Oculto del menú pero accesible
         component: CatalogosClienteComponent
       },
       {
@@ -51,7 +51,7 @@ const routes: Routes = [
       },
       {
         path: '',
-        redirectTo: 'mis-reservas',
+        redirectTo: 'dashboard',  // Inicio como home
         pathMatch: 'full'
       }
     ]

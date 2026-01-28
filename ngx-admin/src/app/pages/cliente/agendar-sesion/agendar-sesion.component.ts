@@ -264,7 +264,7 @@ export class AgendarSesionComponent implements OnInit {
   }
 
   formatearFecha(fecha: Date): string {
-    return new Intl.DateTimeFormat('es-ES', {
+    return new Intl.DateTimeFormat('es-MX', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',

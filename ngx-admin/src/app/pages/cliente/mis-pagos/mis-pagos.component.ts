@@ -34,104 +34,103 @@ export class MisPagosComponent implements OnInit {
   filtroEstado = '';
   filtroMes = '';
 
-  // Datos
+  // Datos (precios en MXN - pesos mexicanos)
   pagos: Pago[] = [
     {
       id: 1,
-      numero_transaccion: 'TXN-2025-001',
-      fecha: new Date(2025, 10, 12),
+      numero_transaccion: 'TXN-2026-001',
+      fecha: new Date(2026, 1, 12),
       concepto: 'Sesión de Yoga - 1 hora',
       entrenador: 'Ana Pérez García',
       metodo_pago: 'Visa •••• 4242',
-      monto: 33.00,
+      monto: 450,
       estado: 'COMPLETADO',
       recibo_url: '#'
     },
     {
       id: 2,
-      numero_transaccion: 'TXN-2025-002',
-      fecha: new Date(2025, 10, 10),
+      numero_transaccion: 'TXN-2026-002',
+      fecha: new Date(2026, 1, 10),
       concepto: 'Sesión de CrossFit - 1.5 horas',
       entrenador: 'Carlos Ruiz López',
       metodo_pago: 'Mastercard •••• 5555',
-      monto: 57.75,
+      monto: 675,
       estado: 'COMPLETADO',
       recibo_url: '#'
     },
     {
       id: 3,
-      numero_transaccion: 'TXN-2025-003',
-      fecha: new Date(2025, 10, 8),
+      numero_transaccion: 'TXN-2026-003',
+      fecha: new Date(2026, 1, 8),
       concepto: 'Sesión de Running - 1 hora',
       entrenador: 'María González',
       metodo_pago: 'PayPal',
-      monto: 27.50,
+      monto: 350,
       estado: 'COMPLETADO',
       recibo_url: '#'
     },
     {
       id: 4,
-      numero_transaccion: 'TXN-2025-004',
-      fecha: new Date(2025, 10, 15),
+      numero_transaccion: 'TXN-2026-004',
+      fecha: new Date(2026, 1, 15),
       concepto: 'Sesión de Boxeo - 1 hora',
       entrenador: 'David Martínez',
       metodo_pago: 'Visa •••• 4242',
-      monto: 44.00,
+      monto: 500,
       estado: 'PENDIENTE'
     },
     {
       id: 5,
-      numero_transaccion: 'TXN-2025-005',
-      fecha: new Date(2025, 9, 28),
+      numero_transaccion: 'TXN-2026-005',
+      fecha: new Date(2026, 0, 28),
       concepto: 'Sesión de Pilates - 1 hora',
       entrenador: 'Ana Pérez García',
       metodo_pago: 'Visa •••• 4242',
-      monto: 33.00,
+      monto: 450,
       estado: 'COMPLETADO',
       recibo_url: '#'
     },
     {
       id: 6,
-      numero_transaccion: 'TXN-2025-006',
-      fecha: new Date(2025, 9, 25),
+      numero_transaccion: 'TXN-2026-006',
+      fecha: new Date(2026, 0, 25),
       concepto: 'Sesión de Natación - 1 hora',
       entrenador: 'Laura Sánchez',
       metodo_pago: 'Mastercard •••• 5555',
-      monto: 30.80,
+      monto: 380,
       estado: 'COMPLETADO',
       recibo_url: '#'
     },
     {
       id: 7,
-      numero_transaccion: 'TXN-2025-007',
-      fecha: new Date(2025, 9, 20),
+      numero_transaccion: 'TXN-2026-007',
+      fecha: new Date(2026, 0, 20),
       concepto: 'Sesión de Ciclismo - 2 horas',
       entrenador: 'Javier Torres',
       metodo_pago: 'PayPal',
-      monto: 70.40,
+      monto: 800,
       estado: 'COMPLETADO',
       recibo_url: '#'
     },
     {
       id: 8,
       numero_transaccion: 'TXN-2025-008',
-      fecha: new Date(2025, 8, 15),
+      fecha: new Date(2025, 11, 15),
       concepto: 'Sesión de Yoga - 1 hora',
       entrenador: 'Ana Pérez García',
       metodo_pago: 'Visa •••• 4242',
-      monto: 33.00,
+      monto: 450,
       estado: 'REEMBOLSADO'
     }
   ];
 
   pagosFiltrados: Pago[] = [];
 
-  // Datos para gráfica
+  // Datos para gráfica (en MXN)
   gastosUltimosMeses: EstadisticaPago[] = [
-    { mes: 'Ago', monto: 165 },
-    { mes: 'Sep', monto: 134.2 },
-    { mes: 'Oct', monto: 226.45 },
-    { mes: 'Nov', monto: 162.25 }
+    { mes: 'Dic', monto: 1800 },
+    { mes: 'Ene', monto: 2430 },
+    { mes: 'Feb', monto: 1975 }
   ];
 
   // Opciones de filtro
@@ -145,10 +144,9 @@ export class MisPagosComponent implements OnInit {
 
   mesesDisponibles = [
     { value: '', label: 'Todos los meses' },
-    { value: '11', label: 'Noviembre 2025' },
-    { value: '10', label: 'Octubre 2025' },
-    { value: '9', label: 'Septiembre 2025' },
-    { value: '8', label: 'Agosto 2025' }
+    { value: '1', label: 'Febrero 2026' },
+    { value: '0', label: 'Enero 2026' },
+    { value: '11', label: 'Diciembre 2025' }
   ];
 
   constructor() {}
@@ -234,7 +232,7 @@ export class MisPagosComponent implements OnInit {
   }
 
   formatearFecha(fecha: Date): string {
-    return new Intl.DateTimeFormat('es-ES', {
+    return new Intl.DateTimeFormat('es-MX', {
       day: '2-digit',
       month: 'short',
       year: 'numeric'
@@ -242,9 +240,9 @@ export class MisPagosComponent implements OnInit {
   }
 
   formatearMoneda(monto: number): string {
-    return new Intl.NumberFormat('es-ES', {
+    return new Intl.NumberFormat('es-MX', {
       style: 'currency',
-      currency: 'EUR'
+      currency: 'MXN'
     }).format(monto);
   }
 

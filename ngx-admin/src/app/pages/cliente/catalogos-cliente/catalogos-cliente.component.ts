@@ -87,9 +87,9 @@ export class CatalogosClienteComponent implements OnInit {
         descripcion: 'Plan de entrenamiento diseñado específicamente para tus objetivos y nivel de condición física.',
         categoria: 'servicios',
         imagen_url: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop',
-        precio: 99.99,
+        precio: 1799,
         disponible: true,
-        fecha_creacion: new Date('2025-01-01')
+        fecha_creacion: new Date('2026-01-01')
       },
       {
         id: 2,
@@ -97,9 +97,9 @@ export class CatalogosClienteComponent implements OnInit {
         descripcion: 'Set completo de pesas ajustables de 2.5kg a 25kg, perfectas para entrenamiento en casa.',
         categoria: 'equipamiento',
         imagen_url: 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=400&h=300&fit=crop',
-        precio: 149.99,
+        precio: 2699,
         disponible: true,
-        fecha_creacion: new Date('2025-01-02')
+        fecha_creacion: new Date('2026-01-02')
       },
       {
         id: 3,
@@ -107,9 +107,9 @@ export class CatalogosClienteComponent implements OnInit {
         descripcion: 'Proteína de suero de leche de alta calidad, 2kg. Sabor chocolate.',
         categoria: 'suplementos',
         imagen_url: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=400&h=300&fit=crop',
-        precio: 49.99,
+        precio: 899,
         disponible: true,
-        fecha_creacion: new Date('2025-01-03')
+        fecha_creacion: new Date('2026-01-03')
       },
       {
         id: 4,
@@ -117,9 +117,9 @@ export class CatalogosClienteComponent implements OnInit {
         descripcion: 'Acceso ilimitado a clases de yoga en línea durante 1 mes.',
         categoria: 'servicios',
         imagen_url: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&h=300&fit=crop',
-        precio: 29.99,
+        precio: 549,
         disponible: true,
-        fecha_creacion: new Date('2025-01-04')
+        fecha_creacion: new Date('2026-01-04')
       },
       {
         id: 5,
@@ -127,9 +127,9 @@ export class CatalogosClienteComponent implements OnInit {
         descripcion: 'Camiseta transpirable y ligera, ideal para running y entrenamientos intensos.',
         categoria: 'ropa',
         imagen_url: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=300&fit=crop',
-        precio: 24.99,
+        precio: 449,
         disponible: true,
-        fecha_creacion: new Date('2025-01-05')
+        fecha_creacion: new Date('2026-01-05')
       },
       {
         id: 6,
@@ -137,9 +137,9 @@ export class CatalogosClienteComponent implements OnInit {
         descripcion: 'Programa completo de 12 semanas para atletas avanzados de CrossFit.',
         categoria: 'deportes',
         imagen_url: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&h=300&fit=crop',
-        precio: 79.99,
+        precio: 1449,
         disponible: true,
-        fecha_creacion: new Date('2025-01-06')
+        fecha_creacion: new Date('2026-01-06')
       }
     ];
   }
