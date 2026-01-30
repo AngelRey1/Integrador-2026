@@ -1,0 +1,290 @@
+<div class="container-fluid">
+  <!-- Título y botón nueva reseña -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center flex-wrap">
+        <div>
+          <h3 class="page-title">Mis Reseñas</h3>
+          <p class="text-hint">Comparte tu experiencia con otros usuarios</p>
+        </div>
+        <button nbButton status="primary" size="medium" (click)="nuevaResena()">
+          <nb-icon icon="plus-outline"></nb-icon>
+          Nueva Reseña
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cards de estadísticas -->
+  <div class="row mb-4">
+    <div class="col-12 col-sm-4 mb-3">
+      <nb-card>
+        <nb-card-body class="stat-card">
+          <div class="stat-icon total">
+            <nb-icon icon="star"></nb-icon>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Total Reseñas</span>
+            <h4 class="stat-value">{{ totalResenas }}</h4>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+
+    <div class="col-12 col-sm-4 mb-3">
+      <nb-card>
+        <nb-card-body class="stat-card">
+          <div class="stat-icon average">
+            <nb-icon icon="trending-up-outline"></nb-icon>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Calificación Promedio</span>
+            <h4 class="stat-value">{{ calificacionPromedio }} <nb-icon icon="star"></nb-icon></h4>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+
+    <div class="col-12 col-sm-4 mb-3">
+      <nb-card>
+        <nb-card-body class="stat-card">
+          <div class="stat-icon responses">
+            <nb-icon icon="message-circle-outline"></nb-icon>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Con Respuesta</span>
+            <h4 class="stat-value">{{ resenasConRespuesta }}</h4>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+  </div>
+
+  <!-- Formulario de nueva/editar reseña -->
+  <div class="row mb-4" *ngIf="mostrarFormulario">
+    <div class="col-12">
+      <nb-card>
+        <nb-card-header>
+          <div class="d-flex justify-content-between align-items-center">
+            <span>{{ resenaEnEdicion ? 'Editar Reseña' : 'Nueva Reseña' }}</span>
+            <button nbButton size="tiny" status="basic" (click)="cancelarFormulario()">
+              <nb-icon icon="close-outline"></nb-icon>
+            </button>
+          </div>
+        </nb-card-header>
+        <nb-card-body>
+          <form [formGroup]="resenaForm" (ngSubmit)="guardarResena()">
+            <!-- Calificación -->
+            <div class="form-group mb-4">
+              <label class="label">Calificación *</label>
+              <div class="star-rating">
+                <button
+                  *ngFor="let star of getEstrellas(5)"
+                  type="button"
+                  class="star-button"
+                  [class.filled]="star <= resenaForm.get('calificacion')?.value"
+                  (click)="setCalificacion(star)"
+                >
+                  <nb-icon icon="star"></nb-icon>
+                </button>
+              </div>
+              <span class="rating-text" *ngIf="resenaForm.get('calificacion')?.value > 0">
+                {{ resenaForm.get('calificacion')?.value }} de 5 estrellas
+              </span>
+              <div class="error-message" *ngIf="resenaForm.get('calificacion')?.invalid && resenaForm.get('calificacion')?.touched">
+                Por favor, selecciona una calificación
+              </div>
+            </div>
+
+            <!-- Comentario -->
+            <div class="form-group mb-3">
+              <label class="label" for="comentario">Comentario *</label>
+              <textarea
+                nbInput
+                fullWidth
+                id="comentario"
+                formControlName="comentario"
+                placeholder="Cuéntanos sobre tu experiencia con este entrenador..."
+                rows="5"
+                [status]="resenaForm.get('comentario')?.invalid && resenaForm.get('comentario')?.touched ? 'danger' : 'basic'"
+              ></textarea>
+              <div class="d-flex justify-content-between align-items-center mt-2">
+                <div class="error-message" *ngIf="resenaForm.get('comentario')?.invalid && resenaForm.get('comentario')?.touched">
+                  <span *ngIf="resenaForm.get('comentario')?.errors?.['required']">El comentario es obligatorio</span>
+                  <span *ngIf="resenaForm.get('comentario')?.errors?.['minlength']">Mínimo 10 caracteres</span>
+                </div>
+                <span class="char-counter" [class.warning]="comentarioLength > 450">
+                  {{ comentarioLength }} / 500
+                </span>
+              </div>
+            </div>
+
+            <!-- Botones -->
+            <div class="d-flex justify-content-end gap-2">
+              <button nbButton type="button" status="basic" (click)="cancelarFormulario()">
+                Cancelar
+              </button>
+              <button nbButton type="submit" status="primary" [disabled]="resenaForm.invalid">
+                {{ resenaEnEdicion ? 'Actualizar' : 'Publicar' }} Reseña
+              </button>
+            </div>
+          </form>
+        </nb-card-body>
+      </nb-card>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <nb-card>
+        <nb-card-body>
+          <div class="filtros-row">
+            <input
+              nbInput
+              type="text"
+              fullWidth
+              placeholder="Buscar por entrenador, deporte o comentario..."
+              [(ngModel)]="filtroBusqueda"
+              (ngModelChange)="aplicarFiltros()"
+              class="search-input"
+            >
+            
+            <nb-select
+              placeholder="Calificación"
+              [(selected)]="filtroCalificacion"
+              (selectedChange)="aplicarFiltros()"
+            >
+              <nb-option *ngFor="let cal of calificacionesDisponibles" [value]="cal.value">
+                {{ cal.label }}
+              </nb-option>
+            </nb-select>
+
+            <button
+              nbButton
+              status="basic"
+              (click)="limpiarFiltros()"
+              [disabled]="!filtroBusqueda && !filtroCalificacion"
+            >
+              <nb-icon icon="close-outline"></nb-icon>
+              Limpiar
+            </button>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+  </div>
+
+  <!-- Lista de reseñas -->
+  <div class="row">
+    <div class="col-12">
+      <div *ngIf="resenasFiltradas.length > 0">
+        <nb-card *ngFor="let resena of resenasFiltradas" class="resena-card">
+          <nb-card-body>
+            <!-- Cabecera con entrenador -->
+            <div class="resena-header">
+              <div class="entrenador-info">
+                <div class="avatar">
+                  <img [src]="resena.entrenador.avatar" [alt]="resena.entrenador.nombre">
+                </div>
+                <div class="info">
+                  <h6 class="nombre">{{ resena.entrenador.nombre }}</h6>
+                  <span class="especialidad">{{ resena.entrenador.especialidad }}</span>
+                </div>
+              </div>
+              <div class="resena-actions">
+                <button nbButton size="tiny" status="basic" (click)="editarResena(resena)" nbTooltip="Editar">
+                  <nb-icon icon="edit-outline"></nb-icon>
+                </button>
+                <button nbButton size="tiny" status="danger" (click)="eliminarResena(resena, dialogEliminar)" nbTooltip="Eliminar">
+                  <nb-icon icon="trash-2-outline"></nb-icon>
+                </button>
+              </div>
+            </div>
+
+            <!-- Calificación y fecha -->
+            <div class="resena-meta">
+              <div class="stars">
+                <nb-icon
+                  *ngFor="let star of getEstrellas(5)"
+                  icon="star"
+                  [class.filled]="star <= resena.calificacion"
+                ></nb-icon>
+                <span class="calificacion-numero">{{ resena.calificacion }}.0</span>
+              </div>
+              <div class="fecha">
+                <nb-icon icon="clock-outline"></nb-icon>
+                <span>{{ formatearFechaRelativa(resena.fecha_creacion) }}</span>
+                <span *ngIf="resena.fecha_edicion" class="editado">(editado)</span>
+              </div>
+            </div>
+
+            <!-- Sesión -->
+            <div class="sesion-info">
+              <nb-icon icon="activity-outline"></nb-icon>
+              <span>{{ resena.sesion.deporte }} - {{ formatearFecha(resena.sesion.fecha) }}</span>
+            </div>
+
+            <!-- Comentario -->
+            <div class="comentario">
+              <p>{{ resena.comentario }}</p>
+            </div>
+
+            <!-- Respuesta del entrenador -->
+            <div class="respuesta-entrenador" *ngIf="resena.respuesta_entrenador">
+              <div class="respuesta-header">
+                <nb-icon icon="corner-down-right"></nb-icon>
+                <strong>Respuesta del entrenador</strong>
+                <span class="fecha-respuesta">{{ formatearFechaRelativa(resena.respuesta_entrenador.fecha) }}</span>
+              </div>
+              <p>{{ resena.respuesta_entrenador.texto }}</p>
+            </div>
+          </nb-card-body>
+        </nb-card>
+      </div>
+
+      <!-- Estado vacío -->
+      <nb-card *ngIf="resenasFiltradas.length === 0">
+        <nb-card-body>
+          <div class="empty-state">
+            <nb-icon icon="star-outline"></nb-icon>
+            <h5>No hay reseñas</h5>
+            <p *ngIf="filtroBusqueda || filtroCalificacion">
+              No se encontraron reseñas con los filtros aplicados
+            </p>
+            <p *ngIf="!filtroBusqueda && !filtroCalificacion && totalResenas === 0">
+              Aún no has dejado ninguna reseña. ¡Comparte tu experiencia!
+            </p>
+            <button nbButton status="primary" (click)="nuevaResena()" *ngIf="totalResenas === 0">
+              Crear Primera Reseña
+            </button>
+            <button nbButton status="basic" (click)="limpiarFiltros()" *ngIf="filtroBusqueda || filtroCalificacion">
+              Limpiar Filtros
+            </button>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+  </div>
+</div>
+
+<!-- Dialog de confirmación para eliminar -->
+<ng-template #dialogEliminar let-data let-ref="dialogRef">
+  <nb-card>
+    <nb-card-header>Confirmar Eliminación</nb-card-header>
+    <nb-card-body>
+      <p>¿Estás seguro de que deseas eliminar esta reseña?</p>
+      <p class="text-hint mb-0">Esta acción no se puede deshacer.</p>
+    </nb-card-body>
+    <nb-card-footer>
+      <div class="d-flex justify-content-end gap-2">
+        <button nbButton status="basic" (click)="ref.close()">
+          Cancelar
+        </button>
+        <button nbButton status="danger" (click)="confirmarEliminar(ref)">
+          Eliminar
+        </button>
+      </div>
+    </nb-card-footer>
+  </nb-card>
+</ng-template>

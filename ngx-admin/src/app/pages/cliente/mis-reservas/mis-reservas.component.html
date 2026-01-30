@@ -1,0 +1,323 @@
+<div class="mis-reservas-container">
+  <!-- Header con filtros -->
+  <nb-card class="filtros-card">
+    <nb-card-body>
+      <div class="filtros-row">
+        <div class="busqueda">
+          <input 
+            nbInput 
+            fullWidth
+            type="text" 
+            placeholder="Buscar por número de reserva o entrenador..."
+            [(ngModel)]="filtroBusqueda">
+        </div>
+
+        <div class="filtro-fecha">
+          <input 
+            nbInput
+            [nbDatepicker]="datepicker"
+            placeholder="Filtrar por fecha"
+            [(ngModel)]="filtroFecha">
+          <nb-datepicker #datepicker></nb-datepicker>
+        </div>
+
+        <button 
+          nbButton 
+          outline 
+          status="basic" 
+          (click)="limpiarFiltros()"
+          *ngIf="filtroFecha || filtroBusqueda">
+          <nb-icon icon="close-outline"></nb-icon>
+          Limpiar
+        </button>
+      </div>
+    </nb-card-body>
+  </nb-card>
+
+  <!-- Tabs por estado -->
+  <nb-card>
+    <nb-card-header>
+      <h5>Mis Reservas</h5>
+    </nb-card-header>
+    <nb-card-body>
+      <nb-tabset fullWidth (changeTab)="tabSeleccionado = $event.tabId">
+        
+        <!-- Tab: Pendientes -->
+        <nb-tab tabTitle="Pendientes" [badgeText]="reservasPendientes.length.toString()" badgeStatus="warning">
+          <div class="reservas-list" *ngIf="reservasPendientes.length > 0; else noReservas">
+            <nb-card *ngFor="let reserva of reservasPendientes" class="reserva-card">
+              <nb-card-body>
+                <div class="reserva-header">
+                  <div class="reserva-info">
+                    <div class="entrenador-avatar">
+                      <img [src]="reserva.entrenador.foto_url" [alt]="reserva.entrenador.nombre">
+                    </div>
+                    <div class="reserva-detalles">
+                      <h6>{{ reserva.entrenador.nombre }}</h6>
+                      <p class="especialidad">{{ reserva.entrenador.especialidad }}</p>
+                      <p class="numero-reserva">
+                        <nb-icon icon="file-text-outline"></nb-icon>
+                        {{ reserva.numero_reserva }}
+                      </p>
+                    </div>
+                  </div>
+                  <nb-badge [text]="reserva.estado" [status]="getEstadoBadgeStatus(reserva.estado)" position="top right"></nb-badge>
+                </div>
+
+                <div class="reserva-meta">
+                  <div class="meta-item">
+                    <nb-icon icon="calendar-outline"></nb-icon>
+                    <span>{{ formatearFecha(reserva.fecha) }}</span>
+                  </div>
+                  <div class="meta-item">
+                    <nb-icon icon="clock-outline"></nb-icon>
+                    <span>{{ reserva.hora }}</span>
+                  </div>
+                  <div class="meta-item">
+                    <nb-icon icon="time-outline"></nb-icon>
+                    <span>{{ getDuracionTexto(reserva.duracion) }}</span>
+                  </div>
+                  <div class="meta-item">
+                    <nb-icon icon="pin-outline"></nb-icon>
+                    <span>{{ reserva.modalidad }}</span>
+                  </div>
+                  <div class="meta-item precio">
+                    <nb-icon icon="credit-card-outline"></nb-icon>
+                    <strong>{{ reserva.precio_total }} MXN</strong>
+                  </div>
+                </div>
+
+                <div class="reserva-actions">
+                  <button nbButton ghost size="small" status="info" (click)="verDetalles(reserva)">
+                    <nb-icon icon="eye-outline"></nb-icon>
+                    Detalles
+                  </button>
+                  <button nbButton ghost size="small" status="success" (click)="confirmarReserva(reserva)">
+                    <nb-icon icon="checkmark-circle-outline"></nb-icon>
+                    Confirmar
+                  </button>
+                  <button nbButton ghost size="small" status="warning" (click)="reprogramarReserva(reserva)">
+                    <nb-icon icon="calendar-outline"></nb-icon>
+                    Reprogramar
+                  </button>
+                  <button nbButton ghost size="small" status="danger" (click)="cancelarReserva(reserva)">
+                    <nb-icon icon="close-circle-outline"></nb-icon>
+                    Cancelar
+                  </button>
+                </div>
+              </nb-card-body>
+            </nb-card>
+          </div>
+        </nb-tab>
+
+        <!-- Tab: Confirmadas -->
+        <nb-tab tabTitle="Confirmadas" [badgeText]="reservasConfirmadas.length.toString()" badgeStatus="info">
+          <div class="reservas-list" *ngIf="reservasConfirmadas.length > 0; else noReservas">
+            <nb-card *ngFor="let reserva of reservasConfirmadas" class="reserva-card">
+              <nb-card-body>
+                <nb-alert status="info" closable="false" class="proxima-alert" *ngIf="esProxima(reserva.fecha)">
+                  <nb-icon icon="bell-outline"></nb-icon>
+                  ¡Próxima sesión! - {{ formatearFecha(reserva.fecha) }} a las {{ reserva.hora }}
+                </nb-alert>
+
+                <div class="reserva-header">
+                  <div class="reserva-info">
+                    <div class="entrenador-avatar">
+                      <img [src]="reserva.entrenador.foto_url" [alt]="reserva.entrenador.nombre">
+                    </div>
+                    <div class="reserva-detalles">
+                      <h6>{{ reserva.entrenador.nombre }}</h6>
+                      <p class="especialidad">{{ reserva.entrenador.especialidad }}</p>
+                      <p class="numero-reserva">
+                        <nb-icon icon="file-text-outline"></nb-icon>
+                        {{ reserva.numero_reserva }}
+                      </p>
+                    </div>
+                  </div>
+                  <nb-badge [text]="reserva.estado" [status]="getEstadoBadgeStatus(reserva.estado)" position="top right"></nb-badge>
+                </div>
+
+                <div class="reserva-meta">
+                  <div class="meta-item">
+                    <nb-icon icon="calendar-outline"></nb-icon>
+                    <span>{{ formatearFecha(reserva.fecha) }}</span>
+                  </div>
+                  <div class="meta-item">
+                    <nb-icon icon="clock-outline"></nb-icon>
+                    <span>{{ reserva.hora }}</span>
+                  </div>
+                  <div class="meta-item">
+                    <nb-icon icon="time-outline"></nb-icon>
+                    <span>{{ getDuracionTexto(reserva.duracion) }}</span>
+                  </div>
+                  <div class="meta-item">
+                    <nb-icon icon="pin-outline"></nb-icon>
+                    <span>{{ reserva.modalidad }}</span>
+                  </div>
+                  <div class="meta-item precio">
+                    <nb-icon icon="credit-card-outline"></nb-icon>
+                    <strong>{{ reserva.precio_total }} MXN</strong>
+                  </div>
+                </div>
+
+                <div class="reserva-actions">
+                  <button nbButton ghost size="small" status="info" (click)="verDetalles(reserva)">
+                    <nb-icon icon="eye-outline"></nb-icon>
+                    Detalles
+                  </button>
+                  <button nbButton ghost size="small" status="warning" (click)="reprogramarReserva(reserva)">
+                    <nb-icon icon="calendar-outline"></nb-icon>
+                    Reprogramar
+                  </button>
+                  <button nbButton ghost size="small" status="danger" (click)="cancelarReserva(reserva)">
+                    <nb-icon icon="close-circle-outline"></nb-icon>
+                    Cancelar
+                  </button>
+                  <button nbButton ghost size="small" status="basic" (click)="descargarRecibo(reserva)">
+                    <nb-icon icon="download-outline"></nb-icon>
+                    Recibo
+                  </button>
+                </div>
+              </nb-card-body>
+            </nb-card>
+          </div>
+        </nb-tab>
+
+        <!-- Tab: Completadas -->
+        <nb-tab tabTitle="Completadas" [badgeText]="reservasCompletadas.length.toString()" badgeStatus="success">
+          <div class="reservas-list" *ngIf="reservasCompletadas.length > 0; else noReservas">
+            <nb-card *ngFor="let reserva of reservasCompletadas" class="reserva-card">
+              <nb-card-body>
+                <div class="reserva-header">
+                  <div class="reserva-info">
+                    <div class="entrenador-avatar">
+                      <img [src]="reserva.entrenador.foto_url" [alt]="reserva.entrenador.nombre">
+                    </div>
+                    <div class="reserva-detalles">
+                      <h6>{{ reserva.entrenador.nombre }}</h6>
+                      <p class="especialidad">{{ reserva.entrenador.especialidad }}</p>
+                      <p class="numero-reserva">
+                        <nb-icon icon="file-text-outline"></nb-icon>
+                        {{ reserva.numero_reserva }}
+                      </p>
+                    </div>
+                  </div>
+                  <nb-badge [text]="reserva.estado" [status]="getEstadoBadgeStatus(reserva.estado)" position="top right"></nb-badge>
+                </div>
+
+                <div class="reserva-meta">
+                  <div class="meta-item">
+                    <nb-icon icon="calendar-outline"></nb-icon>
+                    <span>{{ formatearFecha(reserva.fecha) }}</span>
+                  </div>
+                  <div class="meta-item">
+                    <nb-icon icon="clock-outline"></nb-icon>
+                    <span>{{ reserva.hora }}</span>
+                  </div>
+                  <div class="meta-item">
+                    <nb-icon icon="time-outline"></nb-icon>
+                    <span>{{ getDuracionTexto(reserva.duracion) }}</span>
+                  </div>
+                  <div class="meta-item">
+                    <nb-icon icon="pin-outline"></nb-icon>
+                    <span>{{ reserva.modalidad }}</span>
+                  </div>
+                  <div class="meta-item precio">
+                    <nb-icon icon="credit-card-outline"></nb-icon>
+                    <strong>{{ reserva.precio_total }} MXN</strong>
+                  </div>
+                </div>
+
+                <div class="reserva-actions">
+                  <button nbButton ghost size="small" status="info" (click)="verDetalles(reserva)">
+                    <nb-icon icon="eye-outline"></nb-icon>
+                    Detalles
+                  </button>
+                  <button nbButton ghost size="small" status="success" (click)="dejarResena(reserva)">
+                    <nb-icon icon="star-outline"></nb-icon>
+                    Dejar Reseña
+                  </button>
+                  <button nbButton ghost size="small" status="basic" (click)="descargarRecibo(reserva)">
+                    <nb-icon icon="download-outline"></nb-icon>
+                    Recibo
+                  </button>
+                </div>
+              </nb-card-body>
+            </nb-card>
+          </div>
+        </nb-tab>
+
+        <!-- Tab: Canceladas -->
+        <nb-tab tabTitle="Canceladas" [badgeText]="reservasCanceladas.length.toString()" badgeStatus="danger">
+          <div class="reservas-list" *ngIf="reservasCanceladas.length > 0; else noReservas">
+            <nb-card *ngFor="let reserva of reservasCanceladas" class="reserva-card cancelada">
+              <nb-card-body>
+                <div class="reserva-header">
+                  <div class="reserva-info">
+                    <div class="entrenador-avatar">
+                      <img [src]="reserva.entrenador.foto_url" [alt]="reserva.entrenador.nombre">
+                    </div>
+                    <div class="reserva-detalles">
+                      <h6>{{ reserva.entrenador.nombre }}</h6>
+                      <p class="especialidad">{{ reserva.entrenador.especialidad }}</p>
+                      <p class="numero-reserva">
+                        <nb-icon icon="file-text-outline"></nb-icon>
+                        {{ reserva.numero_reserva }}
+                      </p>
+                    </div>
+                  </div>
+                  <nb-badge [text]="reserva.estado" [status]="getEstadoBadgeStatus(reserva.estado)" position="top right"></nb-badge>
+                </div>
+
+                <div class="reserva-meta">
+                  <div class="meta-item">
+                    <nb-icon icon="calendar-outline"></nb-icon>
+                    <span>{{ formatearFecha(reserva.fecha) }}</span>
+                  </div>
+                  <div class="meta-item">
+                    <nb-icon icon="clock-outline"></nb-icon>
+                    <span>{{ reserva.hora }}</span>
+                  </div>
+                  <div class="meta-item">
+                    <nb-icon icon="time-outline"></nb-icon>
+                    <span>{{ getDuracionTexto(reserva.duracion) }}</span>
+                  </div>
+                  <div class="meta-item">
+                    <nb-icon icon="pin-outline"></nb-icon>
+                    <span>{{ reserva.modalidad }}</span>
+                  </div>
+                </div>
+
+                <div class="notas-cancelacion" *ngIf="reserva.notas">
+                  <nb-icon icon="alert-circle-outline"></nb-icon>
+                  <span>{{ reserva.notas }}</span>
+                </div>
+
+                <div class="reserva-actions">
+                  <button nbButton ghost size="small" status="info" (click)="verDetalles(reserva)">
+                    <nb-icon icon="eye-outline"></nb-icon>
+                    Detalles
+                  </button>
+                </div>
+              </nb-card-body>
+            </nb-card>
+          </div>
+        </nb-tab>
+
+      </nb-tabset>
+    </nb-card-body>
+  </nb-card>
+
+  <!-- Template sin reservas -->
+  <ng-template #noReservas>
+    <div class="no-reservas">
+      <nb-icon icon="calendar-outline" class="no-reservas-icon"></nb-icon>
+      <h6>No hay reservas en esta categoría</h6>
+      <p>Las reservas que realices aparecerán aquí</p>
+      <button nbButton status="primary" routerLink="/pages/cliente/buscar-entrenadores">
+        <nb-icon icon="plus-outline"></nb-icon>
+        Agendar Nueva Sesión
+      </button>
+    </div>
+  </ng-template>
+</div>

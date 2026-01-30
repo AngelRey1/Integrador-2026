@@ -1,0 +1,263 @@
+<div class="admin-dashboard">
+  <!-- Header -->
+  <div class="dashboard-header">
+    <div>
+      <h1>Panel de Administración</h1>
+      <p>Bienvenido de vuelta, Admin. Aquí está el resumen de la plataforma.</p>
+    </div>
+    <div class="header-actions">
+      <span class="date-badge">{{ today | date:'EEEE, d MMMM yyyy' }}</span>
+    </div>
+  </div>
+
+  <!-- Stats Cards Row -->
+  <div class="stats-row">
+    <nb-card class="stat-card" accent="primary">
+      <nb-card-body>
+        <div class="stat-icon-wrapper primary">
+          <nb-icon icon="people-outline"></nb-icon>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value">{{ stats.totalUsers }}</span>
+          <span class="stat-label">Usuarios Totales</span>
+          <span class="stat-trend up">
+            <nb-icon icon="arrow-upward-outline"></nb-icon> +12% este mes
+          </span>
+        </div>
+      </nb-card-body>
+    </nb-card>
+
+    <nb-card class="stat-card" accent="success">
+      <nb-card-body>
+        <div class="stat-icon-wrapper success">
+          <nb-icon icon="person-done-outline"></nb-icon>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value">{{ stats.activeTrainers }}</span>
+          <span class="stat-label">Entrenadores Activos</span>
+          <span class="stat-trend up">
+            <nb-icon icon="arrow-upward-outline"></nb-icon> +5 nuevos
+          </span>
+        </div>
+      </nb-card-body>
+    </nb-card>
+
+    <nb-card class="stat-card" accent="info">
+      <nb-card-body>
+        <div class="stat-icon-wrapper info">
+          <nb-icon icon="calendar-outline"></nb-icon>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value">{{ stats.totalReservations }}</span>
+          <span class="stat-label">Reservas del Mes</span>
+          <span class="stat-trend up">
+            <nb-icon icon="arrow-upward-outline"></nb-icon> +18% vs anterior
+          </span>
+        </div>
+      </nb-card-body>
+    </nb-card>
+
+    <nb-card class="stat-card" accent="warning">
+      <nb-card-body>
+        <div class="stat-icon-wrapper warning">
+          <nb-icon icon="credit-card-outline"></nb-icon>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value">{{ stats.monthlyRevenue | currency:'MXN':'symbol':'1.0-0' }}</span>
+          <span class="stat-label">Ingresos del Mes</span>
+          <span class="stat-trend up">
+            <nb-icon icon="arrow-upward-outline"></nb-icon> +22%
+          </span>
+        </div>
+      </nb-card-body>
+    </nb-card>
+  </div>
+
+  <!-- Main Content Grid -->
+  <div class="dashboard-grid">
+    <!-- Pending Approvals -->
+    <nb-card class="pending-card">
+      <nb-card-header>
+        <div class="card-header-content">
+          <span>Solicitudes de Entrenadores Pendientes</span>
+          <nb-badge text="{{ pendingTrainers.length }}" status="warning"></nb-badge>
+        </div>
+      </nb-card-header>
+      <nb-card-body>
+        <div class="pending-list" *ngIf="pendingTrainers.length > 0">
+          <div class="pending-item" *ngFor="let trainer of pendingTrainers">
+            <div class="pending-info">
+              <nb-user 
+                [name]="trainer.name" 
+                [title]="trainer.specialty"
+                [picture]="trainer.avatar"
+                size="medium">
+              </nb-user>
+              <span class="pending-date">Solicitó: {{ trainer.requestDate | date:'dd/MM/yyyy' }}</span>
+            </div>
+            <div class="pending-actions">
+              <button nbButton status="success" size="small" (click)="approveTrainer(trainer)">
+                <nb-icon icon="checkmark-outline"></nb-icon>
+                Aprobar
+              </button>
+              <button nbButton status="danger" size="small" outline (click)="rejectTrainer(trainer)">
+                <nb-icon icon="close-outline"></nb-icon>
+                Rechazar
+              </button>
+              <button nbButton ghost size="small" (click)="viewTrainerProfile(trainer)">
+                <nb-icon icon="eye-outline"></nb-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="empty-state" *ngIf="pendingTrainers.length === 0">
+          <nb-icon icon="checkmark-circle-2-outline"></nb-icon>
+          <p>No hay solicitudes pendientes</p>
+        </div>
+      </nb-card-body>
+      <nb-card-footer>
+        <a routerLink="/admin/entrenadores/solicitudes">Ver todas las solicitudes</a>
+      </nb-card-footer>
+    </nb-card>
+
+    <!-- Recent Transactions -->
+    <nb-card class="transactions-card">
+      <nb-card-header>
+        <div class="card-header-content">
+          <span>Transacciones Recientes</span>
+          <nb-badge text="{{ stats.todayTransactions }}" status="info"></nb-badge>
+        </div>
+      </nb-card-header>
+      <nb-card-body>
+        <div class="transactions-list">
+          <div class="transaction-item" *ngFor="let tx of recentTransactions">
+            <div class="transaction-info">
+              <div class="transaction-icon" [ngClass]="tx.type">
+                <nb-icon [icon]="tx.type === 'payment' ? 'credit-card-outline' : 'trending-up-outline'"></nb-icon>
+              </div>
+              <div class="transaction-details">
+                <span class="tx-description">{{ tx.description }}</span>
+                <span class="tx-user">{{ tx.user }}</span>
+              </div>
+            </div>
+            <div class="transaction-amount" [ngClass]="tx.type">
+              {{ tx.type === 'payment' ? '+' : '-' }}{{ tx.amount | currency:'MXN':'symbol':'1.0-0' }}
+            </div>
+          </div>
+        </div>
+      </nb-card-body>
+      <nb-card-footer>
+        <a routerLink="/admin/pagos">Ver todos los pagos</a>
+      </nb-card-footer>
+    </nb-card>
+  </div>
+
+  <!-- Second Row -->
+  <div class="dashboard-grid">
+    <!-- Recent Reports/Issues -->
+    <nb-card class="reports-card">
+      <nb-card-header>
+        <div class="card-header-content">
+          <span>Denuncias y Reportes</span>
+          <nb-badge text="{{ reports.length }}" status="danger"></nb-badge>
+        </div>
+      </nb-card-header>
+      <nb-card-body>
+        <div class="reports-list" *ngIf="reports.length > 0">
+          <div class="report-item" *ngFor="let report of reports" [ngClass]="report.priority">
+            <div class="report-priority" [ngClass]="report.priority">
+              {{ report.priority === 'high' ? '🔴' : report.priority === 'medium' ? '🟡' : '🟢' }}
+            </div>
+            <div class="report-content">
+              <span class="report-title">{{ report.title }}</span>
+              <span class="report-meta">{{ report.type }} • {{ report.date | date:'dd/MM' }}</span>
+            </div>
+            <button nbButton ghost size="small" (click)="viewReport(report)">
+              <nb-icon icon="arrow-forward-outline"></nb-icon>
+            </button>
+          </div>
+        </div>
+        <div class="empty-state" *ngIf="reports.length === 0">
+          <nb-icon icon="shield-outline"></nb-icon>
+          <p>No hay reportes pendientes</p>
+        </div>
+      </nb-card-body>
+      <nb-card-footer>
+        <a routerLink="/admin/reportes/denuncias">Ver todos los reportes</a>
+      </nb-card-footer>
+    </nb-card>
+
+    <!-- Platform Stats -->
+    <nb-card class="platform-stats-card">
+      <nb-card-header>
+        <span>Estadísticas de la Plataforma</span>
+      </nb-card-header>
+      <nb-card-body>
+        <div class="platform-stat-row">
+          <span class="stat-name">Deportes Activos</span>
+          <span class="stat-bar">
+            <span class="bar-fill" [style.width.%]="85"></span>
+          </span>
+          <span class="stat-number">{{ stats.activeSports }}</span>
+        </div>
+        <div class="platform-stat-row">
+          <span class="stat-name">Tasa de Conversión</span>
+          <span class="stat-bar">
+            <span class="bar-fill success" [style.width.%]="stats.conversionRate"></span>
+          </span>
+          <span class="stat-number">{{ stats.conversionRate }}%</span>
+        </div>
+        <div class="platform-stat-row">
+          <span class="stat-name">Satisfacción Promedio</span>
+          <span class="stat-bar">
+            <span class="bar-fill warning" [style.width.%]="stats.avgSatisfaction * 20"></span>
+          </span>
+          <span class="stat-number">{{ stats.avgSatisfaction }}/5 ⭐</span>
+        </div>
+        <div class="platform-stat-row">
+          <span class="stat-name">Retención de Usuarios</span>
+          <span class="stat-bar">
+            <span class="bar-fill info" [style.width.%]="stats.retentionRate"></span>
+          </span>
+          <span class="stat-number">{{ stats.retentionRate }}%</span>
+        </div>
+      </nb-card-body>
+    </nb-card>
+  </div>
+
+  <!-- Quick Actions -->
+  <nb-card class="quick-actions-card">
+    <nb-card-header>
+      <span>Acciones Rápidas</span>
+    </nb-card-header>
+    <nb-card-body>
+      <div class="quick-actions-grid">
+        <button nbButton status="primary" routerLink="/admin/entrenadores/solicitudes">
+          <nb-icon icon="person-add-outline"></nb-icon>
+          Revisar Solicitudes
+        </button>
+        <button nbButton status="info" routerLink="/admin/usuarios">
+          <nb-icon icon="people-outline"></nb-icon>
+          Gestionar Usuarios
+        </button>
+        <button nbButton status="success" routerLink="/admin/pagos">
+          <nb-icon icon="credit-card-outline"></nb-icon>
+          Ver Pagos
+        </button>
+        <button nbButton status="warning" routerLink="/admin/reportes/estadisticas">
+          <nb-icon icon="bar-chart-outline"></nb-icon>
+          Generar Reporte
+        </button>
+        <button nbButton status="danger" routerLink="/admin/reportes/denuncias">
+          <nb-icon icon="alert-triangle-outline"></nb-icon>
+          Denuncias ({{ reports.length }})
+        </button>
+        <button nbButton outline routerLink="/admin/deportes">
+          <nb-icon icon="settings-2-outline"></nb-icon>
+          Configurar Deportes
+        </button>
+      </div>
+    </nb-card-body>
+  </nb-card>
+</div>
+

@@ -1,0 +1,365 @@
+<div class="reserva-page-container">
+  <div class="reserva-card">
+    <!-- Header con botón cerrar -->
+    <div class="header-wrapper">
+      <div>
+        <h2 class="titulo-modal">Reservar con {{ entrenador?.nombre }}</h2>
+        <p class="subtitulo-modal">{{ entrenador?.deporte }}</p>
+      </div>
+      <button class="btn-close" (click)="cerrar()" title="Volver">
+        <nb-icon icon="close-outline"></nb-icon>
+      </button>
+    </div>
+
+    <!-- Indicador de pasos -->
+    <div class="steps-indicator" *ngIf="!reservaConfirmada">
+      <div *ngFor="let paso of pasos" class="step-item" [class.active]="pasoActual === paso.numero"
+        [class.completed]="paso.completado" (click)="irAPaso(paso.numero)">
+        <div class="step-circle">
+          <nb-icon *ngIf="!paso.completado" [icon]="paso.icono"></nb-icon>
+          <nb-icon *ngIf="paso.completado" icon="checkmark-outline"></nb-icon>
+        </div>
+        <span class="step-label">{{ paso.titulo }}</span>
+      </div>
+    </div>
+
+    <!-- Contenedor de pasos -->
+    <div class="wizard-content">
+
+      <!-- PASO 1: Fecha y Hora -->
+      <div class="paso-container" *ngIf="pasoActual === 1">
+        <h3 class="paso-titulo">
+          <nb-icon icon="calendar-outline"></nb-icon>
+          ¿Cuándo te gustaría entrenar?
+        </h3>
+
+        <form [formGroup]="paso1Form" class="paso-form">
+          <div class="form-group">
+            <label>Fecha de la sesión *</label>
+            <input type="date" formControlName="fecha" class="form-input" [min]="fechaMinima" />
+          </div>
+
+          <!-- Selector de Horarios Visual -->
+          <div class="form-group">
+            <label>Horarios Disponibles *</label>
+            <div class="horarios-grid">
+              <div *ngFor="let h of horariosDisponibles" class="horario-chip"
+                [class.selected]="paso1Form.get('hora')?.value === h.hora" [class.disabled]="!h.disponible"
+                (click)="h.disponible ? paso1Form.patchValue({hora: h.hora}) : null">
+                {{ h.hora }}
+                <span *ngIf="!h.disponible" class="agotado-label">Agotado</span>
+              </div>
+            </div>
+            <small class="error-text" *ngIf="paso1Form.get('hora')?.invalid && paso1Form.get('hora')?.touched">
+              Selecciona un horario disponible
+            </small>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Duración *</label>
+              <select formControlName="duracion" class="form-select">
+                <option *ngFor="let d of duraciones" [value]="d.value">
+                  {{ d.label }}
+                </option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Nº Personas *</label>
+              <input type="number" formControlName="cantidadPersonas" class="form-input" min="1"
+                [max]="cuposDisponibles" />
+              <small class="error-text" *ngIf="paso1Form.get('cantidadPersonas')?.hasError('excedeCupos')">
+                ¡Solo quedan {{ cuposDisponibles }} cupos!
+              </small>
+            </div>
+          </div>
+
+          <div class="form-group cupos-info">
+            <label>Disponibilidad del día</label>
+            <div class="cupos-badge" [class.low]="cuposDisponibles < 5">
+              {{ cuposDisponibles }} cupos libres
+            </div>
+          </div>
+
+          <div class="info-box" *ngIf="paso1Form.valid">
+            <nb-icon icon="info-outline"></nb-icon>
+            <div>
+              <strong>Total:</strong> ${{ calcularPrecioTotal() }} MXN
+              <br>
+              <small>
+                ${{ entrenador?.precio || 0 }} x {{ paso1Form.get('duracion')?.value / 60 }}h x {{
+                paso1Form.get('cantidadPersonas')?.value }} persona(s)
+              </small>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- PASO 2: Modalidad -->
+      <div class="paso-container" *ngIf="pasoActual === 2">
+        <h3 class="paso-titulo">
+          <nb-icon icon="options-outline"></nb-icon>
+          ¿Cómo prefieres entrenar?
+        </h3>
+
+        <form [formGroup]="paso2Form" class="paso-form">
+          <div class="modalidad-cards">
+            <!-- Opción Presencial -->
+            <div class="modalidad-card" [class.selected]="paso2Form.get('modalidad')?.value === 'presencial'"
+              (click)="paso2Form.patchValue({ modalidad: 'presencial' })">
+              <nb-icon icon="people-outline"></nb-icon>
+              <h4>Presencial</h4>
+              <p>Entrenamiento en persona</p>
+            </div>
+
+            <!-- Opción Online -->
+            <div class="modalidad-card" [class.selected]="paso2Form.get('modalidad')?.value === 'online'"
+              (click)="paso2Form.patchValue({ modalidad: 'online' })">
+              <nb-icon icon="monitor-outline"></nb-icon>
+              <h4>En línea</h4>
+              <p>Entrenamiento por videollamada</p>
+            </div>
+          </div>
+
+          <div class="form-group" *ngIf="paso2Form.get('modalidad')?.value === 'presencial'">
+            <label>Ubicación preferida *</label>
+            <input type="text" formControlName="ubicacion" placeholder="Gimnasio, parque, domicilio..."
+              class="form-input" />
+          </div>
+
+          <div class="form-group">
+            <label>Notas adicionales</label>
+            <textarea formControlName="notas" placeholder="¿Algo que el entrenador deba saber?" class="form-textarea"
+              rows="3"></textarea>
+          </div>
+        </form>
+      </div>
+
+      <!-- PASO 3: Datos del Cliente -->
+      <div class="paso-container" *ngIf="pasoActual === 3">
+        <h3 class="paso-titulo">
+          <nb-icon icon="person-outline"></nb-icon>
+          Tus datos de contacto
+        </h3>
+
+        <form [formGroup]="paso3Form" class="paso-form">
+          <div class="form-group">
+            <label>Nombre completo *</label>
+            <input type="text" formControlName="nombre" placeholder="Tu nombre" class="form-input" />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Email *</label>
+              <input type="email" formControlName="email" placeholder="tu@email.com" class="form-input" />
+            </div>
+            <div class="form-group">
+              <label>Teléfono *</label>
+              <input type="tel" formControlName="telefono" placeholder="+52 999 123 4567" class="form-input" />
+            </div>
+          </div>
+
+          <div class="terminos-wrapper">
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="aceptaTerminos" />
+              <span>Acepto los <a href="/terminos" target="_blank">términos y condiciones</a></span>
+            </label>
+          </div>
+        </form>
+      </div>
+
+      <!-- PASO 4: Pago -->
+      <div class="paso-container pago" *ngIf="pasoActual === 4">
+        <h3 class="paso-titulo">
+          <nb-icon icon="credit-card-outline"></nb-icon>
+          Método de pago
+        </h3>
+
+        <div class="resumen-pago">
+          <div class="resumen-precio-grande">
+            <span class="label">Total a pagar</span>
+            <span class="precio">${{ calcularPrecioTotal() }} MXN</span>
+          </div>
+        </div>
+
+        <form [formGroup]="paso4Form" class="paso-form">
+          <div class="metodo-pago-selector">
+            <label class="radio-label">
+              <input type="radio" formControlName="metodoPago" value="tarjeta" />
+              <div class="radio-content">
+                <nb-icon icon="credit-card-outline"></nb-icon>
+                <span>Tarjeta de crédito o débito</span>
+              </div>
+            </label>
+          </div>
+
+          <div class="form-group" *ngIf="paso4Form.get('metodoPago')?.value === 'tarjeta'">
+            <label>Número de tarjeta *</label>
+            <input type="text" formControlName="numeroTarjeta" placeholder="1234 5678 9012 3456" class="form-input"
+              maxlength="19" (input)="formatearTarjeta($event)" />
+            <small class="error-text"
+              *ngIf="paso4Form.get('numeroTarjeta')?.invalid && paso4Form.get('numeroTarjeta')?.touched">
+              Ingresa un número de tarjeta válido (16 dígitos)
+            </small>
+          </div>
+
+          <div class="form-group" *ngIf="paso4Form.get('metodoPago')?.value === 'tarjeta'">
+            <label>Nombre del titular *</label>
+            <input type="text" formControlName="nombreTitular" placeholder="Como aparece en la tarjeta"
+              class="form-input" />
+          </div>
+
+          <div class="form-row" *ngIf="paso4Form.get('metodoPago')?.value === 'tarjeta'">
+            <div class="form-group">
+              <label>Fecha de expiración *</label>
+              <input type="text" formControlName="fechaExpiracion" placeholder="MM/AA" class="form-input" maxlength="5"
+                (input)="formatearFechaExpiracion($event)" />
+              <small class="error-text"
+                *ngIf="paso4Form.get('fechaExpiracion')?.invalid && paso4Form.get('fechaExpiracion')?.touched">
+                Formato: MM/AA
+              </small>
+            </div>
+            <div class="form-group">
+              <label>CVV *</label>
+              <input type="text" formControlName="cvv" placeholder="123" class="form-input" maxlength="4" />
+              <small class="error-text" *ngIf="paso4Form.get('cvv')?.invalid && paso4Form.get('cvv')?.touched">
+                Código de seguridad (3-4 dígitos)
+              </small>
+            </div>
+          </div>
+
+          <div class="terminos-wrapper">
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="aceptaPoliticas" />
+              <span>Acepto las <a href="/politicas-pago" target="_blank">políticas de pago</a> y <a href="/terminos"
+                  target="_blank">términos y condiciones</a></span>
+            </label>
+          </div>
+
+          <div class="info-seguridad">
+            <nb-icon icon="lock-outline"></nb-icon>
+            <span>Tu información está protegida con encriptación SSL</span>
+          </div>
+        </form>
+
+        <button class="btn-pagar" (click)="procesarPago()" [disabled]="procesandoPago || !paso4Form.valid">
+          <nb-icon icon="card-outline" *ngIf="!procesandoPago"></nb-icon>
+          {{ procesandoPago ? 'Procesando pago...' : 'Pagar $' + calcularPrecioTotal() + ' MXN' }}
+        </button>
+      </div>
+
+      <!-- PASO 5: Confirmación / Resumen -->
+      <div class="paso-container confirmacion" *ngIf="pasoActual === 5 && !reservaConfirmada">
+        <h3 class="paso-titulo">
+          <nb-icon icon="checkmark-circle-outline"></nb-icon>
+          Confirma tu reserva
+        </h3>
+
+        <div class="resumen-reserva">
+          <div class="resumen-item">
+            <nb-icon icon="person-outline"></nb-icon>
+            <div>
+              <strong>Entrenador</strong>
+              <p>{{ entrenador?.nombre }}</p>
+            </div>
+          </div>
+
+          <div class="resumen-item">
+            <nb-icon icon="calendar-outline"></nb-icon>
+            <div>
+              <strong>Fecha y Hora</strong>
+              <p>{{ paso1Form.get('fecha')?.value | date:'fullDate':'':'es' }} a las {{ paso1Form.get('hora')?.value }}
+              </p>
+            </div>
+          </div>
+
+          <div class="resumen-item">
+            <nb-icon icon="people-outline"></nb-icon>
+            <div>
+              <strong>Personas</strong>
+              <p>{{ paso1Form.get('cantidadPersonas')?.value }} persona(s)</p>
+            </div>
+          </div>
+
+          <div class="resumen-item">
+            <nb-icon icon="clock-outline"></nb-icon>
+            <div>
+              <strong>Duración</strong>
+              <p>{{ paso1Form.get('duracion')?.value }} minutos</p>
+            </div>
+          </div>
+
+          <div class="resumen-item">
+            <nb-icon icon="options-outline"></nb-icon>
+            <div>
+              <strong>Modalidad</strong>
+              <p>{{ paso2Form.get('modalidad')?.value === 'presencial' ? 'Presencial' : 'Online' }}</p>
+              <small *ngIf="paso2Form.get('modalidad')?.value === 'presencial'">
+                {{ paso2Form.get('ubicacion')?.value }}
+              </small>
+            </div>
+          </div>
+
+          <div class="resumen-item" *ngIf="pagoCompletado">
+            <nb-icon icon="checkmark-circle-outline" style="color: #10B981;"></nb-icon>
+            <div>
+              <strong>Pago</strong>
+              <p style="color: #10B981;">Pagado - ${{ calcularPrecioTotal() }} MXN</p>
+            </div>
+          </div>
+
+          <div class="resumen-precio">
+            <strong>Total pagado:</strong>
+            <span class="precio">${{ calcularPrecioTotal() }} MXN</span>
+          </div>
+        </div>
+
+        <button class="btn-confirmar" (click)="confirmarReserva()" [disabled]="enviando || !pagoCompletado">
+          {{ enviando ? 'Confirmando...' : 'Confirmar Reserva' }}
+        </button>
+      </div>
+
+      <!-- MENSAJE DE ÉXITO -->
+      <div class="paso-container exito" *ngIf="reservaConfirmada">
+        <div class="icono-exito">
+          <nb-icon icon="checkmark-circle-2-outline"></nb-icon>
+        </div>
+
+        <h3>¡Reserva Confirmada!</h3>
+
+        <div class="numero-reserva">
+          <p>Número de reserva:</p>
+          <strong>{{ numeroReserva }}</strong>
+        </div>
+
+        <p class="mensaje-exito">
+          Hemos enviado un correo de confirmación a <strong>{{ paso3Form.get('email')?.value }}</strong>
+        </p>
+
+        <div class="acciones-exito">
+          <button class="btn-whatsapp" (click)="contactarWhatsApp()">
+            <nb-icon icon="message-circle-outline"></nb-icon>
+            Contactar por WhatsApp
+          </button>
+          <button class="btn-cerrar" (click)="cerrar()">
+            Volver al inicio
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Botones de navegación -->
+    <div class="navigation-buttons" *ngIf="pasoActual < 5 && !reservaConfirmada && pasoActual !== 4">
+      <button class="btn-anterior" (click)="anterior()" [disabled]="pasoActual === 1">
+        <nb-icon icon="arrow-back-outline"></nb-icon>
+        Anterior
+      </button>
+
+      <button class="btn-siguiente" (click)="siguiente()" [disabled]="!validarPasoActual()">
+        Siguiente
+        <nb-icon icon="arrow-forward-outline"></nb-icon>
+      </button>
+    </div>
+  </div>
+</div>

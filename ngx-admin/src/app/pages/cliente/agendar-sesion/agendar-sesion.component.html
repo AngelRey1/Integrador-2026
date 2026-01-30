@@ -1,0 +1,333 @@
+<div class="agendar-container">
+  <!-- Stepper Principal -->
+  <nb-card>
+    <nb-card-header>
+      <div class="header-wrapper">
+        <h4>Agendar Nueva Sesión</h4>
+        <button nbButton ghost status="basic" class="btn-close" (click)="cerrarModal()">
+          <nb-icon icon="close-outline"></nb-icon>
+        </button>
+      </div>
+    </nb-card-header>
+    <nb-card-body>
+      <nb-stepper [linear]="true" [(selectedIndex)]="pasoActual">
+        
+        <!-- PASO 1: Seleccionar Entrenador -->
+        <nb-step [label]="'Entrenador'" [stepControl]="paso1Form">
+          <h5>Selecciona tu entrenador</h5>
+          <p class="step-description">Elige al entrenador con quien deseas agendar la sesión</p>
+
+          <div class="entrenadores-seleccion" [formGroup]="paso1Form">
+            <nb-card 
+              *ngFor="let entrenador of entrenadores" 
+              class="entrenador-card"
+              [class.selected]="paso1Form.value.entrenador_id === entrenador.id"
+              (click)="seleccionarEntrenador(entrenador.id)">
+              
+              <nb-card-body>
+                <div class="entrenador-info">
+                  <img [src]="entrenador.foto_url" [alt]="entrenador.nombre_completo" class="entrenador-foto">
+                  <div class="entrenador-detalles">
+                    <h6>{{ entrenador.nombre_completo }}</h6>
+                    <p class="especialidad">{{ entrenador.especialidad }}</p>
+                    <div class="rating">
+                      <nb-icon 
+                        *ngFor="let star of getEstrellas(entrenador.calificacion)" 
+                        icon="star" 
+                        class="star-filled">
+                      </nb-icon>
+                      <nb-icon 
+                        *ngFor="let star of getEstrellasVacias(entrenador.calificacion)" 
+                        icon="star-outline" 
+                        class="star-empty">
+                      </nb-icon>
+                      <span class="rating-number">{{ entrenador.calificacion }}</span>
+                      <span class="reviews">({{ entrenador.total_resenas }})</span>
+                    </div>
+                    <div class="precio">
+                      <strong>${{ entrenador.tarifa_por_hora }} MXN</strong>/hora
+                    </div>
+                  </div>
+                  <nb-icon 
+                    *ngIf="paso1Form.value.entrenador_id === entrenador.id" 
+                    icon="checkmark-circle-2" 
+                    status="success" 
+                    class="check-icon">
+                  </nb-icon>
+                </div>
+              </nb-card-body>
+            </nb-card>
+          </div>
+
+          <div class="step-actions">
+            <button nbButton status="primary" (click)="siguientePaso()" [disabled]="!paso1Form.valid">
+              Siguiente
+              <nb-icon icon="arrow-forward-outline"></nb-icon>
+            </button>
+          </div>
+        </nb-step>
+
+        <!-- PASO 2: Fecha y Hora -->
+        <nb-step [label]="'Fecha y Hora'" [stepControl]="paso2Form">
+          <h5>Selecciona fecha y horario</h5>
+          <p class="step-description">Elige cuándo quieres tu sesión de entrenamiento</p>
+
+          <div class="fecha-hora-container" [formGroup]="paso2Form">
+            <div class="fecha-section">
+              <label>Selecciona una fecha:</label>
+              <input 
+                nbInput 
+                fullWidth
+                [nbDatepicker]="datepicker"
+                formControlName="fecha"
+                [min]="fechaMinima"
+                [max]="fechaMaxima"
+                (dateChange)="onFechaSeleccionada($event)"
+                placeholder="Seleccionar fecha">
+              <nb-datepicker #datepicker></nb-datepicker>
+            </div>
+
+            <div class="hora-section" *ngIf="paso2Form.get('fecha')?.value">
+              <label>Horarios disponibles:</label>
+              <div class="horarios-grid">
+                <button 
+                  *ngFor="let hora of horariosDisponibles"
+                  nbButton 
+                  [status]="paso2Form.value.hora === hora ? 'primary' : 'basic'"
+                  [outline]="paso2Form.value.hora !== hora"
+                  (click)="paso2Form.patchValue({ hora: hora })"
+                  class="horario-btn">
+                  {{ hora }}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="step-actions">
+            <button nbButton ghost (click)="pasoAnterior()">
+              <nb-icon icon="arrow-back-outline"></nb-icon>
+              Anterior
+            </button>
+            <button nbButton status="primary" (click)="siguientePaso()" [disabled]="!paso2Form.valid">
+              Siguiente
+              <nb-icon icon="arrow-forward-outline"></nb-icon>
+            </button>
+          </div>
+        </nb-step>
+
+        <!-- PASO 3: Configuración -->
+        <nb-step [label]="'Configuración'" [stepControl]="paso3Form">
+          <h5>Configura tu sesión</h5>
+          <p class="step-description">Define la duración, modalidad y agrega notas</p>
+
+          <div class="configuracion-container" [formGroup]="paso3Form">
+            <!-- Duración -->
+            <div class="form-group">
+              <label>Duración de la sesión:</label>
+              <nb-select fullWidth formControlName="duracion" placeholder="Seleccionar duración">
+                <nb-option *ngFor="let dur of duraciones" [value]="dur.value">
+                  {{ dur.label }}
+                </nb-option>
+              </nb-select>
+            </div>
+
+            <!-- Modalidad -->
+            <div class="form-group">
+              <label>Modalidad:</label>
+              <nb-radio-group formControlName="modalidad">
+                <nb-radio *ngFor="let mod of modalidades" [value]="mod.value" class="modalidad-radio">
+                  <nb-icon [icon]="mod.icono"></nb-icon>
+                  {{ mod.label }}
+                </nb-radio>
+              </nb-radio-group>
+            </div>
+
+            <!-- Notas -->
+            <div class="form-group">
+              <label>Notas adicionales (opcional):</label>
+              <textarea 
+                nbInput 
+                fullWidth 
+                formControlName="notas" 
+                rows="4"
+                placeholder="Ej: Tengo una lesión en la rodilla, objetivos específicos, etc.">
+              </textarea>
+              <span class="hint">Comparte información relevante con tu entrenador</span>
+            </div>
+          </div>
+
+          <div class="step-actions">
+            <button nbButton ghost (click)="pasoAnterior()">
+              <nb-icon icon="arrow-back-outline"></nb-icon>
+              Anterior
+            </button>
+            <button nbButton status="primary" (click)="siguientePaso()" [disabled]="!paso3Form.valid">
+              Siguiente
+              <nb-icon icon="arrow-forward-outline"></nb-icon>
+            </button>
+          </div>
+        </nb-step>
+
+        <!-- PASO 4: Pago -->
+        <nb-step [label]="'Pago'" [stepControl]="paso4Form">
+          <h5>Método de pago</h5>
+          <p class="step-description">Selecciona cómo deseas pagar tu sesión</p>
+
+          <div class="pago-container" [formGroup]="paso4Form">
+            <div class="metodos-pago">
+              <nb-radio-group formControlName="metodo_pago">
+                <div 
+                  *ngFor="let metodo of metodosPago" 
+                  class="metodo-pago-card"
+                  [class.selected]="paso4Form.value.metodo_pago === metodo.id">
+                  
+                  <nb-radio [value]="metodo.id">
+                    <div class="metodo-content">
+                      <nb-icon [icon]="metodo.icono"></nb-icon>
+                      <div class="metodo-info">
+                        <span class="metodo-tipo">{{ metodo.tipo }}</span>
+                        <span class="metodo-detalles" *ngIf="metodo.ultimos_digitos">
+                          •••• {{ metodo.ultimos_digitos }}
+                        </span>
+                      </div>
+                    </div>
+                  </nb-radio>
+                </div>
+              </nb-radio-group>
+            </div>
+
+            <!-- Términos y condiciones -->
+            <div class="terminos">
+              <nb-checkbox formControlName="acepto_terminos">
+                Acepto los 
+                <a href="#" (click)="$event.preventDefault()">términos y condiciones</a>
+                y la 
+                <a href="#" (click)="$event.preventDefault()">política de cancelación</a>
+              </nb-checkbox>
+            </div>
+          </div>
+
+          <div class="step-actions">
+            <button nbButton ghost (click)="pasoAnterior()">
+              <nb-icon icon="arrow-back-outline"></nb-icon>
+              Anterior
+            </button>
+            <button 
+              nbButton 
+              status="success" 
+              (click)="confirmarReserva()" 
+              [disabled]="!paso4Form.valid || cargando">
+              <nb-icon icon="checkmark-circle-2-outline" *ngIf="!cargando"></nb-icon>
+              <nb-spinner size="tiny" status="control" *ngIf="cargando"></nb-spinner>
+              {{ cargando ? 'Procesando...' : 'Confirmar Reserva' }}
+            </button>
+          </div>
+        </nb-step>
+
+        <!-- PASO 5: Confirmación -->
+        <nb-step label="Confirmación">
+          <div class="confirmacion-container" *ngIf="reservaConfirmada">
+            <nb-icon icon="checkmark-circle-2" status="success" class="success-icon"></nb-icon>
+            <h3>¡Reserva Confirmada!</h3>
+            <p class="numero-reserva">Número de reserva: <strong>{{ numeroReserva }}</strong></p>
+            
+            <nb-card class="resumen-final">
+              <nb-card-header>Resumen de tu sesión</nb-card-header>
+              <nb-card-body>
+                <div class="resumen-item">
+                  <span class="label">Entrenador:</span>
+                  <span class="value">{{ entrenadorSeleccionado?.nombre_completo }}</span>
+                </div>
+                <div class="resumen-item">
+                  <span class="label">Fecha:</span>
+                  <span class="value">{{ formatearFecha(paso2Form.value.fecha) }}</span>
+                </div>
+                <div class="resumen-item">
+                  <span class="label">Hora:</span>
+                  <span class="value">{{ paso2Form.value.hora }}</span>
+                </div>
+                <div class="resumen-item">
+                  <span class="label">Duración:</span>
+                  <span class="value">{{ getDuracionLabel(paso3Form.value.duracion) }}</span>
+                </div>
+                <div class="resumen-item">
+                  <span class="label">Modalidad:</span>
+                  <span class="value">{{ getModalidadLabel(paso3Form.value.modalidad) }}</span>
+                </div>
+                <div class="resumen-item total">
+                  <span class="label">Total pagado:</span>
+                  <span class="value">{{ totalFinal.toFixed(2) }} MXN</span>
+                </div>
+              </nb-card-body>
+            </nb-card>
+
+            <nb-alert status="info" class="alert-info">
+              <nb-icon icon="email-outline"></nb-icon>
+              Hemos enviado los detalles de tu reserva a tu correo electrónico
+            </nb-alert>
+
+            <div class="final-actions">
+              <button nbButton outline status="basic" (click)="nuevaReserva()">
+                <nb-icon icon="plus-outline"></nb-icon>
+                Nueva Reserva
+              </button>
+              <button nbButton status="primary" (click)="volverAReservas()">
+                <nb-icon icon="calendar-outline"></nb-icon>
+                Ver Mis Reservas
+              </button>
+            </div>
+          </div>
+        </nb-step>
+
+      </nb-stepper>
+    </nb-card-body>
+  </nb-card>
+
+  <!-- Resumen Sticky (visible en pasos 3 y 4) -->
+  <nb-card class="resumen-sticky" *ngIf="entrenadorSeleccionado && pasoActual >= 2 && pasoActual < 4">
+    <nb-card-header>
+      <h6>Resumen</h6>
+    </nb-card-header>
+    <nb-card-body>
+      <div class="resumen-entrenador">
+        <img [src]="entrenadorSeleccionado.foto_url" [alt]="entrenadorSeleccionado.nombre_completo">
+        <div>
+          <strong>{{ entrenadorSeleccionado.nombre_completo }}</strong>
+          <p>{{ entrenadorSeleccionado.especialidad }}</p>
+        </div>
+      </div>
+
+      <div class="resumen-detalle" *ngIf="paso2Form.value.fecha">
+        <nb-icon icon="calendar-outline"></nb-icon>
+        <span>{{ formatearFecha(paso2Form.value.fecha) }}</span>
+      </div>
+
+      <div class="resumen-detalle" *ngIf="paso2Form.value.hora">
+        <nb-icon icon="clock-outline"></nb-icon>
+        <span>{{ paso2Form.value.hora }}</span>
+      </div>
+
+      <div class="resumen-detalle" *ngIf="paso3Form.value.duracion">
+        <nb-icon icon="time-outline"></nb-icon>
+        <span>{{ getDuracionLabel(paso3Form.value.duracion) }}</span>
+      </div>
+
+      <hr>
+
+      <div class="resumen-precios">
+        <div class="precio-item">
+          <span>Sesión</span>
+          <span>{{ precioTotal.toFixed(2) }} MXN</span>
+        </div>
+        <div class="precio-item">
+          <span>Comisión plataforma (10%)</span>
+          <span>{{ comision.toFixed(2) }} MXN</span>
+        </div>
+        <div class="precio-item total">
+          <strong>Total</strong>
+          <strong>{{ totalFinal.toFixed(2) }} MXN</strong>
+        </div>
+      </div>
+    </nb-card-body>
+  </nb-card>
+</div>

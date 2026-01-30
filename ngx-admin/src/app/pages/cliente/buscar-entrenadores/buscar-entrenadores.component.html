@@ -1,0 +1,248 @@
+<div class="buscar-container">
+  <!-- Sidebar de Filtros -->
+  <aside class="filtros-sidebar" [class.collapsed]="!mostrarFiltros">
+    <div class="sidebar-header">
+      <h5>Filtros</h5>
+      <button nbButton ghost size="tiny" (click)="toggleFiltros()" class="toggle-btn">
+        <nb-icon [icon]="mostrarFiltros ? 'close-outline' : 'funnel-outline'"></nb-icon>
+      </button>
+    </div>
+
+    <div class="filtros-content" *ngIf="mostrarFiltros">
+      <!-- Deporte -->
+      <div class="filter-group">
+        <label>Deporte</label>
+        <nb-select 
+          fullWidth 
+          placeholder="Seleccionar deporte" 
+          [(ngModel)]="filtros.deporte"
+          (selectedChange)="aplicarFiltros()">
+          <nb-option value="">Todos los deportes</nb-option>
+          <nb-option *ngFor="let deporte of deportesDisponibles" [value]="deporte">
+            {{ deporte }}
+          </nb-option>
+        </nb-select>
+      </div>
+
+      <!-- Modalidad -->
+      <div class="filter-group">
+        <label>Modalidad</label>
+        <nb-select 
+          fullWidth 
+          placeholder="Modalidad" 
+          [(ngModel)]="filtros.modalidad"
+          (selectedChange)="aplicarFiltros()">
+          <nb-option *ngFor="let mod of modalidadesDisponibles" [value]="mod.value">
+            {{ mod.label }}
+          </nb-option>
+        </nb-select>
+      </div>
+
+      <!-- Nivel -->
+      <div class="filter-group">
+        <label>Nivel del Entrenador</label>
+        <nb-select 
+          fullWidth 
+          placeholder="Nivel" 
+          [(ngModel)]="filtros.nivel"
+          (selectedChange)="aplicarFiltros()">
+          <nb-option *ngFor="let nivel of nivelesDisponibles" [value]="nivel.value">
+            {{ nivel.label }}
+          </nb-option>
+        </nb-select>
+      </div>
+
+      <!-- Ubicación -->
+      <div class="filter-group">
+        <label>Ubicación</label>
+        <input 
+          nbInput 
+          fullWidth 
+          type="text" 
+          placeholder="Ciudad o zona"
+          [(ngModel)]="filtros.ubicacion"
+          (ngModelChange)="aplicarFiltros()">
+      </div>
+
+      <!-- Precio Máximo -->
+      <div class="filter-group">
+        <label>Precio Máximo ($/hora MXN)</label>
+        <input 
+          nbInput 
+          fullWidth 
+          type="number" 
+          placeholder="Ej: 50"
+          [(ngModel)]="filtros.precio_max"
+          (ngModelChange)="aplicarFiltros()">
+      </div>
+
+      <!-- Calificación Mínima -->
+      <div class="filter-group">
+        <label>Calificación Mínima</label>
+        <nb-select 
+          fullWidth 
+          placeholder="Mínimo" 
+          [(ngModel)]="filtros.calificacion_min"
+          (selectedChange)="aplicarFiltros()">
+          <nb-option [value]="0">Todas</nb-option>
+          <nb-option [value]="3">★★★ 3.0+</nb-option>
+          <nb-option [value]="4">★★★★ 4.0+</nb-option>
+          <nb-option [value]="4.5">★★★★★ 4.5+</nb-option>
+        </nb-select>
+      </div>
+
+      <!-- Botones de acción -->
+      <div class="filter-actions">
+        <button nbButton fullWidth status="primary" (click)="aplicarFiltros()">
+          <nb-icon icon="search-outline"></nb-icon>
+          Buscar
+        </button>
+        <button nbButton fullWidth ghost status="basic" (click)="limpiarFiltros()">
+          <nb-icon icon="refresh-outline"></nb-icon>
+          Limpiar
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Contenido Principal -->
+  <main class="resultados-container">
+    <!-- Header con ordenamiento -->
+    <div class="resultados-header">
+      <div class="resultado-count">
+        <h5>
+          {{ entrenadoresFiltrados.length }} 
+          {{ entrenadoresFiltrados.length === 1 ? 'entrenador encontrado' : 'entrenadores encontrados' }}
+        </h5>
+      </div>
+      <div class="ordenar-control">
+        <label>Ordenar por:</label>
+        <nb-select 
+          [(ngModel)]="filtros.ordenarPor" 
+          (selectedChange)="ordenarResultados()"
+          size="small">
+          <nb-option *ngFor="let opcion of ordenarOpciones" [value]="opcion.value">
+            {{ opcion.label }}
+          </nb-option>
+        </nb-select>
+      </div>
+    </div>
+
+    <!-- Spinner de carga -->
+    <div class="loading-spinner" *ngIf="cargando">
+      <nb-spinner status="primary"></nb-spinner>
+    </div>
+
+    <!-- Grid de Entrenadores -->
+    <div class="entrenadores-grid" *ngIf="!cargando">
+      <nb-card *ngFor="let entrenador of entrenadoresFiltrados" class="entrenador-card">
+        <!-- Imagen -->
+        <div class="entrenador-imagen">
+          <img [src]="entrenador.foto_url" [alt]="entrenador.nombre_completo">
+          <span class="certificado-badge" *ngIf="entrenador.certificado">
+            <nb-icon icon="checkmark-circle"></nb-icon>
+            Certificado
+          </span>
+        </div>
+
+        <nb-card-body>
+          <!-- Nombre y especialidad -->
+          <h6 class="entrenador-nombre">{{ entrenador.nombre_completo }}</h6>
+          <p class="entrenador-especialidad">{{ entrenador.especialidad }}</p>
+
+          <!-- Calificación -->
+          <div class="rating">
+            <span class="stars">
+              <nb-icon 
+                *ngFor="let star of getEstrellas(entrenador.calificacion)" 
+                icon="star" 
+                class="star-filled">
+              </nb-icon>
+              <nb-icon 
+                *ngFor="let star of getEstrellasVacias(entrenador.calificacion)" 
+                icon="star-outline" 
+                class="star-empty">
+              </nb-icon>
+            </span>
+            <span class="rating-number">{{ entrenador.calificacion }}</span>
+            <span class="reviews">({{ entrenador.total_resenas }} reseñas)</span>
+          </div>
+
+          <!-- Info adicional -->
+          <div class="info-tags">
+            <nb-badge 
+              *ngFor="let modalidad of entrenador.modalidad" 
+              [text]="modalidad" 
+              status="info" 
+              position="top left">
+            </nb-badge>
+            <nb-badge 
+              [text]="entrenador.nivel" 
+              status="basic" 
+              position="top left">
+            </nb-badge>
+          </div>
+
+          <!-- Ubicación y experiencia -->
+          <div class="entrenador-meta">
+            <span class="meta-item">
+              <nb-icon icon="pin-outline"></nb-icon>
+              {{ entrenador.ubicacion }}
+            </span>
+            <span class="meta-item">
+              <nb-icon icon="award-outline"></nb-icon>
+              {{ entrenador.experiencia }} años
+            </span>
+          </div>
+
+          <!-- Precio -->
+          <div class="precio-section">
+            <span class="precio">{{ entrenador.tarifa_por_hora }} MXN</span>
+            <span class="precio-label">/hora</span>
+          </div>
+
+          <!-- Botones de acción -->
+          <div class="card-actions">
+            <button 
+              nbButton 
+              fullWidth 
+              ghost 
+              status="info" 
+              (click)="verDisponibilidad(entrenador)">
+              <nb-icon icon="calendar-outline"></nb-icon>
+              Ver Disponibilidad
+            </button>
+            <button 
+              nbButton 
+              fullWidth 
+              status="primary" 
+              (click)="agendarSesion(entrenador)">
+              <nb-icon icon="checkmark-circle-2-outline"></nb-icon>
+              Agendar
+            </button>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+
+    <!-- Sin resultados -->
+    <div class="no-resultados" *ngIf="!cargando && entrenadoresFiltrados.length === 0">
+      <nb-icon icon="alert-circle-outline" class="no-resultados-icon"></nb-icon>
+      <h5>No se encontraron entrenadores</h5>
+      <p>Intenta ajustar los filtros de búsqueda</p>
+      <button nbButton status="primary" (click)="limpiarFiltros()">
+        Limpiar Filtros
+      </button>
+    </div>
+  </main>
+
+  <!-- Botón flotante toggle filtros (móvil) -->
+  <button 
+    nbButton 
+    status="primary" 
+    class="floating-filter-btn"
+    (click)="toggleFiltros()">
+    <nb-icon icon="funnel-outline"></nb-icon>
+    Filtros
+  </button>
+</div>

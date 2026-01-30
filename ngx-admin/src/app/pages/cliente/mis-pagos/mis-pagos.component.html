@@ -1,0 +1,247 @@
+<div class="container-fluid">
+  <!-- Título de la página -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <h3 class="page-title">Mis Pagos</h3>
+      <p class="text-hint">Gestiona tu historial de transacciones y descarga recibos</p>
+    </div>
+  </div>
+
+  <!-- Cards de estadísticas -->
+  <div class="row mb-4">
+    <div class="col-12 col-sm-6 col-lg-3 mb-3">
+      <nb-card>
+        <nb-card-body class="stat-card">
+          <div class="stat-icon total">
+            <nb-icon icon="credit-card-outline"></nb-icon>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Total Gastado</span>
+            <h4 class="stat-value">{{ formatearMoneda(totalGastado) }}</h4>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+
+    <div class="col-12 col-sm-6 col-lg-3 mb-3">
+      <nb-card>
+        <nb-card-body class="stat-card">
+          <div class="stat-icon pending">
+            <nb-icon icon="clock-outline"></nb-icon>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Pagos Pendientes</span>
+            <h4 class="stat-value">{{ formatearMoneda(pagosPendientes) }}</h4>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+
+    <div class="col-12 col-sm-6 col-lg-3 mb-3">
+      <nb-card>
+        <nb-card-body class="stat-card">
+          <div class="stat-icon last">
+            <nb-icon icon="calendar-outline"></nb-icon>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Último Pago</span>
+            <h4 class="stat-value">{{ formatearMoneda(ultimoPago) }}</h4>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+
+    <div class="col-12 col-sm-6 col-lg-3 mb-3">
+      <nb-card>
+        <nb-card-body class="stat-card">
+          <div class="stat-icon completed">
+            <nb-icon icon="checkmark-circle-outline"></nb-icon>
+          </div>
+          <div class="stat-info">
+            <span class="stat-label">Pagos Completados</span>
+            <h4 class="stat-value">{{ pagosCompletados }}</h4>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+  </div>
+
+  <!-- Gráfica de gastos -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <nb-card>
+        <nb-card-header>
+          <div class="d-flex justify-content-between align-items-center">
+            <span>Gastos de Últimos Meses</span>
+            <button nbButton size="small" status="basic">
+              <nb-icon icon="download-outline"></nb-icon>
+              Exportar
+            </button>
+          </div>
+        </nb-card-header>
+        <nb-card-body>
+          <div class="chart-container">
+            <div class="chart-bars">
+              <div *ngFor="let item of gastosUltimosMeses" class="bar-wrapper">
+                <div class="bar-value">{{ formatearMoneda(item.monto) }}</div>
+                <div class="bar" [style.height.%]="getBarHeight(item.monto)">
+                  <div class="bar-fill"></div>
+                </div>
+                <div class="bar-label">{{ item.mes }}</div>
+              </div>
+            </div>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+  </div>
+
+  <!-- Historial de pagos -->
+  <div class="row">
+    <div class="col-12">
+      <nb-card>
+        <nb-card-header>
+          <div class="d-flex justify-content-between align-items-center flex-wrap">
+            <span>Historial de Transacciones</span>
+            <button nbButton size="small" status="primary" (click)="descargarTodos()">
+              <nb-icon icon="download-outline"></nb-icon>
+              Descargar Todos
+            </button>
+          </div>
+        </nb-card-header>
+
+        <!-- Filtros -->
+        <nb-card-body>
+          <div class="filtros-row mb-3">
+            <input
+              nbInput
+              type="text"
+              fullWidth
+              placeholder="Buscar por transacción, concepto o entrenador..."
+              [(ngModel)]="filtroBusqueda"
+              (ngModelChange)="aplicarFiltros()"
+              class="search-input"
+            >
+            
+            <nb-select
+              placeholder="Estado"
+              [(selected)]="filtroEstado"
+              (selectedChange)="aplicarFiltros()"
+            >
+              <nb-option *ngFor="let estado of estadosDisponibles" [value]="estado.value">
+                {{ estado.label }}
+              </nb-option>
+            </nb-select>
+
+            <nb-select
+              placeholder="Mes"
+              [(selected)]="filtroMes"
+              (selectedChange)="aplicarFiltros()"
+            >
+              <nb-option *ngFor="let mes of mesesDisponibles" [value]="mes.value">
+                {{ mes.label }}
+              </nb-option>
+            </nb-select>
+
+            <button
+              nbButton
+              status="basic"
+              (click)="limpiarFiltros()"
+              [disabled]="!filtroBusqueda && !filtroEstado && !filtroMes"
+            >
+              <nb-icon icon="close-outline"></nb-icon>
+              Limpiar
+            </button>
+          </div>
+
+          <!-- Tabla de pagos -->
+          <div class="table-responsive">
+            <table class="payments-table">
+              <thead>
+                <tr>
+                  <th>Transacción</th>
+                  <th>Fecha</th>
+                  <th>Concepto</th>
+                  <th>Entrenador</th>
+                  <th>Método</th>
+                  <th class="text-right">Monto</th>
+                  <th>Estado</th>
+                  <th class="text-center">Acciones</th>
+                </tr>
+              </thead>
+              <tbody *ngIf="pagosFiltrados.length > 0">
+                <tr *ngFor="let pago of pagosFiltrados">
+                  <td class="transaction-id">{{ pago.numero_transaccion }}</td>
+                  <td>{{ formatearFecha(pago.fecha) }}</td>
+                  <td class="concepto">{{ pago.concepto }}</td>
+                  <td>{{ pago.entrenador }}</td>
+                  <td>
+                    <span class="metodo-pago">
+                      <nb-icon icon="credit-card-outline"></nb-icon>
+                      {{ pago.metodo_pago }}
+                    </span>
+                  </td>
+                  <td class="text-right monto">{{ formatearMoneda(pago.monto) }}</td>
+                  <td>
+                    <nb-badge
+                      [text]="pago.estado"
+                      [status]="getEstadoBadgeStatus(pago.estado)"
+                      position="centered"
+                    ></nb-badge>
+                  </td>
+                  <td class="text-center">
+                    <button
+                      *ngIf="pago.estado === 'COMPLETADO' && pago.recibo_url"
+                      nbButton
+                      size="tiny"
+                      status="info"
+                      (click)="descargarRecibo(pago)"
+                      nbTooltip="Descargar recibo"
+                    >
+                      <nb-icon icon="download-outline"></nb-icon>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- Estado vacío -->
+            <div *ngIf="pagosFiltrados.length === 0" class="empty-state">
+              <nb-icon icon="file-text-outline"></nb-icon>
+              <h5>No se encontraron transacciones</h5>
+              <p>Intenta ajustar los filtros de búsqueda</p>
+              <button nbButton status="basic" (click)="limpiarFiltros()">
+                Limpiar Filtros
+              </button>
+            </div>
+          </div>
+
+          <!-- Información adicional -->
+          <div class="table-footer mt-3">
+            <span class="text-hint">
+              Mostrando {{ pagosFiltrados.length }} de {{ pagos.length }} transacciones
+            </span>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+  </div>
+
+  <!-- Información de ayuda -->
+  <div class="row mt-4">
+    <div class="col-12">
+      <nb-card accent="info">
+        <nb-card-body class="d-flex align-items-center">
+          <nb-icon icon="info-outline" class="mr-3"></nb-icon>
+          <div>
+            <strong>¿Necesitas ayuda con tus pagos?</strong>
+            <p class="mb-0 text-hint">
+              Si tienes problemas con alguna transacción o necesitas un reembolso, 
+              contacta con nuestro equipo de soporte.
+            </p>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,150 @@
+<div class="page-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1>Gestión de Entrenadores</h1>
+      <p>Administra las solicitudes y entrenadores activos en SportConnect</p>
+    </div>
+    <div class="header-actions">
+      <button nbButton status="info" size="small" (click)="refrescar()">
+        <nb-icon icon="refresh-outline"></nb-icon>
+        Actualizar Lista
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-row">
+    <nb-card class="stat-card">
+      <nb-card-body>
+        <div class="stat-icon primary">
+          <nb-icon icon="award-outline"></nb-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats.total }}</span>
+          <span class="stat-label">Total Entrenadores</span>
+        </div>
+      </nb-card-body>
+    </nb-card>
+
+    <nb-card class="stat-card" (click)="onFilterChange('pendientes')">
+      <nb-card-body>
+        <div class="stat-icon warning">
+          <nb-icon icon="clock-outline"></nb-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats.pendientes }}</span>
+          <span class="stat-label">Pendientes</span>
+        </div>
+      </nb-card-body>
+    </nb-card>
+
+    <nb-card class="stat-card">
+      <nb-card-body>
+        <div class="stat-icon success">
+          <nb-icon icon="checkmark-circle-outline"></nb-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats.activos }}</span>
+          <span class="stat-label">Activos</span>
+        </div>
+      </nb-card-body>
+    </nb-card>
+
+    <nb-card class="stat-card">
+      <nb-card-body>
+        <div class="stat-icon danger">
+          <nb-icon icon="close-circle-outline"></nb-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats.rechazados }}</span>
+          <span class="stat-label">Rechazados</span>
+        </div>
+      </nb-card-body>
+    </nb-card>
+  </div>
+
+  <!-- Filters -->
+  <nb-card class="filters-card">
+    <nb-card-body>
+      <div class="filter-buttons">
+        <button nbButton [status]="filterEstado === 'todos' ? 'primary' : 'basic'" (click)="onFilterChange('todos')">
+          Todos
+        </button>
+        <button nbButton [status]="filterEstado === 'pendiente' ? 'warning' : 'basic'" (click)="onFilterChange('pendiente')">
+          🕐 Pendientes ({{ stats.pendientes }})
+        </button>
+        <button nbButton [status]="filterEstado === 'activo' ? 'success' : 'basic'" (click)="onFilterChange('activo')">
+          ✅ Activos
+        </button>
+        <button nbButton [status]="filterEstado === 'rechazado' ? 'danger' : 'basic'" (click)="onFilterChange('rechazado')">
+          ❌ Rechazados
+        </button>
+      </div>
+    </nb-card-body>
+  </nb-card>
+
+  <!-- Trainers Grid -->
+  <div class="trainers-grid">
+    <nb-card *ngFor="let entrenador of filteredEntrenadores" class="trainer-card">
+      <nb-card-header>
+        <div class="trainer-header">
+          <nb-user [name]="entrenador.nombre" [title]="entrenador.especialidad" [picture]="entrenador.avatar" size="large"></nb-user>
+          <nb-badge 
+            [text]="entrenador.estado" 
+            [status]="entrenador.estado === 'activo' ? 'success' : entrenador.estado === 'pendiente' ? 'warning' : 'danger'"
+          ></nb-badge>
+        </div>
+      </nb-card-header>
+      <nb-card-body>
+        <div class="trainer-info">
+          <div class="info-row">
+            <nb-icon icon="email-outline"></nb-icon>
+            <span>{{ entrenador.email }}</span>
+          </div>
+          <div class="info-row">
+            <nb-icon icon="calendar-outline"></nb-icon>
+            <span>Solicitud: {{ entrenador.fechaSolicitud | date:'dd/MM/yyyy' }}</span>
+          </div>
+          <div class="info-row" *ngIf="entrenador.estado === 'activo'">
+            <nb-icon icon="star-outline"></nb-icon>
+            <span>Rating: {{ entrenador.rating }} ⭐</span>
+          </div>
+          <div class="info-row" *ngIf="entrenador.estado === 'activo'">
+            <nb-icon icon="people-outline"></nb-icon>
+            <span>{{ entrenador.clientes }} clientes</span>
+          </div>
+          <div class="info-row">
+            <nb-icon icon="file-text-outline"></nb-icon>
+            <span [class.success]="entrenador.documentos" [class.danger]="!entrenador.documentos">
+              Documentos: {{ entrenador.documentos ? 'Completos' : 'Incompletos' }}
+            </span>
+          </div>
+        </div>
+      </nb-card-body>
+      <nb-card-footer>
+        <div class="trainer-actions">
+          <button nbButton ghost size="small" status="info" (click)="verPerfil(entrenador)">
+            <nb-icon icon="eye-outline"></nb-icon> Ver Perfil
+          </button>
+          <button nbButton ghost size="small" (click)="verDocumentos(entrenador)">
+            <nb-icon icon="file-outline"></nb-icon> Docs
+          </button>
+          <ng-container *ngIf="entrenador.estado === 'pendiente'">
+            <button nbButton size="small" status="success" (click)="aprobar(entrenador)">
+              <nb-icon icon="checkmark-outline"></nb-icon> Aprobar
+            </button>
+            <button nbButton size="small" status="danger" outline (click)="rechazar(entrenador)">
+              <nb-icon icon="close-outline"></nb-icon> Rechazar
+            </button>
+          </ng-container>
+        </div>
+      </nb-card-footer>
+    </nb-card>
+  </div>
+
+  <div class="empty-state" *ngIf="filteredEntrenadores.length === 0">
+    <nb-icon icon="award-outline"></nb-icon>
+    <p>No hay entrenadores en esta categoría</p>
+  </div>
+</div>

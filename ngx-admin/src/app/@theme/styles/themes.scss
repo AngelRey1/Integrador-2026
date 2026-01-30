@@ -1,0 +1,212 @@
+// @nebular theming framework
+@import '@nebular/theme/styles/theming';
+// @nebular out of the box themes
+@import '@nebular/theme/styles/themes';
+
+$nb-themes: nb-register-theme((
+  layout-padding-top: 2.25rem,
+
+  menu-item-icon-margin: 0 0.5rem 0 0,
+
+  card-height-tiny: 13.5rem,
+  card-height-small: 21.1875rem,
+  card-height-medium: 28.875rem,
+  card-height-large: 36.5625rem,
+  card-height-giant: 44.25rem,
+  card-margin-bottom: 1.875rem,
+  card-header-with-select-padding-top: 0.5rem,
+  card-header-with-select-padding-bottom: 0.5rem,
+
+  select-min-width: 6rem,
+
+  slide-out-background: #f7f9fc,
+  slide-out-shadow-color: 0 4px 14px 0 #8f9bb3,
+  slide-out-shadow-color-rtl: 0 4px 14px 0 #8f9bb3,
+), default, default);
+
+$nb-themes: nb-register-theme((
+  layout-padding-top: 2.25rem,
+
+  menu-item-icon-margin: 0 0.5rem 0 0,
+
+  card-height-tiny: 13.5rem,
+  card-height-small: 21.1875rem,
+  card-height-medium: 28.875rem,
+  card-height-large: 36.5625rem,
+  card-height-giant: 44.25rem,
+  card-margin-bottom: 1.875rem,
+  card-header-with-select-padding-top: 0.5rem,
+  card-header-with-select-padding-bottom: 0.5rem,
+
+  select-min-width: 6rem,
+
+  slide-out-background: #252547,
+  slide-out-shadow-color: 2px 0 3px #29157a,
+  slide-out-shadow-color-rtl: -2px 0 3px #29157a,
+), cosmic, cosmic);
+
+$nb-themes: nb-register-theme((
+  layout-padding-top: 2.25rem,
+
+  menu-item-icon-margin: 0 0.5rem 0 0,
+
+  card-height-tiny: 13.5rem,
+  card-height-small: 21.1875rem,
+  card-height-medium: 28.875rem,
+  card-height-large: 36.5625rem,
+  card-height-giant: 44.25rem,
+  card-margin-bottom: 1.875rem,
+  card-header-with-select-padding-top: 0.5rem,
+  card-header-with-select-padding-bottom: 0.5rem,
+
+  select-min-width: 6rem,
+
+  slide-out-background: linear-gradient(270deg, #edf1f7 0%, #e4e9f2 100%),
+  slide-out-shadow-color: 0 4px 14px 0 #8f9bb3,
+  slide-out-shadow-color-rtl: 0 4px 14px 0 #8f9bb3,
+), corporate, corporate);
+
+$nb-themes: nb-register-theme((
+  layout-padding-top: 2.25rem,
+
+  menu-item-icon-margin: 0 0.5rem 0 0,
+
+  card-height-tiny: 13.5rem,
+  card-height-small: 21.1875rem,
+  card-height-medium: 28.875rem,
+  card-height-large: 36.5625rem,
+  card-height-giant: 44.25rem,
+  card-margin-bottom: 1.875rem,
+  card-header-with-select-padding-top: 0.5rem,
+  card-header-with-select-padding-bottom: 0.5rem,
+
+  select-min-width: 6rem,
+
+  slide-out-background: linear-gradient(270deg, #222b45 0%, #151a30 100%),
+  slide-out-shadow-color: 0 4px 14px 0 #8f9bb3,
+  slide-out-shadow-color-rtl: 0 4px 14px 0 #8f9bb3,
+), dark, dark);
+
+// SportConnect Custom Theme
+$nb-themes: nb-register-theme((
+  // Colors principales de SportConnect
+  color-primary-100: #D4F8F0,
+  color-primary-200: #A9F1E1,
+  color-primary-300: #7DE3CD,
+  color-primary-400: #5DD4B9,
+  color-primary-500: #00D09C, // Color principal
+  color-primary-600: #00B386,
+  color-primary-700: #009670,
+  color-primary-800: #007A5A,
+  color-primary-900: #00644A,
+
+  color-success-100: #D4F8F0,
+  color-success-200: #A9F1E1,
+  color-success-300: #7DE3CD,
+  color-success-400: #5DD4B9,
+  color-success-500: #00D09C,
+  color-success-600: #00B386,
+  color-success-700: #009670,
+  color-success-800: #007A5A,
+  color-success-900: #00644A,
+
+  // Color secundario (azul del carrusel)
+  color-info-100: #D1F5FF,
+  color-info-200: #A3E9FF,
+  color-info-300: #75D6FF,
+  color-info-400: #52C2FF,
+  color-info-500: #0A7B8A,
+  color-info-600: #075F6B,
+  color-info-700: #05464F,
+  color-info-800: #033138,
+  color-info-900: #022028,
+
+  // Grises
+  color-basic-100: #FFFFFF,
+  color-basic-200: #F8FAFC,
+  color-basic-300: #F3F4F6,
+  color-basic-400: #E2E8F0,
+  color-basic-500: #CBD5E1,
+  color-basic-600: #94A3B8,
+  color-basic-700: #64748B,
+  color-basic-800: #475569,
+  color-basic-900: #1E293B,
+  color-basic-1000: #0F172A,
+  color-basic-1100: #020617,
+
+  // Configuración del layout
+  layout-padding-top: 2.25rem,
+  layout-background-color: #F8FAFC,
+  layout-text-color: #0F172A,
+  layout-text-font-family: 'Open Sans' sans-serif,
+  
+  // Sidebar/Menu
+  menu-background-color: #FFFFFF,
+  menu-text-color: #475569,
+  menu-text-font-family: 'Open Sans' sans-serif,
+  menu-text-font-weight: 600,
+  menu-item-hover-background-color: #F3F4F6,
+  menu-item-hover-text-color: #00D09C,
+  menu-item-active-background-color: #D4F8F0,
+  menu-item-active-text-color: #00D09C,
+  menu-item-icon-margin: 0 0.5rem 0 0,
+  menu-item-icon-color: #64748B,
+  menu-item-icon-active-color: #00D09C,
+  
+  // Header
+  header-background-color: #FFFFFF,
+  header-text-color: #0F172A,
+  header-text-font-family: 'Open Sans' sans-serif,
+  header-shadow: 0 2px 8px rgba(0, 0, 0, 0.08),
+  
+  // Cards
+  card-background-color: #FFFFFF,
+  card-text-color: #0F172A,
+  card-text-font-family: 'Open Sans' sans-serif,
+  card-border-radius: 12px,
+  card-shadow: 0 2px 8px rgba(0, 0, 0, 0.08),
+  card-height-tiny: 13.5rem,
+  card-height-small: 21.1875rem,
+  card-height-medium: 28.875rem,
+  card-height-large: 36.5625rem,
+  card-height-giant: 44.25rem,
+  card-margin-bottom: 1.875rem,
+  card-header-with-select-padding-top: 0.5rem,
+  card-header-with-select-padding-bottom: 0.5rem,
+  
+  // Botones
+  button-filled-primary-background-color: #00D09C,
+  button-filled-primary-border-color: #00D09C,
+  button-filled-primary-text-color: #FFFFFF,
+  button-filled-primary-hover-background-color: #00B386,
+  button-filled-primary-hover-border-color: #00B386,
+  button-filled-primary-active-background-color: #009670,
+  button-filled-primary-active-border-color: #009670,
+  
+  // Inputs/Forms
+  input-basic-background-color: #F8FAFC,
+  input-basic-border-color: #E2E8F0,
+  input-basic-text-color: #0F172A,
+  input-basic-placeholder-text-color: #94A3B8,
+  input-basic-focus-border-color: #00D09C,
+  
+  // Select
+  select-min-width: 6rem,
+  
+  // Otros
+  slide-out-background: #F8FAFC,
+  slide-out-shadow-color: 0 4px 14px 0 rgba(0, 208, 156, 0.15),
+  slide-out-shadow-color-rtl: 0 4px 14px 0 rgba(0, 208, 156, 0.15),
+  
+  // Links
+  link-text-color: #00D09C,
+  link-text-hover-color: #00B386,
+  
+  // Tooltips
+  tooltip-background-color: #0F172A,
+  tooltip-text-color: #FFFFFF,
+  
+  // Badges
+  badge-primary-background-color: #00D09C,
+  badge-primary-text-color: #FFFFFF,
+), sportconnect, default);

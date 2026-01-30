@@ -1,0 +1,65 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <h3>Iniciar Sesión</h3>
+      <p class="subtitle">Ingresa tus credenciales para acceder</p>
+    </div>
+    <div class="login-body">
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input 
+            type="email" 
+            id="email"
+            formControlName="email" 
+            placeholder="tu@email.com"
+            class="form-input"
+          />
+          <small class="error-text" *ngIf="form.get('email')?.invalid && form.get('email')?.touched">
+            <span *ngIf="form.get('email')?.errors?.['required']">El email es requerido</span>
+            <span *ngIf="form.get('email')?.errors?.['email']">Email inválido</span>
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Contraseña</label>
+          <input 
+            type="password" 
+            id="password"
+            formControlName="contrasena" 
+            placeholder="••••••••"
+            class="form-input"
+          />
+          <small class="error-text" *ngIf="form.get('contrasena')?.invalid && form.get('contrasena')?.touched">
+            <span *ngIf="form.get('contrasena')?.errors?.['required']">La contraseña es requerida</span>
+            <span *ngIf="form.get('contrasena')?.errors?.['minlength']">Mínimo 6 caracteres</span>
+          </small>
+        </div>
+
+        <div class="form-group checkbox-group">
+          <label>
+            <input type="checkbox" formControlName="recordar" />
+            Recordar sesión
+          </label>
+        </div>
+
+        <div class="error-message" *ngIf="errorMessage">
+          {{ errorMessage }}
+        </div>
+
+        <button 
+          type="submit"
+          class="submit-button"
+          [disabled]="form.invalid || loading"
+        >
+          <span *ngIf="!loading">Iniciar Sesión</span>
+          <span *ngIf="loading">Iniciando sesión...</span>
+        </button>
+
+        <div class="register-link">
+          <p>¿No tienes cuenta? <a routerLink="/auth/register">Regístrate aquí</a></p>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

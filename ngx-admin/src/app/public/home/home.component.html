@@ -1,0 +1,323 @@
+<nb-layout>
+  <nb-layout-column class="no-layout-padding">
+    <ngx-shared-header></ngx-shared-header>
+
+    <div class="public-landing">
+      <!-- HERO IMMERSIVE CON MESH GRADIENT -->
+      <section class="hero-premium">
+        <!-- Mesh Gradient Background -->
+        <div class="mesh-gradient"></div>
+
+        <!-- Large Hero Image Background -->
+        <div class="hero-large-image">
+          <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=2670&auto=format&fit=crop"
+            alt="Entrenamiento Fitness" />
+        </div>
+
+        <div class="hero-overlay"></div>
+
+        <div class="hero-content-wrapper">
+          <div class="hero-inner">
+            <h1 class="hero-title">
+              Encuentra a tu <span class="highlight-neon">Coach</span>
+              <br />en <span class="highlight-neon">Mérida</span>
+            </h1>
+
+            <p class="hero-subtitle">
+              La plataforma más rápida para conectar con entrenadores certificados.
+              <br />Reserva, paga y entrena sin fricción.
+            </p>
+
+            <!-- Barra de Búsqueda FLOTANTE con ICONO -->
+            <div class="search-hero-premium">
+              <input type="text" [(ngModel)]="searchQuery" placeholder="Fútbol, Yoga, Natación, Box..."
+                (keyup.enter)="buscarEntrenadores()" class="search-input-premium" />
+              <button class="btn-search-icon" (click)="buscarEntrenadores()">
+                <ngx-sport-icon name="search" [size]="20"></ngx-sport-icon>
+              </button>
+            </div>
+
+            <!-- Quick Category Chips - Carrusel Automático -->
+            <div class="quick-categories">
+              <div class="quick-chip" *ngFor="let deporte of deportesVisibles"
+                (click)="verEntrenadoresPorDeporte(deporte)">
+                <ngx-sport-icon [name]="deporte.icon" [size]="18"></ngx-sport-icon>
+                {{ deporte.nombre }}
+              </div>
+            </div>
+
+            <!-- Hero Stats (Minimalist) -->
+            <div class="hero-stats-minimal">
+              <div class="stat-minimal">
+                <span class="stat-value">500+</span>
+                <span class="stat-label">Coaches</span>
+              </div>
+              <div class="stat-divider"></div>
+              <div class="stat-minimal">
+                <span class="stat-value">42K</span>
+                <span class="stat-label">Sesiones</span>
+              </div>
+              <div class="stat-divider"></div>
+              <div class="stat-minimal">
+                <span class="stat-value">4.9★</span>
+                <span class="stat-label">Rating</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CATEGORIAS EXPLORADOR PREMIUM -->
+      <section class="explorer-section">
+        <div class="container-premium">
+          <div class="section-header">
+            <h2 class="section-title">Explora por Disciplina</h2>
+            <p class="section-subtitle">Encuentra coaches especializados en cada deporte</p>
+          </div>
+
+          <!-- Carrusel Infinito de Categorías -->
+          <div class="category-carousel-wrapper">
+            <div class="category-carousel-track">
+              <!-- Primera fila de deportes -->
+              <div class="category-card-modern" *ngFor="let deporte of deportes"
+                (click)="verEntrenadoresPorDeporte(deporte)">
+                <div class="category-icon-box">
+                  <ngx-sport-icon [name]="deporte.icon" [size]="32"></ngx-sport-icon>
+                </div>
+                <h4 class="category-name">{{ deporte.nombre }}</h4>
+                <p class="category-count">{{ deporte.entrenadores }} coaches</p>
+                <div class="category-arrow">
+                  <ngx-sport-icon name="chevron-right" [size]="20"></ngx-sport-icon>
+                </div>
+              </div>
+              <!-- Duplicado para loop infinito -->
+              <div class="category-card-modern" *ngFor="let deporte of deportes"
+                (click)="verEntrenadoresPorDeporte(deporte)">
+                <div class="category-icon-box">
+                  <ngx-sport-icon [name]="deporte.icon" [size]="32"></ngx-sport-icon>
+                </div>
+                <h4 class="category-name">{{ deporte.nombre }}</h4>
+                <p class="category-count">{{ deporte.entrenadores }} coaches</p>
+                <div class="category-arrow">
+                  <ngx-sport-icon name="chevron-right" [size]="20"></ngx-sport-icon>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TOP ELITE COACHES GLASSMORPHISM -->
+      <section class="elite-coaches">
+        <div class="container-premium">
+          <div class="section-header">
+            <h2 class="section-title">Los Mejores Coaches en Mérida</h2>
+            <p class="section-subtitle">Seleccionados por excelencia, verificación y disponibilidad inmediata</p>
+          </div>
+
+          <div class="coaches-grid-premium">
+            <div class="coach-card-glass" *ngFor="let entrenador of entrenadoresDestacados"
+              (click)="irAlPerfil(entrenador)">
+
+              <!-- Verified Badge (Corner) -->
+              <div class="badge-elite" *ngIf="entrenador.verificado">
+                <ngx-sport-icon name="check-circle" [size]="14"></ngx-sport-icon> VERIFICADO
+              </div>
+
+              <!-- Coach Image (Large Circle/Rounded) -->
+              <div class="coach-image-premium">
+                <img [src]="entrenador.foto" [alt]="entrenador.nombre" />
+              </div>
+
+              <!-- Info Block (Glass Background) -->
+              <div class="coach-details-glass">
+                <h3 class="coach-name">{{ entrenador.nombre }}</h3>
+                <p class="coach-discipline">{{ entrenador.deporte }}</p>
+
+                <!-- Location -->
+                <p class="coach-location"><ngx-sport-icon name="map-pin" [size]="14"></ngx-sport-icon> Mérida</p>
+
+                <!-- Rating Stars -->
+                <div class="rating-premium">
+                  <span class="stars-neon"><ngx-sport-icon name="star-filled" [size]="14"></ngx-sport-icon> {{
+                    entrenador.estrellas }}</span>
+                  <span class="review-count">({{ entrenador.reviews }} reviews)</span>
+                </div>
+
+                <!-- Price Display (Large & Clear) -->
+                <div class="price-display-premium">
+                  <span class="price-large">${{ entrenador.precio }}</span>
+                  <span class="price-currency">MXN/hora</span>
+                </div>
+
+                <!-- CTA Button (Gradient) -->
+                <button class="btn-cta-elite" (click)="irAlPerfil(entrenador); $event.stopPropagation()">
+                  Ver Perfil
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Link to See All -->
+          <div class="see-all-section">
+            <button class="btn-see-all" (click)="buscarEntrenadores()">Ver todos los coaches →</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- VALUE PROPS PREMIUM -->
+      <section class="value-premium">
+        <div class="container-premium">
+          <div class="value-header">
+            <h2 class="section-title">Por Qué SportConnect es Diferente</h2>
+            <p class="section-subtitle">La experiencia profesional que tú y los coaches merecen</p>
+          </div>
+
+          <div class="value-cards-grid">
+            <div class="value-card-premium">
+              <div class="icon-premium"><ngx-sport-icon name="activity" [size]="32"></ngx-sport-icon></div>
+              <h3>Reserva Instantánea</h3>
+              <p>WhatsApp, pago seguro y código de acceso en menos de 5 minutos.</p>
+            </div>
+            <div class="value-card-premium">
+              <div class="icon-premium"><ngx-sport-icon name="shield" [size]="32"></ngx-sport-icon></div>
+              <h3>100% Seguro</h3>
+              <p>Pago protegido, facturación inmediata y cobertura de cancelación.</p>
+            </div>
+            <div class="value-card-premium">
+              <div class="icon-premium"><ngx-sport-icon name="globe" [size]="32"></ngx-sport-icon></div>
+              <h3>Presencial + Online</h3>
+              <p>Flexible: elige modalidad, horario y ubicación sin restricciones.</p>
+            </div>
+            <div class="value-card-premium">
+              <div class="icon-premium"><ngx-sport-icon name="star-filled" [size]="32"></ngx-sport-icon></div>
+              <h3>Transparencia Total</h3>
+              <p>Calificaciones verificadas, reconocimientos de experiencia y reseñas auténticas.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FLOW 4 PASOS MINIMALIST -->
+      <section class="flow-section">
+        <div class="container-premium">
+          <h2 class="section-title center-text">De Búsqueda a Entrenamiento en 4 Pasos</h2>
+
+          <div class="steps-flow">
+            <div class="flow-step">
+              <div class="step-number-circle">1</div>
+              <h4>Busca tu Disciplina</h4>
+              <p>Fútbol, Yoga, Box, Natación...</p>
+            </div>
+
+            <div class="flow-arrow">→</div>
+
+            <div class="flow-step">
+              <div class="step-number-circle">2</div>
+              <h4>Elige tu Coach</h4>
+              <p>Por rating, ubicación y precio</p>
+            </div>
+
+            <div class="flow-arrow">→</div>
+
+            <div class="flow-step">
+              <div class="step-number-circle">3</div>
+              <h4>Paga Seguro</h4>
+              <p>WhatsApp + Enlace de pago</p>
+            </div>
+
+            <div class="flow-arrow">→</div>
+
+            <div class="flow-step">
+              <div class="step-number-circle">4</div>
+              <h4>Entrena Hoy</h4>
+              <p>Acceso inmediato al panel</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA: ÚNETE COMO ENTRENADOR -->
+      <section class="join-coaches">
+        <div class="join-overlay"></div>
+        <div class="join-container">
+          <div class="join-copy">
+            <span class="pill">¿Eres entrenador?</span>
+            <h2>Únete a SportConnect y gana más</h2>
+            <p class="join-lead">Recibe alumnos verificados, cobra seguro y haz crecer tu agenda sin comisiones ocultas.
+            </p>
+
+            <div class="join-bullets">
+              <div class="join-bullet">
+                <span class="bullet-icon">✓</span>
+                <div>
+                  <h4>Define tus tarifas</h4>
+                  <p>Control total de precio, modalidades y disponibilidad.</p>
+                </div>
+              </div>
+              <div class="join-bullet">
+                <span class="bullet-icon">✓</span>
+                <div>
+                  <h4>Clientes listos para reservar</h4>
+                  <p>Solicitudes filtradas con pago seguro y chat directo.</p>
+                </div>
+              </div>
+              <div class="join-bullet">
+                <span class="bullet-icon">✓</span>
+                <div>
+                  <h4>Soporte y visibilidad</h4>
+                  <p>Badge verificado, reseñas y posicionamiento destacado.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="join-actions">
+              <button class="btn-primary-large" (click)="irAInfoEntrenadores()">
+                <ngx-sport-icon name="activity" [size]="18"></ngx-sport-icon>
+                Más información
+              </button>
+              <button class="btn-secondary-large" (click)="irAUneteEntrenadores(true)">
+                <ngx-sport-icon name="users" [size]="18"></ngx-sport-icon>
+                Registrarme ahora
+              </button>
+            </div>
+
+            <div class="join-stats">
+              <div class="stat-block">
+                <span class="stat-value">500+</span>
+                <span class="stat-label">coaches activos</span>
+              </div>
+              <div class="stat-block">
+                <span class="stat-value">4.9★</span>
+                <span class="stat-label">calificación promedio</span>
+              </div>
+              <div class="stat-block">
+                <span class="stat-value">48h</span>
+                <span class="stat-label">tiempo medio para conseguir alumnos</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="join-steps-card">
+            <h3>Así te unes</h3>
+            <div class="steps-list">
+              <div class="step-card" *ngFor="let paso of pasosEntrenador">
+                <span class="step-number">{{ paso.numero }}</span>
+                <div>
+                  <h4>{{ paso.titulo }}</h4>
+                  <p>{{ paso.descripcion }}</p>
+                </div>
+              </div>
+            </div>
+            <div class="cta-inline">
+              <span>¿Listo para empezar?</span>
+              <button class="btn-ghost" (click)="irAUneteEntrenadores(true)">Crear mi perfil</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <ngx-shared-footer></ngx-shared-footer>
+  </nb-layout-column>
+</nb-layout>
