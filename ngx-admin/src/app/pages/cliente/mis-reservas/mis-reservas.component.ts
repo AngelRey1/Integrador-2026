@@ -1,13 +1,16 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { NbDialogService, NbToastrService } from '@nebular/theme';
+import { ClienteFirebaseService, Reserva as ReservaFirebase } from '../../../@core/services/cliente-firebase.service';
+import { Subscription } from 'rxjs';
 
 type EstadoReserva = 'PENDIENTE' | 'CONFIRMADA' | 'COMPLETADA' | 'CANCELADA';
 
 interface Reserva {
-  id: number;
+  id: string;
   numero_reserva: string;
   entrenador: {
+    id?: string;
     nombre: string;
     foto_url: string;
     especialidad: string;
@@ -27,106 +30,69 @@ interface Reserva {
   templateUrl: './mis-reservas.component.html',
   styleUrls: ['./mis-reservas.component.scss']
 })
-export class MisReservasComponent {
+export class MisReservasComponent implements OnInit, OnDestroy {
   tabSeleccionado = 0;
-  
+  loading = true;
+
   // Filtros
   filtroFecha: Date | null = null;
   filtroEntrenador = '';
   filtroBusqueda = '';
 
-  // Todas las reservas (datos mock - precios en MXN)
-  todasReservas: Reserva[] = [
-    {
-      id: 1,
-      numero_reserva: 'RSV-ABC123',
-      entrenador: {
-        nombre: 'Ana Pérez García',
-        foto_url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop&crop=face',
-        especialidad: 'Yoga & Pilates'
-      },
-      fecha: new Date(2026, 1, 20),
-      hora: '10:00',
-      duracion: 1,
-      modalidad: 'Presencial',
-      estado: 'CONFIRMADA',
-      precio_total: 450,
-      notas: 'Primera sesión de yoga',
-      fecha_creacion: new Date(2026, 1, 13)
-    },
-    {
-      id: 2,
-      numero_reserva: 'RSV-DEF456',
-      entrenador: {
-        nombre: 'Carlos Ruiz López',
-        foto_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face',
-        especialidad: 'CrossFit & Funcional'
-      },
-      fecha: new Date(2026, 1, 15),
-      hora: '18:00',
-      duracion: 1.5,
-      modalidad: 'Presencial',
-      estado: 'PENDIENTE',
-      precio_total: 675,
-      fecha_creacion: new Date(2026, 1, 12)
-    },
-    {
-      id: 3,
-      numero_reserva: 'RSV-GHI789',
-      entrenador: {
-        nombre: 'María González',
-        foto_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop&crop=face',
-        especialidad: 'Running & Atletismo'
-      },
-      fecha: new Date(2026, 0, 25),
-      hora: '07:00',
-      duracion: 1,
-      modalidad: 'Online',
-      estado: 'COMPLETADA',
-      precio_total: 350,
-      notas: 'Sesión de técnica de carrera',
-      fecha_creacion: new Date(2026, 0, 20)
-    },
-    {
-      id: 4,
-      numero_reserva: 'RSV-JKL012',
-      entrenador: {
-        nombre: 'David Martínez',
-        foto_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&crop=face',
-        especialidad: 'Boxeo'
-      },
-      fecha: new Date(2026, 0, 18),
-      hora: '16:00',
-      duracion: 1,
-      modalidad: 'Presencial',
-      estado: 'CANCELADA',
-      precio_total: 500,
-      notas: 'Cancelada por el cliente',
-      fecha_creacion: new Date(2026, 0, 15)
-    },
-    {
-      id: 5,
-      numero_reserva: 'RSV-MNO345',
-      entrenador: {
-        nombre: 'Ana Pérez García',
-        foto_url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop&crop=face',
-        especialidad: 'Yoga & Pilates'
-      },
-      fecha: new Date(2026, 0, 10),
-      hora: '10:00',
-      duracion: 1,
-      modalidad: 'Online',
-      estado: 'COMPLETADA',
-      precio_total: 400,
-      fecha_creacion: new Date(2026, 0, 5)
-    }
-  ];
+  // Todas las reservas desde Firebase
+  todasReservas: Reserva[] = [];
+
+  private reservasSubscription: Subscription | null = null;
 
   constructor(
     private dialogService: NbDialogService,
     private router: Router,
-    private toastr: NbToastrService
-  ) {}
+    private toastr: NbToastrService,
+    private clienteFirebase: ClienteFirebaseService
+  ) { }
+
+  ngOnInit(): void {
+    this.cargarReservas();
+  }
+
+  ngOnDestroy(): void {
+    if (this.reservasSubscription) {
+      this.reservasSubscription.unsubscribe();
+    }
+  }
+
+  cargarReservas(): void {
+    this.loading = true;
+    this.reservasSubscription = this.clienteFirebase.getMisReservas().subscribe(reservas => {
+      this.todasReservas = reservas.map(r => this.convertirReserva(r));
+      this.loading = false;
+    });
+  }
+
+  private convertirReserva(r: ReservaFirebase): Reserva {
+    const fecha = r.fecha instanceof Date ? r.fecha : new Date((r.fecha as any)?.seconds * 1000);
+    const fechaCreacion = r.fechaCreacion instanceof Date ? r.fechaCreacion : new Date((r.fechaCreacion as any)?.seconds * 1000);
+
+
+    return {
+      id: r.id || '',
+      numero_reserva: `RSV-${(r.id || '').slice(-6).toUpperCase()}`,
+      entrenador: {
+        id: r.entrenadorId,
+        nombre: r.entrenadorNombre,
+        foto_url: 'assets/images/avatar-default.png',
+        especialidad: (r as any).deporte || 'General'
+      },
+      fecha: fecha,
+      hora: fecha.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }),
+      duracion: r.duracion ? r.duracion / 60 : 1,
+      modalidad: r.modalidad || 'Presencial',
+      estado: r.estado as EstadoReserva,
+      precio_total: r.precio || 0,
+      notas: r.notas,
+      fecha_creacion: fechaCreacion
+    };
+  }
 
   // Filtrado por estado
   get reservasPendientes(): Reserva[] {
@@ -150,7 +116,7 @@ export class MisReservasComponent {
 
     // Aplicar filtros adicionales
     if (this.filtroEntrenador) {
-      reservas = reservas.filter(r => 
+      reservas = reservas.filter(r =>
         r.entrenador.nombre.toLowerCase().includes(this.filtroEntrenador.toLowerCase())
       );
     }
@@ -163,7 +129,7 @@ export class MisReservasComponent {
     }
 
     if (this.filtroFecha) {
-      reservas = reservas.filter(r => 
+      reservas = reservas.filter(r =>
         r.fecha.toDateString() === this.filtroFecha?.toDateString()
       );
     }
@@ -173,7 +139,6 @@ export class MisReservasComponent {
 
   // Acciones
   verDetalles(reserva: Reserva): void {
-    // Mostrar detalles en toast por ahora (en producción sería un modal)
     this.toastr.info(
       `${reserva.entrenador.especialidad} · ${this.formatearFecha(reserva.fecha)} a las ${reserva.hora}`,
       `Reserva ${reserva.numero_reserva}`,
@@ -181,55 +146,60 @@ export class MisReservasComponent {
     );
   }
 
-  confirmarReserva(reserva: Reserva): void {
-    reserva.estado = 'CONFIRMADA';
-    this.toastr.success(
-      `Tu sesión con ${reserva.entrenador.nombre} ha sido confirmada`,
-      '¡Reserva Confirmada!',
-      { duration: 4000, icon: 'checkmark-circle-outline' }
-    );
+  async confirmarReserva(reserva: Reserva): Promise<void> {
+    const result = await this.clienteFirebase.actualizarEstadoReserva(reserva.id, 'CONFIRMADA');
+    if (result.success) {
+      this.toastr.success(
+        `Tu sesión con ${reserva.entrenador.nombre} ha sido confirmada`,
+        '¡Reserva Confirmada!',
+        { duration: 4000, icon: 'checkmark-circle-outline' }
+      );
+    } else {
+      this.toastr.danger(result.message, 'Error');
+    }
   }
 
-  cancelarReserva(reserva: Reserva): void {
+  async cancelarReserva(reserva: Reserva): Promise<void> {
     if (confirm(`¿Estás seguro de cancelar la reserva ${reserva.numero_reserva}?`)) {
-      reserva.estado = 'CANCELADA';
-      this.toastr.warning(
-        'Tu reserva ha sido cancelada exitosamente',
-        'Reserva Cancelada',
-        { duration: 4000, icon: 'close-circle-outline' }
-      );
+      const result = await this.clienteFirebase.cancelarReserva(reserva.id, 'Cancelada por el cliente');
+      if (result.success) {
+        this.toastr.warning(
+          'Tu reserva ha sido cancelada exitosamente',
+          'Reserva Cancelada',
+          { duration: 4000, icon: 'close-circle-outline' }
+        );
+      } else {
+        this.toastr.danger(result.message, 'Error');
+      }
     }
   }
 
   reprogramarReserva(reserva: Reserva): void {
-    // Navegar a agendar sesión con parámetros
     this.router.navigate(['/pages/cliente/agendar-sesion'], {
-      queryParams: { 
+      queryParams: {
         reprogramar: reserva.id,
-        entrenador: reserva.entrenador.nombre 
+        entrenador: reserva.entrenador.nombre
       }
     });
   }
 
   dejarResena(reserva: Reserva): void {
-    // Navegar a reseñas con el entrenador preseleccionado
     this.router.navigate(['/pages/cliente/mis-resenas'], {
-      queryParams: { 
+      queryParams: {
         nueva: true,
         entrenador: reserva.entrenador.nombre,
+        entrenadorId: reserva.entrenador.id,
         sesion: reserva.id
       }
     });
   }
 
   descargarRecibo(reserva: Reserva): void {
-    // Simular descarga de recibo
     this.toastr.primary(
       `Descargando recibo de la reserva ${reserva.numero_reserva}...`,
       'Descarga Iniciada',
       { duration: 3000, icon: 'download-outline' }
     );
-    // En producción: llamar a un servicio que genere el PDF
   }
 
   limpiarFiltros(): void {
@@ -271,3 +241,4 @@ export class MisReservasComponent {
     return dias > 0 && dias <= 7;
   }
 }
+

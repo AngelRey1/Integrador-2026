@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ClienteFirebaseService, Entrenador, Reserva } from '../../@core/services/cliente-firebase.service';
+import { Subscription } from 'rxjs';
 
 interface Paso {
   numero: number;
@@ -14,26 +16,19 @@ interface Horario {
   disponible: boolean;
 }
 
-// Mock Data (Duplicado temporalmente para demo, idealmente en un servicio)
-const ENTRENADORES_MOCK = [
-  { id: 1, nombre: 'Carlos Méndez', deporte: 'Fútbol', precio: 350, whatsapp: '529991234567' },
-  { id: 2, nombre: 'Ana García', deporte: 'Yoga', precio: 280, whatsapp: '529997654321' },
-  { id: 3, nombre: 'Jorge Sánchez', deporte: 'CrossFit', precio: 420, whatsapp: '529991112223' },
-  { id: 4, nombre: 'María López', deporte: 'Running', precio: 300, whatsapp: '529994445556' },
-  { id: 14, nombre: 'Camila Reyes', deporte: 'Ballet Fitness', precio: 330, whatsapp: '529998889990' },
-  // ... otros si es necesario
-];
-
 @Component({
   selector: 'ngx-reserva-modal',
   templateUrl: './reserva-modal.component.html',
   styleUrls: ['./reserva-modal.component.scss']
 })
-export class ReservaModalComponent implements OnInit {
+export class ReservaModalComponent implements OnInit, OnDestroy {
   pasoActual = 1;
   totalPasos = 5;
   fechaMinima: string;
-  entrenador: any;
+  entrenador: Entrenador | null = null;
+  cargandoEntrenador = true;
+  horariosOcupados: string[] = [];
+  private subscriptions: Subscription[] = [];
 
   pasos: Paso[] = [
     { numero: 1, titulo: 'Fecha y Hora', icono: 'calendar-outline', completado: false },
@@ -68,11 +63,13 @@ export class ReservaModalComponent implements OnInit {
   numeroReserva = '';
   pagoCompletado = false;
   procesandoPago = false;
+  cargandoHorarios = false;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private clienteFirebase: ClienteFirebaseService
   ) {
     this.fechaMinima = new Date().toISOString().split('T')[0];
 
@@ -111,18 +108,21 @@ export class ReservaModalComponent implements OnInit {
   cuposDisponibles = 10;
 
   ngOnInit() {
-    // 1. Obtener ID del entrenador de la URL
+    // 1. Obtener ID del entrenador de la URL y cargar desde Firebase
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
-      this.entrenador = ENTRENADORES_MOCK.find(e => e.id === +id) || { nombre: 'Entrenador', deporte: 'General', precio: 0 };
+      this.cargarEntrenador(id);
+    } else {
+      this.cargandoEntrenador = false;
     }
 
     this.generarHorarios();
 
-    // Listener para generar horarios cuando cambia la fecha
+    // Listener para cargar horarios ocupados cuando cambia la fecha
     this.paso1Form.get('fecha')?.valueChanges.subscribe((fecha) => {
-      this.generarHorarios();
-      this.cargarCupos(fecha);
+      if (fecha && this.entrenador?.id) {
+        this.cargarHorariosOcupados(this.entrenador.id, new Date(fecha));
+      }
       this.validarCupos();
     });
 
@@ -142,43 +142,80 @@ export class ReservaModalComponent implements OnInit {
     });
   }
 
-  cargarCupos(fecha: Date | null) {
-    if (!fecha || !this.entrenador?.id) return;
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
 
-    // Convertir fecha a string YYYY-MM-DD para la clave
-    const fechaObj = new Date(fecha);
-    const fechaStr = fechaObj.toISOString().split('T')[0];
-    const storageKey = `cupos_${this.entrenador.id}_${fechaStr}`;
+  /**
+   * Cargar datos del entrenador desde Firebase
+   */
+  cargarEntrenador(id: string) {
+    this.cargandoEntrenador = true;
+    const sub = this.clienteFirebase.getEntrenador(id).subscribe({
+      next: (entrenador) => {
+        if (entrenador) {
+          this.entrenador = entrenador;
+        } else {
+          // Entrenador no encontrado
+          console.warn('Entrenador no encontrado con ID:', id);
+          this.entrenador = null;
+        }
+        this.cargandoEntrenador = false;
+      },
+      error: (error) => {
+        console.error('Error al cargar entrenador:', error);
+        this.cargandoEntrenador = false;
+      }
+    });
+    this.subscriptions.push(sub);
+  }
 
-    const cuposGuardados = localStorage.getItem(storageKey);
+  /**
+   * Cargar horarios ocupados desde Firebase para la fecha seleccionada
+   */
+  cargarHorariosOcupados(entrenadorId: string, fecha: Date) {
+    this.cargandoHorarios = true;
+    const sub = this.clienteFirebase.getHorariosOcupados(entrenadorId, fecha).subscribe({
+      next: (horariosOcupados) => {
+        this.horariosOcupados = horariosOcupados;
+        this.generarHorarios(); // Regenerar con los horarios ocupados reales
+        this.cargarCuposReales(fecha);
+        this.cargandoHorarios = false;
+      },
+      error: (error) => {
+        console.error('Error al cargar horarios ocupados:', error);
+        this.horariosOcupados = [];
+        this.generarHorarios();
+        this.cargandoHorarios = false;
+      }
+    });
+    this.subscriptions.push(sub);
+  }
 
-    if (cuposGuardados) {
-      this.cuposDisponibles = parseInt(cuposGuardados, 10);
-    } else {
-      // Valor por defecto si no hay registro
-      this.cuposDisponibles = 10;
-    }
-
-    // Validar si la cantidad seleccionada previamente sigue siendo válida
+  /**
+   * Cargar cupos disponibles basados en reservas reales
+   */
+  cargarCuposReales(fecha: Date) {
+    // Los cupos se calculan basados en la cantidad de horarios disponibles
+    const horariosLibres = this.horariosDisponibles.filter(h => h.disponible).length;
+    this.cuposDisponibles = horariosLibres;
+    this.cuposTotales = this.horariosDisponibles.length;
     this.validarCupos();
   }
 
-  actualizarCuposReserva() {
-    const cantidad = this.paso1Form.get('cantidadPersonas')?.value || 1;
-    const fecha = this.paso1Form.get('fecha')?.value;
-
+  cargarCupos(fecha: Date | null) {
+    // Este método ahora usa datos reales de Firebase
     if (!fecha || !this.entrenador?.id) return;
+    this.cargarHorariosOcupados(this.entrenador.id, new Date(fecha));
+  }
 
-    const fechaStr = new Date(fecha).toISOString().split('T')[0];
-    const storageKey = `cupos_${this.entrenador.id}_${fechaStr}`;
-
-    // Obtener cupos actuales (o 10 por defecto) y restar
-    let cuposActuales = parseInt(localStorage.getItem(storageKey) || '10', 10);
-    cuposActuales = Math.max(0, cuposActuales - cantidad);
-
-    // Guardar nuevo valor
-    localStorage.setItem(storageKey, cuposActuales.toString());
-    this.cuposDisponibles = cuposActuales;
+  actualizarCuposReserva() {
+    // Ya no usamos localStorage, los cupos se actualizan automáticamente
+    // cuando se crea la reserva en Firebase
+    const fecha = this.paso1Form.get('fecha')?.value;
+    if (fecha && this.entrenador?.id) {
+      this.cargarHorariosOcupados(this.entrenador.id, new Date(fecha));
+    }
   }
 
   validarCupos() {
@@ -191,33 +228,19 @@ export class ReservaModalComponent implements OnInit {
   }
 
   generarHorarios() {
-    // Generar horarios de 8:00 a 20:00 con DISPONIBILIDAD SIMULADA
+    // Generar horarios de 8:00 a 20:00 usando datos REALES de Firebase
     const horarios: Horario[] = [];
-
-    // Seed básico basado en la fecha (si hay fecha seleccionada) para que sea consistente al cambiar
-    // Si no hay fecha, es random cada vez.
     const fechaSeleccionada = this.paso1Form.get('fecha')?.value;
 
     for (let hora = 8; hora <= 19; hora++) {
       const horaStr = `${hora.toString().padStart(2, '0')}:00`;
-      // SIMULACION: Si la hora es par, hay 30% chance de estar lleno. Si es impar, 10%.
-      // Esto es solo para demo visual.
-      let disponible = true;
-      if (fechaSeleccionada) {
-        // Lógica determinista simple para demo: 'random' basado en suma de caracteres de fecha + hora
-        const seed = fechaSeleccionada.toString().length + hora;
-        if (seed % 7 === 0 || seed % 5 === 0) disponible = false; // Algunos randoms no disponibles
-      }
-
-      horarios.push({ hora: horaStr, disponible: disponible });
+      // Verificar si este horario está ocupado (basado en reservas reales)
+      const disponible = !this.horariosOcupados.includes(horaStr);
+      horarios.push({ hora: horaStr, disponible });
 
       if (hora < 19) {
         const mediaHoraStr = `${hora.toString().padStart(2, '0')}:30`;
-        let disponibleMedia = true;
-        if (fechaSeleccionada) {
-          const seedMedia = fechaSeleccionada.toString().length + hora + 30;
-          if (seedMedia % 9 === 0) disponibleMedia = false;
-        }
+        const disponibleMedia = !this.horariosOcupados.includes(mediaHoraStr);
         horarios.push({ hora: mediaHoraStr, disponible: disponibleMedia });
       }
     }
@@ -288,37 +311,59 @@ export class ReservaModalComponent implements OnInit {
       return;
     }
 
+    if (!this.entrenador?.id) {
+      alert('Error: No se encontró información del entrenador');
+      return;
+    }
+
     this.enviando = true;
 
-    // Simular envío de reserva después del pago
-    setTimeout(() => {
-      const reservaData = {
-        entrenador: this.entrenador,
-        ...this.paso1Form.value,
-        ...this.paso2Form.value,
-        ...this.paso3Form.value,
-        pago: {
-          monto: this.calcularPrecioTotal(),
-          metodo: this.paso4Form.get('metodoPago')?.value,
-          completado: true,
-          fecha: new Date().toISOString()
-        }
-      };
+    // Crear la reserva en Firebase
+    const fechaReserva = new Date(this.paso1Form.get('fecha')?.value);
+    const horaSeleccionada = this.paso1Form.get('hora')?.value;
 
-      console.log('Reserva confirmada con pago:', reservaData);
+    // Combinar fecha y hora
+    const [horas, minutos] = horaSeleccionada.split(':').map(Number);
+    fechaReserva.setHours(horas, minutos, 0, 0);
 
-      // Actualizar cupos en localStorage
-      this.actualizarCuposReserva();
+    const reservaData: Omit<Reserva, 'id' | 'clienteId' | 'fechaCreacion'> = {
+      entrenadorId: this.entrenador.id!,
+      entrenadorNombre: this.entrenador.nombre + ' ' + (this.entrenador.apellidoPaterno || ''),
+      clienteNombre: this.paso3Form.get('nombre')?.value,
+      fecha: fechaReserva,
+      hora: horaSeleccionada,
+      duracion: this.paso1Form.get('duracion')?.value,
+      precio: this.calcularPrecioTotal(),
+      modalidad: this.paso2Form.get('modalidad')?.value,
+      estado: 'PENDIENTE',
+      notas: this.paso2Form.get('notas')?.value || '',
+      ubicacion: this.paso2Form.get('ubicacion')?.value || ''
+    };
 
+    this.clienteFirebase.crearReserva(reservaData).then(result => {
       this.enviando = false;
-      this.reservaConfirmada = true;
-      this.numeroReserva = 'RSV-' + Math.random().toString(36).substr(2, 9).toUpperCase();
-    }, 1500);
+
+      if (result.success) {
+        this.reservaConfirmada = true;
+        this.numeroReserva = 'RSV-' + (result.id?.substring(0, 8).toUpperCase() || Math.random().toString(36).substr(2, 9).toUpperCase());
+        console.log('Reserva creada exitosamente:', result.id);
+      } else {
+        alert('Error al crear la reserva: ' + result.message);
+      }
+    }).catch(error => {
+      this.enviando = false;
+      console.error('Error al confirmar reserva:', error);
+      alert('Error al crear la reserva. Por favor intenta de nuevo.');
+    });
   }
 
   calcularPrecioTotal(): number {
     const duracion = this.paso1Form.get('duracion')?.value || 60;
-    const precioHora = this.entrenador?.precio || 0; // Fixed prop name from precioHora to precio (based on mock)
+    const modalidad = this.paso2Form.get('modalidad')?.value;
+    // Usar precio online si la modalidad es online
+    const precioHora = modalidad === 'online' 
+      ? (this.entrenador?.precioOnline || this.entrenador?.precio || 0)
+      : (this.entrenador?.precio || 0);
     const personas = this.paso1Form.get('cantidadPersonas')?.value || 1;
     return ((duracion / 60) * precioHora) * personas;
   }

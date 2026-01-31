@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AuthService } from '../../@core/services/auth.service';
+import { AuthFirebaseService } from '../../@core/services/auth-firebase.service';
 import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
@@ -30,18 +30,18 @@ import { Router, ActivatedRoute } from '@angular/router';
             </small>
           </div>
           <div style="margin-bottom: 15px;">
-            <input formControlName="contrasena" type="password" placeholder="Contraseña (mínimo 6 caracteres)" style="width: 100%; padding: 10px; border: 1px solid #e4e9f2; border-radius: 4px; box-sizing: border-box;" />
-            <small style="color: red; font-size: 0.85rem;" *ngIf="form.get('contrasena')?.invalid && form.get('contrasena')?.touched">
-              <span *ngIf="form.get('contrasena')?.errors?.['required']">La contraseña es requerida</span>
-              <span *ngIf="form.get('contrasena')?.errors?.['minlength']">Mínimo 6 caracteres</span>
+            <input formControlName="password" type="password" placeholder="Contraseña (mínimo 6 caracteres)" style="width: 100%; padding: 10px; border: 1px solid #e4e9f2; border-radius: 4px; box-sizing: border-box;" />
+            <small style="color: red; font-size: 0.85rem;" *ngIf="form.get('password')?.invalid && form.get('password')?.touched">
+              <span *ngIf="form.get('password')?.errors?.['required']">La contraseña es requerida</span>
+              <span *ngIf="form.get('password')?.errors?.['minlength']">Mínimo 6 caracteres</span>
             </small>
           </div>
           <div style="margin-bottom: 15px;">
-            <input formControlName="confirmar_contrasena" type="password" placeholder="Confirmar Contraseña" style="width: 100%; padding: 10px; border: 1px solid #e4e9f2; border-radius: 4px; box-sizing: border-box;" />
-            <small style="color: red; font-size: 0.85rem;" *ngIf="form.get('confirmar_contrasena')?.invalid && form.get('confirmar_contrasena')?.touched">
+            <input formControlName="confirmPassword" type="password" placeholder="Confirmar Contraseña" style="width: 100%; padding: 10px; border: 1px solid #e4e9f2; border-radius: 4px; box-sizing: border-box;" />
+            <small style="color: red; font-size: 0.85rem;" *ngIf="form.get('confirmPassword')?.invalid && form.get('confirmPassword')?.touched">
               Debes confirmar la contraseña
             </small>
-            <small style="color: red; font-size: 0.85rem;" *ngIf="form.errors?.['mismatch'] && form.get('confirmar_contrasena')?.touched">
+            <small style="color: red; font-size: 0.85rem;" *ngIf="form.errors?.['mismatch'] && form.get('confirmPassword')?.touched">
               Las contraseñas no coinciden
             </small>
           </div>
@@ -63,9 +63,6 @@ import { Router, ActivatedRoute } from '@angular/router';
                 </div>
               </label>
             </div>
-            <small style="color: red; font-size: 0.85rem;" *ngIf="form.get('rol')?.invalid && form.get('rol')?.touched">
-              <span *ngIf="form.get('rol')?.errors?.['required']">Debes seleccionar un rol</span>
-            </small>
             <div style="margin-top: 10px; padding: 10px; background: #fff9e6; border-left: 3px solid #ffd93d; border-radius: 4px;" *ngIf="form.get('rol')?.value === 'ENTRENADOR'">
               <small style="color: #856404;">⚠️ <strong>Nota:</strong> Si te registras como Entrenador, tu cuenta requerirá aprobación por nuestro equipo. Te notificaremos en 2-3 días hábiles.</small>
             </div>
@@ -112,8 +109,8 @@ export class RegisterComponent implements OnInit {
   successMessage = '';
 
   constructor(
-    private fb: FormBuilder, 
-    private auth: AuthService, 
+    private fb: FormBuilder,
+    private authFirebase: AuthFirebaseService,
     private router: Router,
     private route: ActivatedRoute
   ) {
@@ -121,8 +118,8 @@ export class RegisterComponent implements OnInit {
       nombre: ['', Validators.required],
       apellido: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      contrasena: ['', [Validators.required, Validators.minLength(6)]],
-      confirmar_contrasena: ['', Validators.required],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      confirmPassword: ['', Validators.required],
       rol: ['CLIENTE', Validators.required],
       terminos: [false, Validators.requiredTrue]
     }, { validators: this.passwordsMatch });
@@ -138,13 +135,12 @@ export class RegisterComponent implements OnInit {
   }
 
   passwordsMatch(group: FormGroup) {
-    const p = group.get('contrasena')?.value;
-    const c = group.get('confirmar_contrasena')?.value;
+    const p = group.get('password')?.value;
+    const c = group.get('confirmPassword')?.value;
     return p === c ? null : { mismatch: true };
   }
 
-  submit() {
-    // Marcar todos los campos como touched para mostrar errores
+  async submit() {
     if (this.form.invalid) {
       Object.keys(this.form.controls).forEach(key => {
         this.form.get(key)?.markAsTouched();
@@ -156,56 +152,39 @@ export class RegisterComponent implements OnInit {
     this.errorMessage = '';
     this.successMessage = '';
 
-    this.auth.register(this.form.value).subscribe({
-      next: (res: any) => {
-        this.loading = false;
-        this.errorMessage = '';
-        const nombreUsuario = res?.user?.nombreUsuario || 'usuario';
-        const email = res?.user?.email || this.form.value.email;
-        const estado = res?.user?.estado;
-        
-        if (estado === 'PENDIENTE') {
-          // Si es entrenador y está pendiente
-          this.successMessage = `¡Registro exitoso! Tu nombre de usuario es: ${nombreUsuario}. Tu solicitud será revisada en 2-3 días hábiles. Te notificaremos por email.`;
-          
-          setTimeout(() => {
-            this.router.navigate(['/auth/pendiente-aprobacion']);
-          }, 3000);
-        } else {
-          // Si es cliente (activo inmediatamente)
-          this.successMessage = `¡Registro exitoso! Tu nombre de usuario es: ${nombreUsuario}. Redirigiendo al login...`;
-          
-          setTimeout(() => {
-            this.router.navigate(['/auth/login'], {
-              queryParams: {
-                email: email,
-                nombreUsuario: nombreUsuario
-              }
-            });
-          }, 2000);
-        }
-      },
-      error: (error: any) => {
-        this.loading = false;
-        this.successMessage = '';
-        // Extraer el mensaje de error correctamente
-        let errorMsg = 'Error al registrar. Por favor, intenta nuevamente.';
-        
-        if (error) {
-          if (typeof error === 'string') {
-            errorMsg = error;
-          } else if (error.message) {
-            errorMsg = error.message;
-          } else if (error.error && error.error.message) {
-            errorMsg = error.error.message;
-          } else if (error.error && typeof error.error === 'string') {
-            errorMsg = error.error;
-          }
-        }
-        
-        this.errorMessage = errorMsg;
-        console.error('Error en registro:', error);
-      }
+    const { nombre, apellido, email, password, rol } = this.form.value;
+
+    const result = await this.authFirebase.register({
+      nombre,
+      apellido,
+      email,
+      password,
+      rol
     });
+
+    this.loading = false;
+
+    if (result.success) {
+      this.successMessage = result.message;
+
+      if (rol === 'ENTRENADOR') {
+        // Entrenador: redirigir a página de pendiente
+        setTimeout(() => {
+          this.router.navigate(['/auth/login'], {
+            queryParams: { email, pending: true }
+          });
+        }, 3000);
+      } else {
+        // Cliente: redirigir al login
+        setTimeout(() => {
+          this.router.navigate(['/auth/login'], {
+            queryParams: { email, registered: true }
+          });
+        }, 2000);
+      }
+    } else {
+      this.errorMessage = result.message;
+    }
   }
 }
+

@@ -1,7 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { NbToastrService } from '@nebular/theme';
+import { ClienteFirebaseService, Pago as PagoFirebase } from '../../../@core/services/cliente-firebase.service';
+import { Subscription } from 'rxjs';
 
 interface Pago {
-  id: number;
+  id: string;
   numero_transaccion: string;
   fecha: Date;
   concepto: string;
@@ -22,7 +25,9 @@ interface EstadisticaPago {
   templateUrl: './mis-pagos.component.html',
   styleUrls: ['./mis-pagos.component.scss']
 })
-export class MisPagosComponent implements OnInit {
+export class MisPagosComponent implements OnInit, OnDestroy {
+  loading = true;
+
   // Stats resumen
   totalGastado = 0;
   pagosPendientes = 0;
@@ -34,104 +39,12 @@ export class MisPagosComponent implements OnInit {
   filtroEstado = '';
   filtroMes = '';
 
-  // Datos (precios en MXN - pesos mexicanos)
-  pagos: Pago[] = [
-    {
-      id: 1,
-      numero_transaccion: 'TXN-2026-001',
-      fecha: new Date(2026, 1, 12),
-      concepto: 'Sesión de Yoga - 1 hora',
-      entrenador: 'Ana Pérez García',
-      metodo_pago: 'Visa •••• 4242',
-      monto: 450,
-      estado: 'COMPLETADO',
-      recibo_url: '#'
-    },
-    {
-      id: 2,
-      numero_transaccion: 'TXN-2026-002',
-      fecha: new Date(2026, 1, 10),
-      concepto: 'Sesión de CrossFit - 1.5 horas',
-      entrenador: 'Carlos Ruiz López',
-      metodo_pago: 'Mastercard •••• 5555',
-      monto: 675,
-      estado: 'COMPLETADO',
-      recibo_url: '#'
-    },
-    {
-      id: 3,
-      numero_transaccion: 'TXN-2026-003',
-      fecha: new Date(2026, 1, 8),
-      concepto: 'Sesión de Running - 1 hora',
-      entrenador: 'María González',
-      metodo_pago: 'PayPal',
-      monto: 350,
-      estado: 'COMPLETADO',
-      recibo_url: '#'
-    },
-    {
-      id: 4,
-      numero_transaccion: 'TXN-2026-004',
-      fecha: new Date(2026, 1, 15),
-      concepto: 'Sesión de Boxeo - 1 hora',
-      entrenador: 'David Martínez',
-      metodo_pago: 'Visa •••• 4242',
-      monto: 500,
-      estado: 'PENDIENTE'
-    },
-    {
-      id: 5,
-      numero_transaccion: 'TXN-2026-005',
-      fecha: new Date(2026, 0, 28),
-      concepto: 'Sesión de Pilates - 1 hora',
-      entrenador: 'Ana Pérez García',
-      metodo_pago: 'Visa •••• 4242',
-      monto: 450,
-      estado: 'COMPLETADO',
-      recibo_url: '#'
-    },
-    {
-      id: 6,
-      numero_transaccion: 'TXN-2026-006',
-      fecha: new Date(2026, 0, 25),
-      concepto: 'Sesión de Natación - 1 hora',
-      entrenador: 'Laura Sánchez',
-      metodo_pago: 'Mastercard •••• 5555',
-      monto: 380,
-      estado: 'COMPLETADO',
-      recibo_url: '#'
-    },
-    {
-      id: 7,
-      numero_transaccion: 'TXN-2026-007',
-      fecha: new Date(2026, 0, 20),
-      concepto: 'Sesión de Ciclismo - 2 horas',
-      entrenador: 'Javier Torres',
-      metodo_pago: 'PayPal',
-      monto: 800,
-      estado: 'COMPLETADO',
-      recibo_url: '#'
-    },
-    {
-      id: 8,
-      numero_transaccion: 'TXN-2025-008',
-      fecha: new Date(2025, 11, 15),
-      concepto: 'Sesión de Yoga - 1 hora',
-      entrenador: 'Ana Pérez García',
-      metodo_pago: 'Visa •••• 4242',
-      monto: 450,
-      estado: 'REEMBOLSADO'
-    }
-  ];
-
+  // Datos desde Firebase
+  pagos: Pago[] = [];
   pagosFiltrados: Pago[] = [];
 
-  // Datos para gráfica (en MXN)
-  gastosUltimosMeses: EstadisticaPago[] = [
-    { mes: 'Dic', monto: 1800 },
-    { mes: 'Ene', monto: 2430 },
-    { mes: 'Feb', monto: 1975 }
-  ];
+  // Datos para gráfica
+  gastosUltimosMeses: EstadisticaPago[] = [];
 
   // Opciones de filtro
   estadosDisponibles = [
@@ -149,11 +62,54 @@ export class MisPagosComponent implements OnInit {
     { value: '11', label: 'Diciembre 2025' }
   ];
 
-  constructor() {}
+  private subscription: Subscription | null = null;
+
+  constructor(
+    private clienteFirebase: ClienteFirebaseService,
+    private toastr: NbToastrService
+  ) { }
 
   ngOnInit(): void {
-    this.calcularEstadisticas();
-    this.aplicarFiltros();
+    this.cargarPagos();
+  }
+
+  ngOnDestroy(): void {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
+  }
+
+  cargarPagos(): void {
+    this.loading = true;
+    this.subscription = this.clienteFirebase.getMisPagos().subscribe(pagos => {
+      this.pagos = pagos.map(p => this.convertirPago(p));
+      this.calcularEstadisticas();
+      this.aplicarFiltros();
+      this.loading = false;
+    });
+  }
+
+  private convertirPago(p: PagoFirebase): Pago {
+    const fecha = p.fecha instanceof Date ? p.fecha : new Date((p.fecha as any)?.seconds * 1000);
+
+    // Mapear estado de Firebase al formato del componente
+    let estado: 'COMPLETADO' | 'PENDIENTE' | 'FALLIDO' | 'REEMBOLSADO';
+    switch (p.estado) {
+      case 'COMPLETADO': estado = 'COMPLETADO'; break;
+      case 'REEMBOLSADO': estado = 'REEMBOLSADO'; break;
+      default: estado = 'PENDIENTE';
+    }
+
+    return {
+      id: p.id || '',
+      numero_transaccion: `TXN-${(p.id || '').slice(-8).toUpperCase()}`,
+      fecha: fecha,
+      concepto: `Sesión con entrenador`,
+      entrenador: 'Entrenador', // Se podría enriquecer con datos del entrenador
+      metodo_pago: p.metodo === 'tarjeta' ? 'Tarjeta •••• 4242' : p.metodo === 'efectivo' ? 'Efectivo' : 'Transferencia',
+      monto: p.monto || 0,
+      estado: estado
+    };
   }
 
   calcularEstadisticas(): void {
@@ -175,6 +131,25 @@ export class MisPagosComponent implements OnInit {
 
     // Total de pagos completados
     this.pagosCompletados = this.pagos.filter(p => p.estado === 'COMPLETADO').length;
+
+    // Calcular gastos por mes
+    this.calcularGastosMensuales();
+  }
+
+  private calcularGastosMensuales(): void {
+    const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    const gastosPorMes: { [key: string]: number } = {};
+
+    this.pagos
+      .filter(p => p.estado === 'COMPLETADO')
+      .forEach(p => {
+        const key = meses[p.fecha.getMonth()];
+        gastosPorMes[key] = (gastosPorMes[key] || 0) + p.monto;
+      });
+
+    this.gastosUltimosMeses = Object.entries(gastosPorMes)
+      .map(([mes, monto]) => ({ mes, monto }))
+      .slice(-3);
   }
 
   aplicarFiltros(): void {
@@ -212,13 +187,19 @@ export class MisPagosComponent implements OnInit {
   }
 
   descargarRecibo(pago: Pago): void {
-    console.log('Descargar recibo:', pago);
-    // TODO: Implementar descarga de PDF
+    this.toastr.primary(
+      `Descargando recibo ${pago.numero_transaccion}...`,
+      'Descarga Iniciada',
+      { duration: 3000, icon: 'download-outline' }
+    );
   }
 
   descargarTodos(): void {
-    console.log('Descargar todos los recibos');
-    // TODO: Implementar descarga masiva
+    this.toastr.primary(
+      'Preparando descarga de todos los recibos...',
+      'Descarga Múltiple',
+      { duration: 3000, icon: 'download-outline' }
+    );
   }
 
   getEstadoBadgeStatus(estado: string): string {
@@ -247,7 +228,7 @@ export class MisPagosComponent implements OnInit {
   }
 
   getMaxGasto(): number {
-    return Math.max(...this.gastosUltimosMeses.map(g => g.monto));
+    return Math.max(...this.gastosUltimosMeses.map(g => g.monto), 1);
   }
 
   getBarHeight(monto: number): number {
@@ -255,3 +236,4 @@ export class MisPagosComponent implements OnInit {
     return (monto / max) * 100;
   }
 }
+

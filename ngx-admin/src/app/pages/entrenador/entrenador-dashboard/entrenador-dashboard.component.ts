@@ -1,9 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
+import { EntrenadorFirebaseService, EstadisticasMensuales, ClienteResumen } from '../../../@core/services/entrenador-firebase.service';
+import { Reserva } from '../../../@core/services/cliente-firebase.service';
+import { Subscription } from 'rxjs';
 
 interface Sesion {
-  id: number;
+  id: string;
   cliente: {
+    id?: string;
     nombre: string;
     avatar: string;
   };
@@ -16,168 +20,129 @@ interface Sesion {
   ubicacion?: string;
 }
 
-interface Estadistica {
-  mes: string;
-  sesiones: number;
-  ingresos: number;
-}
-
 @Component({
   selector: 'ngx-entrenador-dashboard',
   templateUrl: './entrenador-dashboard.component.html',
   styleUrls: ['./entrenador-dashboard.component.scss']
 })
-export class EntrenadorDashboardComponent implements OnInit {
+export class EntrenadorDashboardComponent implements OnInit, OnDestroy {
+  loading = true;
+
   // Métricas principales
-  clientesActivos = 24;
-  sesionesMes = 42;
-  ingresosMes = 1890;
-  ingresosSemanales = 450;
-  calificacionPromedio = 4.8;
-  tasaAsistencia = 94;
-  totalResenas = 127;
+  clientesActivos = 0;
+  sesionesMes = 0;
+  ingresosMes = 0;
+  ingresosSemanales = 0;
+  calificacionPromedio = 0;
+  tasaAsistencia = 0;
+  totalResenas = 0;
 
   // Próximas sesiones
   proximasSesiones: Sesion[] = [];
-  
+
   // Sesiones de hoy
   sesionesHoy: Sesion[] = [];
 
   // Últimos clientes
-  ultimosClientes: any[] = [];
+  ultimosClientes: ClienteResumen[] = [];
 
   // Estadísticas mensuales
-  estadisticasMensuales: Estadistica[] = [
-    { mes: 'Ago', sesiones: 38, ingresos: 1710 },
-    { mes: 'Sep', sesiones: 41, ingresos: 1845 },
-    { mes: 'Oct', sesiones: 45, ingresos: 2025 },
-    { mes: 'Nov', sesiones: 42, ingresos: 1890 }
-  ];
+  estadisticasMensuales: EstadisticasMensuales[] = [];
 
   // Notificaciones
-  notificacionesPendientes = 3;
+  notificacionesPendientes = 0;
 
-  constructor(private router: Router) {}
+  private subscriptions: Subscription[] = [];
+
+  constructor(
+    private router: Router,
+    private entrenadorFirebase: EntrenadorFirebaseService
+  ) { }
 
   ngOnInit(): void {
-    this.cargarDatos();
+    this.cargarDatosFirebase();
   }
 
-  cargarDatos(): void {
-    const ahora = new Date();
-    
-    // Mock data clientes
-    this.ultimosClientes = [
-      { nombre: 'María González', foto: 'https://i.pravatar.cc/150?img=5', sesiones: 12 },
-      { nombre: 'Carlos Mendez', foto: 'https://i.pravatar.cc/150?img=6', sesiones: 8 },
-      { nombre: 'Ana López', foto: 'https://i.pravatar.cc/150?img=7', sesiones: 5 },
-      { nombre: 'Juan Pérez', foto: 'https://i.pravatar.cc/150?img=8', sesiones: 3 }
-    ];
-    
-    // Mock data sesiones
-    const todasSesiones: Sesion[] = [
-      {
-        id: 1,
-        cliente: {
-          nombre: 'María González',
-          avatar: 'https://i.pravatar.cc/150?img=5'
-        },
-        deporte: 'Yoga',
-        fecha: new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate(), 9, 0),
-        hora: '09:00',
-        duracion: 60,
-        modalidad: 'presencial',
-        estado: 'CONFIRMADA',
-        ubicacion: 'Estudio Central'
-      },
-      {
-        id: 2,
-        cliente: {
-          nombre: 'Carlos Ruiz',
-          avatar: 'https://i.pravatar.cc/150?img=12'
-        },
-        deporte: 'CrossFit',
-        fecha: new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate(), 11, 0),
-        hora: '11:00',
-        duracion: 90,
-        modalidad: 'presencial',
-        estado: 'CONFIRMADA',
-        ubicacion: 'Box Principal'
-      },
-      {
-        id: 3,
-        cliente: {
-          nombre: 'Ana Pérez',
-          avatar: 'https://i.pravatar.cc/150?img=1'
-        },
-        deporte: 'Pilates',
-        fecha: new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate(), 16, 0),
-        hora: '16:00',
-        duracion: 60,
-        modalidad: 'online',
-        estado: 'CONFIRMADA'
-      },
-      {
-        id: 4,
-        cliente: {
-          nombre: 'David Martínez',
-          avatar: 'https://i.pravatar.cc/150?img=8'
-        },
-        deporte: 'Yoga',
-        fecha: new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate() + 1, 10, 0),
-        hora: '10:00',
-        duracion: 60,
-        modalidad: 'presencial',
-        estado: 'CONFIRMADA',
-        ubicacion: 'Estudio Central'
-      },
-      {
-        id: 5,
-        cliente: {
-          nombre: 'Laura Sánchez',
-          avatar: 'https://i.pravatar.cc/150?img=20'
-        },
-        deporte: 'Yoga',
-        fecha: new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate() + 1, 18, 0),
-        hora: '18:00',
-        duracion: 60,
-        modalidad: 'online',
-        estado: 'PENDIENTE'
-      },
-      {
-        id: 6,
-        cliente: {
-          nombre: 'Javier Torres',
-          avatar: 'https://i.pravatar.cc/150?img=13'
-        },
-        deporte: 'Pilates',
-        fecha: new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate() + 2, 9, 0),
-        hora: '09:00',
-        duracion: 60,
-        modalidad: 'presencial',
-        estado: 'CONFIRMADA',
-        ubicacion: 'Estudio 2'
-      }
-    ];
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
 
-    // Filtrar sesiones de hoy
-    this.sesionesHoy = todasSesiones.filter(s => {
-      const fechaSesion = new Date(s.fecha);
-      return fechaSesion.getDate() === ahora.getDate() &&
-             fechaSesion.getMonth() === ahora.getMonth() &&
-             fechaSesion.getFullYear() === ahora.getFullYear();
+  cargarDatosFirebase(): void {
+    this.loading = true;
+
+    // Cargar estadísticas del dashboard
+    const statsSub = this.entrenadorFirebase.getDashboardStats().subscribe(stats => {
+      this.clientesActivos = stats.clientesActivos;
+      this.sesionesMes = stats.sesionesMes;
+      this.ingresosMes = stats.ingresosMes;
+      this.calificacionPromedio = stats.calificacion;
+      this.totalResenas = stats.totalResenas;
+      this.tasaAsistencia = stats.tasaAsistencia;
+      this.loading = false;
     });
+    this.subscriptions.push(statsSub);
 
-    // Próximas 6 sesiones
-    this.proximasSesiones = todasSesiones
-      .filter(s => s.fecha >= ahora)
-      .sort((a, b) => a.fecha.getTime() - b.fecha.getTime())
-      .slice(0, 6);
+    // Cargar resumen de ingresos semanales
+    const ingresosSub = this.entrenadorFirebase.getResumenIngresos().subscribe(resumen => {
+      this.ingresosSemanales = resumen.ingresosSemanales;
+    });
+    this.subscriptions.push(ingresosSub);
+
+    // Cargar sesiones de hoy
+    const hoySub = this.entrenadorFirebase.getSesionesHoy().subscribe(reservas => {
+      this.sesionesHoy = reservas.map(r => this.convertirReservaASesion(r));
+    });
+    this.subscriptions.push(hoySub);
+
+    // Cargar próximas sesiones
+    const proximasSub = this.entrenadorFirebase.getProximasSesiones(6).subscribe(reservas => {
+      this.proximasSesiones = reservas.map(r => this.convertirReservaASesion(r));
+    });
+    this.subscriptions.push(proximasSub);
+
+    // Cargar clientes
+    const clientesSub = this.entrenadorFirebase.getMisClientes().subscribe(clientes => {
+      this.ultimosClientes = clientes.slice(0, 4);
+    });
+    this.subscriptions.push(clientesSub);
+
+    // Cargar estadísticas mensuales
+    const estadsSub = this.entrenadorFirebase.getEstadisticasMensuales(4).subscribe(estadisticas => {
+      this.estadisticasMensuales = estadisticas;
+    });
+    this.subscriptions.push(estadsSub);
+
+    // Cargar reservas pendientes como notificaciones
+    const pendientesSub = this.entrenadorFirebase.getMisReservas('PENDIENTE').subscribe(reservas => {
+      this.notificacionesPendientes = reservas.length;
+    });
+    this.subscriptions.push(pendientesSub);
+  }
+
+  private convertirReservaASesion(r: Reserva): Sesion {
+    const fecha = r.fecha instanceof Date ? r.fecha : new Date((r.fecha as any)?.seconds * 1000);
+
+    return {
+      id: r.id || '',
+      cliente: {
+        id: r.clienteId,
+        nombre: r.clienteNombre,
+        avatar: 'assets/images/avatar-default.png'
+      },
+      deporte: (r as any).deporte || 'General',
+      fecha: fecha,
+      hora: fecha.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }),
+      duracion: r.duracion || 60,
+      modalidad: r.modalidad || 'presencial',
+      estado: r.estado as any,
+      ubicacion: r.ubicacion
+    };
   }
 
   verCliente(sesion: Sesion): void {
-    console.log('Ver cliente:', sesion.cliente.nombre);
-    this.router.navigate(['/pages/entrenador/mis-clientes']);
+    this.router.navigate(['/pages/entrenador/mis-clientes'], {
+      queryParams: { cliente: sesion.cliente.id }
+    });
   }
 
   irACalendario(): void {
@@ -207,15 +172,15 @@ export class EntrenadorDashboardComponent implements OnInit {
     const manana = new Date(hoy);
     manana.setDate(hoy.getDate() + 1);
 
-    if (fecha.getDate() === hoy.getDate() && 
-        fecha.getMonth() === hoy.getMonth() && 
-        fecha.getFullYear() === hoy.getFullYear()) {
+    if (fecha.getDate() === hoy.getDate() &&
+      fecha.getMonth() === hoy.getMonth() &&
+      fecha.getFullYear() === hoy.getFullYear()) {
       return 'Hoy';
     }
-    
-    if (fecha.getDate() === manana.getDate() && 
-        fecha.getMonth() === manana.getMonth() && 
-        fecha.getFullYear() === manana.getFullYear()) {
+
+    if (fecha.getDate() === manana.getDate() &&
+      fecha.getMonth() === manana.getMonth() &&
+      fecha.getFullYear() === manana.getFullYear()) {
       return 'Mañana';
     }
 
@@ -226,7 +191,8 @@ export class EntrenadorDashboardComponent implements OnInit {
   }
 
   getMaxEstadistica(tipo: 'sesiones' | 'ingresos'): number {
-    return Math.max(...this.estadisticasMensuales.map(e => tipo === 'sesiones' ? e.sesiones : e.ingresos));
+    if (this.estadisticasMensuales.length === 0) return 1;
+    return Math.max(...this.estadisticasMensuales.map(e => tipo === 'sesiones' ? e.sesiones : e.ingresos), 1);
   }
 
   getBarHeight(valor: number, tipo: 'sesiones' | 'ingresos'): number {
@@ -241,3 +207,4 @@ export class EntrenadorDashboardComponent implements OnInit {
     }).format(monto);
   }
 }
+

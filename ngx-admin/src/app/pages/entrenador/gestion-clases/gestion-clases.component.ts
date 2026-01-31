@@ -1,16 +1,18 @@
-import { Component, OnInit, TemplateRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, TemplateRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NbDialogService, NbToastrService } from '@nebular/theme';
+import { EntrenadorFirebaseService, Clase as ClaseFirebase } from '../../../@core/services/entrenador-firebase.service';
+import { Subscription } from 'rxjs';
 
 interface Clase {
-  id: number;
+  id: string;
   nombre: string;
   deporte: string;
   descripcion: string;
-  modalidad: 'presencial' | 'online' | 'ambas';
+  modalidad: 'presencial' | 'online' | 'ambos';
   duracion: number;
   precio: number;
-  cupo_maximo: number;
+  capacidad: number;
   ubicacion?: string;
   nivel: string;
   activa: boolean;
@@ -21,19 +23,24 @@ interface Clase {
   templateUrl: './gestion-clases.component.html',
   styleUrls: ['./gestion-clases.component.scss']
 })
-export class GestionClasesComponent implements OnInit {
+export class GestionClasesComponent implements OnInit, OnDestroy {
   claseForm: FormGroup;
   clases: Clase[] = [];
   claseEnEdicion: Clase | null = null;
   mostrarFormulario = false;
+  loading = true;
+  guardando = false;
 
   deportesDisponibles = ['Yoga', 'Pilates', 'CrossFit', 'Running', 'Natación', 'Boxeo', 'Ciclismo'];
   nivelesDisponibles = ['Principiante', 'Intermedio', 'Avanzado', 'Todos los niveles'];
 
+  private subscription: Subscription | null = null;
+
   constructor(
     private fb: FormBuilder,
     private dialogService: NbDialogService,
-    private toastrService: NbToastrService
+    private toastrService: NbToastrService,
+    private entrenadorFirebase: EntrenadorFirebaseService
   ) {
     this.claseForm = this.fb.group({
       nombre: ['', Validators.required],
@@ -41,8 +48,8 @@ export class GestionClasesComponent implements OnInit {
       descripcion: ['', [Validators.required, Validators.maxLength(300)]],
       modalidad: ['presencial', Validators.required],
       duracion: [60, [Validators.required, Validators.min(15)]],
-      precio: [30, [Validators.required, Validators.min(5)]],
-      cupo_maximo: [10, [Validators.required, Validators.min(1)]],
+      precio: [500, [Validators.required, Validators.min(50)]],
+      capacidad: [10, [Validators.required, Validators.min(1)]],
       ubicacion: [''],
       nivel: ['Todos los niveles', Validators.required],
       activa: [true]
@@ -53,47 +60,34 @@ export class GestionClasesComponent implements OnInit {
     this.cargarClases();
   }
 
+  ngOnDestroy(): void {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
+  }
+
   cargarClases(): void {
-    this.clases = [
-      {
-        id: 1,
-        nombre: 'Yoga Integral',
-        deporte: 'Yoga',
-        descripcion: 'Sesión completa de yoga para todos los niveles, enfocada en flexibilidad y relajación.',
-        modalidad: 'ambas',
-        duracion: 60,
-        precio: 30,
-        cupo_maximo: 12,
-        ubicacion: 'Estudio Central',
-        nivel: 'Todos los niveles',
-        activa: true
-      },
-      {
-        id: 2,
-        nombre: 'CrossFit Intenso',
-        deporte: 'CrossFit',
-        descripcion: 'Entrenamiento de alta intensidad para mejorar resistencia y fuerza.',
-        modalidad: 'presencial',
-        duracion: 90,
-        precio: 45,
-        cupo_maximo: 8,
-        ubicacion: 'Box Principal',
-        nivel: 'Avanzado',
-        activa: true
-      },
-      {
-        id: 3,
-        nombre: 'Pilates Online',
-        deporte: 'Pilates',
-        descripcion: 'Clase online de pilates mat work, ideal para fortalecer el core.',
-        modalidad: 'online',
-        duracion: 50,
-        precio: 25,
-        cupo_maximo: 20,
-        nivel: 'Intermedio',
-        activa: true
-      }
-    ];
+    this.loading = true;
+    this.subscription = this.entrenadorFirebase.getMisClases().subscribe(clases => {
+      this.clases = clases.map(c => this.convertirClase(c));
+      this.loading = false;
+    });
+  }
+
+  private convertirClase(c: ClaseFirebase): Clase {
+    return {
+      id: c.id || '',
+      nombre: c.nombre,
+      deporte: c.deporte,
+      descripcion: c.descripcion,
+      modalidad: c.modalidad,
+      duracion: c.duracion,
+      precio: c.precio,
+      capacidad: c.capacidad,
+      ubicacion: '',
+      nivel: 'Todos los niveles',
+      activa: c.activa
+    };
   }
 
   nuevaClase(): void {
@@ -101,8 +95,8 @@ export class GestionClasesComponent implements OnInit {
     this.claseForm.reset({
       modalidad: 'presencial',
       duracion: 60,
-      precio: 30,
-      cupo_maximo: 10,
+      precio: 500,
+      capacidad: 10,
       nivel: 'Todos los niveles',
       activa: true
     });
@@ -115,7 +109,7 @@ export class GestionClasesComponent implements OnInit {
     this.mostrarFormulario = true;
   }
 
-  guardarClase(): void {
+  async guardarClase(): Promise<void> {
     if (this.claseForm.invalid) {
       Object.keys(this.claseForm.controls).forEach(key => {
         this.claseForm.get(key)?.markAsTouched();
@@ -124,22 +118,47 @@ export class GestionClasesComponent implements OnInit {
     }
 
     const formValue = this.claseForm.value;
+    this.guardando = true;
 
     if (this.claseEnEdicion) {
-      const index = this.clases.findIndex(c => c.id === this.claseEnEdicion!.id);
-      if (index !== -1) {
-        this.clases[index] = { ...this.clases[index], ...formValue };
-        this.toastrService.success('Clase actualizada correctamente', 'Éxito');
+      // Editar clase existente
+      const result = await this.entrenadorFirebase.actualizarClase(this.claseEnEdicion.id, {
+        nombre: formValue.nombre,
+        deporte: formValue.deporte,
+        descripcion: formValue.descripcion,
+        modalidad: formValue.modalidad,
+        duracion: formValue.duracion,
+        precio: formValue.precio,
+        capacidad: formValue.capacidad,
+        activa: formValue.activa
+      });
+
+      if (result.success) {
+        this.toastrService.success(result.message, 'Éxito');
+      } else {
+        this.toastrService.danger(result.message, 'Error');
       }
     } else {
-      const nuevaClase: Clase = {
-        id: Math.max(...this.clases.map(c => c.id), 0) + 1,
-        ...formValue
-      };
-      this.clases.unshift(nuevaClase);
-      this.toastrService.success('Clase creada correctamente', 'Éxito');
+      // Nueva clase
+      const result = await this.entrenadorFirebase.crearClase({
+        nombre: formValue.nombre,
+        deporte: formValue.deporte,
+        descripcion: formValue.descripcion,
+        modalidad: formValue.modalidad,
+        duracion: formValue.duracion,
+        precio: formValue.precio,
+        capacidad: formValue.capacidad,
+        activa: formValue.activa
+      });
+
+      if (result.success) {
+        this.toastrService.success(result.message, 'Éxito');
+      } else {
+        this.toastrService.danger(result.message, 'Error');
+      }
     }
 
+    this.guardando = false;
     this.cancelarFormulario();
   }
 
@@ -148,18 +167,29 @@ export class GestionClasesComponent implements OnInit {
     this.dialogService.open(dialog, { context: clase });
   }
 
-  confirmarEliminar(ref: any): void {
+  async confirmarEliminar(ref: any): Promise<void> {
     if (this.claseEnEdicion) {
-      this.clases = this.clases.filter(c => c.id !== this.claseEnEdicion!.id);
-      this.toastrService.success('Clase eliminada correctamente', 'Éxito');
+      const result = await this.entrenadorFirebase.eliminarClase(this.claseEnEdicion.id);
+      if (result.success) {
+        this.toastrService.success(result.message, 'Éxito');
+      } else {
+        this.toastrService.danger(result.message, 'Error');
+      }
     }
     ref.close();
   }
 
-  toggleActiva(clase: Clase): void {
-    clase.activa = !clase.activa;
-    const estado = clase.activa ? 'activada' : 'desactivada';
-    this.toastrService.info(`Clase ${estado}`, 'Información');
+  async toggleActiva(clase: Clase): Promise<void> {
+    const result = await this.entrenadorFirebase.actualizarClase(clase.id, {
+      activa: !clase.activa
+    });
+
+    if (result.success) {
+      const estado = !clase.activa ? 'activada' : 'desactivada';
+      this.toastrService.info(`Clase ${estado}`, 'Información');
+    } else {
+      this.toastrService.danger(result.message, 'Error');
+    }
   }
 
   cancelarFormulario(): void {
@@ -172,3 +202,4 @@ export class GestionClasesComponent implements OnInit {
     return this.claseForm.get('descripcion')?.value?.length || 0;
   }
 }
+

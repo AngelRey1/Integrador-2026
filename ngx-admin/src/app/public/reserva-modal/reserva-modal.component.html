@@ -1,10 +1,30 @@
 <div class="reserva-page-container">
-  <div class="reserva-card">
+  <!-- Estado de carga -->
+  <div class="reserva-card" *ngIf="cargandoEntrenador">
+    <div class="loading-state">
+      <nb-spinner status="primary" size="large"></nb-spinner>
+      <p>Cargando información del entrenador...</p>
+    </div>
+  </div>
+
+  <!-- Entrenador no encontrado -->
+  <div class="reserva-card" *ngIf="!cargandoEntrenador && !entrenador">
+    <div class="error-state">
+      <nb-icon icon="alert-circle-outline" style="font-size: 3rem; color: #ff3d71;"></nb-icon>
+      <h3>Entrenador no encontrado</h3>
+      <p>El entrenador que buscas no existe o no está disponible.</p>
+      <button nbButton status="primary" (click)="router.navigate(['/entrenadores'])">
+        Ver otros entrenadores
+      </button>
+    </div>
+  </div>
+
+  <div class="reserva-card" *ngIf="!cargandoEntrenador && entrenador">
     <!-- Header con botón cerrar -->
     <div class="header-wrapper">
       <div>
-        <h2 class="titulo-modal">Reservar con {{ entrenador?.nombre }}</h2>
-        <p class="subtitulo-modal">{{ entrenador?.deporte }}</p>
+        <h2 class="titulo-modal">Reservar con {{ entrenador?.nombre }} {{ entrenador?.apellidoPaterno }}</h2>
+        <p class="subtitulo-modal">{{ entrenador?.deportes?.join(', ') || 'Entrenador' }}</p>
       </div>
       <button class="btn-close" (click)="cerrar()" title="Volver">
         <nb-icon icon="close-outline"></nb-icon>
@@ -42,7 +62,11 @@
           <!-- Selector de Horarios Visual -->
           <div class="form-group">
             <label>Horarios Disponibles *</label>
-            <div class="horarios-grid">
+            <div *ngIf="cargandoHorarios" class="loading-horarios">
+              <nb-spinner status="primary" size="small"></nb-spinner>
+              <span>Cargando disponibilidad...</span>
+            </div>
+            <div class="horarios-grid" *ngIf="!cargandoHorarios">
               <div *ngFor="let h of horariosDisponibles" class="horario-chip"
                 [class.selected]="paso1Form.get('hora')?.value === h.hora" [class.disabled]="!h.disponible"
                 (click)="h.disponible ? paso1Form.patchValue({hora: h.hora}) : null">

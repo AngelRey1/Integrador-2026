@@ -7,6 +7,8 @@ import { map, takeUntil, filter } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { AuthService } from '../../../@core/services/auth.service';
 import { Router } from '@angular/router';
+import { NotificacionesFirebaseService, Notificacion } from '../../../@core/services/notificaciones-firebase.service';
+import { CloudinaryService } from '../../../@core/services/cloudinary.service';
 
 @Component({
   selector: 'ngx-header',
@@ -19,6 +21,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
   userPictureOnly: boolean = false;
   user: any;
   currentRole: string = 'cliente';
+
+  // Notificaciones
+  notificaciones: Notificacion[] = [];
+  notificacionesNoLeidas: number = 0;
+  mostrarNotificaciones: boolean = false;
 
   themes = [
     {
@@ -46,15 +53,18 @@ export class HeaderComponent implements OnInit, OnDestroy {
     { title: 'Cerrar Sesión', data: { action: 'logout' } },
   ];
 
-  constructor(private sidebarService: NbSidebarService,
-              private menuService: NbMenuService,
-              private themeService: NbThemeService,
-              private userService: UserData,
-              private layoutService: LayoutService,
-              private breakpointService: NbMediaBreakpointsService,
-              private authService: AuthService,
-              private router: Router) {
-  }
+  constructor(
+    private sidebarService: NbSidebarService,
+    private menuService: NbMenuService,
+    private themeService: NbThemeService,
+    private userService: UserData,
+    private layoutService: LayoutService,
+    private breakpointService: NbMediaBreakpointsService,
+    private authService: AuthService,
+    private router: Router,
+    private notificacionesService: NotificacionesFirebaseService,
+    private cloudinaryService: CloudinaryService
+  ) { }
 
   ngOnInit() {
     this.currentTheme = this.themeService.currentTheme;
@@ -63,26 +73,24 @@ export class HeaderComponent implements OnInit, OnDestroy {
     // Obtener nombre de usuario o email del token para mostrar en el header
     let nombreUsuario = '';
     let email = '';
-    
+
     try {
       nombreUsuario = this.authService.getNombreUsuario() || '';
       email = this.authService.getEmail() || '';
     } catch (e) {
       console.warn('Error obteniendo datos de usuario:', e);
     }
-    
+
     const displayName = nombreUsuario || email || 'Usuario';
-    
-    // Generar una foto consistente basada en el nombre de usuario o email
-    const seed = nombreUsuario || email || 'usuario';
-    const fotoId = this.generarFotoIdHombre(seed);
-    
-    // Configurar el usuario con el nombre/email del token y foto estática
-    // Usar UI Avatars como respaldo confiable que genera avatares basados en iniciales
+
+    // Usar CloudinaryService para obtener avatar
     this.user = {
       name: displayName,
-      picture: `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=00d68f&color=fff&size=128&bold=true`
+      picture: this.cloudinaryService.getDefaultAvatarUrl(displayName, 128)
     };
+
+    // Cargar notificaciones en tiempo real
+    this.cargarNotificaciones();
 
     const { xl } = this.breakpointService.getBreakpointsMap();
     this.themeService.onMediaQueryChange()
@@ -107,13 +115,63 @@ export class HeaderComponent implements OnInit, OnDestroy {
       )
       .subscribe((event: any) => {
         const action = event.item?.data?.action;
-        
+
         if (action === 'logout') {
           this.logout();
         } else if (action === 'profile') {
           this.goToProfile();
         }
       });
+  }
+
+  cargarNotificaciones(): void {
+    // Escuchar notificaciones en tiempo real
+    this.notificacionesService.getMisNotificaciones()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(notificaciones => {
+        this.notificaciones = notificaciones;
+      });
+
+    // Contar no leídas
+    this.notificacionesService.contarNoLeidas()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(count => {
+        this.notificacionesNoLeidas = count;
+      });
+  }
+
+  toggleNotificaciones(): void {
+    this.mostrarNotificaciones = !this.mostrarNotificaciones;
+  }
+
+  cerrarNotificaciones(): void {
+    this.mostrarNotificaciones = false;
+  }
+
+  async marcarComoLeida(notificacion: Notificacion): Promise<void> {
+    if (notificacion.id && !notificacion.leida) {
+      await this.notificacionesService.marcarComoLeida(notificacion.id);
+    }
+  }
+
+  async marcarTodasComoLeidas(): Promise<void> {
+    await this.notificacionesService.marcarTodasComoLeidas();
+  }
+
+  formatearFecha(fecha: Date): string {
+    return this.notificacionesService.formatearFechaRelativa(fecha);
+  }
+
+  getIconoNotificacion(tipo: string): string {
+    const iconos: { [key: string]: string } = {
+      'NUEVA_RESERVA': 'calendar-outline',
+      'RESERVA_CONFIRMADA': 'checkmark-circle-outline',
+      'RESERVA_CANCELADA': 'close-circle-outline',
+      'NUEVA_RESENA': 'star-outline',
+      'PAGO_RECIBIDO': 'credit-card-outline',
+      'GENERAL': 'bell-outline'
+    };
+    return iconos[tipo] || 'bell-outline';
   }
 
   ngOnDestroy() {
@@ -153,25 +211,5 @@ export class HeaderComponent implements OnInit, OnDestroy {
       this.router.navigate(['/pages/cliente/perfil']);
     }
   }
-
-  // Generar un ID de foto consistente de HOMBRE basado en el nombre de usuario o email
-  // Usa solo IDs específicos que son fotos de hombres en pravatar.cc
-  private generarFotoIdHombre(texto: string): number {
-    // IDs conocidos de fotos de hombres en pravatar.cc (1-70, pero seleccionamos solo hombres)
-    const idsHombres = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-                       21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
-                       41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60,
-                       61, 62, 63, 64, 65, 66, 67, 68, 69, 70];
-    
-    let hash = 0;
-    for (let i = 0; i < texto.length; i++) {
-      const char = texto.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash = hash & hash; // Convertir a 32bit integer
-    }
-    // Seleccionar un ID de la lista de hombres usando el hash
-    const indice = Math.abs(hash % idsHombres.length);
-    return idsHombres[indice];
-  }
-
 }
+

@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AuthService } from '../../@core/services/auth.service';
+import { AuthFirebaseService } from '../../@core/services/auth-firebase.service';
 import { Router, ActivatedRoute } from '@angular/router';
-import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'ngx-login',
@@ -14,15 +13,16 @@ import { finalize } from 'rxjs/operators';
         
         <form [formGroup]="form" (ngSubmit)="submit()">
           <div style="margin-bottom: 20px;">
-            <label style="display: block; margin-bottom: 5px; font-weight: 500; color: #2c3e50;">Email o Nombre de Usuario *</label>
+            <label style="display: block; margin-bottom: 5px; font-weight: 500; color: #2c3e50;">Email *</label>
             <input 
-              type="text" 
+              type="email" 
               formControlName="email" 
-              placeholder="tu@email.com o nombre_usuario"
+              placeholder="tu@email.com"
               style="width: 100%; padding: 10px; border: 1px solid #e4e9f2; border-radius: 4px; font-size: 1rem; box-sizing: border-box;"
             />
             <small style="color: red; font-size: 0.85rem;" *ngIf="form.get('email')?.invalid && form.get('email')?.touched">
-              <span *ngIf="form.get('email')?.errors?.['required']">El email o nombre de usuario es requerido</span>
+              <span *ngIf="form.get('email')?.errors?.['required']">El email es requerido</span>
+              <span *ngIf="form.get('email')?.errors?.['email']">Email no válido</span>
             </small>
           </div>
 
@@ -30,13 +30,13 @@ import { finalize } from 'rxjs/operators';
             <label style="display: block; margin-bottom: 5px; font-weight: 500; color: #2c3e50;">Contraseña</label>
             <input 
               type="password" 
-              formControlName="contrasena" 
+              formControlName="password" 
               placeholder="••••••••"
               style="width: 100%; padding: 10px; border: 1px solid #e4e9f2; border-radius: 4px; font-size: 1rem; box-sizing: border-box;"
             />
-            <small style="color: red; font-size: 0.85rem;" *ngIf="form.get('contrasena')?.invalid && form.get('contrasena')?.touched">
-              <span *ngIf="form.get('contrasena')?.errors?.['required']">La contraseña es requerida</span>
-              <span *ngIf="form.get('contrasena')?.errors?.['minlength']">Mínimo 6 caracteres</span>
+            <small style="color: red; font-size: 0.85rem;" *ngIf="form.get('password')?.invalid && form.get('password')?.touched">
+              <span *ngIf="form.get('password')?.errors?.['required']">La contraseña es requerida</span>
+              <span *ngIf="form.get('password')?.errors?.['minlength']">Mínimo 6 caracteres</span>
             </small>
           </div>
 
@@ -58,20 +58,14 @@ import { finalize } from 'rxjs/operators';
                 </div>
               </label>
             </div>
-            <small style="color: red; font-size: 0.85rem; margin-top: 5px; display: block;" *ngIf="form.get('rol')?.invalid && form.get('rol')?.touched">
-              <span *ngIf="form.get('rol')?.errors?.['required']">Debes seleccionar un rol</span>
-            </small>
-          </div>
-
-          <div style="margin-bottom: 20px;">
-            <label style="display: flex; align-items: center; cursor: pointer;">
-              <input type="checkbox" formControlName="recordar" style="margin-right: 8px;" />
-              <span>Recordar sesión</span>
-            </label>
           </div>
 
           <div style="color: red; margin-bottom: 15px; padding: 10px; background: #fff5f5; border: 1px solid #ff6b6b; border-radius: 4px;" *ngIf="errorMessage">
             {{ errorMessage }}
+          </div>
+
+          <div style="color: #22c55e; margin-bottom: 15px; padding: 10px; background: #f0fdf4; border: 1px solid #22c55e; border-radius: 4px;" *ngIf="successMessage">
+            {{ successMessage }}
           </div>
 
           <button 
@@ -83,6 +77,12 @@ import { finalize } from 'rxjs/operators';
           >
             {{ loading ? 'Iniciando sesión...' : 'Iniciar Sesión' }}
           </button>
+
+          <div style="text-align: center; margin-bottom: 15px;">
+            <a (click)="forgotPassword()" style="color: #667eea; text-decoration: none; font-size: 0.9rem; cursor: pointer;">
+              ¿Olvidaste tu contraseña?
+            </a>
+          </div>
 
           <div style="text-align: center; padding-top: 20px; border-top: 1px solid #e4e9f2;">
             <p style="margin: 0; color: #7b8a8b; font-size: 0.9rem;">
@@ -98,55 +98,43 @@ export class LoginComponent implements OnInit {
   form: FormGroup;
   loading = false;
   errorMessage = '';
+  successMessage = '';
 
   constructor(
-    private fb: FormBuilder, 
-    private auth: AuthService, 
+    private fb: FormBuilder,
+    private authFirebase: AuthFirebaseService,
     private router: Router,
     private route: ActivatedRoute
   ) {
-    // Inicializar formulario en el constructor para evitar problemas de timing
-    // El campo email puede ser email o nombre de usuario
-    // Y un selector de rol para elegir cómo entrar
     this.form = this.fb.group({
-      email: ['', [Validators.required]], // Puede ser email o nombreUsuario
-      nombreUsuario: [''], // Se llenará automáticamente si se ingresa email
-      contrasena: ['', [Validators.required, Validators.minLength(6)]],
-      rol: ['CLIENTE', [Validators.required]], // Selector de rol: CLIENTE, ENTRENADOR o ADMIN
-      recordar: [false]
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      rol: ['CLIENTE', [Validators.required]]
     });
   }
 
   ngOnInit() {
     // Verificar si hay parámetros de query (viene del registro)
     this.route.queryParams.subscribe(params => {
-      const email = params['email'];
-      const nombreUsuario = params['nombreUsuario'];
-      
-      if (email) {
-        this.form.patchValue({ email: email });
+      if (params['email']) {
+        this.form.patchValue({ email: params['email'] });
       }
-      if (nombreUsuario) {
-        // Limpiar mensajes de error si viene del registro
-        this.errorMessage = '';
+      if (params['registered']) {
+        this.successMessage = '¡Registro exitoso! Ya puedes iniciar sesión.';
+      }
+      if (params['pending']) {
+        this.successMessage = 'Tu cuenta de entrenador está pendiente de aprobación.';
       }
     });
 
-    // Verificar si ya está autenticado después de un pequeño delay
-    setTimeout(() => {
-      try {
-        if (this.auth && this.auth.token) {
-          this.redirectByRole();
-        }
-      } catch (error) {
-        console.warn('Error verificando autenticación:', error);
-      }
-    }, 300);
+    // Verificar si ya está autenticado
+    if (this.authFirebase.isAuthenticated()) {
+      this.redirectByRole();
+    }
   }
 
-  submit() {
+  async submit() {
     if (this.form.invalid) {
-      // Marcar todos los campos como touched para mostrar errores
       Object.keys(this.form.controls).forEach(key => {
         this.form.get(key)?.markAsTouched();
       });
@@ -155,68 +143,59 @@ export class LoginComponent implements OnInit {
 
     this.loading = true;
     this.errorMessage = '';
+    this.successMessage = '';
 
-    // Preparar datos para login: el campo email puede contener email o nombreUsuario
-    const loginData = {
-      email: this.form.value.email.trim(),
-      nombreUsuario: this.form.value.email.trim(), // Usar el mismo valor para ambos
-      contrasena: this.form.value.contrasena,
-      rol: this.form.value.rol
-    };
+    const { email, password, rol } = this.form.value;
 
-    // El servicio ahora maneja automáticamente el fallback a localStorage
-    this.auth.login(loginData).pipe(
-      finalize(() => this.loading = false)
-    ).subscribe({
-      next: (res: any) => {
-        // Esperar un momento para que el token se guarde
-        setTimeout(() => {
-          this.redirectByRole();
-        }, 100);
-      },
-      error: (error) => {
-        // Manejar errores especiales de estado
-        if (error.code === 'PENDING_APPROVAL') {
-          this.router.navigate(['/auth/pendiente-aprobacion']);
-          return;
-        }
-        
-        if (error.code === 'ACCOUNT_REJECTED') {
-          this.router.navigate(['/auth/solicitud-rechazada']);
-          return;
-        }
-        
-        this.errorMessage = error.message || 'Error al iniciar sesión. Verifica tus credenciales y el rol seleccionado.';
-        console.error('Error en login:', error);
-      }
-    });
+    const result = await this.authFirebase.login(email, password, rol);
+
+    this.loading = false;
+
+    if (result.success) {
+      this.redirectByRole();
+    } else {
+      this.errorMessage = result.message;
+    }
+  }
+
+  async forgotPassword() {
+    const email = this.form.get('email')?.value;
+
+    if (!email) {
+      this.errorMessage = 'Ingresa tu email primero';
+      return;
+    }
+
+    this.loading = true;
+    const result = await this.authFirebase.resetPassword(email);
+    this.loading = false;
+
+    if (result.success) {
+      this.successMessage = result.message;
+      this.errorMessage = '';
+    } else {
+      this.errorMessage = result.message;
+    }
   }
 
   private redirectByRole() {
-    const role = this.auth.getRole();
-    
+    const role = this.authFirebase.getRole();
+
     if (!role) {
-      // Si no hay rol, redirigir al login
-      this.router.navigate(['/auth/login']);
       return;
     }
-    
-    // Normalizar el rol a minúsculas para comparación
+
     const roleLower = role.toLowerCase();
-    
-    // Redirigir según el rol del usuario autenticado
-    // El rol se obtiene automáticamente del token JWT
-    if (roleLower === 'cliente' || roleLower === 'client') {
+
+    if (roleLower === 'cliente') {
       this.router.navigate(['/pages/cliente/dashboard']);
-    } else if (roleLower === 'entrenador' || roleLower === 'trainer') {
+    } else if (roleLower === 'entrenador') {
       this.router.navigate(['/pages/entrenador/dashboard']);
-    } else if (roleLower === 'admin' || roleLower === 'administrador' || roleLower === 'administrator') {
-      // Los admins acceden a sportconnect-admin en puerto 4300
+    } else if (roleLower === 'admin') {
       window.location.href = 'http://localhost:4300/admin/dashboard';
     } else {
-      // Si el rol no es reconocido, redirigir a cliente por defecto
       this.router.navigate(['/pages/cliente/dashboard']);
     }
   }
-
 }
+

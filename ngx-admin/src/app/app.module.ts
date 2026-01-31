@@ -24,6 +24,12 @@ import { JwtInterceptor } from './@core/interceptors/jwt.interceptor';
 import { ErrorInterceptor } from './@core/interceptors/error.interceptor';
 import { AuthModule } from './auth/auth.module';
 
+// Firebase Imports
+import { AngularFireModule } from '@angular/fire/compat';
+import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
+import { AngularFireAuthModule } from '@angular/fire/compat/auth';
+import { environment } from '../environments/environment';
+
 @NgModule({
   declarations: [AppComponent],
   imports: [
@@ -32,6 +38,12 @@ import { AuthModule } from './auth/auth.module';
     HttpClientModule,
     AppRoutingModule,
     AuthModule,
+
+    // Firebase Modules
+    AngularFireModule.initializeApp(environment.firebase),
+    AngularFirestoreModule,
+    AngularFireAuthModule,
+
     // Nebular Modules
     NbSidebarModule.forRoot(),
     NbMenuModule.forRoot(),

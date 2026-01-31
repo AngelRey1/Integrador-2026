@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogModule } from '@angular/material/dialog';
-import { NbLayoutModule, NbIconModule } from '@nebular/theme';
+import { NbLayoutModule, NbIconModule, NbSpinnerModule, NbButtonModule } from '@nebular/theme';
 import { NbEvaIconsModule } from '@nebular/eva-icons';
 import { EntrenadoresListComponent } from '../entrenadores-list/entrenadores-list.component';
 import { EntrenadorPerfilComponent } from '../entrenador-perfil/entrenador-perfil.component';
@@ -24,6 +24,8 @@ import { SportIconsModule } from '../../@theme/components/sport-icons/sport-icon
     MatDialogModule,
     NbLayoutModule,
     NbIconModule,
+    NbSpinnerModule,
+    NbButtonModule,
     NbEvaIconsModule,
     ClientRoutingModule,
     SharedModule,

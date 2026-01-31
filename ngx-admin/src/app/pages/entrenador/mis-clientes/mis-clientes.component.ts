@@ -1,14 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { EntrenadorFirebaseService, ClienteResumen } from '../../../@core/services/entrenador-firebase.service';
+import { Subscription } from 'rxjs';
 
 interface Cliente {
-  id: number;
+  id: string;
   nombre: string;
   avatar: string;
   email: string;
   telefono: string;
   sesiones_totales: number;
   sesiones_completadas: number;
-  ultima_sesion: Date;
+  ultima_sesion: Date | null;
   notas: string;
 }
 
@@ -17,35 +20,60 @@ interface Cliente {
   templateUrl: './mis-clientes.component.html',
   styleUrls: ['./mis-clientes.component.scss']
 })
-export class MisClientesComponent implements OnInit {
+export class MisClientesComponent implements OnInit, OnDestroy {
   clientes: Cliente[] = [];
   filtro = '';
+  loading = true;
+  clienteSeleccionado: string | null = null;
+
+  private subscription: Subscription | null = null;
+
+  constructor(
+    private route: ActivatedRoute,
+    private entrenadorFirebase: EntrenadorFirebaseService
+  ) { }
 
   ngOnInit(): void {
-    this.clientes = [
-      {
-        id: 1,
-        nombre: 'María González',
-        avatar: 'https://i.pravatar.cc/150?img=5',
-        email: 'maria@example.com',
-        telefono: '+34 612 345 678',
-        sesiones_totales: 24,
-        sesiones_completadas: 22,
-        ultima_sesion: new Date(2025, 10, 10),
-        notas: 'Cliente regular, muy comprometida'
-      },
-      {
-        id: 2,
-        nombre: 'Carlos Ruiz',
-        avatar: 'https://i.pravatar.cc/150?img=12',
-        email: 'carlos@example.com',
-        telefono: '+34 623 456 789',
-        sesiones_totales: 18,
-        sesiones_completadas: 17,
-        ultima_sesion: new Date(2025, 10, 8),
-        notas: 'Enfoque en fuerza'
-      }
-    ];
+    // Verificar si hay un cliente específico en query params
+    this.route.queryParams.subscribe(params => {
+      this.clienteSeleccionado = params['cliente'] || null;
+    });
+
+    this.cargarClientes();
+  }
+
+  ngOnDestroy(): void {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
+  }
+
+  cargarClientes(): void {
+    this.loading = true;
+    this.subscription = this.entrenadorFirebase.getMisClientes().subscribe(clientes => {
+      this.clientes = clientes.map(c => this.convertirCliente(c));
+      this.loading = false;
+    });
+  }
+
+  private convertirCliente(c: ClienteResumen): Cliente {
+    const ultimaSesion = c.ultimaSesion instanceof Date
+      ? c.ultimaSesion
+      : c.ultimaSesion
+        ? new Date((c.ultimaSesion as any)?.seconds * 1000)
+        : null;
+
+    return {
+      id: c.clienteId,
+      nombre: c.nombre,
+      avatar: c.foto || 'assets/images/avatar-default.png',
+      email: '', // No disponible en resumen
+      telefono: '', // No disponible en resumen
+      sesiones_totales: c.sesiones,
+      sesiones_completadas: c.sesiones,
+      ultima_sesion: ultimaSesion,
+      notas: ''
+    };
   }
 
   get clientesFiltrados(): Cliente[] {
@@ -57,6 +85,17 @@ export class MisClientesComponent implements OnInit {
   }
 
   getTasaAsistencia(cliente: Cliente): number {
+    if (cliente.sesiones_totales === 0) return 100;
     return Math.round((cliente.sesiones_completadas / cliente.sesiones_totales) * 100);
   }
+
+  formatearFecha(fecha: Date | null): string {
+    if (!fecha) return 'Sin sesiones';
+    return new Intl.DateTimeFormat('es-MX', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    }).format(fecha);
+  }
 }
+

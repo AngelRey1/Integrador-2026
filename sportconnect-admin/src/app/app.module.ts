@@ -3,11 +3,19 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule } from '@angular/common/http';
 
-import { NbThemeModule, NbLayoutModule, NbSidebarModule, NbMenuModule, 
-         NbCardModule, NbIconModule, NbButtonModule, NbToastrModule,
-         NbDialogModule, NbWindowModule, NbActionsModule, NbUserModule,
-         NbContextMenuModule, NbSearchModule, NbTooltipModule, NbBadgeModule } from '@nebular/theme';
+import {
+  NbThemeModule, NbLayoutModule, NbSidebarModule, NbMenuModule,
+  NbCardModule, NbIconModule, NbButtonModule, NbToastrModule,
+  NbDialogModule, NbWindowModule, NbActionsModule, NbUserModule,
+  NbContextMenuModule, NbSearchModule, NbTooltipModule, NbBadgeModule
+} from '@nebular/theme';
 import { NbEvaIconsModule } from '@nebular/eva-icons';
+
+// Firebase
+import { AngularFireModule } from '@angular/fire/compat';
+import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
+import { AngularFireAuthModule } from '@angular/fire/compat/auth';
+import { environment } from '../environments/environment';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -23,7 +31,12 @@ import { SharedModule } from './shared/shared.module';
     BrowserAnimationsModule,
     HttpClientModule,
     AppRoutingModule,
-    
+
+    // Firebase
+    AngularFireModule.initializeApp(environment.firebase),
+    AngularFirestoreModule,
+    AngularFireAuthModule,
+
     // Nebular Theme
     NbThemeModule.forRoot({ name: 'corporate' }),
     NbLayoutModule,
@@ -33,7 +46,7 @@ import { SharedModule } from './shared/shared.module';
     NbDialogModule.forRoot(),
     NbWindowModule.forRoot(),
     NbEvaIconsModule,
-    
+
     // Nebular UI Components
     NbCardModule,
     NbIconModule,
@@ -44,7 +57,7 @@ import { SharedModule } from './shared/shared.module';
     NbSearchModule,
     NbTooltipModule,
     NbBadgeModule,
-    
+
     CoreModule,
     SharedModule
   ],
@@ -52,3 +65,4 @@ import { SharedModule } from './shared/shared.module';
   bootstrap: [AppComponent]
 })
 export class AppModule { }
+

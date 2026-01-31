@@ -1,9 +1,14 @@
-import { Component, OnInit, TemplateRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, TemplateRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { NbDialogService } from '@nebular/theme';
+import { ActivatedRoute } from '@angular/router';
+import { NbDialogService, NbToastrService } from '@nebular/theme';
+import { ClienteFirebaseService, Review } from '../../../@core/services/cliente-firebase.service';
+import { Subscription } from 'rxjs';
 
 interface Resena {
-  id: number;
+  id: string;
+  entrenadorId: string;
+  reservaId: string;
   entrenador: {
     nombre: string;
     avatar: string;
@@ -28,19 +33,24 @@ interface Resena {
   templateUrl: './mis-resenas.component.html',
   styleUrls: ['./mis-resenas.component.scss']
 })
-export class MisResenasComponent implements OnInit {
+export class MisResenasComponent implements OnInit, OnDestroy {
   resenaForm: FormGroup;
   resenas: Resena[] = [];
   resenasFiltradas: Resena[] = [];
   resenaEnEdicion: Resena | null = null;
-  
+  loading = true;
+
   // Estados
   mostrarFormulario = false;
   cargando = false;
-  
+
   // Filtros
   filtroBusqueda = '';
   filtroCalificacion = 0;
+
+  // Para nueva reseña desde query params
+  entrenadorIdNuevo: string | null = null;
+  sesionIdNueva: string | null = null;
 
   // Opciones de filtro
   calificacionesDisponibles = [
@@ -51,6 +61,8 @@ export class MisResenasComponent implements OnInit {
     { value: 2, label: '⭐⭐ (2 estrellas)' },
     { value: 1, label: '⭐ (1 estrella)' }
   ];
+
+  private subscription: Subscription | null = null;
 
   // Estadísticas
   get totalResenas(): number {
@@ -69,7 +81,10 @@ export class MisResenasComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private dialogService: NbDialogService
+    private route: ActivatedRoute,
+    private dialogService: NbDialogService,
+    private toastr: NbToastrService,
+    private clienteFirebase: ClienteFirebaseService
   ) {
     this.resenaForm = this.fb.group({
       calificacion: [0, [Validators.required, Validators.min(1), Validators.max(5)]],
@@ -78,83 +93,58 @@ export class MisResenasComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Verificar query params para nueva reseña
+    this.route.queryParams.subscribe(params => {
+      if (params['nueva'] === 'true') {
+        this.entrenadorIdNuevo = params['entrenadorId'] || null;
+        this.sesionIdNueva = params['sesion'] || null;
+        // Abrir formulario automáticamente
+        setTimeout(() => this.nuevaResena(), 500);
+      }
+    });
+
     this.cargarResenas();
   }
 
-  cargarResenas(): void {
-    // Mock data - reemplazar con servicio real
-    this.resenas = [
-      {
-        id: 1,
-        entrenador: {
-          nombre: 'Ana Pérez García',
-          avatar: 'https://i.pravatar.cc/150?img=1',
-          especialidad: 'Yoga & Pilates'
-        },
-        sesion: {
-          fecha: new Date(2026, 1, 10),
-          deporte: 'Yoga'
-        },
-        calificacion: 5,
-        comentario: 'Excelente entrenadora, muy profesional y atenta. Las sesiones son dinámicas y efectivas.',
-        fecha_creacion: new Date(2026, 1, 11),
-        respuesta_entrenador: {
-          texto: '¡Muchas gracias por tus palabras! Es un placer trabajar contigo.',
-          fecha: new Date(2026, 1, 12)
-        }
-      },
-      {
-        id: 2,
-        entrenador: {
-          nombre: 'Carlos Ruiz López',
-          avatar: 'https://i.pravatar.cc/150?img=12',
-          especialidad: 'CrossFit & HIIT'
-        },
-        sesion: {
-          fecha: new Date(2026, 1, 5),
-          deporte: 'CrossFit'
-        },
-        calificacion: 4,
-        comentario: 'Muy buenos entrenamientos, aunque a veces un poco intensos para principiantes.',
-        fecha_creacion: new Date(2026, 1, 6)
-      },
-      {
-        id: 3,
-        entrenador: {
-          nombre: 'María González',
-          avatar: 'https://i.pravatar.cc/150?img=5',
-          especialidad: 'Running & Atletismo'
-        },
-        sesion: {
-          fecha: new Date(2026, 0, 28),
-          deporte: 'Running'
-        },
-        calificacion: 5,
-        comentario: 'Súper recomendada. Me ayudó a mejorar mi técnica de carrera significativamente.',
-        fecha_creacion: new Date(2026, 0, 29),
-        respuesta_entrenador: {
-          texto: 'Gracias por tu confianza. Sigue así, vas muy bien!',
-          fecha: new Date(2026, 0, 30)
-        }
-      },
-      {
-        id: 4,
-        entrenador: {
-          nombre: 'David Martínez',
-          avatar: 'https://i.pravatar.cc/150?img=8',
-          especialidad: 'Boxeo & Artes Marciales'
-        },
-        sesion: {
-          fecha: new Date(2026, 0, 20),
-          deporte: 'Boxeo'
-        },
-        calificacion: 3,
-        comentario: 'Buen entrenador, pero las instalaciones donde entrena podrían mejorar.',
-        fecha_creacion: new Date(2026, 0, 21)
-      }
-    ];
+  ngOnDestroy(): void {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
+  }
 
-    this.aplicarFiltros();
+  cargarResenas(): void {
+    this.loading = true;
+    this.subscription = this.clienteFirebase.getMisResenas().subscribe(reviews => {
+      this.resenas = reviews.map(r => this.convertirResena(r));
+      this.aplicarFiltros();
+      this.loading = false;
+    });
+  }
+
+  private convertirResena(r: Review): Resena {
+    const fecha = r.fecha instanceof Date ? r.fecha : new Date((r.fecha as any)?.seconds * 1000);
+
+    return {
+      id: r.id || '',
+      entrenadorId: r.entrenadorId,
+      reservaId: r.reservaId,
+      entrenador: {
+        nombre: 'Entrenador', // Se podría enriquecer con datos del entrenador
+        avatar: 'assets/images/avatar-default.png',
+        especialidad: 'Deportes'
+      },
+      sesion: {
+        fecha: fecha,
+        deporte: 'Sesión'
+      },
+      calificacion: r.calificacion,
+      comentario: r.comentario,
+      fecha_creacion: fecha,
+      respuesta_entrenador: r.respuestaEntrenador ? {
+        texto: r.respuestaEntrenador,
+        fecha: fecha
+      } : undefined
+    };
   }
 
   aplicarFiltros(): void {
@@ -175,7 +165,7 @@ export class MisResenasComponent implements OnInit {
       resultado = resultado.filter(r => r.calificacion === this.filtroCalificacion);
     }
 
-    this.resenasFiltradas = resultado.sort((a, b) => 
+    this.resenasFiltradas = resultado.sort((a, b) =>
       b.fecha_creacion.getTime() - a.fecha_creacion.getTime()
     );
   }
@@ -208,14 +198,15 @@ export class MisResenasComponent implements OnInit {
 
   confirmarEliminar(ref: any): void {
     if (this.resenaEnEdicion) {
+      // Por ahora solo eliminar localmente (Firebase no tiene método de eliminar reseñas aún)
       this.resenas = this.resenas.filter(r => r.id !== this.resenaEnEdicion!.id);
       this.aplicarFiltros();
-      console.log('Reseña eliminada:', this.resenaEnEdicion.id);
+      this.toastr.success('Reseña eliminada correctamente', 'Eliminada');
     }
     ref.close();
   }
 
-  guardarResena(): void {
+  async guardarResena(): Promise<void> {
     if (this.resenaForm.invalid) {
       Object.keys(this.resenaForm.controls).forEach(key => {
         this.resenaForm.get(key)?.markAsTouched();
@@ -224,9 +215,10 @@ export class MisResenasComponent implements OnInit {
     }
 
     const formValue = this.resenaForm.value;
+    this.cargando = true;
 
     if (this.resenaEnEdicion) {
-      // Editar reseña existente
+      // Editar reseña existente (actualización local por ahora)
       const index = this.resenas.findIndex(r => r.id === this.resenaEnEdicion!.id);
       if (index !== -1) {
         this.resenas[index] = {
@@ -235,27 +227,29 @@ export class MisResenasComponent implements OnInit {
           comentario: formValue.comentario,
           fecha_edicion: new Date()
         };
-        console.log('Reseña actualizada:', this.resenas[index]);
+        this.toastr.success('Reseña actualizada correctamente', 'Actualizada');
       }
+      this.cargando = false;
     } else {
-      // Nueva reseña
-      const nuevaResena: Resena = {
-        id: Math.max(...this.resenas.map(r => r.id), 0) + 1,
-        entrenador: {
-          nombre: 'Entrenador Demo',
-          avatar: 'https://i.pravatar.cc/150?img=15',
-          especialidad: 'Especialidad Demo'
-        },
-        sesion: {
-          fecha: new Date(),
-          deporte: 'Demo'
-        },
-        calificacion: formValue.calificacion,
-        comentario: formValue.comentario,
-        fecha_creacion: new Date()
-      };
-      this.resenas.unshift(nuevaResena);
-      console.log('Nueva reseña creada:', nuevaResena);
+      // Nueva reseña a Firebase
+      if (this.entrenadorIdNuevo && this.sesionIdNueva) {
+        const result = await this.clienteFirebase.crearResena({
+          entrenadorId: this.entrenadorIdNuevo,
+          reservaId: this.sesionIdNueva,
+          calificacion: formValue.calificacion,
+          comentario: formValue.comentario
+        });
+
+        if (result.success) {
+          this.toastr.success(result.message, '¡Reseña Publicada!');
+          // Los datos se actualizarán automáticamente por la suscripción
+        } else {
+          this.toastr.danger(result.message, 'Error');
+        }
+      } else {
+        this.toastr.warning('Selecciona un entrenador y sesión para dejar una reseña', 'Información incompleta');
+      }
+      this.cargando = false;
     }
 
     this.aplicarFiltros();
@@ -300,3 +294,4 @@ export class MisResenasComponent implements OnInit {
     return this.resenaForm.get('comentario')?.value?.length || 0;
   }
 }
+

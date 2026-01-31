@@ -19,6 +19,40 @@
   margin-top: 2rem;
 }
 
+// Estados de carga y error
+.loading-state,
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+  gap: 1rem;
+
+  p {
+    color: #64748B;
+    margin: 0;
+  }
+
+  h3 {
+    color: #0F172A;
+    margin: 0.5rem 0;
+  }
+}
+
+.loading-horarios {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  color: #64748B;
+  
+  nb-spinner {
+    transform: scale(0.8);
+  }
+}
+
 // Header
 .header-wrapper {
   display: flex;

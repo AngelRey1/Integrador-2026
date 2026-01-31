@@ -1,7 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { NbToastrService } from '@nebular/theme';
+import { AdminFirebaseService, Usuario as UsuarioFirebase } from '../../../../core/services/admin-firebase.service';
+import { Subscription } from 'rxjs';
 
 interface Usuario {
-  id: number;
+  id: string;
   nombre: string;
   email: string;
   rol: string;
@@ -16,12 +19,13 @@ interface Usuario {
   templateUrl: './usuarios-list.component.html',
   styleUrls: ['./usuarios-list.component.scss']
 })
-export class UsuariosListComponent implements OnInit {
+export class UsuariosListComponent implements OnInit, OnDestroy {
   usuarios: Usuario[] = [];
   filteredUsuarios: Usuario[] = [];
   searchTerm = '';
   filterEstado = 'todos';
-  
+  loading = true;
+
   stats = {
     total: 0,
     activos: 0,
@@ -29,34 +33,57 @@ export class UsuariosListComponent implements OnInit {
     nuevosEsteMes: 0
   };
 
-  constructor() { }
+  private subscription: Subscription | null = null;
+
+  constructor(
+    private adminFirebase: AdminFirebaseService,
+    private toastr: NbToastrService
+  ) { }
 
   ngOnInit(): void {
     this.loadUsuarios();
   }
 
-  loadUsuarios(): void {
-    // Datos de demo
-    this.usuarios = [
-      { id: 1, nombre: 'Juan Pérez', email: 'juan.perez@email.com', rol: 'Cliente', estado: 'activo', fechaRegistro: new Date('2025-11-15'), avatar: '', reservas: 12 },
-      { id: 2, nombre: 'María García', email: 'maria.garcia@email.com', rol: 'Cliente', estado: 'activo', fechaRegistro: new Date('2025-12-01'), avatar: '', reservas: 8 },
-      { id: 3, nombre: 'Carlos López', email: 'carlos.lopez@email.com', rol: 'Cliente', estado: 'activo', fechaRegistro: new Date('2026-01-05'), avatar: '', reservas: 3 },
-      { id: 4, nombre: 'Ana Martínez', email: 'ana.martinez@email.com', rol: 'Cliente', estado: 'baneado', fechaRegistro: new Date('2025-10-20'), avatar: '', reservas: 0 },
-      { id: 5, nombre: 'Roberto Sánchez', email: 'roberto.sanchez@email.com', rol: 'Cliente', estado: 'activo', fechaRegistro: new Date('2026-01-10'), avatar: '', reservas: 5 },
-      { id: 6, nombre: 'Laura Fernández', email: 'laura.fernandez@email.com', rol: 'Cliente', estado: 'activo', fechaRegistro: new Date('2025-12-15'), avatar: '', reservas: 15 },
-      { id: 7, nombre: 'Diego Ramírez', email: 'diego.ramirez@email.com', rol: 'Cliente', estado: 'pendiente', fechaRegistro: new Date('2026-01-20'), avatar: '', reservas: 0 },
-      { id: 8, nombre: 'Patricia Vega', email: 'patricia.vega@email.com', rol: 'Cliente', estado: 'activo', fechaRegistro: new Date('2025-11-28'), avatar: '', reservas: 7 },
-    ];
+  ngOnDestroy(): void {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
+  }
 
-    this.calculateStats();
-    this.applyFilters();
+  loadUsuarios(): void {
+    this.loading = true;
+    this.subscription = this.adminFirebase.getUsuarios().subscribe(usuarios => {
+      this.usuarios = usuarios.map(u => this.convertirUsuario(u));
+      this.calculateStats();
+      this.applyFilters();
+      this.loading = false;
+    });
+  }
+
+  private convertirUsuario(u: UsuarioFirebase): Usuario {
+    const fechaRegistro = u.fechaRegistro instanceof Date
+      ? u.fechaRegistro
+      : u.fechaRegistro
+        ? new Date((u.fechaRegistro as any)?.seconds * 1000)
+        : new Date();
+
+    return {
+      id: u.id || '',
+      nombre: `${u.nombre} ${u.apellidoPaterno}`,
+      email: u.email,
+      rol: u.tipo === 'cliente' ? 'Cliente' : u.tipo === 'entrenador' ? 'Entrenador' : 'Admin',
+      estado: u.activo ? 'activo' : 'baneado',
+      fechaRegistro: fechaRegistro,
+      avatar: u.fotoUrl || '',
+      reservas: 0
+    };
   }
 
   calculateStats(): void {
     this.stats.total = this.usuarios.length;
     this.stats.activos = this.usuarios.filter(u => u.estado === 'activo').length;
     this.stats.baneados = this.usuarios.filter(u => u.estado === 'baneado').length;
-    
+
     const thisMonth = new Date();
     thisMonth.setDate(1);
     this.stats.nuevosEsteMes = this.usuarios.filter(u => u.fechaRegistro >= thisMonth).length;
@@ -65,7 +92,7 @@ export class UsuariosListComponent implements OnInit {
   applyFilters(): void {
     this.filteredUsuarios = this.usuarios.filter(u => {
       const matchSearch = u.nombre.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-                          u.email.toLowerCase().includes(this.searchTerm.toLowerCase());
+        u.email.toLowerCase().includes(this.searchTerm.toLowerCase());
       const matchEstado = this.filterEstado === 'todos' || u.estado === this.filterEstado;
       return matchSearch && matchEstado;
     });
@@ -81,19 +108,26 @@ export class UsuariosListComponent implements OnInit {
     this.applyFilters();
   }
 
-  banUser(usuario: Usuario): void {
-    usuario.estado = 'baneado';
-    this.calculateStats();
-    this.applyFilters();
+  async banUser(usuario: Usuario): Promise<void> {
+    const result = await this.adminFirebase.desactivarUsuario(usuario.id);
+    if (result.success) {
+      this.toastr.success('Usuario baneado', 'Éxito');
+    } else {
+      this.toastr.danger(result.message, 'Error');
+    }
   }
 
-  unbanUser(usuario: Usuario): void {
-    usuario.estado = 'activo';
-    this.calculateStats();
-    this.applyFilters();
+  async unbanUser(usuario: Usuario): Promise<void> {
+    const result = await this.adminFirebase.activarUsuario(usuario.id);
+    if (result.success) {
+      this.toastr.success('Usuario activado', 'Éxito');
+    } else {
+      this.toastr.danger(result.message, 'Error');
+    }
   }
 
   viewUser(usuario: Usuario): void {
     console.log('Ver usuario:', usuario);
   }
 }
+

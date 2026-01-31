@@ -1,9 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { NbToastrService } from '@nebular/theme';
+import { AdminFirebaseService, DashboardStats, Entrenador, Pago } from '../../../core/services/admin-firebase.service';
+import { Subscription } from 'rxjs';
 
 interface PendingTrainer {
-  id: number;
+  id: string;
   name: string;
   specialty: string;
   avatar: string;
@@ -12,19 +14,11 @@ interface PendingTrainer {
 }
 
 interface Transaction {
-  id: number;
+  id: string;
   type: 'payment' | 'commission';
   description: string;
   user: string;
   amount: number;
-  date: Date;
-}
-
-interface Report {
-  id: number;
-  title: string;
-  type: string;
-  priority: 'high' | 'medium' | 'low';
   date: Date;
 }
 
@@ -33,161 +27,137 @@ interface Report {
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
   today = new Date();
+  loading = true;
 
   stats = {
-    totalUsers: 1248,
-    activeTrainers: 87,
-    totalReservations: 342,
-    monthlyRevenue: 156750,
-    todayTransactions: 23,
-    activeSports: 15,
-    conversionRate: 68,
-    avgSatisfaction: 4.7,
-    retentionRate: 82
+    totalUsers: 0,
+    activeTrainers: 0,
+    totalReservations: 0,
+    monthlyRevenue: 0,
+    todayTransactions: 0,
+    activeSports: 0,
+    conversionRate: 0,
+    avgSatisfaction: 0,
+    retentionRate: 0
   };
 
-  pendingTrainers: PendingTrainer[] = [
-    {
-      id: 1,
-      name: 'Carlos Mendoza',
-      specialty: 'Entrenamiento Funcional',
-      avatar: '',
-      requestDate: new Date('2026-01-10'),
-      email: 'carlos.mendoza@email.com'
-    },
-    {
-      id: 2,
-      name: 'María González',
-      specialty: 'Yoga y Pilates',
-      avatar: '',
-      requestDate: new Date('2026-01-11'),
-      email: 'maria.gonzalez@email.com'
-    },
-    {
-      id: 3,
-      name: 'Roberto Sánchez',
-      specialty: 'CrossFit',
-      avatar: '',
-      requestDate: new Date('2026-01-12'),
-      email: 'roberto.sanchez@email.com'
-    },
-    {
-      id: 4,
-      name: 'Ana Martínez',
-      specialty: 'Natación',
-      avatar: '',
-      requestDate: new Date('2026-01-12'),
-      email: 'ana.martinez@email.com'
-    },
-    {
-      id: 5,
-      name: 'Luis Hernández',
-      specialty: 'Boxeo',
-      avatar: '',
-      requestDate: new Date('2026-01-13'),
-      email: 'luis.hernandez@email.com'
-    }
-  ];
+  pendingTrainers: PendingTrainer[] = [];
+  recentTransactions: Transaction[] = [];
+  reports: any[] = [];
 
-  recentTransactions: Transaction[] = [
-    {
-      id: 1,
-      type: 'payment',
-      description: 'Sesión de Yoga',
-      user: 'Juan Pérez',
-      amount: 350,
-      date: new Date()
-    },
-    {
-      id: 2,
-      type: 'commission',
-      description: 'Comisión plataforma',
-      user: 'María González',
-      amount: 52.50,
-      date: new Date()
-    },
-    {
-      id: 3,
-      type: 'payment',
-      description: 'Pack 5 sesiones CrossFit',
-      user: 'Laura Ruiz',
-      amount: 1500,
-      date: new Date()
-    },
-    {
-      id: 4,
-      type: 'payment',
-      description: 'Entrenamiento Personal',
-      user: 'Carlos Vega',
-      amount: 450,
-      date: new Date()
-    },
-    {
-      id: 5,
-      type: 'commission',
-      description: 'Comisión plataforma',
-      user: 'Roberto Sánchez',
-      amount: 67.50,
-      date: new Date()
-    }
-  ];
-
-  reports: Report[] = [
-    {
-      id: 1,
-      title: 'Usuario reportado por comportamiento inadecuado',
-      type: 'Denuncia Usuario',
-      priority: 'high',
-      date: new Date('2026-01-12')
-    },
-    {
-      id: 2,
-      title: 'Entrenador no cumplió con la sesión',
-      type: 'Queja Servicio',
-      priority: 'medium',
-      date: new Date('2026-01-11')
-    }
-  ];
+  private subscriptions: Subscription[] = [];
 
   constructor(
     private router: Router,
-    private toastr: NbToastrService
-  ) {}
+    private toastr: NbToastrService,
+    private adminFirebase: AdminFirebaseService
+  ) { }
 
   ngOnInit(): void {
-    // Aquí cargaríamos datos reales del backend
+    this.cargarDatos();
   }
 
-  approveTrainer(trainer: PendingTrainer): void {
-    this.pendingTrainers = this.pendingTrainers.filter(t => t.id !== trainer.id);
-    this.toastr.success(
-      `El entrenador ${trainer.name} ha sido aprobado exitosamente`,
-      'Entrenador Aprobado',
-      { duration: 4000 }
-    );
-    this.stats.activeTrainers++;
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
-  rejectTrainer(trainer: PendingTrainer): void {
-    this.pendingTrainers = this.pendingTrainers.filter(t => t.id !== trainer.id);
-    this.toastr.warning(
-      `La solicitud de ${trainer.name} ha sido rechazada`,
-      'Solicitud Rechazada',
-      { duration: 4000 }
-    );
+  cargarDatos(): void {
+    this.loading = true;
+
+    // Cargar estadísticas del dashboard
+    const statsSub = this.adminFirebase.getDashboardStats().subscribe(stats => {
+      this.stats.totalUsers = stats.totalUsuarios;
+      this.stats.activeTrainers = stats.totalEntrenadores;
+      this.stats.totalReservations = stats.totalReservas;
+      this.stats.monthlyRevenue = stats.ingresosMes;
+      this.stats.todayTransactions = stats.reservasHoy;
+      this.loading = false;
+    });
+    this.subscriptions.push(statsSub);
+
+    // Cargar entrenadores pendientes de verificación
+    const trainersSub = this.adminFirebase.getEntrenadores().subscribe(entrenadores => {
+      this.pendingTrainers = entrenadores
+        .filter(e => !e.verificado)
+        .slice(0, 5)
+        .map(e => ({
+          id: e.id || '',
+          name: `${e.nombre} ${e.apellidoPaterno}`,
+          specialty: e.deportes?.join(', ') || 'General',
+          avatar: e.foto || '',
+          requestDate: this.convertirFecha(e.fechaRegistro),
+          email: ''
+        }));
+    });
+    this.subscriptions.push(trainersSub);
+
+    // Cargar transacciones recientes
+    const pagosSub = this.adminFirebase.getPagos().subscribe(pagos => {
+      this.recentTransactions = pagos.slice(0, 5).map(p => ({
+        id: p.id || '',
+        type: 'payment' as const,
+        description: 'Sesión de entrenamiento',
+        user: p.clienteId,
+        amount: p.monto,
+        date: this.convertirFecha(p.fecha)
+      }));
+    });
+    this.subscriptions.push(pagosSub);
+
+    // Cargar deportes activos
+    const deportesSub = this.adminFirebase.getDeportes().subscribe(deportes => {
+      this.stats.activeSports = deportes.filter(d => d.activo).length;
+    });
+    this.subscriptions.push(deportesSub);
+  }
+
+  private convertirFecha(fecha: any): Date {
+    if (fecha instanceof Date) return fecha;
+    if (fecha?.seconds) return new Date(fecha.seconds * 1000);
+    return new Date();
+  }
+
+  async approveTrainer(trainer: PendingTrainer): Promise<void> {
+    const result = await this.adminFirebase.verificarEntrenador(trainer.id);
+    if (result.success) {
+      this.toastr.success(
+        `El entrenador ${trainer.name} ha sido aprobado exitosamente`,
+        'Entrenador Aprobado',
+        { duration: 4000 }
+      );
+    } else {
+      this.toastr.danger(result.message, 'Error');
+    }
+  }
+
+  async rejectTrainer(trainer: PendingTrainer): Promise<void> {
+    const result = await this.adminFirebase.desactivarEntrenador(trainer.id);
+    if (result.success) {
+      this.toastr.warning(
+        `La solicitud de ${trainer.name} ha sido rechazada`,
+        'Solicitud Rechazada',
+        { duration: 4000 }
+      );
+    } else {
+      this.toastr.danger(result.message, 'Error');
+    }
   }
 
   viewTrainerProfile(trainer: PendingTrainer): void {
-    // En producción navegaría al perfil detallado
-    this.toastr.info(
-      `Viendo perfil de ${trainer.name}`,
-      'Perfil del Entrenador'
-    );
+    this.router.navigate(['/admin/entrenadores', trainer.id]);
   }
 
-  viewReport(report: Report): void {
+  viewReport(report: any): void {
     this.router.navigate(['/admin/reportes/denuncias', report.id]);
   }
+
+  formatearMoneda(monto: number): string {
+    return new Intl.NumberFormat('es-MX', {
+      style: 'currency',
+      currency: 'MXN'
+    }).format(monto);
+  }
 }
+
