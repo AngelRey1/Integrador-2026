@@ -20,6 +20,19 @@ export const environment = {
     storageBucket: 'sportconecta-6d1ce.firebasestorage.app',
     messagingSenderId: '129548411869',
     appId: '1:129548411869:web:63bbd269f0ef7d80c18c34'
+  },
+
+  // Stripe Configuration
+  // IMPORTANTE: Reemplaza con tus claves reales de Stripe
+  // Obtén tus claves en: https://dashboard.stripe.com/apikeys
+  stripe: {
+    // Clave pública (publishable key) - segura para el frontend
+    publishableKey: 'pk_test_51SxfDODedWVOZwp7giJrXakkl5NUMPjOP9uZ6dFJxgm0CJevBt8vgQYLWNsaflSn3VOCj6PBhT0RLyjJYnFQqZuP00HRvBn0Yx',
+    // URL del backend para Stripe (Vercel)
+    // CAMBIAR cuando despliegues a Vercel (ej: https://tu-proyecto.vercel.app)
+    functionsUrl: '',
+    // Modo simulado: true = genera vouchers fake, false = usa Stripe real
+    simulatedMode: true
   }
 };
 

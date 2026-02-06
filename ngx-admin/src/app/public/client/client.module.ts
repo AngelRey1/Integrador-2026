@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
 import { MatDialogModule } from '@angular/material/dialog';
 import { NbLayoutModule, NbIconModule, NbSpinnerModule, NbButtonModule } from '@nebular/theme';
 import { NbEvaIconsModule } from '@nebular/eva-icons';
@@ -21,6 +22,7 @@ import { SportIconsModule } from '../../@theme/components/sport-icons/sport-icon
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
+    HttpClientModule,
     MatDialogModule,
     NbLayoutModule,
     NbIconModule,

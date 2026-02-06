@@ -1,37 +1,101 @@
 <div class="container-fluid">
   <div class="row mb-4">
     <div class="col-12">
-      <div class="d-flex justify-content-between">
+      <div class="d-flex justify-content-between align-items-center">
         <h3 class="page-title">Mi Perfil Profesional</h3>
-        <button nbButton [status]="editando ? 'success' : 'primary'" (click)="editando ? guardar() : toggleEditar()">
-          <nb-icon [icon]="editando ? 'save-outline' : 'edit-outline'"></nb-icon>
-          {{ editando ? 'Guardar' : 'Editar' }}
-        </button>
+        <div class="d-flex gap-2">
+          <button *ngIf="editando" nbButton status="basic" (click)="toggleEditar()">
+            <nb-icon icon="close-outline"></nb-icon>
+            Cancelar
+          </button>
+          <button nbButton [status]="editando ? 'success' : 'primary'" 
+                  [disabled]="guardando"
+                  (click)="editando ? guardar() : toggleEditar()">
+            <nb-icon [icon]="editando ? 'save-outline' : 'edit-outline'"></nb-icon>
+            {{ guardando ? 'Guardando...' : (editando ? 'Guardar cambios' : 'Editar perfil') }}
+          </button>
+        </div>
       </div>
     </div>
   </div>
 
   <div class="row">
     <div class="col-md-8">
+      <!-- Información personal -->
       <nb-card>
+        <nb-card-header>
+          <nb-icon icon="person-outline"></nb-icon>
+          Información Personal
+        </nb-card-header>
         <nb-card-body>
           <form [formGroup]="perfilForm">
-            <div class="mb-3">
-              <label class="label">Nombre Completo</label>
-              <input nbInput fullWidth formControlName="nombre">
-            </div>
-            <div class="mb-3">
-              <label class="label">Biografía</label>
-              <textarea nbInput fullWidth formControlName="bio" rows="4"></textarea>
-            </div>
             <div class="row">
               <div class="col-md-6 mb-3">
-                <label class="label">Años de Experiencia</label>
-                <input nbInput fullWidth type="number" formControlName="experiencia">
+                <label class="label">Nombre</label>
+                <input nbInput fullWidth formControlName="nombre" placeholder="Tu nombre">
               </div>
               <div class="col-md-6 mb-3">
-                <label class="label">Tarifa Base (€/hora)</label>
-                <input nbInput fullWidth type="number" formControlName="tarifa_base">
+                <label class="label">Apellido</label>
+                <input nbInput fullWidth formControlName="apellidoPaterno" placeholder="Tu apellido">
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="label">Biografía / Descripción</label>
+              <textarea nbInput fullWidth formControlName="bio" rows="4" 
+                        placeholder="Cuéntale a tus clientes sobre ti, tu experiencia y metodología..."></textarea>
+              <small class="text-muted">Esta descripción se mostrará en tu perfil público</small>
+            </div>
+          </form>
+        </nb-card-body>
+      </nb-card>
+
+      <!-- Tarifas -->
+      <nb-card class="pricing-card">
+        <nb-card-header>
+          <nb-icon icon="pricetags-outline"></nb-icon>
+          Mis Tarifas
+        </nb-card-header>
+        <nb-card-body>
+          <form [formGroup]="perfilForm">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="label">
+                  <nb-icon icon="home-outline"></nb-icon>
+                  Precio Presencial (MXN/hora)
+                </label>
+                <div class="input-group">
+                  <span class="input-prefix">$</span>
+                  <input nbInput fullWidth type="number" formControlName="precio" 
+                         placeholder="500" min="0" step="50">
+                  <span class="input-suffix">MXN</span>
+                </div>
+                <small class="text-muted">Tarifa para sesiones presenciales</small>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="label">
+                  <nb-icon icon="video-outline"></nb-icon>
+                  Precio Online (MXN/hora)
+                </label>
+                <div class="input-group">
+                  <span class="input-prefix">$</span>
+                  <input nbInput fullWidth type="number" formControlName="precioOnline" 
+                         placeholder="400" min="0" step="50">
+                  <span class="input-suffix">MXN</span>
+                </div>
+                <small class="text-muted">Tarifa para sesiones por videollamada</small>
+              </div>
+            </div>
+            
+            <div class="pricing-preview" *ngIf="!editando">
+              <div class="price-box presencial">
+                <span class="price-label">Presencial</span>
+                <span class="price-amount">${{ perfil?.precio || 0 }} MXN</span>
+                <span class="price-unit">/hora</span>
+              </div>
+              <div class="price-box online">
+                <span class="price-label">Online</span>
+                <span class="price-amount">${{ perfil?.precioOnline || 0 }} MXN</span>
+                <span class="price-unit">/hora</span>
               </div>
             </div>
           </form>
@@ -40,21 +104,57 @@
     </div>
 
     <div class="col-md-4">
+      <!-- Especialidades -->
       <nb-card>
-        <nb-card-header>Especialidades</nb-card-header>
+        <nb-card-header>
+          <nb-icon icon="award-outline"></nb-icon>
+          Especialidades
+        </nb-card-header>
         <nb-card-body>
-          <nb-badge *ngFor="let esp of especialidades" [text]="esp" status="primary" class="mr-2 mb-2"></nb-badge>
+          <div class="tags-container">
+            <nb-badge *ngFor="let esp of especialidades" [text]="esp" status="primary" class="tag-badge"></nb-badge>
+          </div>
+          <p *ngIf="especialidades.length === 0" class="text-muted">No hay especialidades registradas</p>
         </nb-card-body>
       </nb-card>
 
+      <!-- Certificaciones -->
       <nb-card>
-        <nb-card-header>Certificaciones</nb-card-header>
+        <nb-card-header>
+          <nb-icon icon="file-text-outline"></nb-icon>
+          Certificaciones
+        </nb-card-header>
         <nb-card-body>
-          <ul class="cert-list">
-            <li *ngFor="let cert of certificaciones">{{ cert }}</li>
+          <ul class="cert-list" *ngIf="certificaciones.length > 0">
+            <li *ngFor="let cert of certificaciones">
+              <nb-icon icon="checkmark-circle-outline" status="success"></nb-icon>
+              {{ cert }}
+            </li>
           </ul>
+          <p *ngIf="certificaciones.length === 0" class="text-muted">No hay certificaciones registradas</p>
+        </nb-card-body>
+      </nb-card>
+
+      <!-- Estadísticas -->
+      <nb-card>
+        <nb-card-header>
+          <nb-icon icon="bar-chart-outline"></nb-icon>
+          Estadísticas
+        </nb-card-header>
+        <nb-card-body>
+          <div class="stat-item">
+            <nb-icon icon="star" status="warning"></nb-icon>
+            <span class="stat-value">{{ perfil?.calificacionPromedio | number:'1.1-1' || '0.0' }}</span>
+            <span class="stat-label">Calificación</span>
+          </div>
+          <div class="stat-item">
+            <nb-icon icon="message-circle-outline"></nb-icon>
+            <span class="stat-value">{{ perfil?.totalReviews || 0 }}</span>
+            <span class="stat-label">Reseñas</span>
+          </div>
         </nb-card-body>
       </nb-card>
     </div>
   </div>
 </div>
+

@@ -48,7 +48,7 @@
     "@nebular/security": "11.0.1",
     "@nebular/theme": "11.0.1",
     "@stripe/react-stripe-js": "^5.4.1",
-    "@stripe/stripe-js": "^8.6.4",
+    "@stripe/stripe-js": "^8.7.0",
     "@swimlane/ngx-charts": "^20.2.14",
     "angular2-chartjs": "0.4.1",
     "bootstrap": "4.3.1",

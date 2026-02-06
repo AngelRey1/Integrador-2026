@@ -31,8 +31,8 @@ export class PerfilEntrenadorComponent implements OnInit, OnDestroy {
       nombre: [{ value: '', disabled: true }, Validators.required],
       apellidoPaterno: [{ value: '', disabled: true }],
       bio: [{ value: '', disabled: true }],
-      experiencia: [{ value: 0, disabled: true }, Validators.required],
-      precio: [{ value: 500, disabled: true }, Validators.required]
+      precio: [{ value: 500, disabled: true }, [Validators.required, Validators.min(0)]],
+      precioOnline: [{ value: 400, disabled: true }, [Validators.required, Validators.min(0)]]
     });
   }
 
@@ -58,8 +58,8 @@ export class PerfilEntrenadorComponent implements OnInit, OnDestroy {
           nombre: perfil.nombre,
           apellidoPaterno: perfil.apellidoPaterno,
           bio: perfil.bio || '',
-          experiencia: this.calcularExperiencia(perfil.fechaRegistro),
-          precio: perfil.precio || 500
+          precio: perfil.precio || 500,
+          precioOnline: perfil.precioOnline || 400
         });
       }
       this.loading = false;
@@ -93,7 +93,8 @@ export class PerfilEntrenadorComponent implements OnInit, OnDestroy {
         nombre: formValue.nombre,
         apellidoPaterno: formValue.apellidoPaterno,
         bio: formValue.bio,
-        precio: formValue.precio
+        precio: formValue.precio,
+        precioOnline: formValue.precioOnline
       });
 
       if (result.success) {
