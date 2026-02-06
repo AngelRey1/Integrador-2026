@@ -1,0 +1,1166 @@
+// ============================================
+// CLIENTE DASHBOARD - INICIO UNIFICADO
+// Diseño limpio y profesional para tema claro
+// Compatible con SportConnect Nebular theme
+// ============================================
+
+// === PALETA DE COLORES - TEMA CLARO ===
+$primary: #00d9a5;
+$primary-dark: #00b386;
+$primary-light: #e6fff8;
+$secondary: #0a7b8a;
+$accent: #ff6b35;
+$accent-light: #fff0eb;
+
+// Fondos y superficies
+$bg-page: #f7f9fc;
+$bg-card: #ffffff;
+$bg-card-hover: #f8fafc;
+$bg-muted: #edf2f7;
+
+// Textos
+$text-dark: #1a202c;
+$text-body: #4a5568;
+$text-muted: #718096;
+$text-light: #a0aec0;
+
+// Bordes y sombras
+$border-light: #e2e8f0;
+$shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+$shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.12);
+
+// === RESET BASE ===
+:host {
+  display: block;
+  background: $bg-page;
+  min-height: 100vh;
+  padding: 1.5rem;
+}
+
+// ═══════════════════════════════════════════
+// HERO - BIENVENIDA COMPACTA
+// ═══════════════════════════════════════════
+.personal-hero-glass {
+  background: linear-gradient(135deg, $primary 0%, $secondary 100%);
+  border-radius: 16px;
+  padding: 1.5rem 2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: $shadow-md;
+
+  .hero-backdrop { display: none; }
+
+  .hero-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+
+  .welcome-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .welcome-avatar {
+    position: relative;
+    flex-shrink: 0;
+
+    .avatar-ring {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      padding: 3px;
+      background: rgba(255, 255, 255, 0.3);
+
+      .avatar-img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid white;
+        background: $bg-card;
+      }
+    }
+
+    .status-indicator {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2px solid white;
+
+      &.online {
+        background: #10b981;
+        box-shadow: 0 0 8px #10b981;
+      }
+    }
+  }
+
+  .welcome-text {
+    color: white;
+
+    .greeting-small {
+      font-size: 0.85rem;
+      opacity: 0.9;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .welcome-name {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0 0 4px 0;
+    }
+
+    .member-since {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      opacity: 0.85;
+      margin: 0;
+    }
+  }
+
+  .hero-quick-stats {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+
+    .quick-stat-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 25px;
+      color: white;
+
+      .stat-num {
+        font-size: 1.1rem;
+        font-weight: 700;
+      }
+
+      .stat-label {
+        font-size: 0.75rem;
+        opacity: 0.9;
+      }
+
+      &.accent {
+        background: rgba(255, 255, 255, 0.3);
+      }
+    }
+  }
+}
+
+// ═══════════════════════════════════════════
+// LAYOUT PRINCIPAL - 2 COLUMNAS
+// ═══════════════════════════════════════════
+.dashboard-grid-layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 1.5rem;
+
+  @media (max-width: 1100px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.main-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.side-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+// ═══════════════════════════════════════════
+// SECTION HEADERS
+// ═══════════════════════════════════════════
+.section-glass-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-title-premium {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: $text-dark;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .live-indicator {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    background: $accent-light;
+    border: 1px solid rgba($accent, 0.3);
+    border-radius: 15px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: $accent;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+
+    .pulse-dot {
+      width: 6px;
+      height: 6px;
+      background: $accent;
+      border-radius: 50%;
+      /* Removida animación parpadeante */
+    }
+  }
+
+  .countdown-badge {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    background: $accent-light;
+    border: 1px solid rgba($accent, 0.2);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: $accent;
+  }
+
+  .period-label {
+    font-size: 0.8rem;
+    color: $text-muted;
+  }
+
+  .view-controls {
+    display: flex;
+    background: $bg-muted;
+    border-radius: 8px;
+    padding: 3px;
+
+    .view-toggle {
+      padding: 6px 14px;
+      background: transparent;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: $text-muted;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &.active {
+        background: $primary;
+        color: white;
+      }
+
+      &:hover:not(.active) {
+        color: $text-dark;
+      }
+    }
+  }
+}
+
+// ═══════════════════════════════════════════
+// PRÓXIMA SESIÓN - CARD DESTACADA
+// ═══════════════════════════════════════════
+.next-session-highlight {
+  background: $bg-card;
+  border: 1px solid $border-light;
+  border-radius: 16px;
+  padding: 1.25rem;
+  box-shadow: $shadow-sm;
+}
+
+.featured-session-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1.25rem;
+  background: $primary-light;
+  border: 1px solid rgba($primary, 0.2);
+  border-radius: 12px;
+  padding: 1.25rem;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+
+  .session-visual {
+    .session-sport-bg { display: none; }
+
+    .session-date-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 14px 20px;
+      background: $primary;
+      border-radius: 12px;
+      min-width: 80px;
+      color: white;
+
+      .day-big {
+        font-size: 2rem;
+        font-weight: 800;
+        line-height: 1;
+      }
+
+      .month-abbr {
+        font-size: 0.75rem;
+        font-weight: 600;
+        opacity: 0.9;
+        text-transform: uppercase;
+      }
+
+      .time-highlight {
+        margin-top: 6px;
+        padding: 3px 10px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 600;
+      }
+    }
+  }
+
+  .session-details-premium {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    .trainer-featured {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .trainer-avatar-ring {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        padding: 2px;
+        background: linear-gradient(135deg, $primary, $accent);
+        flex-shrink: 0;
+
+        .trainer-img {
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+          object-fit: cover;
+          background: $bg-card;
+        }
+      }
+
+      .trainer-info-column {
+        .trainer-name-lg {
+          font-size: 1.1rem;
+          font-weight: 600;
+          color: $text-dark;
+          margin: 0 0 4px 0;
+        }
+
+        .trainer-meta {
+          display: flex;
+          gap: 10px;
+
+          .sport-tag, .duration-tag {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.8rem;
+            color: $text-body;
+          }
+        }
+      }
+    }
+
+    .session-location {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      color: $text-body;
+    }
+
+    .session-actions-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+
+      .btn-session-action {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 8px 14px;
+        background: $bg-card;
+        border: 1px solid $border-light;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: $text-body;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+          background: $bg-muted;
+          color: $text-dark;
+        }
+
+        &.primary {
+          background: $primary;
+          border: none;
+          color: white;
+
+          &:hover {
+            background: $primary-dark;
+          }
+        }
+
+        &.danger {
+          border-color: rgba($accent, 0.3);
+          color: $accent;
+
+          &:hover {
+            background: $accent-light;
+          }
+        }
+      }
+    }
+  }
+}
+
+// ═══════════════════════════════════════════
+// EMPTY STATE
+// ═══════════════════════════════════════════
+.empty-next-session {
+  .empty-glass-card {
+    background: $bg-card;
+    border: 1px dashed $border-light;
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: $shadow-sm;
+
+    .empty-illustration {
+      position: relative;
+      width: 100px;
+      height: 100px;
+      margin: 0 auto 1rem;
+
+      .floating-icons {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+
+        .float-icon {
+          position: absolute;
+          animation: floatIcon 3s infinite ease-in-out;
+
+          &.i1 { top: 0; left: 15%; animation-delay: 0s; }
+          &.i2 { top: 15%; right: 5%; animation-delay: 0.4s; }
+          &.i3 { bottom: 15%; left: 5%; animation-delay: 0.8s; }
+          &.i4 { bottom: 0; right: 15%; animation-delay: 1.2s; }
+        }
+      }
+
+      .main-empty-icon {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: $text-light;
+      }
+    }
+
+    .empty-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: $text-dark;
+      margin: 0 0 6px 0;
+    }
+
+    .empty-description {
+      font-size: 0.85rem;
+      color: $text-muted;
+      margin: 0 0 1.25rem 0;
+    }
+
+    .btn-cta-gradient {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: $primary;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: $shadow-sm;
+
+      &:hover {
+        background: $primary-dark;
+        transform: translateY(-2px);
+        box-shadow: $shadow-md;
+      }
+    }
+  }
+}
+
+// ═══════════════════════════════════════════
+// SESSIONS LIST
+// ═══════════════════════════════════════════
+.sessions-history-section {
+  background: $bg-card;
+  border: 1px solid $border-light;
+  border-radius: 16px;
+  padding: 1.25rem;
+  box-shadow: $shadow-sm;
+}
+
+.sessions-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.session-card-compact {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 14px;
+  background: $bg-page;
+  border: 1px solid $border-light;
+  border-radius: 10px;
+  transition: all 0.2s;
+
+  &:hover {
+    background: $bg-card-hover;
+    border-color: rgba($primary, 0.3);
+    box-shadow: $shadow-sm;
+  }
+
+  &.featured {
+    border-color: rgba($primary, 0.3);
+    background: $primary-light;
+  }
+
+  .card-date-strip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 6px 10px;
+    background: $primary;
+    border-radius: 8px;
+    min-width: 44px;
+    color: white;
+
+    .strip-day {
+      font-size: 1.1rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .strip-month {
+      font-size: 0.65rem;
+      opacity: 0.9;
+      text-transform: uppercase;
+    }
+
+    &.past {
+      background: $bg-muted;
+
+      .strip-day { color: $text-body; }
+      .strip-month { color: $text-muted; }
+    }
+
+    // Sport variants
+    &.sport-crossfit { background: $accent; }
+    &.sport-yoga { background: #8a2be2; }
+    &.sport-natacion, &.sport-natación { background: #0095ff; }
+    &.sport-running { background: #f59e0b; }
+    &.sport-boxeo { background: #ef4444; }
+  }
+
+  .card-main-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-width: 0;
+
+    .trainer-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+
+      .mini-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        object-fit: cover;
+        flex-shrink: 0;
+        background: $bg-muted;
+      }
+
+      .trainer-compact-info {
+        min-width: 0;
+
+        .name {
+          display: block;
+          font-size: 0.9rem;
+          font-weight: 600;
+          color: $text-dark;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .meta {
+          display: block;
+          font-size: 0.75rem;
+          color: $text-muted;
+        }
+      }
+    }
+
+    .time-badge, .rating-given {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      background: $bg-muted;
+      border-radius: 15px;
+      font-size: 0.8rem;
+      color: $text-body;
+      flex-shrink: 0;
+    }
+  }
+
+  .card-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .status-chip {
+      padding: 4px 10px;
+      border-radius: 15px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+
+      &.status-confirmada { background: rgba($primary, 0.15); color: $primary-dark; }
+      &.status-pendiente { background: rgba(#f59e0b, 0.15); color: #d97706; }
+      &.status-cancelada { background: rgba(#ef4444, 0.15); color: #dc2626; }
+      &.status-completada { background: rgba(#0095ff, 0.15); color: #0077cc; }
+    }
+
+    .icon-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: $bg-muted;
+      border: 1px solid $border-light;
+      border-radius: 8px;
+      color: $text-muted;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover {
+        background: $primary-light;
+        color: $primary;
+        border-color: rgba($primary, 0.3);
+      }
+    }
+
+    .btn-rebook {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 12px;
+      background: $primary-light;
+      border: 1px solid rgba($primary, 0.2);
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: $primary-dark;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover {
+        background: rgba($primary, 0.2);
+      }
+    }
+  }
+}
+
+.empty-state-inline {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 1.5rem;
+  color: $text-muted;
+  text-align: center;
+
+  p { margin: 0; font-size: 0.9rem; }
+}
+
+// ═══════════════════════════════════════════
+// PROGRESS SECTION
+// ═══════════════════════════════════════════
+.progress-section {
+  background: $bg-card;
+  border: 1px solid $border-light;
+  border-radius: 16px;
+  padding: 1.25rem;
+  box-shadow: $shadow-sm;
+}
+
+.progress-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.progress-card-3d {
+  padding: 1rem;
+  background: $bg-page;
+  border: 1px solid $border-light;
+  border-radius: 12px;
+  text-align: center;
+  transition: all 0.2s;
+
+  &:hover {
+    transform: translateY(-3px);
+    border-color: rgba($primary, 0.3);
+    box-shadow: $shadow-sm;
+  }
+
+  .card-icon-circle {
+    width: 42px;
+    height: 42px;
+    margin: 0 auto 8px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+
+    &.sessions { background: $primary; }
+    &.hours { background: #0095ff; }
+    &.coaches { background: #8a2be2; }
+    &.sports { background: $accent; }
+  }
+
+  .card-metric {
+    .metric-value {
+      display: block;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: $text-dark;
+      line-height: 1;
+    }
+
+    .metric-label {
+      display: block;
+      font-size: 0.75rem;
+      color: $text-muted;
+      margin-top: 2px;
+    }
+  }
+
+  .metric-trend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    margin-top: 6px;
+    font-size: 0.75rem;
+    color: $text-muted;
+
+    &.up { color: $primary-dark; }
+
+    .mini-text { font-size: 0.7rem; }
+  }
+
+  .sports-mini-icons {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    margin-top: 6px;
+  }
+}
+
+// ═══════════════════════════════════════════
+// SIDEBAR PANELS
+// ═══════════════════════════════════════════
+.panel-header-glass {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+
+  .panel-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: $text-dark;
+    margin: 0;
+  }
+
+  .count-badge {
+    padding: 2px 8px;
+    background: $bg-muted;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: $text-body;
+  }
+}
+
+.panel-title-small {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: $text-muted;
+  margin: 0 0 0.75rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+// ═══════════════════════════════════════════
+// FAVORITES PANEL
+// ═══════════════════════════════════════════
+.favorites-panel {
+  background: $bg-card;
+  border: 1px solid $border-light;
+  border-radius: 16px;
+  padding: 1rem;
+  box-shadow: $shadow-sm;
+}
+
+.favorites-scroll {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.empty-favorites {
+  text-align: center;
+  padding: 1.5rem 1rem;
+
+  .empty-heart-icon {
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    font-size: 0.8rem;
+    color: $text-muted;
+    margin: 0.75rem 0;
+  }
+
+  .btn-outline-small {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 14px;
+    background: transparent;
+    border: 1px solid $border-light;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    color: $text-body;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      border-color: $primary;
+      color: $primary;
+    }
+  }
+}
+
+.favorite-coach-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+  background: $bg-page;
+  border: 1px solid $border-light;
+  border-radius: 10px;
+  transition: all 0.2s;
+
+  &:hover {
+    background: $bg-card-hover;
+    border-color: rgba($primary, 0.3);
+  }
+
+  .coach-visual {
+    position: relative;
+
+    .coach-photo {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: $bg-muted;
+    }
+
+    .online-dot {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 10px;
+      height: 10px;
+      background: #10b981;
+      border: 2px solid $bg-card;
+      border-radius: 50%;
+    }
+  }
+
+  .coach-details {
+    min-width: 0;
+
+    .coach-name {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: $text-dark;
+      margin: 0 0 2px 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .coach-specialty {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.75rem;
+      color: $text-muted;
+      margin-bottom: 3px;
+    }
+
+    .coach-rating-price {
+      display: flex;
+      gap: 10px;
+      font-size: 0.75rem;
+
+      .rating {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        color: $text-body;
+      }
+
+      .price {
+        color: $primary-dark;
+        font-weight: 600;
+      }
+    }
+  }
+
+  .btn-quick-book {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: $primary;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      background: $primary-dark;
+      transform: scale(1.05);
+    }
+  }
+}
+
+// ═══════════════════════════════════════════
+// QUICK ACTIONS
+// ═══════════════════════════════════════════
+.quick-actions-panel {
+  background: $bg-card;
+  border: 1px solid $border-light;
+  border-radius: 16px;
+  padding: 1rem;
+  box-shadow: $shadow-sm;
+}
+
+.action-buttons-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.action-btn-glass {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: $bg-page;
+  border: 1px solid $border-light;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+  text-align: left;
+
+  &:hover {
+    background: $bg-card-hover;
+    border-color: rgba($primary, 0.3);
+
+    .action-icon { transform: scale(1.1); }
+  }
+
+  .action-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    color: white;
+    transition: transform 0.2s;
+
+    &.search { background: $primary; }
+    &.history { background: #0095ff; }
+    &.profile { background: #8a2be2; }
+    &.settings { background: #64748b; }
+  }
+
+  .action-text {
+    flex: 1;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: $text-body;
+  }
+}
+
+// ═══════════════════════════════════════════
+// ACHIEVEMENTS
+// ═══════════════════════════════════════════
+.achievements-teaser {
+  background: $bg-card;
+  border: 1px solid $border-light;
+  border-radius: 16px;
+  padding: 1rem;
+  box-shadow: $shadow-sm;
+}
+
+.achievements-row {
+  display: flex;
+  gap: 8px;
+}
+
+.achievement-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 8px;
+  background: $bg-page;
+  border-radius: 10px;
+  flex: 1;
+  min-width: 0;
+
+  .badge-icon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: white;
+
+    &.bronce { background: linear-gradient(135deg, #cd7f32, #8b4513); }
+    &.plata { background: linear-gradient(135deg, #c0c0c0, #808080); }
+    &.oro { background: linear-gradient(135deg, #ffd700, #ffb300); }
+  }
+
+  .badge-label {
+    font-size: 0.65rem;
+    color: $text-muted;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+  }
+}
+
+// ═══════════════════════════════════════════
+// ANIMATIONS
+// ═══════════════════════════════════════════
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.3); }
+}
+
+@keyframes floatIcon {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+// ═══════════════════════════════════════════
+// RESPONSIVE
+// ═══════════════════════════════════════════
+@media (max-width: 768px) {
+  :host { padding: 1rem; }
+
+  .personal-hero-glass {
+    padding: 1.25rem;
+
+    .hero-content { flex-direction: column; align-items: flex-start; }
+    .welcome-text .welcome-name { font-size: 1.25rem; }
+    .hero-quick-stats { width: 100%; }
+  }
+
+  .session-card-compact {
+    grid-template-columns: auto 1fr;
+
+    .card-actions {
+      grid-column: 1 / -1;
+      justify-content: flex-end;
+      margin-top: 6px;
+    }
+  }
+
+  .progress-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

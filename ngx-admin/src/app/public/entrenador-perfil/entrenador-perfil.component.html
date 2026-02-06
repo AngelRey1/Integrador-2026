@@ -1,0 +1,228 @@
+<nb-layout>
+  <nb-layout-column class="no-layout-padding">
+    <ngx-shared-header></ngx-shared-header>
+
+    <div class="perfil-container">
+      <!-- Hero Section -->
+      <section class="perfil-hero">
+        <div class="hero-header">
+          <button class="btn-volver" routerLink="/" title="Volver al inicio">
+            <i eva-icon="arrow-back-outline" eva-pack="outline"></i> Volver
+          </button>
+          <h1 class="hero-title" *ngIf="entrenador">{{ entrenador.nombre }}</h1>
+        </div>
+
+        <div class="hero-content" *ngIf="entrenador">
+          <div class="hero-left">
+            <div class="foto-principal">
+              <img [src]="entrenador.foto" [alt]="entrenador.nombre" />
+              <span *ngIf="entrenador.destacado" class="badge-destacado"><nb-icon icon="star"></nb-icon>
+                Destacado</span>
+              <span class="badge-nivel" [class.elite]="entrenador.nivel === 'ELITE'">
+                {{ entrenador.nivel }}
+              </span>
+            </div>
+
+            <div class="galeria-fotos">
+              <img *ngFor="let foto of entrenador.fotos" [src]="foto" alt="Galería" class="foto-thumb" />
+            </div>
+          </div>
+
+          <div class="hero-right">
+            <h1 class="entrenador-nombre">{{ entrenador.nombre }}</h1>
+            <p class="entrenador-ubicacion"><nb-icon icon="pin-outline"></nb-icon> {{ entrenador.ubicacion }}</p>
+
+            <div class="rating-section">
+              <div class="estrellas">
+                <span *ngFor="let star of getEstrellas(entrenador.calificacion)" class="star">
+                  <nb-icon [icon]="star === 'full' ? 'star' : 'star-outline'"></nb-icon>
+                </span>
+              </div>
+              <span class="rating-text">{{ entrenador.calificacion }} ({{ entrenador.totalResenas }} opiniones)</span>
+            </div>
+
+            <div class="especialidades">
+              <span class="especialidad-tag" *ngFor="let deporte of entrenador.deportes">
+                {{ deporte }}
+              </span>
+            </div>
+
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-icon"><nb-icon icon="briefcase-outline"></nb-icon></span>
+                <div>
+                  <span class="info-label">Experiencia</span>
+                  <span class="info-value">{{ entrenador.experiencia }} años</span>
+                </div>
+              </div>
+
+              <div class="info-item">
+                <span class="info-icon"><nb-icon icon="globe-2-outline"></nb-icon></span>
+                <div>
+                  <span class="info-label">Idiomas</span>
+                  <span class="info-value">{{ entrenador.idiomas.join(', ') }}</span>
+                </div>
+              </div>
+
+              <div class="info-item">
+                <span class="info-icon"><nb-icon icon="pin-outline"></nb-icon></span>
+                <div>
+                  <span class="info-label">Modalidad</span>
+                  <span class="info-value">{{ entrenador.modalidad.join(' / ') }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="precio-section">
+              <div class="precio-box">
+                <span class="precio-label">Precio por hora</span>
+                <span class="precio-valor">${{ entrenador.precioHora }}</span>
+              </div>
+              <button class="btn-reservar" [routerLink]="['/entrenador/reservar', entrenador.id]">
+                <i eva-icon="calendar-outline" eva-pack="outline"></i>
+                Reservar
+              </button>
+              <button class="btn-whatsapp" (click)="contactarWhatsApp()">
+                <span class="whatsapp-icon"><nb-icon icon="message-circle-outline"></nb-icon></span>
+                WhatsApp
+              </button>
+            </div>
+
+            <button class="btn-compartir" (click)="compartirPerfil()">
+              🔗 Compartir perfil
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tabs Section -->
+      <section class="tabs-section">
+        <div class="container">
+          <div class="tabs-header">
+            <button class="tab-btn" [class.active]="tabActiva === 'sobre-mi'" (click)="cambiarTab('sobre-mi')">
+              Sobre mí
+            </button>
+            <button class="tab-btn" [class.active]="tabActiva === 'horarios'" (click)="cambiarTab('horarios')">
+              Horarios
+            </button>
+            <button class="tab-btn" [class.active]="tabActiva === 'resenas'" (click)="cambiarTab('resenas')">
+              Reseñas ({{ entrenador.totalResenas }})
+            </button>
+          </div>
+
+          <!-- Tab: Sobre mí -->
+          <div class="tab-content" *ngIf="tabActiva === 'sobre-mi'">
+            <div class="sobre-mi-grid">
+              <div class="columna-izquierda">
+                <h2>Sobre mí</h2>
+                <p class="bio-text">{{ entrenador.bio }}</p>
+
+                <h3>🎓 Certificaciones</h3>
+                <ul class="certificaciones-list">
+                  <li *ngFor="let cert of entrenador.certificaciones">
+                    <span class="check-icon">✓</span> {{ cert }}
+                  </li>
+                </ul>
+
+                <h3>🏆 Logros</h3>
+                <ul class="logros-list">
+                  <li *ngFor="let logro of entrenador.logros">
+                    <span class="trophy-icon">🏆</span> {{ logro }}
+                  </li>
+                </ul>
+              </div>
+
+              <div class="columna-derecha">
+                <div class="info-box">
+                  <h3>💡 ¿Por qué elegirme?</h3>
+                  <ul class="beneficios-list">
+                    <li>✅ Planes personalizados</li>
+                    <li>✅ Seguimiento constante</li>
+                    <li>✅ Resultados garantizados</li>
+                    <li>✅ Flexibilidad de horarios</li>
+                    <li>✅ Primera clase gratis</li>
+                  </ul>
+                </div>
+
+                <div class="contacto-box">
+                  <h3>📞 Contacto</h3>
+                  <p class="contacto-item">
+                    <span class="icon">📧</span> {{ entrenador.email }}
+                  </p>
+                  <p class="contacto-item">
+                    <span class="icon">📱</span> WhatsApp disponible
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab: Horarios -->
+          <div class="tab-content" *ngIf="tabActiva === 'horarios'">
+            <h2>📅 Disponibilidad</h2>
+            <div class="horarios-grid">
+              <div *ngFor="let dia of horarios" class="horario-card" [class.no-disponible]="!dia.disponible">
+                <h3 class="dia-nombre">{{ dia.dia }}</h3>
+                <div *ngIf="dia.disponible" class="horarios-lista">
+                  <span *ngFor="let horario of dia.horarios" class="horario-tag">
+                    {{ horario }}
+                  </span>
+                </div>
+                <p *ngIf="!dia.disponible" class="no-disponible-text">No disponible</p>
+              </div>
+            </div>
+            <p class="horarios-nota">
+              💡 <strong>Nota:</strong> Los horarios pueden variar. Confirma tu disponibilidad por WhatsApp.
+            </p>
+          </div>
+
+          <!-- Tab: Reseñas -->
+          <div class="tab-content" *ngIf="tabActiva === 'resenas'">
+            <div class="resenas-header">
+              <h2><nb-icon icon="star"></nb-icon> Reseñas de clientes</h2>
+              <div class="resumen-rating">
+                <div class="rating-grande">{{ entrenador.calificacion }}</div>
+                <div class="rating-info">
+                  <div class="estrellas-grandes">
+                    <span *ngFor="let star of getEstrellas(entrenador.calificacion)" class="star">
+                      <nb-icon [icon]="star === 'full' ? 'star' : 'star-outline'"></nb-icon>
+                    </span>
+                  </div>
+                  <p>{{ entrenador.totalResenas }} opiniones</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="resenas-lista">
+              <div *ngFor="let resena of resenas" class="resena-card">
+                <div class="resena-header">
+                  <div class="cliente-avatar">
+                    {{ resena.cliente.charAt(0) }}
+                  </div>
+                  <div class="cliente-info">
+                    <h4 class="cliente-nombre">{{ resena.cliente }}</h4>
+                    <div class="resena-rating">
+                      <span *ngFor="let star of getEstrellas(resena.calificacion)" class="star">
+                        <nb-icon [icon]="star === 'full' ? 'star' : 'star-outline'"></nb-icon>
+                      </span>
+                    </div>
+                  </div>
+                  <span class="resena-fecha">{{ resena.fecha }}</span>
+                </div>
+                <p class="resena-comentario">{{ resena.comentario }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA Flotante -->
+      <div class="cta-flotante">
+        <div class="cta-content">
+        </div>
+      </div>
+    </div>
+
+    <ngx-shared-footer></ngx-shared-footer>
+  </nb-layout-column>
+</nb-layout>

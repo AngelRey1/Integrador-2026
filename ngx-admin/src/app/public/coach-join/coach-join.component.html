@@ -1,0 +1,181 @@
+<nb-layout>
+  <nb-layout-column class="no-layout-padding">
+    <ngx-shared-header></ngx-shared-header>
+
+    <div class="coach-join-page">
+      <!-- HERO SECTION -->
+      <section class="hero-coach">
+        <div class="hero-content">
+          <button class="btn-back" (click)="volverAlInicio()">
+            <i eva-icon="arrow-back-outline" eva-pack="outline"></i> Volver
+          </button>
+          <h1>Únete como Entrenador a SportConnect</h1>
+          <p class="hero-lead">Conecta con cientos de alumnos que buscan exactamente tus servicios. Sin comisiones ocultas, sin burocracia.</p>
+          <button class="btn-cta-hero" (click)="irARegistro()">Comenzar ahora</button>
+        </div>
+      </section>
+
+      <!-- SECCIÓN: QUIÉN PUEDE APLICAR -->
+      <section class="info-section">
+        <div class="container-info">
+          <div class="info-card-large">
+            <h2>Quién puede aplicar</h2>
+            <p>Estamos buscando entrenadores certificados o con experiencia comprobable en disciplinas deportivas o bienestar. Ya sea que tengas experiencia formal (con títulos reconocidos) o experiencia práctica documentada, queremos conocerte.</p>
+            <div class="checklist">
+              <div class="check-item">
+                <span class="check-icon">✓</span>
+                <span>Certificación o experiencia comprobable en tu disciplina</span>
+              </div>
+              <div class="check-item">
+                <span class="check-icon">✓</span>
+                <span>Disponibilidad para recibir alumnos en presencial u online</span>
+              </div>
+              <div class="check-item">
+                <span class="check-icon">✓</span>
+                <span>Zona geográfica clara (a nivel de ciudad o sector)</span>
+              </div>
+              <div class="check-item">
+                <span class="check-icon">✓</span>
+                <span>Disposición para obtener badge verificado (validación simple)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN: CÓMO FUNCIONA -->
+      <section class="info-section">
+        <div class="container-info">
+          <div class="info-card-large">
+            <h2>Cómo funciona el sistema</h2>
+            <p>Te simplificamos todo el proceso para que solo te dediques a lo que sabes hacer: entrenar.</p>
+            <div class="process-flow">
+              <div class="process-step">
+                <span class="step-num">1</span>
+                <h4>Completa tu perfil</h4>
+                <p>Foto, disciplinas, zona de cobertura, horarios disponibles y tarifa por sesión.</p>
+              </div>
+              <div class="flow-connector"></div>
+              <div class="process-step">
+                <span class="step-num">2</span>
+                <h4>Validación en 24-48h</h4>
+                <p>Nuestro equipo verifica tus credenciales y activa tu perfil como "Coach Verificado".</p>
+              </div>
+              <div class="flow-connector"></div>
+              <div class="process-step">
+                <span class="step-num">3</span>
+                <h4>Recibe solicitudes</h4>
+                <p>Los alumnos te ven, te contactan por chat y reservan directamente desde tu agenda.</p>
+              </div>
+              <div class="flow-connector"></div>
+              <div class="process-step">
+                <span class="step-num">4</span>
+                <h4>Cobra seguro</h4>
+                <p>El pago llega a tu cuenta. Tú defines políticas de cancelación, nosotros manejamos la seguridad.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN: BENEFICIOS -->
+      <section class="info-section">
+        <div class="container-info">
+          <div class="info-card-large">
+            <h2>Tus beneficios</h2>
+            <p>Diseñado para que ganes más y trabajes menos administrativamente.</p>
+            <div class="benefits-grid">
+              <div class="benefit-box">
+                <div class="benefit-icon"><nb-icon icon="credit-card-outline"></nb-icon></div>
+                <h4>Control total de tarifas</h4>
+                <p>Fijas el precio que cobras por sesión, sin comisiones ocultas ni porcentajes sorpresa.</p>
+              </div>
+              <div class="benefit-box">
+                <div class="benefit-icon"><nb-icon icon="checkmark-circle-outline"></nb-icon></div>
+                <h4>Badge Verificado</h4>
+                <p>Destacas en búsquedas con un badge que dice "Coach Verificado", genera confianza.</p>
+              </div>
+              <div class="benefit-box">
+                <div class="benefit-icon"><nb-icon icon="star-outline"></nb-icon></div>
+                <h4>Reseñas auténticas</h4>
+                <p>Tus alumnos dejan comentarios verificados. Las reseñas que subes posicionan tu perfil.</p>
+              </div>
+              <div class="benefit-box">
+                <div class="benefit-icon"><nb-icon icon="smartphone-outline"></nb-icon></div>
+                <h4>Chat y disponibilidad</h4>
+                <p>Habla directo con tus alumnos. Ellos ven tu agenda en tiempo real y reservan solos.</p>
+              </div>
+              <div class="benefit-box">
+                <div class="benefit-icon"><nb-icon icon="shield-outline"></nb-icon></div>
+                <h4>Protección ante cancelaciones</h4>
+                <p>Si un alumno cancela última hora, tienes políticas de no-show, y te resguardamos.</p>
+              </div>
+              <div class="benefit-box">
+                <div class="benefit-icon"><nb-icon icon="bar-chart-outline"></nb-icon></div>
+                <h4>Panel de control</h4>
+                <p>Gana cientos de pesos por mes sin salir de tu casa. Acceso a reportes y estadísticas.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN: PASOS A SEGUIR -->
+      <section class="info-section">
+        <div class="container-info">
+          <div class="info-card-large">
+            <h2>Así te unes en 3 pasos</h2>
+            <div class="steps-vertical">
+              <div class="step-card" *ngFor="let paso of pasosEntrenador">
+                <span class="step-number">{{ paso.numero }}</span>
+                <div>
+                  <h4>{{ paso.titulo }}</h4>
+                  <p>{{ paso.descripcion }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN: ESTADÍSTICAS -->
+      <section class="stats-section">
+        <div class="container-info">
+          <div class="stats-grid">
+            <div class="stat-block">
+              <span class="stat-number">500+</span>
+              <span class="stat-label">coaches activos en SportConnect</span>
+            </div>
+            <div class="stat-block">
+              <span class="stat-number">4.9★</span>
+              <span class="stat-label">calificación promedio de coaches</span>
+            </div>
+            <div class="stat-block">
+              <span class="stat-number">48h</span>
+              <span class="stat-label">tiempo promedio para conseguir primer alumno</span>
+            </div>
+            <div class="stat-block">
+              <span class="stat-number">10K+</span>
+              <span class="stat-label">sesiones reservadas este mes</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA FINAL -->
+      <section class="final-cta">
+        <div class="cta-box">
+          <h2>¿Listo para ganar más con SportConnect?</h2>
+          <p>Únete a la comunidad de entrenadores que generan ingresos sin límite, sin comisiones ocultas.</p>
+          <button class="btn-primary-xl" (click)="irARegistro()">
+            <i eva-icon="person-add-outline" eva-pack="outline"></i>
+            Crear mi perfil de coach
+          </button>
+          <p class="disclaimer">Validación en 24-48 horas. Sin cuotas de alta.</p>
+        </div>
+      </section>
+    </div>
+
+    <ngx-shared-footer></ngx-shared-footer>
+  </nb-layout-column>
+</nb-layout>

@@ -1,0 +1,196 @@
+.page-title { margin-bottom: 0.5rem; font-weight: 700; }
+.label { 
+  display: flex; 
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem; 
+  font-weight: 600; 
+  color: #222b45; 
+  font-size: 0.875rem; 
+
+  nb-icon {
+    font-size: 1rem;
+    color: #8f9bb3;
+  }
+}
+.mb-2 { margin-bottom: 0.5rem; }
+.mb-3 { margin-bottom: 1rem; }
+.mb-4 { margin-bottom: 1.5rem; }
+.mr-2 { margin-right: 0.5rem; }
+
+.d-flex { display: flex; }
+.justify-content-between { justify-content: space-between; }
+.align-items-center { align-items: center; }
+.gap-2 { gap: 0.5rem; }
+
+nb-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+
+  nb-icon {
+    font-size: 1.25rem;
+  }
+}
+
+// Estilos para inputs de precio
+.input-group {
+  display: flex;
+  align-items: center;
+  gap: 0;
+
+  .input-prefix, .input-suffix {
+    padding: 0.75rem;
+    background: #f7f9fc;
+    border: 1px solid #e4e9f2;
+    color: #8f9bb3;
+    font-weight: 600;
+    font-size: 0.875rem;
+  }
+
+  .input-prefix {
+    border-radius: 4px 0 0 4px;
+    border-right: none;
+  }
+
+  .input-suffix {
+    border-radius: 0 4px 4px 0;
+    border-left: none;
+  }
+
+  input[nbInput] {
+    border-radius: 0;
+    text-align: center;
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+}
+
+// Preview de precios
+.pricing-preview {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px dashed #e4e9f2;
+}
+
+.price-box {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem;
+  border-radius: 12px;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+
+  &.presencial {
+    background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%);
+    border: 2px solid #48bb78;
+  }
+
+  &.online {
+    background: linear-gradient(135deg, #ebf8ff 0%, #bee3f8 100%);
+    border: 2px solid #4299e1;
+  }
+
+  .price-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #64748b;
+    margin-bottom: 0.5rem;
+  }
+
+  .price-amount {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #1a202c;
+  }
+
+  .price-unit {
+    font-size: 0.875rem;
+    color: #64748b;
+  }
+}
+
+// Tags y badges
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tag-badge {
+  margin: 0 !important;
+}
+
+// Lista de certificaciones
+.cert-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #edf1f7;
+    
+    &:last-child { border-bottom: none; }
+
+    nb-icon {
+      font-size: 1rem;
+    }
+  }
+}
+
+// Estadísticas
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid #edf1f7;
+
+  &:last-child { border-bottom: none; }
+
+  nb-icon {
+    font-size: 1.5rem;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a202c;
+  }
+
+  .stat-label {
+    color: #64748b;
+    font-size: 0.875rem;
+  }
+}
+
+.text-muted {
+  color: #8f9bb3;
+  font-size: 0.8rem;
+}
+
+// Pricing card
+.pricing-card {
+  nb-card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+
+    nb-icon {
+      color: white;
+    }
+  }
+}
+

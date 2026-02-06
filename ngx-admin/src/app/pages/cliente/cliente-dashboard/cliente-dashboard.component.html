@@ -1,0 +1,428 @@
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<!-- SPORTCONNECT - CLIENTE DASHBOARD - HUB PERSONAL PREMIUM                     -->
+<!-- Arquitectura: Dashboard personal (NO Discovery - eso está en Landing)       -->
+<!-- Diseño: Glassmorphism + 3D Cards + Premium animations                       -->
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+
+<!-- HERO - Bienvenida Personalizada con Stats en tiempo real -->
+<section class="personal-hero-glass">
+  <div class="hero-backdrop"></div>
+  <div class="hero-content">
+    <div class="welcome-section">
+      <div class="welcome-avatar">
+        <div class="avatar-ring">
+          <img [src]="cliente?.foto_url || 'assets/images/default-avatar.png'" [alt]="cliente?.nombre"
+            class="avatar-img" (error)="$event.target.src='assets/images/default-avatar.png'">
+        </div>
+        <div class="status-indicator online"></div>
+      </div>
+      <div class="welcome-text">
+        <span class="greeting-small">{{ getGreeting() }} 👋</span>
+        <h1 class="welcome-name">{{ cliente?.nombre || 'Atleta' }}</h1>
+        <p class="member-since">
+          <ngx-sport-icon name="calendar" [size]="14" color="rgba(255,255,255,0.7)"></ngx-sport-icon>
+          Miembro desde {{ cliente?.fecha_registro | date:'MMMM yyyy' }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Quick Stats en Hero -->
+    <div class="hero-quick-stats">
+      <div class="quick-stat-pill">
+        <ngx-sport-icon name="fire" [size]="18" color="#ff6b35"></ngx-sport-icon>
+        <span class="stat-num">{{ racha || 0 }}</span>
+        <span class="stat-label">días racha</span>
+      </div>
+      <div class="quick-stat-pill">
+        <ngx-sport-icon name="trophy" [size]="18" color="#ffd700"></ngx-sport-icon>
+        <span class="stat-num">{{ logrosDesbloqueados || 0 }}</span>
+        <span class="stat-label">logros</span>
+      </div>
+      <div class="quick-stat-pill accent">
+        <ngx-sport-icon name="trending-up" [size]="18" color="#00d9a5"></ngx-sport-icon>
+        <span class="stat-num">+{{ progresoMes || 0 }}%</span>
+        <span class="stat-label">este mes</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LAYOUT PRINCIPAL: 2 columnas -->
+<div class="dashboard-grid-layout">
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- COLUMNA PRINCIPAL (70%) -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div class="main-column">
+
+    <!-- PRÓXIMA SESIÓN DESTACADA -->
+    <section class="next-session-highlight" *ngIf="proximaSesion">
+      <div class="section-glass-header">
+        <div class="header-left">
+          <span class="live-indicator">
+            <span class="pulse-dot"></span>
+            PRÓXIMA
+          </span>
+          <h2 class="section-title-premium">Tu Próxima Sesión</h2>
+        </div>
+        <div class="countdown-badge" *ngIf="tiempoRestante">
+          <ngx-sport-icon name="timer" [size]="16" color="#ff6b35"></ngx-sport-icon>
+          <span>{{ tiempoRestante }}</span>
+        </div>
+      </div>
+
+      <div class="featured-session-card">
+        <div class="session-visual">
+          <div class="session-sport-bg" [ngClass]="'sport-' + (proximaSesion.deporte | lowercase)">
+            <ngx-sport-icon [name]="getDeporteIcon(proximaSesion.deporte)" [size]="48"
+              color="rgba(255,255,255,0.3)"></ngx-sport-icon>
+          </div>
+          <div class="session-date-block">
+            <span class="day-big">{{ proximaSesion.fecha_hora | date:'dd' }}</span>
+            <span class="month-abbr">{{ proximaSesion.fecha_hora | date:'MMM' | uppercase }}</span>
+            <span class="time-highlight">{{ proximaSesion.fecha_hora | date:'HH:mm' }}</span>
+          </div>
+        </div>
+
+        <div class="session-details-premium">
+          <div class="trainer-featured">
+            <div class="trainer-avatar-ring">
+              <img [src]="proximaSesion.entrenador?.foto" [alt]="proximaSesion.entrenador?.nombre" class="trainer-img">
+            </div>
+            <div class="trainer-info-column">
+              <h3 class="trainer-name-lg">{{ proximaSesion.entrenador?.nombre }}</h3>
+              <div class="trainer-meta">
+                <span class="sport-tag">
+                  <ngx-sport-icon [name]="getDeporteIcon(proximaSesion.deporte)" [size]="14"></ngx-sport-icon>
+                  {{ proximaSesion.deporte }}
+                </span>
+                <span class="duration-tag">
+                  <ngx-sport-icon name="clock" [size]="14"></ngx-sport-icon>
+                  {{ proximaSesion.duracion }} min
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="session-location" *ngIf="proximaSesion.ubicacion">
+            <ngx-sport-icon name="map-pin" [size]="16" color="#00d9a5"></ngx-sport-icon>
+            <span>{{ proximaSesion.ubicacion }}</span>
+          </div>
+
+          <div class="session-actions-row">
+            <button class="btn-session-action primary" (click)="verSesion(proximaSesion)">
+              <ngx-sport-icon name="eye" [size]="18"></ngx-sport-icon>
+              Ver Detalles
+            </button>
+            <button class="btn-session-action" (click)="contactarEntrenador(proximaSesion.entrenador)">
+              <ngx-sport-icon name="message" [size]="18"></ngx-sport-icon>
+              Mensaje
+            </button>
+            <button class="btn-session-action danger" (click)="cancelarSesion(proximaSesion)" title="Cancelar">
+              <ngx-sport-icon name="x" [size]="18"></ngx-sport-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ESTADO VACÍO: Sin próxima sesión -->
+    <section class="empty-next-session" *ngIf="!proximaSesion">
+      <div class="empty-glass-card">
+        <div class="empty-illustration">
+          <div class="floating-icons">
+            <ngx-sport-icon name="calendar" [size]="28" color="rgba(0,217,165,0.4)"
+              class="float-icon i1"></ngx-sport-icon>
+            <ngx-sport-icon name="futbol" [size]="24" color="rgba(255,107,53,0.4)"
+              class="float-icon i2"></ngx-sport-icon>
+            <ngx-sport-icon name="yoga" [size]="22" color="rgba(138,43,226,0.4)" class="float-icon i3"></ngx-sport-icon>
+            <ngx-sport-icon name="running" [size]="26" color="rgba(0,149,255,0.4)"
+              class="float-icon i4"></ngx-sport-icon>
+          </div>
+          <div class="main-empty-icon">
+            <ngx-sport-icon name="calendar" [size]="56" color="currentColor"></ngx-sport-icon>
+          </div>
+        </div>
+        <h3 class="empty-title">No tienes sesiones programadas</h3>
+        <p class="empty-description">Explora nuestros entrenadores certificados y agenda tu primera sesión</p>
+        <button class="btn-cta-gradient" (click)="buscarEntrenadores()">
+          <ngx-sport-icon name="search" [size]="20"></ngx-sport-icon>
+          Explorar Entrenadores
+        </button>
+      </div>
+    </section>
+
+    <!-- HISTORIAL DE SESIONES -->
+    <section class="sessions-history-section">
+      <div class="section-glass-header">
+        <h2 class="section-title-premium">
+          <ngx-sport-icon name="calendar" [size]="22" color="#00d9a5"></ngx-sport-icon>
+          Todas tus Sesiones
+        </h2>
+        <div class="view-controls">
+          <button class="view-toggle" [class.active]="vistaActiva === 'proximas'" (click)="vistaActiva = 'proximas'">
+            Próximas ({{ proximasSesiones?.length || 0 }})
+          </button>
+          <button class="view-toggle" [class.active]="vistaActiva === 'pasadas'" (click)="vistaActiva = 'pasadas'">
+            Historial
+          </button>
+        </div>
+      </div>
+
+      <!-- Lista de Sesiones Próximas -->
+      <div class="sessions-grid" *ngIf="vistaActiva === 'proximas'">
+        <div class="session-card-compact" *ngFor="let sesion of proximasSesiones; let i = index"
+          [class.featured]="i === 0">
+          <div class="card-date-strip" [ngClass]="'sport-' + (sesion.deporte | lowercase)">
+            <span class="strip-day">{{ sesion.fecha_hora | date:'dd' }}</span>
+            <span class="strip-month">{{ sesion.fecha_hora | date:'MMM' }}</span>
+          </div>
+
+          <div class="card-main-content">
+            <div class="trainer-row">
+              <img [src]="sesion.entrenador?.foto" [alt]="sesion.entrenador?.nombre" class="mini-avatar">
+              <div class="trainer-compact-info">
+                <span class="name">{{ sesion.entrenador?.nombre }}</span>
+                <span class="meta">{{ sesion.deporte }} • {{ sesion.duracion }}min</span>
+              </div>
+            </div>
+            <div class="time-badge">
+              <ngx-sport-icon name="clock" [size]="14"></ngx-sport-icon>
+              {{ sesion.fecha_hora | date:'HH:mm' }}
+            </div>
+          </div>
+
+          <div class="card-actions">
+            <span class="status-chip" [ngClass]="'status-' + sesion.estado?.toLowerCase()">
+              {{ sesion.estado }}
+            </span>
+            <button class="icon-btn" (click)="verSesion(sesion)" title="Ver detalles">
+              <ngx-sport-icon name="eye" [size]="16"></ngx-sport-icon>
+            </button>
+          </div>
+        </div>
+
+        <!-- Estado vacío para próximas -->
+        <div class="empty-state-inline" *ngIf="!proximasSesiones || proximasSesiones.length === 0">
+          <ngx-sport-icon name="calendar" [size]="32" color="rgba(255,255,255,0.3)"></ngx-sport-icon>
+          <p>No hay sesiones programadas</p>
+        </div>
+      </div>
+
+      <!-- Lista de Historial -->
+      <div class="sessions-grid history" *ngIf="vistaActiva === 'pasadas'">
+        <div class="session-card-compact past" *ngFor="let sesion of historialSesiones; let i = index">
+          <div class="card-date-strip past">
+            <span class="strip-day">{{ sesion.fecha_hora | date:'dd' }}</span>
+            <span class="strip-month">{{ sesion.fecha_hora | date:'MMM' }}</span>
+          </div>
+
+          <div class="card-main-content">
+            <div class="trainer-row">
+              <img [src]="sesion.entrenador?.foto" [alt]="sesion.entrenador?.nombre" class="mini-avatar">
+              <div class="trainer-compact-info">
+                <span class="name">{{ sesion.entrenador?.nombre }}</span>
+                <span class="meta">{{ sesion.deporte }} • {{ sesion.duracion }}min</span>
+              </div>
+            </div>
+            <!-- Calificación dada -->
+            <div class="rating-given" *ngIf="sesion.calificacion">
+              <ngx-sport-icon name="star-filled" [size]="14" color="#ffd700"></ngx-sport-icon>
+              {{ sesion.calificacion }}
+            </div>
+          </div>
+
+          <div class="card-actions">
+            <button class="btn-rebook" (click)="reagendarSesion(sesion)" title="Volver a agendar">
+              <ngx-sport-icon name="refresh" [size]="16"></ngx-sport-icon>
+              Reagendar
+            </button>
+          </div>
+        </div>
+
+        <!-- Estado vacío para historial -->
+        <div class="empty-state-inline" *ngIf="!historialSesiones || historialSesiones.length === 0">
+          <ngx-sport-icon name="clock" [size]="32" color="rgba(255,255,255,0.3)"></ngx-sport-icon>
+          <p>Aún no tienes sesiones completadas</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- MI PROGRESO - Cards de estadísticas -->
+    <section class="progress-section">
+      <div class="section-glass-header">
+        <h2 class="section-title-premium">
+          <ngx-sport-icon name="activity" [size]="22" color="#ff6b35"></ngx-sport-icon>
+          Mi Progreso
+        </h2>
+        <span class="period-label">Este mes</span>
+      </div>
+
+      <div class="progress-cards-grid">
+        <div class="progress-card-3d">
+          <div class="card-icon-circle sessions">
+            <ngx-sport-icon name="calendar" [size]="24" color="#fff"></ngx-sport-icon>
+          </div>
+          <div class="card-metric">
+            <span class="metric-value">{{ totalSesionesMes || 0 }}</span>
+            <span class="metric-label">Sesiones</span>
+          </div>
+          <div class="metric-trend up" *ngIf="tendenciaSesiones > 0">
+            <ngx-sport-icon name="trending-up" [size]="14" color="#00d9a5"></ngx-sport-icon>
+            +{{ tendenciaSesiones }}%
+          </div>
+        </div>
+
+        <div class="progress-card-3d">
+          <div class="card-icon-circle hours">
+            <ngx-sport-icon name="clock" [size]="24" color="#fff"></ngx-sport-icon>
+          </div>
+          <div class="card-metric">
+            <span class="metric-value">{{ totalHorasMes || 0 }}</span>
+            <span class="metric-label">Horas</span>
+          </div>
+          <div class="metric-trend">
+            <ngx-sport-icon name="fire" [size]="14" color="#ff6b35"></ngx-sport-icon>
+            {{ caloriasQuemadas || 0 }} kcal
+          </div>
+        </div>
+
+        <div class="progress-card-3d">
+          <div class="card-icon-circle coaches">
+            <ngx-sport-icon name="users" [size]="24" color="#fff"></ngx-sport-icon>
+          </div>
+          <div class="card-metric">
+            <span class="metric-value">{{ entrenadoresUnicos || 0 }}</span>
+            <span class="metric-label">Coaches</span>
+          </div>
+          <div class="metric-trend">
+            <span class="mini-text">diferentes</span>
+          </div>
+        </div>
+
+        <div class="progress-card-3d">
+          <div class="card-icon-circle sports">
+            <ngx-sport-icon name="trophy" [size]="24" color="#fff"></ngx-sport-icon>
+          </div>
+          <div class="card-metric">
+            <span class="metric-value">{{ deportesPracticados || 0 }}</span>
+            <span class="metric-label">Deportes</span>
+          </div>
+          <div class="sports-mini-icons">
+            <ngx-sport-icon *ngFor="let d of deportesLista?.slice(0,3)" [name]="getDeporteIcon(d)" [size]="12"
+              color="rgba(255,255,255,0.6)">
+            </ngx-sport-icon>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- COLUMNA LATERAL (30%) -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div class="side-column">
+
+    <!-- FAVORITOS - Acceso Rápido -->
+    <section class="favorites-panel">
+      <div class="panel-header-glass">
+        <h3 class="panel-title">
+          <ngx-sport-icon name="heart" [size]="18" color="#ff6b35" [filled]="true"></ngx-sport-icon>
+          Mis Favoritos
+        </h3>
+        <span class="count-badge">{{ entrenadoresFavoritos?.length || 0 }}</span>
+      </div>
+
+      <div class="favorites-scroll">
+        <!-- Estado vacío -->
+        <div class="empty-favorites" *ngIf="!entrenadoresFavoritos || entrenadoresFavoritos.length === 0">
+          <div class="empty-heart-icon">
+            <ngx-sport-icon name="heart" [size]="36" color="rgba(255,107,53,0.3)"></ngx-sport-icon>
+          </div>
+          <p>Guarda tus entrenadores favoritos para acceso rápido</p>
+          <button class="btn-outline-small" (click)="buscarEntrenadores()">
+            <ngx-sport-icon name="search" [size]="14"></ngx-sport-icon>
+            Explorar
+          </button>
+        </div>
+
+        <!-- Lista de favoritos -->
+        <div class="favorite-coach-card" *ngFor="let coach of entrenadoresFavoritos">
+          <div class="coach-visual">
+            <img [src]="coach.foto_url" [alt]="coach.nombre_completo" class="coach-photo">
+            <div class="online-dot" *ngIf="coach.disponible"></div>
+          </div>
+
+          <div class="coach-details">
+            <h4 class="coach-name">{{ coach.nombre_completo }}</h4>
+            <div class="coach-specialty">
+              <ngx-sport-icon [name]="getDeporteIcon(coach.especialidad)" [size]="12"></ngx-sport-icon>
+              {{ coach.especialidad }}
+            </div>
+            <div class="coach-rating-price">
+              <span class="rating">
+                <ngx-sport-icon name="star-filled" [size]="12" color="#ffd700"></ngx-sport-icon>
+                {{ coach.calificacion }}
+              </span>
+              <span class="price">${{ coach.tarifa_por_hora }} MXN</span>
+            </div>
+          </div>
+
+          <button class="btn-quick-book" (click)="agendarConEntrenador(coach)" title="Agendar rápido">
+            <ngx-sport-icon name="calendar" [size]="16"></ngx-sport-icon>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ACCIONES RÁPIDAS -->
+    <section class="quick-actions-panel">
+      <h3 class="panel-title-small">Acciones Rápidas</h3>
+
+      <div class="action-buttons-stack">
+        <button class="action-btn-glass" (click)="buscarEntrenadores()">
+          <div class="action-icon search">
+            <ngx-sport-icon name="search" [size]="20" color="#fff"></ngx-sport-icon>
+          </div>
+          <span class="action-text">Buscar Entrenadores</span>
+          <ngx-sport-icon name="chevron-right" [size]="16" color="rgba(255,255,255,0.5)"></ngx-sport-icon>
+        </button>
+
+        <button class="action-btn-glass" (click)="verHistorial()">
+          <div class="action-icon history">
+            <ngx-sport-icon name="clock" [size]="20" color="#fff"></ngx-sport-icon>
+          </div>
+          <span class="action-text">Historial Completo</span>
+          <ngx-sport-icon name="chevron-right" [size]="16" color="rgba(255,255,255,0.5)"></ngx-sport-icon>
+        </button>
+
+        <button class="action-btn-glass" (click)="verPerfil()">
+          <div class="action-icon profile">
+            <ngx-sport-icon name="user" [size]="20" color="#fff"></ngx-sport-icon>
+          </div>
+          <span class="action-text">Mi Perfil</span>
+          <ngx-sport-icon name="chevron-right" [size]="16" color="rgba(255,255,255,0.5)"></ngx-sport-icon>
+        </button>
+      </div>
+    </section>
+
+    <!-- LOGROS RECIENTES -->
+    <section class="achievements-teaser" *ngIf="logrosRecientes?.length > 0">
+      <div class="panel-header-glass">
+        <h3 class="panel-title">
+          <ngx-sport-icon name="award" [size]="18" color="#ffd700"></ngx-sport-icon>
+          Logros Recientes
+        </h3>
+      </div>
+
+      <div class="achievements-row">
+        <div class="achievement-badge" *ngFor="let logro of logrosRecientes?.slice(0,3)" [title]="logro.nombre">
+          <div class="badge-icon" [ngClass]="logro.tipo">
+            <ngx-sport-icon [name]="logro.icono || 'trophy'" [size]="20" color="#fff"></ngx-sport-icon>
+          </div>
+          <span class="badge-label">{{ logro.nombre }}</span>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

@@ -1,0 +1,471 @@
+<div class="container-fluid">
+  <!-- Título -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <h3 class="page-title">Mi Perfil</h3>
+      <p class="text-hint">Gestiona tu información personal y preferencias</p>
+    </div>
+  </div>
+
+  <!-- Card de perfil principal -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <nb-card>
+        <nb-card-body>
+          <div class="perfil-header">
+            <div class="avatar-section">
+              <div class="avatar-wrapper">
+                <img [src]="avatarPreview || usuario.avatar || 'https://i.pravatar.cc/300?img=1'" [alt]="usuario.nombreUsuario || usuario.email" class="avatar-image">
+                <label class="avatar-upload" [class.editing]="editandoPerfil">
+                  <input type="file" accept="image/*" (change)="onFileSelected($event)" [disabled]="!editandoPerfil">
+                  <nb-icon icon="camera-outline"></nb-icon>
+                </label>
+              </div>
+            </div>
+            <div class="perfil-info">
+              <h4 class="nombre">{{ usuario.nombreUsuario || usuario.email }}</h4>
+              <p class="email">
+                <strong>Email:</strong> {{ usuario.email }}
+              </p>
+              <div class="badges">
+                <nb-badge text="Cliente" status="primary"></nb-badge>
+                <nb-badge [text]="edad + ' años'" status="info"></nb-badge>
+              </div>
+            </div>
+            <div class="perfil-actions">
+              <button 
+                *ngIf="!editandoPerfil" 
+                nbButton 
+                status="primary" 
+                (click)="toggleEditarPerfil()"
+              >
+                <nb-icon icon="edit-outline"></nb-icon>
+                Editar Perfil
+              </button>
+              <button 
+                *ngIf="editandoPerfil" 
+                nbButton 
+                status="success" 
+                (click)="guardarPerfil()"
+                [disabled]="perfilForm.invalid || guardando"
+              >
+                <nb-icon icon="checkmark-outline"></nb-icon>
+                Guardar Cambios
+              </button>
+              <button 
+                *ngIf="editandoPerfil" 
+                nbButton 
+                status="basic" 
+                (click)="toggleEditarPerfil()"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+  </div>
+
+  <!-- Tabs de configuración -->
+  <div class="row">
+    <div class="col-12">
+      <nb-card>
+        <nb-card-body>
+          <nb-tabset fullWidth>
+            
+            <!-- Tab 1: Información Personal -->
+            <nb-tab tabTitle="Información Personal" tabIcon="person-outline">
+              <form [formGroup]="perfilForm" class="perfil-form">
+                <div class="row">
+                  <!-- Nombre -->
+                  <div class="col-md-6 mb-3">
+                    <label class="label" for="nombre">Nombre *</label>
+                    <input 
+                      nbInput 
+                      fullWidth 
+                      id="nombre" 
+                      formControlName="nombre"
+                      placeholder="Tu nombre"
+                      [status]="perfilForm.get('nombre')?.invalid && perfilForm.get('nombre')?.touched ? 'danger' : 'basic'"
+                    >
+                    <div class="error-message" *ngIf="perfilForm.get('nombre')?.invalid && perfilForm.get('nombre')?.touched">
+                      El nombre es obligatorio
+                    </div>
+                  </div>
+
+                  <!-- Apellidos -->
+                  <div class="col-md-6 mb-3">
+                    <label class="label" for="apellidos">Apellidos *</label>
+                    <input 
+                      nbInput 
+                      fullWidth 
+                      id="apellidos" 
+                      formControlName="apellidos"
+                      placeholder="Tus apellidos"
+                      [status]="perfilForm.get('apellidos')?.invalid && perfilForm.get('apellidos')?.touched ? 'danger' : 'basic'"
+                    >
+                    <div class="error-message" *ngIf="perfilForm.get('apellidos')?.invalid && perfilForm.get('apellidos')?.touched">
+                      Los apellidos son obligatorios
+                    </div>
+                  </div>
+
+                  <!-- Email -->
+                  <div class="col-md-6 mb-3">
+                    <label class="label" for="email">Email *</label>
+                    <input 
+                      nbInput 
+                      fullWidth 
+                      type="email" 
+                      id="email" 
+                      formControlName="email"
+                      placeholder="tu@email.com"
+                      [status]="perfilForm.get('email')?.invalid && perfilForm.get('email')?.touched ? 'danger' : 'basic'"
+                    >
+                    <div class="error-message" *ngIf="perfilForm.get('email')?.invalid && perfilForm.get('email')?.touched">
+                      <span *ngIf="perfilForm.get('email')?.errors?.['required']">El email es obligatorio</span>
+                      <span *ngIf="perfilForm.get('email')?.errors?.['email']">Email no válido</span>
+                    </div>
+                  </div>
+
+                  <!-- Teléfono -->
+                  <div class="col-md-6 mb-3">
+                    <label class="label" for="telefono">Teléfono *</label>
+                    <input 
+                      nbInput 
+                      fullWidth 
+                      type="tel" 
+                      id="telefono" 
+                      formControlName="telefono"
+                      placeholder="+34 600 000 000"
+                      [status]="perfilForm.get('telefono')?.invalid && perfilForm.get('telefono')?.touched ? 'danger' : 'basic'"
+                    >
+                  </div>
+
+                  <!-- Fecha de nacimiento -->
+                  <div class="col-md-6 mb-3">
+                    <label class="label" for="fecha_nacimiento">Fecha de Nacimiento</label>
+                    <input 
+                      nbInput 
+                      fullWidth 
+                      [nbDatepicker]="datepicker"
+                      formControlName="fecha_nacimiento"
+                      placeholder="Selecciona tu fecha de nacimiento"
+                    >
+                    <nb-datepicker #datepicker></nb-datepicker>
+                  </div>
+
+                  <!-- Género -->
+                  <div class="col-md-6 mb-3">
+                    <label class="label">Género</label>
+                    <nb-select fullWidth formControlName="genero" placeholder="Selecciona tu género">
+                      <nb-option *ngFor="let genero of generosDisponibles" [value]="genero.value">
+                        {{ genero.label }}
+                      </nb-option>
+                    </nb-select>
+                  </div>
+
+                  <!-- Dirección -->
+                  <div class="col-12 mb-3">
+                    <label class="label" for="calle">Dirección</label>
+                    <input 
+                      nbInput 
+                      fullWidth 
+                      id="calle" 
+                      formControlName="calle"
+                      placeholder="Calle, número, piso"
+                    >
+                  </div>
+
+                  <!-- Ciudad -->
+                  <div class="col-md-4 mb-3">
+                    <label class="label" for="ciudad">Ciudad</label>
+                    <input 
+                      nbInput 
+                      fullWidth 
+                      id="ciudad" 
+                      formControlName="ciudad"
+                      placeholder="Ciudad"
+                    >
+                  </div>
+
+                  <!-- Código Postal -->
+                  <div class="col-md-4 mb-3">
+                    <label class="label" for="codigo_postal">Código Postal</label>
+                    <input 
+                      nbInput 
+                      fullWidth 
+                      id="codigo_postal" 
+                      formControlName="codigo_postal"
+                      placeholder="28001"
+                    >
+                  </div>
+
+                  <!-- País -->
+                  <div class="col-md-4 mb-3">
+                    <label class="label">País</label>
+                    <nb-select fullWidth formControlName="pais" placeholder="Selecciona tu país">
+                      <nb-option *ngFor="let pais of paisesDisponibles" [value]="pais.value">
+                        {{ pais.label }}
+                      </nb-option>
+                    </nb-select>
+                  </div>
+                </div>
+              </form>
+
+              <!-- Cambiar contraseña -->
+              <div class="cambiar-password-section">
+                <h6 class="section-title">Cambiar Contraseña</h6>
+                <form [formGroup]="passwordForm" (ngSubmit)="cambiarPassword()">
+                  <div class="row">
+                    <div class="col-md-4 mb-3">
+                      <label class="label" for="password_actual">Contraseña Actual *</label>
+                      <input 
+                        nbInput 
+                        fullWidth 
+                        type="password" 
+                        id="password_actual" 
+                        formControlName="password_actual"
+                        placeholder="••••••••"
+                        [status]="passwordForm.get('password_actual')?.invalid && passwordForm.get('password_actual')?.touched ? 'danger' : 'basic'"
+                      >
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                      <label class="label" for="password_nueva">Nueva Contraseña *</label>
+                      <input 
+                        nbInput 
+                        fullWidth 
+                        type="password" 
+                        id="password_nueva" 
+                        formControlName="password_nueva"
+                        placeholder="••••••••"
+                        [status]="passwordForm.get('password_nueva')?.invalid && passwordForm.get('password_nueva')?.touched ? 'danger' : 'basic'"
+                      >
+                      <div class="error-message" *ngIf="passwordForm.get('password_nueva')?.invalid && passwordForm.get('password_nueva')?.touched">
+                        Mínimo 6 caracteres
+                      </div>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                      <label class="label" for="password_confirmar">Confirmar Contraseña *</label>
+                      <input 
+                        nbInput 
+                        fullWidth 
+                        type="password" 
+                        id="password_confirmar" 
+                        formControlName="password_confirmar"
+                        placeholder="••••••••"
+                        [status]="passwordForm.get('password_confirmar')?.invalid && passwordForm.get('password_confirmar')?.touched ? 'danger' : 'basic'"
+                      >
+                      <div class="error-message" *ngIf="passwordForm.errors?.['passwordMismatch'] && passwordForm.get('password_confirmar')?.touched">
+                        Las contraseñas no coinciden
+                      </div>
+                    </div>
+
+                    <div class="col-12">
+                      <button nbButton type="submit" status="warning" [disabled]="passwordForm.invalid || guardando">
+                        <nb-icon icon="lock-outline"></nb-icon>
+                        Cambiar Contraseña
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </nb-tab>
+
+            <!-- Tab 2: Preferencias Deportivas -->
+            <nb-tab tabTitle="Preferencias Deportivas" tabIcon="activity-outline">
+              <div class="preferencias-form">
+                <!-- Deportes Favoritos -->
+                <div class="form-section mb-4">
+                  <h6 class="section-title">Deportes Favoritos</h6>
+                  <p class="text-hint">Selecciona los deportes que más te interesan</p>
+                  <div class="deportes-grid">
+                    <div 
+                      *ngFor="let deporte of deportesDisponibles" 
+                      class="deporte-card"
+                      [class.selected]="isDeporteSelected(deporte.value)"
+                      (click)="toggleDeporte(deporte.value)"
+                    >
+                      <span class="deporte-icon">{{ deporte.icon }}</span>
+                      <span class="deporte-label">{{ deporte.label }}</span>
+                      <nb-icon *ngIf="isDeporteSelected(deporte.value)" icon="checkmark-circle" class="check-icon"></nb-icon>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Nivel de Experiencia -->
+                <div class="form-section mb-4">
+                  <h6 class="section-title">Nivel de Experiencia</h6>
+                  <nb-radio-group [(value)]="preferencias.nivel_experiencia">
+                    <nb-radio *ngFor="let nivel of nivelesExperiencia" [value]="nivel.value">
+                      {{ nivel.label }}
+                    </nb-radio>
+                  </nb-radio-group>
+                </div>
+
+                <!-- Objetivos -->
+                <div class="form-section mb-4">
+                  <h6 class="section-title">Objetivos de Entrenamiento</h6>
+                  <p class="text-hint">Selecciona uno o varios objetivos</p>
+                  <div class="objetivos-list">
+                    <nb-checkbox 
+                      *ngFor="let objetivo of objetivosDisponibles"
+                      [checked]="isObjetivoSelected(objetivo.value)"
+                      (checkedChange)="toggleObjetivo(objetivo.value)"
+                    >
+                      {{ objetivo.label }}
+                    </nb-checkbox>
+                  </div>
+                </div>
+
+                <!-- Días Preferidos -->
+                <div class="form-section mb-4">
+                  <h6 class="section-title">Días Preferidos para Entrenar</h6>
+                  <div class="dias-grid">
+                    <button 
+                      *ngFor="let dia of diasDisponibles"
+                      nbButton
+                      [status]="isDiaSelected(dia.value) ? 'primary' : 'basic'"
+                      size="small"
+                      (click)="toggleDia(dia.value)"
+                    >
+                      {{ dia.label }}
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Horario Preferido -->
+                <div class="form-section mb-4">
+                  <h6 class="section-title">Horario Preferido</h6>
+                  <nb-select [(selected)]="preferencias.horario_preferido" fullWidth>
+                    <nb-option *ngFor="let horario of horariosDisponibles" [value]="horario.value">
+                      {{ horario.label }}
+                    </nb-option>
+                  </nb-select>
+                </div>
+
+                <!-- Presupuesto Mensual -->
+                <div class="form-section mb-4">
+                  <h6 class="section-title">Presupuesto Mensual</h6>
+                  <div class="presupuesto-input">
+                    <input 
+                      nbInput 
+                      type="number" 
+                      [(ngModel)]="preferencias.presupuesto_mensual"
+                      placeholder="2500"
+                      min="0"
+                      step="100"
+                    >
+                    <span class="currency">$ MXN</span>
+                  </div>
+                  <p class="text-hint mt-2">Presupuesto aproximado que deseas invertir mensualmente</p>
+                </div>
+
+                <!-- Botón guardar -->
+                <div class="form-actions">
+                  <button nbButton status="primary" (click)="guardarPreferencias()" [disabled]="guardando">
+                    <nb-icon icon="save-outline"></nb-icon>
+                    Guardar Preferencias
+                  </button>
+                </div>
+              </div>
+            </nb-tab>
+
+            <!-- Tab 3: Configuración -->
+            <nb-tab tabTitle="Configuración" tabIcon="settings-outline">
+              <div class="configuracion-form">
+                <!-- Notificaciones por Email -->
+                <div class="form-section mb-4">
+                  <h6 class="section-title">Notificaciones por Email</h6>
+                  <div class="notificaciones-list">
+                    <div class="notificacion-item">
+                      <div class="notificacion-info">
+                        <strong>Nuevas reservas</strong>
+                        <p class="text-hint">Recibe un email cuando se confirme una reserva</p>
+                      </div>
+                      <nb-toggle [(checked)]="notificaciones.email_nuevas_reservas"></nb-toggle>
+                    </div>
+
+                    <div class="notificacion-item">
+                      <div class="notificacion-info">
+                        <strong>Recordatorios</strong>
+                        <p class="text-hint">Recordatorios 24h antes de tus sesiones</p>
+                      </div>
+                      <nb-toggle [(checked)]="notificaciones.email_recordatorios"></nb-toggle>
+                    </div>
+
+                    <div class="notificacion-item">
+                      <div class="notificacion-info">
+                        <strong>Promociones y ofertas</strong>
+                        <p class="text-hint">Recibe información sobre ofertas especiales</p>
+                      </div>
+                      <nb-toggle [(checked)]="notificaciones.email_promociones"></nb-toggle>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Notificaciones por SMS -->
+                <div class="form-section mb-4">
+                  <h6 class="section-title">Notificaciones por SMS</h6>
+                  <div class="notificaciones-list">
+                    <div class="notificacion-item">
+                      <div class="notificacion-info">
+                        <strong>Recordatorios SMS</strong>
+                        <p class="text-hint">Recordatorios por SMS antes de tus sesiones</p>
+                      </div>
+                      <nb-toggle [(checked)]="notificaciones.sms_recordatorios"></nb-toggle>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Notificaciones Push -->
+                <div class="form-section mb-4">
+                  <h6 class="section-title">Notificaciones Push</h6>
+                  <div class="notificaciones-list">
+                    <div class="notificacion-item">
+                      <div class="notificacion-info">
+                        <strong>Notificaciones en el navegador</strong>
+                        <p class="text-hint">Recibe notificaciones push en tu navegador</p>
+                      </div>
+                      <nb-toggle [(checked)]="notificaciones.push_notificaciones"></nb-toggle>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Botón guardar notificaciones -->
+                <div class="form-actions mb-5">
+                  <button nbButton status="primary" (click)="guardarNotificaciones()" [disabled]="guardando">
+                    <nb-icon icon="bell-outline"></nb-icon>
+                    Guardar Configuración
+                  </button>
+                </div>
+
+                <!-- Zona de peligro -->
+                <div class="danger-zone">
+                  <h6 class="section-title danger">Zona de Peligro</h6>
+                  <nb-card accent="danger">
+                    <nb-card-body>
+                      <div class="danger-content">
+                        <div>
+                          <strong>Eliminar cuenta</strong>
+                          <p class="text-hint mb-0">Esta acción eliminará permanentemente tu cuenta y todos tus datos</p>
+                        </div>
+                        <button nbButton status="danger" outline (click)="eliminarCuenta()">
+                          <nb-icon icon="trash-2-outline"></nb-icon>
+                          Eliminar Cuenta
+                        </button>
+                      </div>
+                    </nb-card-body>
+                  </nb-card>
+                </div>
+              </div>
+            </nb-tab>
+
+          </nb-tabset>
+        </nb-card-body>
+      </nb-card>
+    </div>
+  </div>
+</div>

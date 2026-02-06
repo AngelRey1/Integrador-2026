@@ -1,0 +1,118 @@
+.page-title {
+  margin-bottom: 0.5rem;
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #222b45;
+}
+
+.text-hint {
+  color: #8f9bb3;
+  font-size: 0.875rem;
+}
+
+.catalogo-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+  }
+
+  .catalogo-imagen {
+    width: 100%;
+    height: 220px;
+    overflow: hidden;
+    border-radius: 8px 8px 0 0;
+    margin: -1rem -1rem 1rem -1rem;
+    background: #f7f9fc;
+    position: relative;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    &:hover img {
+      transform: scale(1.05);
+    }
+  }
+
+  .catalogo-imagen-placeholder {
+    width: 100%;
+    height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f7f9fc 0%, #edf1f7 100%);
+    border-radius: 8px 8px 0 0;
+    margin: -1rem -1rem 1rem -1rem;
+
+    nb-icon {
+      font-size: 4rem;
+      color: #8f9bb3;
+      opacity: 0.5;
+    }
+  }
+
+  .catalogo-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+
+    .catalogo-categoria {
+      margin-bottom: 0.5rem;
+    }
+
+    .catalogo-nombre {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #222b45;
+      margin-bottom: 0.75rem;
+      line-height: 1.4;
+    }
+
+    .catalogo-descripcion {
+      color: #8f9bb3;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin-bottom: 1rem;
+      flex: 1;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .catalogo-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+      padding-top: 1rem;
+      border-top: 1px solid #edf1f7;
+
+      .catalogo-precio {
+        font-size: 1.25rem;
+        color: #00d68f;
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+nb-card {
+  height: 100%;
+  transition: box-shadow 0.3s ease;
+  overflow: hidden;
+  border: 1px solid #edf1f7;
+
+  &:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    border-color: #e4e9f2;
+  }
+}
+

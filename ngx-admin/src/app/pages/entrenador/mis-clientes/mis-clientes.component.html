@@ -1,0 +1,35 @@
+<div class="container-fluid">
+  <div class="row mb-4">
+    <div class="col-12">
+      <h3 class="page-title">Mis Clientes</h3>
+      <input nbInput fullWidth placeholder="Buscar clientes..." [(ngModel)]="filtro" class="mt-3">
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6 col-lg-4 mb-4" *ngFor="let cliente of clientesFiltrados">
+      <nb-card>
+        <nb-card-body>
+          <div class="cliente-header">
+            <img [src]="cliente.avatar" [alt]="cliente.nombre" class="avatar">
+            <div>
+              <h6>{{ cliente.nombre }}</h6>
+              <p class="text-hint mb-0">{{ cliente.email }}</p>
+            </div>
+          </div>
+          <div class="cliente-stats">
+            <div class="stat">
+              <span class="value">{{ cliente.sesiones_totales }}</span>
+              <span class="label">Sesiones</span>
+            </div>
+            <div class="stat">
+              <span class="value">{{ getTasaAsistencia(cliente) }}%</span>
+              <span class="label">Asistencia</span>
+            </div>
+          </div>
+          <p class="notas">{{ cliente.notas }}</p>
+        </nb-card-body>
+      </nb-card>
+    </div>
+  </div>
+</div>

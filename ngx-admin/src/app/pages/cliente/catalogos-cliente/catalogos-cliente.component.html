@@ -1,0 +1,101 @@
+<div class="container-fluid">
+  <!-- Título -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <h3 class="page-title">Catálogos</h3>
+      <p class="text-hint">Explora nuestros productos y servicios disponibles</p>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <nb-card>
+        <nb-card-body>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <input
+                nbInput
+                fullWidth
+                type="text"
+                placeholder="Buscar catálogos..."
+                [(ngModel)]="filtroBusqueda"
+                (input)="aplicarFiltros()"
+              />
+            </div>
+            <div class="col-md-6 mb-3">
+              <nb-select
+                fullWidth
+                [(ngModel)]="filtroCategoria"
+                (ngModelChange)="aplicarFiltros()"
+                placeholder="Filtrar por categoría"
+              >
+                <nb-option *ngFor="let cat of categorias" [value]="cat.value">
+                  {{ cat.label }}
+                </nb-option>
+              </nb-select>
+            </div>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="row" *ngIf="loading">
+    <div class="col-12 text-center">
+      <nb-spinner size="large"></nb-spinner>
+      <p>Cargando catálogos...</p>
+    </div>
+  </div>
+
+  <!-- Lista de Catálogos -->
+  <div class="row" *ngIf="!loading">
+    <div class="col-12 mb-3">
+      <p *ngIf="catalogosFiltrados.length === 0" class="text-muted">
+        No se encontraron catálogos con los filtros seleccionados.
+      </p>
+      <p *ngIf="catalogosFiltrados.length > 0" class="text-muted">
+        Mostrando {{ catalogosFiltrados.length }} catálogo(s)
+      </p>
+    </div>
+
+    <div class="col-md-6 col-lg-4 mb-4" *ngFor="let catalogo of catalogosFiltrados">
+      <nb-card (click)="verDetalle(catalogo)" style="cursor: pointer; height: 100%;">
+        <nb-card-body>
+          <div class="catalogo-card">
+            <div class="catalogo-imagen" *ngIf="catalogo.imagen_url">
+              <img [src]="catalogo.imagen_url" [alt]="catalogo.nombre" />
+            </div>
+            <div class="catalogo-imagen-placeholder" *ngIf="!catalogo.imagen_url">
+              <nb-icon icon="book-outline" [options]="{ animation: { type: 'pulse' } }"></nb-icon>
+            </div>
+            
+            <div class="catalogo-info">
+              <div class="catalogo-categoria">
+                <nb-badge [text]="getCategoriaLabel(catalogo.categoria)" status="info"></nb-badge>
+              </div>
+              
+              <h4 class="catalogo-nombre">{{ catalogo.nombre }}</h4>
+              
+              <p class="catalogo-descripcion">{{ catalogo.descripcion }}</p>
+              
+              <div class="catalogo-footer">
+                <div class="catalogo-precio" *ngIf="catalogo.precio">
+                  <strong>{{ catalogo.precio | number:'1.2-2' }} MXN</strong>
+                </div>
+                <div class="catalogo-disponible">
+                  <nb-badge 
+                    [text]="catalogo.disponible ? 'Disponible' : 'No disponible'" 
+                    [status]="catalogo.disponible ? 'success' : 'danger'">
+                  </nb-badge>
+                </div>
+              </div>
+            </div>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+  </div>
+</div>
+

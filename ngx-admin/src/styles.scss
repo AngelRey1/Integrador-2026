@@ -1,0 +1,28 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap");
+@import "~@nebular/theme/styles/theming";
+@import "~@nebular/theme/styles/themes/default";
+
+body {
+  font-family: "Space Grotesk", "Helvetica Neue", Arial, sans-serif;
+  margin: 0;
+}
+
+// ============================================
+// Estilos globales para iconos - evitar flash
+// ============================================
+nb-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  
+  // Tamaño por defecto
+  &:not([class*="icon-"]) {
+    width: 1.25em;
+    height: 1.25em;
+  }
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+}

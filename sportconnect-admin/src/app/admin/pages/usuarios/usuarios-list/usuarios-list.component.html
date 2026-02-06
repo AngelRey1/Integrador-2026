@@ -1,0 +1,158 @@
+<div class="page-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1>Gestión de Usuarios</h1>
+      <p>Administra los usuarios de la plataforma SportConnect</p>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-row">
+    <nb-card class="stat-card">
+      <nb-card-body>
+        <div class="stat-icon primary">
+          <nb-icon icon="people-outline"></nb-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats.total }}</span>
+          <span class="stat-label">Total Usuarios</span>
+        </div>
+      </nb-card-body>
+    </nb-card>
+
+    <nb-card class="stat-card">
+      <nb-card-body>
+        <div class="stat-icon success">
+          <nb-icon icon="checkmark-circle-outline"></nb-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats.activos }}</span>
+          <span class="stat-label">Activos</span>
+        </div>
+      </nb-card-body>
+    </nb-card>
+
+    <nb-card class="stat-card">
+      <nb-card-body>
+        <div class="stat-icon danger">
+          <nb-icon icon="slash-outline"></nb-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats.baneados }}</span>
+          <span class="stat-label">Baneados</span>
+        </div>
+      </nb-card-body>
+    </nb-card>
+
+    <nb-card class="stat-card">
+      <nb-card-body>
+        <div class="stat-icon info">
+          <nb-icon icon="trending-up-outline"></nb-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats.nuevosEsteMes }}</span>
+          <span class="stat-label">Nuevos este mes</span>
+        </div>
+      </nb-card-body>
+    </nb-card>
+  </div>
+
+  <!-- Filters -->
+  <nb-card class="filters-card">
+    <nb-card-body>
+      <div class="filters-row">
+        <div class="search-box">
+          <nb-icon icon="search-outline"></nb-icon>
+          <input 
+            type="text" 
+            placeholder="Buscar por nombre o email..."
+            [ngModel]="searchTerm"
+            (ngModelChange)="onSearch($event)"
+          />
+        </div>
+        <div class="filter-buttons">
+          <button nbButton [status]="filterEstado === 'todos' ? 'primary' : 'basic'" size="small" (click)="onFilterChange('todos')">
+            Todos
+          </button>
+          <button nbButton [status]="filterEstado === 'activo' ? 'success' : 'basic'" size="small" (click)="onFilterChange('activo')">
+            Activos
+          </button>
+          <button nbButton [status]="filterEstado === 'baneado' ? 'danger' : 'basic'" size="small" (click)="onFilterChange('baneado')">
+            Baneados
+          </button>
+        </div>
+      </div>
+    </nb-card-body>
+  </nb-card>
+
+  <!-- Users Table -->
+  <nb-card>
+    <nb-card-header>
+      <span>Lista de Usuarios</span>
+      <nb-badge [text]="filteredUsuarios.length + ' usuarios'" status="info"></nb-badge>
+    </nb-card-header>
+    <nb-card-body class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Usuario</th>
+            <th>Email</th>
+            <th>Rol</th>
+            <th>Estado</th>
+            <th>Reservas</th>
+            <th>Registro</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let usuario of filteredUsuarios">
+            <td>
+              <nb-user [name]="usuario.nombre" [picture]="usuario.avatar" size="medium" onlyPicture="false"></nb-user>
+            </td>
+            <td>{{ usuario.email }}</td>
+            <td>
+              <nb-badge [text]="usuario.rol" status="primary"></nb-badge>
+            </td>
+            <td>
+              <nb-badge 
+                [text]="usuario.estado" 
+                [status]="usuario.estado === 'activo' ? 'success' : usuario.estado === 'baneado' ? 'danger' : 'warning'"
+              ></nb-badge>
+            </td>
+            <td>{{ usuario.reservas }}</td>
+            <td>{{ usuario.fechaRegistro | date:'dd/MM/yyyy' }}</td>
+            <td>
+              <div class="action-buttons">
+                <button nbButton ghost size="small" status="info" (click)="viewUser(usuario)" nbTooltip="Ver detalles">
+                  <nb-icon icon="eye-outline"></nb-icon>
+                </button>
+                <button 
+                  *ngIf="usuario.estado !== 'baneado'" 
+                  nbButton ghost size="small" status="danger" 
+                  (click)="banUser(usuario)" 
+                  nbTooltip="Banear usuario"
+                >
+                  <nb-icon icon="slash-outline"></nb-icon>
+                </button>
+                <button 
+                  *ngIf="usuario.estado === 'baneado'" 
+                  nbButton ghost size="small" status="success" 
+                  (click)="unbanUser(usuario)" 
+                  nbTooltip="Desbanear usuario"
+                >
+                  <nb-icon icon="checkmark-circle-outline"></nb-icon>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="empty-state" *ngIf="filteredUsuarios.length === 0">
+        <nb-icon icon="people-outline"></nb-icon>
+        <p>No se encontraron usuarios</p>
+      </div>
+    </nb-card-body>
+  </nb-card>
+</div>

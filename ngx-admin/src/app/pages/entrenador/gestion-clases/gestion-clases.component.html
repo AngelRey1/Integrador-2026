@@ -1,0 +1,145 @@
+<div class="container-fluid">
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h3 class="page-title">Gestión de Clases</h3>
+          <p class="text-hint">Administra tus clases y servicios</p>
+        </div>
+        <button nbButton status="primary" (click)="nuevaClase()">
+          <nb-icon icon="plus-outline"></nb-icon>
+          Nueva Clase
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulario -->
+  <div class="row mb-4" *ngIf="mostrarFormulario">
+    <div class="col-12">
+      <nb-card>
+        <nb-card-header>{{ claseEnEdicion ? 'Editar Clase' : 'Nueva Clase' }}</nb-card-header>
+        <nb-card-body>
+          <form [formGroup]="claseForm" (ngSubmit)="guardarClase()">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="label">Nombre de la Clase *</label>
+                <input nbInput fullWidth formControlName="nombre" placeholder="Ej: Yoga Integral">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="label">Deporte *</label>
+                <nb-select fullWidth formControlName="deporte">
+                  <nb-option *ngFor="let deporte of deportesDisponibles" [value]="deporte">{{ deporte }}</nb-option>
+                </nb-select>
+              </div>
+              <div class="col-12 mb-3">
+                <label class="label">Descripción *</label>
+                <textarea nbInput fullWidth formControlName="descripcion" rows="3"></textarea>
+                <span class="char-counter">{{ descripcionLength }} / 300</span>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="label">Modalidad *</label>
+                <nb-select fullWidth formControlName="modalidad">
+                  <nb-option value="presencial">Presencial</nb-option>
+                  <nb-option value="online">Online</nb-option>
+                  <nb-option value="ambas">Ambas</nb-option>
+                </nb-select>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="label">Duración (min) *</label>
+                <input nbInput fullWidth type="number" formControlName="duracion">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="label">Precio (€) *</label>
+                <input nbInput fullWidth type="number" formControlName="precio">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="label">Cupo Máximo *</label>
+                <input nbInput fullWidth type="number" formControlName="cupo_maximo">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="label">Ubicación</label>
+                <input nbInput fullWidth formControlName="ubicacion" placeholder="Ej: Estudio Central">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="label">Nivel *</label>
+                <nb-select fullWidth formControlName="nivel">
+                  <nb-option *ngFor="let nivel of nivelesDisponibles" [value]="nivel">{{ nivel }}</nb-option>
+                </nb-select>
+              </div>
+            </div>
+            <div class="d-flex justify-content-end gap-2">
+              <button nbButton type="button" status="basic" (click)="cancelarFormulario()">Cancelar</button>
+              <button nbButton type="submit" status="primary">Guardar Clase</button>
+            </div>
+          </form>
+        </nb-card-body>
+      </nb-card>
+    </div>
+  </div>
+
+  <!-- Lista de clases -->
+  <div class="row">
+    <div class="col-12 col-md-6 col-lg-4 mb-4" *ngFor="let clase of clases">
+      <nb-card [class.inactive]="!clase.activa">
+        <nb-card-header>
+          <div class="d-flex justify-content-between align-items-center">
+            <strong>{{ clase.nombre }}</strong>
+            <nb-toggle [checked]="clase.activa" (checkedChange)="toggleActiva(clase)"></nb-toggle>
+          </div>
+        </nb-card-header>
+        <nb-card-body>
+          <div class="clase-info">
+            <p class="deporte-badge">{{ clase.deporte }}</p>
+            <p class="descripcion">{{ clase.descripcion }}</p>
+            <div class="clase-meta">
+              <div class="meta-item">
+                <nb-icon icon="clock-outline"></nb-icon>
+                <span>{{ clase.duracion }} min</span>
+              </div>
+              <div class="meta-item">
+                <nb-icon icon="people-outline"></nb-icon>
+                <span>{{ clase.cupo_maximo }} personas</span>
+              </div>
+              <div class="meta-item">
+                <nb-icon icon="pricetags-outline"></nb-icon>
+                <span>{{ clase.precio }}€</span>
+              </div>
+            </div>
+            <div class="clase-badges">
+              <nb-badge [text]="clase.modalidad" [status]="clase.modalidad === 'online' ? 'info' : 'success'"></nb-badge>
+              <nb-badge [text]="clase.nivel" status="basic"></nb-badge>
+            </div>
+          </div>
+        </nb-card-body>
+        <nb-card-footer>
+          <div class="d-flex gap-2">
+            <button nbButton size="small" status="info" (click)="editarClase(clase)">
+              <nb-icon icon="edit-outline"></nb-icon>
+              Editar
+            </button>
+            <button nbButton size="small" status="danger" (click)="eliminarClase(clase, dialogEliminar)">
+              <nb-icon icon="trash-2-outline"></nb-icon>
+              Eliminar
+            </button>
+          </div>
+        </nb-card-footer>
+      </nb-card>
+    </div>
+  </div>
+</div>
+
+<ng-template #dialogEliminar let-data let-ref="dialogRef">
+  <nb-card>
+    <nb-card-header>Confirmar Eliminación</nb-card-header>
+    <nb-card-body>
+      <p>¿Estás seguro de que deseas eliminar la clase "{{ data.nombre }}"?</p>
+    </nb-card-body>
+    <nb-card-footer>
+      <div class="d-flex justify-content-end gap-2">
+        <button nbButton status="basic" (click)="ref.close()">Cancelar</button>
+        <button nbButton status="danger" (click)="confirmarEliminar(ref)">Eliminar</button>
+      </div>
+    </nb-card-footer>
+  </nb-card>
+</ng-template>
