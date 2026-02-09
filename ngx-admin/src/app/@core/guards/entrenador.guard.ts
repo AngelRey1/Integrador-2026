@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, Router } from '@angular/router';
-import { AuthService } from '../services/auth.service';
+import { AuthFirebaseService } from '../services/auth-firebase.service';
 
 @Injectable({ providedIn: 'root' })
 export class EntrenadorGuard implements CanActivate {
-  constructor(private auth: AuthService, private router: Router) {}
+  constructor(private authFirebase: AuthFirebaseService, private router: Router) {}
 
   canActivate(): boolean {
-    const role = this.auth.getRole();
+    const role = this.authFirebase.getRole();
     if (role === 'ENTRENADOR' || role === 'entrenador') {
       return true;
     }
