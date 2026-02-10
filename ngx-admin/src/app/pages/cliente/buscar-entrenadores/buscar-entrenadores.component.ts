@@ -104,7 +104,13 @@ export class BuscarEntrenadoresComponent implements OnInit, OnDestroy {
 
   cargarEntrenadores(): void {
     this.cargando = true;
+    
+    // DEBUG: Mostrar TODOS los entrenadores para diagnóstico
+    this.clienteFirebase.getAllEntrenadoresDebug().subscribe();
+    
+    // Cargar entrenadores filtrados (verificados y activos)
     this.subscription = this.clienteFirebase.getEntrenadores().subscribe(entrenadores => {
+      console.log('📊 Total entrenadores para mostrar:', entrenadores.length);
       this.entrenadores = entrenadores.map(e => this.convertirEntrenador(e));
       this.entrenadoresFiltrados = [...this.entrenadores];
       this.ordenarResultados();

@@ -31,7 +31,7 @@
     <div class="metric-content">
       <span class="metric-label">Clientes Activos</span>
       <span class="metric-value">{{ clientesActivos }}</span>
-      <span class="metric-trend positive">+3 este mes</span>
+      <span class="metric-trend" [ngClass]="getTendenciaClientes().tipo">{{ getTendenciaClientes().valor }}</span>
     </div>
   </div>
 
@@ -44,7 +44,7 @@
     <div class="metric-content">
       <span class="metric-label">Sesiones Este Mes</span>
       <span class="metric-value">{{ sesionesMes }}</span>
-      <span class="metric-trend neutral">+2 vs mes anterior</span>
+      <span class="metric-trend" [ngClass]="getTendenciaSesiones().tipo">{{ getTendenciaSesiones().valor }}</span>
     </div>
   </div>
 
@@ -58,7 +58,7 @@
     <div class="metric-content">
       <span class="metric-label">Ingresos Este Mes</span>
       <span class="metric-value">{{ formatearMoneda(ingresosMes) }}</span>
-      <span class="metric-trend negative">-6% vs mes anterior</span>
+      <span class="metric-trend" [ngClass]="getTendenciaIngresos().tipo">{{ getTendenciaIngresos().valor }}</span>
     </div>
   </div>
 

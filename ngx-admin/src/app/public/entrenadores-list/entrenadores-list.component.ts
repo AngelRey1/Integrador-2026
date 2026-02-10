@@ -1,9 +1,11 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
+import { Subscription } from 'rxjs';
+import { ClienteFirebaseService, Entrenador as EntrenadorFirebase } from '../../@core/services/cliente-firebase.service';
 
 interface Entrenador {
-  id: number;
+  id: string;
   nombre: string;
   ubicacion: string;
   foto: string;
@@ -23,10 +25,12 @@ interface Entrenador {
   templateUrl: './entrenadores-list.component.html',
   styleUrls: ['./entrenadores-list.component.scss']
 })
-export class EntrenadoresListComponent implements OnInit {
+export class EntrenadoresListComponent implements OnInit, OnDestroy {
   @ViewChild('filtrosSectionRef') filtrosSection: ElementRef;
   searchQuery = '';
   ubicacionQuery = '';
+  loading = true;
+  private subscription: Subscription;
   
   filtros = {
     deporte: 'todos',
@@ -55,10 +59,10 @@ export class EntrenadoresListComponent implements OnInit {
     'Calistenia'
   ];
 
-  // Lista completa de entrenadores (sincronizada con home)
+  // Lista de entrenadores (se carga desde Firebase)
   entrenadores: Entrenador[] = [
     {
-      id: 1,
+      id: '1',
       nombre: 'Carlos Méndez',
       ubicacion: 'Mérida',
       foto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
@@ -73,7 +77,7 @@ export class EntrenadoresListComponent implements OnInit {
       descripcion: 'Entrenador certificado con 10 años de experiencia'
     },
     {
-      id: 2,
+      id: '2',
       nombre: 'Ana García',
       ubicacion: 'Mérida',
       foto: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop',
@@ -88,7 +92,7 @@ export class EntrenadoresListComponent implements OnInit {
       descripcion: 'Instructora certificada en Hatha y Vinyasa Yoga'
     },
     {
-      id: 3,
+      id: '3',
       nombre: 'Jorge Sánchez',
       ubicacion: 'Mérida',
       foto: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop',
@@ -103,7 +107,7 @@ export class EntrenadoresListComponent implements OnInit {
       descripcion: 'Entrenador certificado CrossFit Level 3'
     },
     {
-      id: 4,
+      id: '4',
       nombre: 'María López',
       ubicacion: 'Mérida',
       foto: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop',
@@ -118,7 +122,7 @@ export class EntrenadoresListComponent implements OnInit {
       descripcion: 'Especialista en running y maratones'
     },
     {
-      id: 5,
+      id: '5',
       nombre: 'Roberto Hernández',
       ubicacion: 'Mérida',
       foto: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop',
@@ -133,7 +137,7 @@ export class EntrenadoresListComponent implements OnInit {
       descripcion: 'Boxeador profesional con 12 años de experiencia'
     },
     {
-      id: 6,
+      id: '6',
       nombre: 'Laura Martínez',
       ubicacion: 'Mérida',
       foto: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop',
@@ -148,7 +152,7 @@ export class EntrenadoresListComponent implements OnInit {
       descripcion: 'Nadadora profesional y entrenadora certificada'
     },
     {
-      id: 7,
+      id: '7',
       nombre: 'Diego Ramírez',
       ubicacion: 'Mérida',
       foto: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=400&h=400&fit=crop',
@@ -163,7 +167,7 @@ export class EntrenadoresListComponent implements OnInit {
       descripcion: 'Ex-tenista profesional, entrenador certificado'
     },
     {
-      id: 8,
+      id: '8',
       nombre: 'Sofia Torres',
       ubicacion: 'Mérida',
       foto: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop',
@@ -178,7 +182,7 @@ export class EntrenadoresListComponent implements OnInit {
       descripcion: 'Instructora certificada de Pilates Mat y Reformer'
     },
     {
-      id: 9,
+      id: '9',
       nombre: 'Luis Fernández',
       ubicacion: 'Mérida',
       foto: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=400&fit=crop',
@@ -193,7 +197,7 @@ export class EntrenadoresListComponent implements OnInit {
       descripcion: 'Ciclista profesional y entrenador de ruta y montaña'
     },
     {
-      id: 10,
+      id: '10',
       nombre: 'Valeria Rojas',
       ubicacion: 'Mérida',
       foto: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=400&fit=crop',
@@ -208,7 +212,7 @@ export class EntrenadoresListComponent implements OnInit {
       descripcion: 'Instructora certificada de Zumba y baile fitness'
     },
     {
-      id: 11,
+      id: '11',
       nombre: 'Eduardo Morales',
       ubicacion: 'Mérida',
       foto: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop',
@@ -223,7 +227,7 @@ export class EntrenadoresListComponent implements OnInit {
       descripcion: 'Especialista en entrenamiento funcional y acondicionamiento'
     },
     {
-      id: 12,
+      id: '12',
       nombre: 'Patricia Silva',
       ubicacion: 'Mérida',
       foto: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&h=400&fit=crop',
@@ -238,7 +242,7 @@ export class EntrenadoresListComponent implements OnInit {
       descripcion: 'Instructora certificada de spinning y cycling indoor'
     },
     {
-      id: 13,
+      id: '13',
       nombre: 'Andrés Castillo',
       ubicacion: 'Mérida',
       foto: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop',
@@ -253,7 +257,7 @@ export class EntrenadoresListComponent implements OnInit {
       descripcion: 'Maestro de artes marciales mixtas y defensa personal'
     },
     {
-      id: 14,
+      id: '14',
       nombre: 'Camila Reyes',
       ubicacion: 'Mérida',
       foto: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=400&fit=crop',
@@ -268,7 +272,7 @@ export class EntrenadoresListComponent implements OnInit {
       descripcion: 'Bailarina profesional e instructora de ballet fitness'
     },
     {
-      id: 15,
+      id: '15',
       nombre: 'Miguel Ángel Ortiz',
       ubicacion: 'Mérida',
       foto: 'https://images.unsplash.com/photo-1463453091185-61582044d556?w=400&h=400&fit=crop',
@@ -295,56 +299,122 @@ export class EntrenadoresListComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private location: Location,
+    private clienteFirebase: ClienteFirebaseService,
   ) {}
 
   ngOnInit(): void {
-    this.entrenadoresFiltrados = [...this.entrenadores];
+    this.loading = true;
+    
+    // Cargar entrenadores desde Firebase
+    this.subscription = this.clienteFirebase.getEntrenadores().subscribe({
+      next: (entrenadoresFirebase) => {
+        console.log('🔥 Entrenadores cargados desde Firebase:', entrenadoresFirebase.length);
+        
+        // Transformar datos de Firebase al formato del componente
+        this.entrenadores = entrenadoresFirebase.map(e => this.transformarEntrenador(e));
+        
+        this.entrenadoresFiltrados = [...this.entrenadores];
+        this.loading = false;
+        
+        // Procesar query params después de cargar datos
+        this.procesarQueryParams();
+      },
+      error: (err) => {
+        console.error('Error cargando entrenadores:', err);
+        this.loading = false;
+        // Mantener mockups como fallback si hay error
+        this.entrenadoresFiltrados = [...this.entrenadores];
+        this.procesarQueryParams();
+      }
+    });
 
+    // Suscripción a cambios en query params
     this.route.queryParams.subscribe(params => {
-      // Reset filtros
-      this.filtros.deporte = 'todos';
-      this.searchQuery = '';
-      this.deporteActual = '';
-
-      if (params['deporte']) {
-        const normalizado = params['deporte'].toLowerCase();
-        const mapaDeportes: Record<string, string> = {
-          futbol: 'Fútbol',
-          fútbol: 'Fútbol',
-          crossfit: 'CrossFit',
-          yoga: 'Yoga',
-          natacion: 'Natación',
-          natación: 'Natación',
-          running: 'Running',
-          boxeo: 'Boxeo',
-          ciclismo: 'Ciclismo',
-          tenis: 'Tenis',
-          pilates: 'Pilates',
-          zumba: 'Zumba',
-          funcional: 'Functional Training',
-          functional: 'Functional Training',
-          'functional training': 'Functional Training',
-          spinning: 'Spinning',
-          artes: 'Artes Marciales',
-          'artes marciales': 'Artes Marciales',
-          ballet: 'Ballet Fitness',
-          calistenia: 'Calistenia'
-        };
-        this.filtros.deporte = mapaDeportes[normalizado] || params['deporte'];
-        this.deporteActual = this.filtros.deporte;
+      if (!this.loading) {
+        this.procesarQueryParamsFromEvent(params);
       }
-      if (params['q']) {
-        this.searchQuery = (params['q'] as string).trim();
-      }
-      this.actualizarDestacados();
-      // No hacer scroll en el primer render, solo aplicar filtros
-      this.aplicarFiltros(false);
     });
 
     // Auto-scroll del carrusel cada 5 segundos
     setInterval(() => {
       this.siguienteDestacado();
     }, 5000);
+  }
+
+  ngOnDestroy(): void {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
+  }
+
+  private transformarEntrenador(e: EntrenadorFirebase): Entrenador {
+    return {
+      id: e.id || '',
+      nombre: `${e.nombre} ${e.apellidoPaterno || ''}`.trim(),
+      ubicacion: e.ubicacion?.ciudad || 'México',
+      foto: e.foto || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
+      especialidad: e.deportes?.[0] || 'Fitness',
+      deportes: e.deportes || [],
+      calificacion: e.calificacionPromedio || 5.0,
+      totalResenas: e.totalReviews || 0,
+      precioHora: e.precio || 300,
+      destacado: e.verificado && (e.calificacionPromedio >= 4.5 || e.totalReviews >= 10),
+      nivel: this.determinarNivel(e),
+      modalidad: e.modalidades || ['Presencial'],
+      descripcion: e.bio || e.descripcion || 'Entrenador profesional'
+    };
+  }
+
+  private determinarNivel(e: EntrenadorFirebase): 'BASICO' | 'PROFESIONAL' | 'ELITE' {
+    if (e.certificaciones && e.certificaciones.length >= 3) return 'ELITE';
+    if (e.certificaciones && e.certificaciones.length >= 1) return 'PROFESIONAL';
+    return 'BASICO';
+  }
+
+  private procesarQueryParams(): void {
+    const params = this.route.snapshot.queryParams;
+    this.procesarQueryParamsFromEvent(params);
+  }
+
+  private procesarQueryParamsFromEvent(params: any): void {
+    // Reset filtros
+    this.filtros.deporte = 'todos';
+    this.searchQuery = '';
+    this.deporteActual = '';
+
+    if (params['deporte']) {
+      const normalizado = params['deporte'].toLowerCase();
+      const mapaDeportes: Record<string, string> = {
+        futbol: 'Fútbol',
+        fútbol: 'Fútbol',
+        crossfit: 'CrossFit',
+        yoga: 'Yoga',
+        natacion: 'Natación',
+        natación: 'Natación',
+        running: 'Running',
+        boxeo: 'Boxeo',
+        ciclismo: 'Ciclismo',
+        tenis: 'Tenis',
+        pilates: 'Pilates',
+        zumba: 'Zumba',
+        funcional: 'Functional Training',
+        functional: 'Functional Training',
+        'functional training': 'Functional Training',
+        spinning: 'Spinning',
+        artes: 'Artes Marciales',
+        'artes marciales': 'Artes Marciales',
+        ballet: 'Ballet Fitness',
+        calistenia: 'Calistenia'
+      };
+      this.filtros.deporte = mapaDeportes[normalizado] || params['deporte'];
+      this.deporteActual = this.filtros.deporte;
+    }
+    if (params['q']) {
+      this.searchQuery = (params['q'] as string).trim();
+    }
+    this.actualizarDestacados();
+    // No hacer scroll en el primer render, solo aplicar filtros
+    this.aplicarFiltros(false);
   }
 
   actualizarDestacados() {

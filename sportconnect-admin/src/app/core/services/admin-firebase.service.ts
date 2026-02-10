@@ -161,8 +161,20 @@ export class AdminFirebaseService {
 
     async verificarEntrenador(id: string): Promise<{ success: boolean; message: string }> {
         try {
-            await this.firestore.doc(`entrenadores/${id}`).update({ verificado: true });
-            return { success: true, message: 'Entrenador verificado' };
+            // Actualizar el perfil del entrenador
+            await this.firestore.doc(`entrenadores/${id}`).update({ 
+                verificado: true,
+                activo: true,
+                fechaAprobacion: new Date()
+            });
+            
+            // IMPORTANTE: También actualizar el estado en la colección users
+            // para que el login permita el acceso
+            await this.firestore.doc(`users/${id}`).update({ 
+                estado: 'ACTIVO'
+            });
+            
+            return { success: true, message: 'Entrenador verificado y activado' };
         } catch (error) {
             console.error('Error:', error);
             return { success: false, message: 'Error al verificar entrenador' };
@@ -171,11 +183,21 @@ export class AdminFirebaseService {
 
     async desactivarEntrenador(id: string): Promise<{ success: boolean; message: string }> {
         try {
-            await this.firestore.doc(`entrenadores/${id}`).update({ activo: false });
-            return { success: true, message: 'Entrenador desactivado' };
+            // Actualizar el perfil del entrenador
+            await this.firestore.doc(`entrenadores/${id}`).update({ 
+                activo: false,
+                verificado: false
+            });
+            
+            // También actualizar el estado en users
+            await this.firestore.doc(`users/${id}`).update({ 
+                estado: 'RECHAZADO'
+            });
+            
+            return { success: true, message: 'Entrenador rechazado' };
         } catch (error) {
             console.error('Error:', error);
-            return { success: false, message: 'Error al desactivar entrenador' };
+            return { success: false, message: 'Error al rechazar entrenador' };
         }
     }
 

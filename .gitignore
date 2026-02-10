@@ -62,6 +62,11 @@ Desktop.ini
 **/firebase-adminsdk*.json
 **/google-services.json
 
+# Archivos de environment con credenciales
+**/environments/environment.ts
+**/environments/environment.prod.ts
+!**/environments/environment.example.ts
+
 # ============================================
 # Firebase
 # ============================================
