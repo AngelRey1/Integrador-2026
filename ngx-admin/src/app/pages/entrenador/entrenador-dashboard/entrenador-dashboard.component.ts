@@ -30,8 +30,12 @@ export class EntrenadorDashboardComponent implements OnInit, OnDestroy {
 
   // Métricas principales
   clientesActivos = 0;
+  clientesNuevosMes = 0;
+  clientesMesAnterior = 0;
   sesionesMes = 0;
+  sesionesMesAnterior = 0;
   ingresosMes = 0;
+  ingresosMesAnterior = 0;
   ingresosSemanales = 0;
   calificacionPromedio = 0;
   tasaAsistencia = 0;
@@ -70,11 +74,15 @@ export class EntrenadorDashboardComponent implements OnInit, OnDestroy {
   cargarDatosFirebase(): void {
     this.loading = true;
 
-    // Cargar estadísticas del dashboard
+    // Cargar estadísticas del dashboard con tendencias
     const statsSub = this.entrenadorFirebase.getDashboardStats().subscribe(stats => {
       this.clientesActivos = stats.clientesActivos;
+      this.clientesNuevosMes = stats.clientesNuevosMes;
+      this.clientesMesAnterior = stats.clientesMesAnterior;
       this.sesionesMes = stats.sesionesMes;
+      this.sesionesMesAnterior = stats.sesionesMesAnterior;
       this.ingresosMes = stats.ingresosMes;
+      this.ingresosMesAnterior = stats.ingresosMesAnterior;
       this.calificacionPromedio = stats.calificacion;
       this.totalResenas = stats.totalResenas;
       this.tasaAsistencia = stats.tasaAsistencia;
@@ -155,6 +163,46 @@ export class EntrenadorDashboardComponent implements OnInit, OnDestroy {
 
   irAIngresos(): void {
     this.router.navigate(['/pages/entrenador/mis-ingresos']);
+  }
+
+  verSesion(sesion: Sesion): void {
+    this.router.navigate(['/pages/entrenador/calendario'], {
+      queryParams: { sesion: sesion.id }
+    });
+  }
+
+  async completarSesion(sesion: Sesion): Promise<void> {
+    const result = await this.entrenadorFirebase.completarReserva(sesion.id);
+    if (result.success) {
+      // Actualizar lista local
+      sesion.estado = 'COMPLETADA';
+    }
+  }
+
+  // Métodos para calcular tendencias
+  getTendenciaClientes(): { valor: string; tipo: 'positive' | 'negative' | 'neutral' } {
+    const diff = this.clientesNuevosMes;
+    if (diff > 0) return { valor: `+${diff} este mes`, tipo: 'positive' };
+    if (diff === 0 && this.clientesMesAnterior === 0) return { valor: 'Sin cambios', tipo: 'neutral' };
+    return { valor: `${diff} este mes`, tipo: diff < 0 ? 'negative' : 'neutral' };
+  }
+
+  getTendenciaSesiones(): { valor: string; tipo: 'positive' | 'negative' | 'neutral' } {
+    const diff = this.sesionesMes - this.sesionesMesAnterior;
+    if (diff > 0) return { valor: `+${diff} vs mes anterior`, tipo: 'positive' };
+    if (diff === 0) return { valor: 'Sin cambios', tipo: 'neutral' };
+    return { valor: `${diff} vs mes anterior`, tipo: 'negative' };
+  }
+
+  getTendenciaIngresos(): { valor: string; tipo: 'positive' | 'negative' | 'neutral' } {
+    if (this.ingresosMesAnterior === 0) {
+      if (this.ingresosMes > 0) return { valor: '+100%', tipo: 'positive' };
+      return { valor: 'Sin datos previos', tipo: 'neutral' };
+    }
+    const porcentaje = Math.round(((this.ingresosMes - this.ingresosMesAnterior) / this.ingresosMesAnterior) * 100);
+    if (porcentaje > 0) return { valor: `+${porcentaje}% vs mes anterior`, tipo: 'positive' };
+    if (porcentaje === 0) return { valor: 'Sin cambios', tipo: 'neutral' };
+    return { valor: `${porcentaje}% vs mes anterior`, tipo: 'negative' };
   }
 
   getEstadoBadgeStatus(estado: string): string {

@@ -34,7 +34,8 @@ import {
   NbToggleModule,
   NbCalendarModule,
   NbCalendarRangeModule,
-  NbToastrModule
+  NbToastrModule,
+  NbTagModule
 } from '@nebular/theme';
 import { NbEvaIconsModule } from '@nebular/eva-icons';
 
@@ -74,7 +75,8 @@ import { NbEvaIconsModule } from '@nebular/eva-icons';
     NbToggleModule,
     NbCalendarModule,
     NbCalendarRangeModule,
-    NbToastrModule.forRoot()
+    NbToastrModule.forRoot(),
+    NbTagModule
   ]
 })
 export class EntrenadorModule { }

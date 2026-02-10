@@ -188,7 +188,7 @@
 
       <!-- Mensaje si no hay resultados -->
       <div *ngIf="entrenadoresFiltrados.length === 0" class="sin-resultados">
-        <p>😕 No encontramos entrenadores con esos criterios</p>
+        <p> No encontramos entrenadores con esos criterios</p>
         <button class="btn-limpiar" (click)="filtros = { deporte: 'todos', precioMax: 500, modalidad: 'todos', nivel: 'todos', calificacionMin: 0 }; aplicarFiltros()">
           Limpiar filtros
         </button>

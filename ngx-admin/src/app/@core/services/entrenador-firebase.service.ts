@@ -409,12 +409,16 @@ export class EntrenadorFirebaseService {
     // ==================== ESTADÍSTICAS DASHBOARD ====================
 
     /**
-     * Obtener estadísticas del dashboard
+     * Obtener estadísticas del dashboard con comparaciones al mes anterior
      */
     getDashboardStats(): Observable<{
         clientesActivos: number;
+        clientesNuevosMes: number;
+        clientesMesAnterior: number;
         sesionesMes: number;
+        sesionesMesAnterior: number;
         ingresosMes: number;
+        ingresosMesAnterior: number;
         calificacion: number;
         totalResenas: number;
         tasaAsistencia: number;
@@ -423,33 +427,93 @@ export class EntrenadorFirebaseService {
             switchMap(user => {
                 if (!user) return of({
                     clientesActivos: 0,
+                    clientesNuevosMes: 0,
+                    clientesMesAnterior: 0,
                     sesionesMes: 0,
+                    sesionesMesAnterior: 0,
                     ingresosMes: 0,
+                    ingresosMesAnterior: 0,
                     calificacion: 0,
                     totalResenas: 0,
                     tasaAsistencia: 0
                 });
 
                 const ahora = new Date();
-                const inicioMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
+                const inicioMesActual = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
+                const inicioMesAnterior = new Date(ahora.getFullYear(), ahora.getMonth() - 1, 1);
+                const finMesAnterior = new Date(ahora.getFullYear(), ahora.getMonth(), 0); // Último día del mes anterior
 
                 return combineLatest([
                     this.getMisClientes(),
                     this.getMisReservas(),
-                    this.getMisIngresos({ desde: inicioMes, hasta: ahora }),
+                    this.getMisIngresos(),
                     this.getMiPerfil()
                 ]).pipe(
-                    map(([clientes, reservas, ingresos, perfil]) => {
-                        const reservasMes = reservas.filter(r => new Date(r.fecha) >= inicioMes);
-                        const completadas = reservasMes.filter(r => r.estado === 'COMPLETADA').length;
-                        const total = reservasMes.filter(r => ['COMPLETADA', 'CANCELADA'].includes(r.estado)).length;
+                    map(([clientes, reservas, pagos, perfil]) => {
+                        // Reservas este mes
+                        const reservasMesActual = reservas.filter(r => {
+                            const fecha = this.toDate(r.fecha);
+                            return fecha >= inicioMesActual && fecha <= ahora;
+                        });
+
+                        // Reservas mes anterior
+                        const reservasMesAnterior = reservas.filter(r => {
+                            const fecha = this.toDate(r.fecha);
+                            return fecha >= inicioMesAnterior && fecha <= finMesAnterior;
+                        });
+
+                        // Clientes nuevos este mes (primera sesión completada este mes)
+                        const clientesPrimeraSesion = new Map<string, Date>();
+                        reservas.filter(r => r.estado === 'COMPLETADA').forEach(r => {
+                            const fecha = this.toDate(r.fecha);
+                            const existente = clientesPrimeraSesion.get(r.clienteId);
+                            if (!existente || fecha < existente) {
+                                clientesPrimeraSesion.set(r.clienteId, fecha);
+                            }
+                        });
+
+                        const clientesNuevosMes = Array.from(clientesPrimeraSesion.values())
+                            .filter(fecha => fecha >= inicioMesActual).length;
+
+                        const clientesMesAnterior = Array.from(clientesPrimeraSesion.values())
+                            .filter(fecha => fecha >= inicioMesAnterior && fecha <= finMesAnterior).length;
+
+                        // Sesiones activas (completadas, confirmadas, pendientes)
+                        const sesionesMes = reservasMesActual.filter(r =>
+                            ['COMPLETADA', 'CONFIRMADA', 'PENDIENTE'].includes(r.estado)
+                        ).length;
+
+                        const sesionesMesAnterior = reservasMesAnterior.filter(r =>
+                            ['COMPLETADA', 'CONFIRMADA', 'PENDIENTE'].includes(r.estado)
+                        ).length;
+
+                        // Ingresos
+                        const ingresosMes = pagos
+                            .filter(p => {
+                                const fecha = this.toDate(p.fecha);
+                                return fecha >= inicioMesActual && fecha <= ahora;
+                            })
+                            .reduce((sum, p) => sum + (p.montoEntrenador || 0), 0);
+
+                        const ingresosMesAnterior = pagos
+                            .filter(p => {
+                                const fecha = this.toDate(p.fecha);
+                                return fecha >= inicioMesAnterior && fecha <= finMesAnterior;
+                            })
+                            .reduce((sum, p) => sum + (p.montoEntrenador || 0), 0);
+
+                        // Tasa de asistencia
+                        const completadas = reservasMesActual.filter(r => r.estado === 'COMPLETADA').length;
+                        const total = reservasMesActual.filter(r => ['COMPLETADA', 'CANCELADA'].includes(r.estado)).length;
 
                         return {
                             clientesActivos: clientes.length,
-                            sesionesMes: reservasMes.filter(r =>
-                                ['COMPLETADA', 'CONFIRMADA', 'PENDIENTE'].includes(r.estado)
-                            ).length,
-                            ingresosMes: ingresos.reduce((sum, p) => sum + p.montoEntrenador, 0),
+                            clientesNuevosMes,
+                            clientesMesAnterior,
+                            sesionesMes,
+                            sesionesMesAnterior,
+                            ingresosMes,
+                            ingresosMesAnterior,
                             calificacion: perfil?.calificacionPromedio || 0,
                             totalResenas: perfil?.totalReviews || 0,
                             tasaAsistencia: total > 0 ? Math.round((completadas / total) * 100) : 100
@@ -458,6 +522,16 @@ export class EntrenadorFirebaseService {
                 );
             })
         );
+    }
+
+    /**
+     * Convertir fecha de Firestore a Date
+     */
+    private toDate(fecha: any): Date {
+        if (fecha instanceof Date) return fecha;
+        if (fecha?.seconds) return new Date(fecha.seconds * 1000);
+        if (fecha?.toDate) return fecha.toDate();
+        return new Date(fecha);
     }
 
     /**

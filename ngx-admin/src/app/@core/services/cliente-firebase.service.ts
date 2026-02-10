@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { Observable, of, combineLatest } from 'rxjs';
-import { map, switchMap, catchError } from 'rxjs/operators';
+import { map, switchMap, catchError, tap } from 'rxjs/operators';
 
 export interface Entrenador {
     id?: string;
@@ -112,7 +112,53 @@ export class ClienteFirebaseService {
         return this.firestore.collection<Entrenador>('entrenadores', ref =>
             ref.where('verificado', '==', true)
                 .where('activo', '==', true)
-        ).valueChanges({ idField: 'id' });
+        ).valueChanges({ idField: 'id' }).pipe(
+            tap(entrenadores => {
+                console.log('🔍 Entrenadores encontrados (verificados y activos):', entrenadores.length);
+                entrenadores.forEach(e => console.log(`  - ${e.nombre}: verificado=${e.verificado}, activo=${e.activo}`));
+            })
+        );
+    }
+
+    /**
+     * Obtener un entrenador público por ID (para perfil público)
+     */
+    getEntrenadorPublico(id: string): Observable<Entrenador | undefined> {
+        return this.firestore.doc<Entrenador>(`entrenadores/${id}`)
+            .valueChanges({ idField: 'id' }).pipe(
+                map(entrenador => {
+                    // Solo devolver si está verificado y activo
+                    if (entrenador && entrenador.verificado && entrenador.activo) {
+                        return entrenador;
+                    }
+                    return undefined;
+                }),
+                catchError(err => {
+                    console.error('Error obteniendo entrenador:', err);
+                    return of(undefined);
+                })
+            );
+    }
+
+    /**
+     * DEBUG: Obtener TODOS los entrenadores sin filtrar (para diagnóstico)
+     */
+    getAllEntrenadoresDebug(): Observable<Entrenador[]> {
+        return this.firestore.collection<Entrenador>('entrenadores')
+            .valueChanges({ idField: 'id' }).pipe(
+                tap(entrenadores => {
+                    console.log('🐛 DEBUG - TODOS los entrenadores en Firestore:');
+                    entrenadores.forEach(e => {
+                        console.log(`  📋 ${e.nombre} ${e.apellidoPaterno}:`, {
+                            id: e.id,
+                            verificado: e.verificado,
+                            activo: e.activo,
+                            deportes: e.deportes,
+                            precio: e.precio
+                        });
+                    });
+                })
+            );
     }
 
     /**

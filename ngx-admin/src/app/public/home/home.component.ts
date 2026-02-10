@@ -1,5 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { ClienteFirebaseService, Entrenador as EntrenadorFirebase } from '../../@core/services/cliente-firebase.service';
 
 interface Deporte {
   nombre: string;
@@ -9,7 +11,7 @@ interface Deporte {
 }
 
 interface EntrenadorDestacado {
-  id: number;
+  id: string;
   nombre: string;
   deporte: string;
   foto: string;
@@ -29,6 +31,8 @@ export class PublicHomeComponent implements OnInit, OnDestroy {
   deportesVisibles: Deporte[] = [];
   private carouselInterval: any;
   private currentIndex = 0;
+  private subscription: Subscription;
+  loadingEntrenadores = true;
 
   pasosEntrenador = [
     {
@@ -71,15 +75,15 @@ export class PublicHomeComponent implements OnInit, OnDestroy {
   ];
 
   avatarsFlotantes = [
-    { id: 1, top: '5%', left: '8%', delay: '0s', imgIndex: 0 },
-    { id: 2, top: '15%', right: '12%', delay: '1s', imgIndex: 1 },
-    { id: 3, top: '60%', left: '5%', delay: '2s', imgIndex: 2 },
-    { id: 4, top: '70%', right: '8%', delay: '1.5s', imgIndex: 3 },
+    { id: '1', top: '5%', left: '8%', delay: '0s', imgIndex: 0 },
+    { id: '2', top: '15%', right: '12%', delay: '1s', imgIndex: 1 },
+    { id: '3', top: '60%', left: '5%', delay: '2s', imgIndex: 2 },
+    { id: '4', top: '70%', right: '8%', delay: '1.5s', imgIndex: 3 },
   ];
 
   entrenadoresDestacados: EntrenadorDestacado[] = [
     {
-      id: 1,
+      id: '1',
       nombre: 'Carlos Méndez',
       deporte: 'Fútbol',
       foto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
@@ -89,7 +93,7 @@ export class PublicHomeComponent implements OnInit, OnDestroy {
       verificado: true
     },
     {
-      id: 2,
+      id: '2',
       nombre: 'Ana García',
       deporte: 'Yoga',
       foto: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop',
@@ -99,7 +103,7 @@ export class PublicHomeComponent implements OnInit, OnDestroy {
       verificado: true
     },
     {
-      id: 3,
+      id: '3',
       nombre: 'Jorge Sánchez',
       deporte: 'CrossFit',
       foto: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop',
@@ -109,7 +113,7 @@ export class PublicHomeComponent implements OnInit, OnDestroy {
       verificado: true
     },
     {
-      id: 4,
+      id: '4',
       nombre: 'María López',
       deporte: 'Running',
       foto: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop',
@@ -119,7 +123,7 @@ export class PublicHomeComponent implements OnInit, OnDestroy {
       verificado: true
     },
     {
-      id: 5,
+      id: '5',
       nombre: 'Roberto Hernández',
       deporte: 'Boxeo',
       foto: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop',
@@ -129,7 +133,7 @@ export class PublicHomeComponent implements OnInit, OnDestroy {
       verificado: true
     },
     {
-      id: 6,
+      id: '6',
       nombre: 'Laura Martínez',
       deporte: 'Natación',
       foto: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop',
@@ -139,7 +143,7 @@ export class PublicHomeComponent implements OnInit, OnDestroy {
       verificado: true
     },
     {
-      id: 7,
+      id: '7',
       nombre: 'Diego Ramírez',
       deporte: 'Tenis',
       foto: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=400&h=400&fit=crop',
@@ -149,7 +153,7 @@ export class PublicHomeComponent implements OnInit, OnDestroy {
       verificado: true
     },
     {
-      id: 8,
+      id: '8',
       nombre: 'Sofia Torres',
       deporte: 'Pilates',
       foto: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop',
@@ -159,7 +163,7 @@ export class PublicHomeComponent implements OnInit, OnDestroy {
       verificado: true
     },
     {
-      id: 9,
+      id: '9',
       nombre: 'Luis Fernández',
       deporte: 'Ciclismo',
       foto: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=400&fit=crop',
@@ -169,7 +173,7 @@ export class PublicHomeComponent implements OnInit, OnDestroy {
       verificado: true
     },
     {
-      id: 10,
+      id: '10',
       nombre: 'Valeria Rojas',
       deporte: 'Zumba',
       foto: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=400&fit=crop',
@@ -179,7 +183,7 @@ export class PublicHomeComponent implements OnInit, OnDestroy {
       verificado: true
     },
     {
-      id: 11,
+      id: '11',
       nombre: 'Eduardo Morales',
       deporte: 'Functional Training',
       foto: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop',
@@ -189,7 +193,7 @@ export class PublicHomeComponent implements OnInit, OnDestroy {
       verificado: true
     },
     {
-      id: 12,
+      id: '12',
       nombre: 'Patricia Silva',
       deporte: 'Spinning',
       foto: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&h=400&fit=crop',
@@ -199,7 +203,7 @@ export class PublicHomeComponent implements OnInit, OnDestroy {
       verificado: true
     },
     {
-      id: 13,
+      id: '13',
       nombre: 'Andrés Castillo',
       deporte: 'Artes Marciales',
       foto: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop',
@@ -209,7 +213,7 @@ export class PublicHomeComponent implements OnInit, OnDestroy {
       verificado: true
     },
     {
-      id: 14,
+      id: '14',
       nombre: 'Camila Reyes',
       deporte: 'Ballet Fitness',
       foto: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=400&fit=crop',
@@ -219,7 +223,7 @@ export class PublicHomeComponent implements OnInit, OnDestroy {
       verificado: true
     },
     {
-      id: 15,
+      id: '15',
       nombre: 'Miguel Ángel Ortiz',
       deporte: 'Calistenia',
       foto: 'https://images.unsplash.com/photo-1463453091185-61582044d556?w=400&h=400&fit=crop',
@@ -230,7 +234,10 @@ export class PublicHomeComponent implements OnInit, OnDestroy {
     }
   ];
 
-  constructor(private router: Router) { }
+  constructor(
+    private router: Router,
+    private clienteFirebase: ClienteFirebaseService
+  ) { }
 
   ngOnInit(): void {
     // Aleatorizar el orden de deportes al iniciar (para que sea diferente cada vez)
@@ -244,12 +251,53 @@ export class PublicHomeComponent implements OnInit, OnDestroy {
       this.currentIndex = (this.currentIndex + 1) % this.deportes.length;
       this.actualizarDeportesVisibles();
     }, 20000);
+
+    // Cargar entrenadores destacados desde Firebase
+    this.cargarEntrenadoresDestacados();
+  }
+
+  private cargarEntrenadoresDestacados(): void {
+    this.loadingEntrenadores = true;
+    this.subscription = this.clienteFirebase.getEntrenadores().subscribe({
+      next: (entrenadoresFirebase) => {
+        if (entrenadoresFirebase && entrenadoresFirebase.length > 0) {
+          // Transformar y ordenar por calificación
+          this.entrenadoresDestacados = entrenadoresFirebase
+            .map(e => this.transformarEntrenador(e))
+            .sort((a, b) => b.estrellas - a.estrellas)
+            .slice(0, 15); // Máximo 15 destacados
+        }
+        // Si no hay entrenadores en Firebase, mantener los mockups
+        this.loadingEntrenadores = false;
+      },
+      error: (err) => {
+        console.error('Error cargando entrenadores:', err);
+        this.loadingEntrenadores = false;
+        // Mantener mockups como fallback
+      }
+    });
+  }
+
+  private transformarEntrenador(e: EntrenadorFirebase): EntrenadorDestacado {
+    return {
+      id: e.id || '',
+      nombre: `${e.nombre} ${e.apellidoPaterno || ''}`.trim(),
+      deporte: e.deportes?.[0] || 'Fitness',
+      foto: e.foto || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
+      estrellas: e.calificacionPromedio || 5.0,
+      reviews: e.totalReviews || 0,
+      precio: e.precio || 300,
+      verificado: e.verificado
+    };
   }
 
   ngOnDestroy(): void {
     // Limpiar interval al destruir el componente
     if (this.carouselInterval) {
       clearInterval(this.carouselInterval);
+    }
+    if (this.subscription) {
+      this.subscription.unsubscribe();
     }
   }
 

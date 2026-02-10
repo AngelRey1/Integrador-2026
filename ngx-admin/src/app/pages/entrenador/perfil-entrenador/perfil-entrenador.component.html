@@ -1,159 +1,345 @@
-<div class="container-fluid">
-  <div class="row mb-4">
-    <div class="col-12">
-      <div class="d-flex justify-content-between align-items-center">
-        <h3 class="page-title">Mi Perfil Profesional</h3>
-        <div class="d-flex gap-2">
-          <button *ngIf="editando" nbButton status="basic" (click)="toggleEditar()">
-            <nb-icon icon="close-outline"></nb-icon>
-            Cancelar
-          </button>
-          <button nbButton [status]="editando ? 'success' : 'primary'" 
-                  [disabled]="guardando"
-                  (click)="editando ? guardar() : toggleEditar()">
-            <nb-icon [icon]="editando ? 'save-outline' : 'edit-outline'"></nb-icon>
-            {{ guardando ? 'Guardando...' : (editando ? 'Guardar cambios' : 'Editar perfil') }}
-          </button>
+<div class="container-fluid perfil-container">
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <nb-spinner size="large" status="primary"></nb-spinner>
+    <p>Cargando tu perfil...</p>
+  </div>
+
+  <div *ngIf="!loading">
+    <!-- Header -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <div>
+            <h3 class="page-title">Mi Perfil Profesional</h3>
+            <p class="page-subtitle text-muted mb-0">Configura tu información para que los clientes te encuentren</p>
+          </div>
+          <div class="d-flex gap-2">
+            <button *ngIf="editando" nbButton status="basic" (click)="toggleEditar()">
+              <nb-icon icon="close-outline"></nb-icon>
+              Cancelar
+            </button>
+            <button nbButton [status]="editando ? 'success' : 'primary'" 
+                    [disabled]="guardando"
+                    (click)="editando ? guardar() : toggleEditar()">
+              <nb-icon [icon]="editando ? 'save-outline' : 'edit-outline'"></nb-icon>
+              {{ guardando ? 'Guardando...' : (editando ? 'Guardar cambios' : 'Editar perfil') }}
+            </button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div class="row">
-    <div class="col-md-8">
-      <!-- Información personal -->
-      <nb-card>
-        <nb-card-header>
-          <nb-icon icon="person-outline"></nb-icon>
-          Información Personal
-        </nb-card-header>
-        <nb-card-body>
-          <form [formGroup]="perfilForm">
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label class="label">Nombre</label>
-                <input nbInput fullWidth formControlName="nombre" placeholder="Tu nombre">
-              </div>
-              <div class="col-md-6 mb-3">
-                <label class="label">Apellido</label>
-                <input nbInput fullWidth formControlName="apellidoPaterno" placeholder="Tu apellido">
-              </div>
-            </div>
-            <div class="mb-3">
-              <label class="label">Biografía / Descripción</label>
-              <textarea nbInput fullWidth formControlName="bio" rows="4" 
-                        placeholder="Cuéntale a tus clientes sobre ti, tu experiencia y metodología..."></textarea>
-              <small class="text-muted">Esta descripción se mostrará en tu perfil público</small>
-            </div>
-          </form>
-        </nb-card-body>
-      </nb-card>
+    <!-- Alerta de visibilidad -->
+    <div class="row mb-3" *ngIf="perfil && (!perfil.verificado || !perfil.activo)">
+      <div class="col-12">
+        <nb-alert status="warning" closable="false">
+          <nb-icon icon="alert-circle-outline"></nb-icon>
+          <span *ngIf="!perfil.verificado">
+            <strong>Tu perfil está pendiente de verificación.</strong> 
+            Un administrador debe aprobar tu cuenta para que aparezcas en las búsquedas.
+          </span>
+          <span *ngIf="perfil.verificado && !perfil.activo">
+            <strong>Tu perfil está oculto.</strong> 
+            Activa la opción "Perfil visible al público" para aparecer en las búsquedas.
+          </span>
+        </nb-alert>
+      </div>
+    </div>
 
-      <!-- Tarifas -->
-      <nb-card class="pricing-card">
-        <nb-card-header>
-          <nb-icon icon="pricetags-outline"></nb-icon>
-          Mis Tarifas
-        </nb-card-header>
-        <nb-card-body>
-          <form [formGroup]="perfilForm">
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label class="label">
-                  <nb-icon icon="home-outline"></nb-icon>
-                  Precio Presencial (MXN/hora)
-                </label>
-                <div class="input-group">
-                  <span class="input-prefix">$</span>
-                  <input nbInput fullWidth type="number" formControlName="precio" 
-                         placeholder="500" min="0" step="50">
-                  <span class="input-suffix">MXN</span>
+    <!-- Status de verificación -->
+    <div class="row mb-3" *ngIf="perfil?.verificado && perfil?.activo">
+      <div class="col-12">
+        <nb-alert status="success" closable="false">
+          <nb-icon icon="checkmark-circle-2-outline"></nb-icon>
+          <strong>¡Tu perfil está activo!</strong> Apareces en las búsquedas de clientes.
+        </nb-alert>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- COLUMNA IZQUIERDA - Información principal -->
+      <div class="col-lg-8">
+        <!-- Información personal -->
+        <nb-card>
+          <nb-card-header>
+            <nb-icon icon="person-outline"></nb-icon>
+            Información Personal
+          </nb-card-header>
+          <nb-card-body>
+            <form [formGroup]="perfilForm">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="label">Nombre *</label>
+                  <input nbInput fullWidth formControlName="nombre" placeholder="Tu nombre">
                 </div>
-                <small class="text-muted">Tarifa para sesiones presenciales</small>
+                <div class="col-md-6 mb-3">
+                  <label class="label">Apellido</label>
+                  <input nbInput fullWidth formControlName="apellidoPaterno" placeholder="Tu apellido">
+                </div>
               </div>
-              <div class="col-md-6 mb-3">
-                <label class="label">
-                  <nb-icon icon="video-outline"></nb-icon>
-                  Precio Online (MXN/hora)
-                </label>
-                <div class="input-group">
-                  <span class="input-prefix">$</span>
-                  <input nbInput fullWidth type="number" formControlName="precioOnline" 
-                         placeholder="400" min="0" step="50">
-                  <span class="input-suffix">MXN</span>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="label">Teléfono</label>
+                  <input nbInput fullWidth formControlName="telefono" placeholder="10 dígitos">
                 </div>
-                <small class="text-muted">Tarifa para sesiones por videollamada</small>
+                <div class="col-md-6 mb-3">
+                  <label class="label">WhatsApp</label>
+                  <input nbInput fullWidth formControlName="whatsapp" placeholder="Número de WhatsApp">
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="label">Ciudad / Ubicación</label>
+                <input nbInput fullWidth formControlName="ciudad" placeholder="Ej: Ciudad de México, Guadalajara...">
+                <small class="text-muted">Esta ubicación se mostrará a los clientes</small>
+              </div>
+              <div class="mb-3">
+                <label class="label">Biografía / Descripción *</label>
+                <textarea nbInput fullWidth formControlName="bio" rows="4" 
+                          placeholder="Cuéntale a tus clientes sobre ti, tu experiencia y metodología..."></textarea>
+                <small class="text-muted">Esta descripción se mostrará en tu perfil público</small>
+              </div>
+            </form>
+          </nb-card-body>
+        </nb-card>
+
+        <!-- Deportes -->
+        <nb-card>
+          <nb-card-header>
+            <nb-icon icon="activity-outline"></nb-icon>
+            Deportes que Enseño
+          </nb-card-header>
+          <nb-card-body>
+            <div class="tags-container mb-3">
+              <nb-tag *ngFor="let deporte of deportes" 
+                      [text]="deporte" 
+                      status="primary"
+                      [removable]="editando"
+                      (remove)="eliminarDeporte(deporte)">
+              </nb-tag>
+              <span *ngIf="deportes.length === 0" class="text-muted">No hay deportes seleccionados</span>
+            </div>
+            
+            <div *ngIf="editando" class="add-section">
+              <label class="label">Agregar deporte:</label>
+              <nb-select placeholder="Selecciona un deporte" 
+                         (selectedChange)="agregarDeporte($event)"
+                         size="small">
+                <nb-option *ngFor="let d of getDeportesDisponiblesFiltrados()" [value]="d">{{ d }}</nb-option>
+              </nb-select>
+            </div>
+          </nb-card-body>
+        </nb-card>
+
+        <!-- Tarifas -->
+        <nb-card class="pricing-card">
+          <nb-card-header>
+            <nb-icon icon="pricetags-outline"></nb-icon>
+            Mis Tarifas
+          </nb-card-header>
+          <nb-card-body>
+            <form [formGroup]="perfilForm">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="label">
+                    <nb-icon icon="home-outline"></nb-icon>
+                    Precio Presencial (MXN/hora)
+                  </label>
+                  <div class="input-group">
+                    <span class="input-prefix">$</span>
+                    <input nbInput fullWidth type="number" formControlName="precio" 
+                           placeholder="500" min="0" step="50">
+                    <span class="input-suffix">MXN</span>
+                  </div>
+                  <small class="text-muted">Tarifa para sesiones presenciales</small>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="label">
+                    <nb-icon icon="video-outline"></nb-icon>
+                    Precio Online (MXN/hora)
+                  </label>
+                  <div class="input-group">
+                    <span class="input-prefix">$</span>
+                    <input nbInput fullWidth type="number" formControlName="precioOnline" 
+                           placeholder="400" min="0" step="50">
+                    <span class="input-suffix">MXN</span>
+                  </div>
+                  <small class="text-muted">Tarifa para sesiones por videollamada</small>
+                </div>
+              </div>
+              
+              <div class="pricing-preview" *ngIf="!editando && perfil">
+                <div class="price-box presencial">
+                  <span class="price-label">Presencial</span>
+                  <span class="price-amount">${{ perfil.precio || 0 }} MXN</span>
+                  <span class="price-unit">/hora</span>
+                </div>
+                <div class="price-box online">
+                  <span class="price-label">Online</span>
+                  <span class="price-amount">${{ perfil.precioOnline || 0 }} MXN</span>
+                  <span class="price-unit">/hora</span>
+                </div>
+              </div>
+            </form>
+          </nb-card-body>
+        </nb-card>
+
+        <!-- Modalidades -->
+        <nb-card>
+          <nb-card-header>
+            <nb-icon icon="globe-outline"></nb-icon>
+            Modalidades de Sesión
+          </nb-card-header>
+          <nb-card-body>
+            <p class="text-muted mb-3">Selecciona las modalidades en las que ofreces tus servicios:</p>
+            
+            <div class="modalidades-grid">
+              <div class="modalidad-option" 
+                   *ngFor="let mod of modalidadesDisponibles"
+                   [class.selected]="modalidades.includes(mod.value)"
+                   [class.disabled]="!editando"
+                   (click)="editando && toggleModalidad(mod.value)">
+                <nb-icon [icon]="mod.value === 'presencial' ? 'home-outline' : 'video-outline'"></nb-icon>
+                <span>{{ mod.label }}</span>
+                <nb-icon *ngIf="modalidades.includes(mod.value)" icon="checkmark-circle-2" status="success"></nb-icon>
               </div>
             </div>
             
-            <div class="pricing-preview" *ngIf="!editando">
-              <div class="price-box presencial">
-                <span class="price-label">Presencial</span>
-                <span class="price-amount">${{ perfil?.precio || 0 }} MXN</span>
-                <span class="price-unit">/hora</span>
+            <small *ngIf="modalidades.length === 0 && editando" class="text-danger">
+              Debes seleccionar al menos una modalidad
+            </small>
+          </nb-card-body>
+        </nb-card>
+      </div>
+
+      <!-- COLUMNA DERECHA - Detalles adicionales -->
+      <div class="col-lg-4">
+        <!-- Visibilidad -->
+        <nb-card [accent]="perfil?.activo ? 'success' : 'warning'">
+          <nb-card-header>
+            <nb-icon icon="eye-outline"></nb-icon>
+            Visibilidad del Perfil
+          </nb-card-header>
+          <nb-card-body>
+            <form [formGroup]="perfilForm">
+              <nb-toggle formControlName="activo" [disabled]="!editando">
+                Perfil visible al público
+              </nb-toggle>
+              <p class="text-muted mt-2 small">
+                <span *ngIf="perfilForm.get('activo')?.value">
+                  Tu perfil aparecerá en las búsquedas de clientes.
+                </span>
+                <span *ngIf="!perfilForm.get('activo')?.value">
+                  Tu perfil está oculto. Los clientes no podrán encontrarte.
+                </span>
+              </p>
+            </form>
+            
+            <div class="visibility-status mt-3" *ngIf="perfil">
+              <div class="status-item">
+                <nb-icon [icon]="perfil.verificado ? 'checkmark-circle-2' : 'clock-outline'" 
+                         [status]="perfil.verificado ? 'success' : 'warning'"></nb-icon>
+                <span>{{ perfil.verificado ? 'Verificado por admin' : 'Pendiente de verificación' }}</span>
               </div>
-              <div class="price-box online">
-                <span class="price-label">Online</span>
-                <span class="price-amount">${{ perfil?.precioOnline || 0 }} MXN</span>
-                <span class="price-unit">/hora</span>
+              <div class="status-item">
+                <nb-icon [icon]="perfil.activo ? 'checkmark-circle-2' : 'close-circle-outline'" 
+                         [status]="perfil.activo ? 'success' : 'danger'"></nb-icon>
+                <span>{{ perfil.activo ? 'Perfil activo' : 'Perfil oculto' }}</span>
               </div>
             </div>
-          </form>
-        </nb-card-body>
-      </nb-card>
-    </div>
+          </nb-card-body>
+        </nb-card>
 
-    <div class="col-md-4">
-      <!-- Especialidades -->
-      <nb-card>
-        <nb-card-header>
-          <nb-icon icon="award-outline"></nb-icon>
-          Especialidades
-        </nb-card-header>
-        <nb-card-body>
-          <div class="tags-container">
-            <nb-badge *ngFor="let esp of especialidades" [text]="esp" status="primary" class="tag-badge"></nb-badge>
-          </div>
-          <p *ngIf="especialidades.length === 0" class="text-muted">No hay especialidades registradas</p>
-        </nb-card-body>
-      </nb-card>
+        <!-- Especialidades -->
+        <nb-card>
+          <nb-card-header>
+            <nb-icon icon="award-outline"></nb-icon>
+            Especialidades
+          </nb-card-header>
+          <nb-card-body>
+            <div class="tags-container">
+              <nb-tag *ngFor="let esp of especialidades" 
+                      [text]="esp" 
+                      status="info"
+                      [removable]="editando"
+                      (remove)="eliminarEspecialidad(esp)">
+              </nb-tag>
+            </div>
+            <p *ngIf="especialidades.length === 0" class="text-muted small">No hay especialidades registradas</p>
+            
+            <div *ngIf="editando" class="add-section mt-3">
+              <div class="input-with-button">
+                <input nbInput fullWidth [(ngModel)]="nuevaEspecialidad" 
+                       placeholder="Ej: Pérdida de peso, Alto rendimiento..."
+                       (keyup.enter)="agregarEspecialidad()">
+                <button nbButton status="primary" size="small" (click)="agregarEspecialidad()" 
+                        [disabled]="!nuevaEspecialidad.trim()">
+                  <nb-icon icon="plus-outline"></nb-icon>
+                </button>
+              </div>
+            </div>
+          </nb-card-body>
+        </nb-card>
 
-      <!-- Certificaciones -->
-      <nb-card>
-        <nb-card-header>
-          <nb-icon icon="file-text-outline"></nb-icon>
-          Certificaciones
-        </nb-card-header>
-        <nb-card-body>
-          <ul class="cert-list" *ngIf="certificaciones.length > 0">
-            <li *ngFor="let cert of certificaciones">
-              <nb-icon icon="checkmark-circle-outline" status="success"></nb-icon>
-              {{ cert }}
-            </li>
-          </ul>
-          <p *ngIf="certificaciones.length === 0" class="text-muted">No hay certificaciones registradas</p>
-        </nb-card-body>
-      </nb-card>
+        <!-- Certificaciones -->
+        <nb-card>
+          <nb-card-header>
+            <nb-icon icon="file-text-outline"></nb-icon>
+            Certificaciones
+          </nb-card-header>
+          <nb-card-body>
+            <ul class="cert-list" *ngIf="certificaciones.length > 0">
+              <li *ngFor="let cert of certificaciones" class="cert-item">
+                <nb-icon icon="checkmark-circle-outline" status="success"></nb-icon>
+                <span>{{ cert }}</span>
+                <button *ngIf="editando" nbButton ghost size="tiny" status="danger" 
+                        (click)="eliminarCertificacion(cert)">
+                  <nb-icon icon="close-outline"></nb-icon>
+                </button>
+              </li>
+            </ul>
+            <p *ngIf="certificaciones.length === 0" class="text-muted small">No hay certificaciones registradas</p>
+            
+            <div *ngIf="editando" class="add-section mt-3">
+              <div class="input-with-button">
+                <input nbInput fullWidth [(ngModel)]="nuevaCertificacion" 
+                       placeholder="Ej: NSCA-CPT, ACE, CrossFit L1..."
+                       (keyup.enter)="agregarCertificacion()">
+                <button nbButton status="primary" size="small" (click)="agregarCertificacion()"
+                        [disabled]="!nuevaCertificacion.trim()">
+                  <nb-icon icon="plus-outline"></nb-icon>
+                </button>
+              </div>
+            </div>
+          </nb-card-body>
+        </nb-card>
 
-      <!-- Estadísticas -->
-      <nb-card>
-        <nb-card-header>
-          <nb-icon icon="bar-chart-outline"></nb-icon>
-          Estadísticas
-        </nb-card-header>
-        <nb-card-body>
-          <div class="stat-item">
-            <nb-icon icon="star" status="warning"></nb-icon>
-            <span class="stat-value">{{ perfil?.calificacionPromedio | number:'1.1-1' || '0.0' }}</span>
-            <span class="stat-label">Calificación</span>
-          </div>
-          <div class="stat-item">
-            <nb-icon icon="message-circle-outline"></nb-icon>
-            <span class="stat-value">{{ perfil?.totalReviews || 0 }}</span>
-            <span class="stat-label">Reseñas</span>
-          </div>
-        </nb-card-body>
-      </nb-card>
+        <!-- Estadísticas -->
+        <nb-card>
+          <nb-card-header>
+            <nb-icon icon="bar-chart-outline"></nb-icon>
+            Estadísticas
+          </nb-card-header>
+          <nb-card-body>
+            <div class="stats-grid">
+              <div class="stat-item">
+                <nb-icon icon="star" status="warning"></nb-icon>
+                <div class="stat-content">
+                  <span class="stat-value">{{ perfil?.calificacionPromedio | number:'1.1-1' }}</span>
+                  <span class="stat-label">Calificación</span>
+                </div>
+              </div>
+              <div class="stat-item">
+                <nb-icon icon="message-circle-outline" status="info"></nb-icon>
+                <div class="stat-content">
+                  <span class="stat-value">{{ perfil?.totalReviews || 0 }}</span>
+                  <span class="stat-label">Reseñas</span>
+                </div>
+              </div>
+            </div>
+          </nb-card-body>
+        </nb-card>
+      </div>
     </div>
   </div>
 </div>
