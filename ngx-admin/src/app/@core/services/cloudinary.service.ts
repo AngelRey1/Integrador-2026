@@ -1,207 +1,136 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, from } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 
 export interface CloudinaryUploadResult {
-    public_id: string;
-    secure_url: string;
-    url: string;
-    format: string;
-    width: number;
-    height: number;
-    bytes: number;
-    original_filename: string;
+  success: boolean;
+  url?: string;
+  publicId?: string;
+  error?: string;
 }
 
-export interface ImageUploadOptions {
-    folder?: string;
-    transformation?: string;
-    maxWidth?: number;
-    maxHeight?: number;
-}
-
-@Injectable({
-    providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class CloudinaryService {
+  // Configuración de Cloudinary (usar variables de entorno en producción)
+  private cloudName = 'sportconnect'; // Cambiar por tu cloud name
+  private uploadPreset = 'sportconnect_upload'; // Crear un upload preset sin firma
 
-    // Configuración de Cloudinary
-    private readonly cloudName = 'difnotiok';
-    private readonly uploadPreset = 'sportconecta_uploads';
-    private readonly uploadUrl = `https://api.cloudinary.com/v1_1/${this.cloudName}/image/upload`;
+  constructor(private http: HttpClient) {}
 
-    constructor(private http: HttpClient) { }
+  /**
+   * Generar URL de avatar por defecto usando UI Avatars
+   */
+  getDefaultAvatarUrl(name: string, size: number = 128): string {
+    const initials = this.getInitials(name);
+    const colors = [
+      '3366ff', // Azul
+      '00cc99', // Verde
+      'ff6633', // Naranja
+      '9966ff', // Púrpura
+      'ff3366', // Rosa
+      '33cccc', // Cyan
+    ];
+    
+    // Seleccionar color basado en el nombre
+    const colorIndex = name.length % colors.length;
+    const bgColor = colors[colorIndex];
+    
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&size=${size}&background=${bgColor}&color=fff&bold=true`;
+  }
 
-    /**
-     * Subir una imagen a Cloudinary
-     */
-    uploadImage(file: File, options?: ImageUploadOptions): Observable<CloudinaryUploadResult> {
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('upload_preset', this.uploadPreset);
+  /**
+   * Obtener iniciales de un nombre
+   */
+  private getInitials(name: string): string {
+    if (!name) return 'U';
+    
+    const words = name.trim().split(/\s+/);
+    if (words.length === 1) {
+      return words[0].substring(0, 2).toUpperCase();
+    }
+    
+    return (words[0][0] + words[words.length - 1][0]).toUpperCase();
+  }
 
-        if (options?.folder) {
-            formData.append('folder', options.folder);
+  /**
+   * Subir imagen a Cloudinary
+   */
+  uploadImage(file: File): Observable<CloudinaryUploadResult> {
+    const url = `https://api.cloudinary.com/v1_1/${this.cloudName}/image/upload`;
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', this.uploadPreset);
+    formData.append('folder', 'sportconnect/avatars');
+    
+    return this.http.post<any>(url, formData).pipe(
+      map(response => ({
+        success: true,
+        url: response.secure_url,
+        publicId: response.public_id
+      })),
+      catchError(error => {
+        console.error('Error subiendo imagen a Cloudinary:', error);
+        return of({
+          success: false,
+          error: error.message || 'Error al subir la imagen'
+        });
+      })
+    );
+  }
+
+  /**
+   * Obtener URL optimizada de Cloudinary
+   */
+  getOptimizedUrl(publicId: string, width: number = 300, height: number = 300): string {
+    return `https://res.cloudinary.com/${this.cloudName}/image/upload/c_fill,w_${width},h_${height},q_auto,f_auto/${publicId}`;
+  }
+
+  /**
+   * Obtener URL de avatar (Cloudinary o generado)
+   */
+  getAvatarUrl(fotoUrl: string | undefined, nombre: string, size: number = 128): string {
+    if (fotoUrl && fotoUrl.trim() !== '') {
+      // Si es una URL de Cloudinary, optimizarla
+      if (fotoUrl.includes('cloudinary')) {
+        // Extraer public_id y generar URL optimizada
+        const match = fotoUrl.match(/upload\/(.+)/);
+        if (match) {
+          return `https://res.cloudinary.com/${this.cloudName}/image/upload/c_fill,w_${size},h_${size},q_auto,f_auto/${match[1]}`;
         }
-
-        return this.http.post<CloudinaryUploadResult>(this.uploadUrl, formData);
+      }
+      return fotoUrl;
     }
+    
+    return this.getDefaultAvatarUrl(nombre, size);
+  }
 
-    /**
-     * Subir imagen de perfil de usuario
-     */
-    uploadProfileImage(file: File, userId: string): Observable<CloudinaryUploadResult> {
-        return this.uploadImage(file, {
-            folder: `sportconnect/perfiles/${userId}`
-        });
-    }
+  /**
+   * Convertir archivo a Base64
+   */
+  fileToBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = error => reject(error);
+    });
+  }
 
-    /**
-     * Subir imagen de entrenador (perfil público)
-     */
-    uploadTrainerImage(file: File, trainerId: string): Observable<CloudinaryUploadResult> {
-        return this.uploadImage(file, {
-            folder: `sportconnect/entrenadores/${trainerId}`
-        });
-    }
+  /**
+   * Validar que el archivo sea una imagen
+   */
+  isValidImage(file: File): boolean {
+    const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    return validTypes.includes(file.type);
+  }
 
-    /**
-     * Subir imagen a galería de entrenador
-     */
-    uploadGalleryImage(file: File, trainerId: string): Observable<CloudinaryUploadResult> {
-        return this.uploadImage(file, {
-            folder: `sportconnect/galeria/${trainerId}`
-        });
-    }
-
-    /**
-     * Subir certificación de entrenador
-     */
-    uploadCertification(file: File, trainerId: string): Observable<CloudinaryUploadResult> {
-        return this.uploadImage(file, {
-            folder: `sportconnect/certificaciones/${trainerId}`
-        });
-    }
-
-    /**
-     * Subir múltiples imágenes
-     */
-    uploadMultipleImages(files: File[], folder: string): Observable<CloudinaryUploadResult[]> {
-        const uploads = files.map(file => this.uploadImage(file, { folder }).toPromise());
-        return from(Promise.all(uploads)) as Observable<CloudinaryUploadResult[]>;
-    }
-
-    /**
-     * Obtener URL optimizada de imagen
-     * Cloudinary permite transformaciones on-the-fly
-     */
-    getOptimizedUrl(publicId: string, options?: {
-        width?: number;
-        height?: number;
-        crop?: 'fill' | 'fit' | 'scale' | 'thumb';
-        quality?: 'auto' | number;
-    }): string {
-        const baseUrl = `https://res.cloudinary.com/${this.cloudName}/image/upload`;
-
-        const transforms: string[] = [];
-
-        if (options?.width) transforms.push(`w_${options.width}`);
-        if (options?.height) transforms.push(`h_${options.height}`);
-        if (options?.crop) transforms.push(`c_${options.crop}`);
-        if (options?.quality) transforms.push(`q_${options.quality}`);
-
-        // Siempre agregar formato auto para optimización
-        transforms.push('f_auto');
-
-        const transformString = transforms.length > 0 ? transforms.join(',') + '/' : '';
-
-        return `${baseUrl}/${transformString}${publicId}`;
-    }
-
-    /**
-     * Obtener URL de avatar (cuadrado, optimizado)
-     */
-    getAvatarUrl(publicId: string, size: number = 150): string {
-        return this.getOptimizedUrl(publicId, {
-            width: size,
-            height: size,
-            crop: 'fill',
-            quality: 'auto'
-        });
-    }
-
-    /**
-     * Obtener URL de thumbnail (para galerías)
-     */
-    getThumbnailUrl(publicId: string): string {
-        return this.getOptimizedUrl(publicId, {
-            width: 300,
-            height: 200,
-            crop: 'fill',
-            quality: 'auto'
-        });
-    }
-
-    /**
-     * Generar avatar por defecto usando UI Avatars
-     * Útil cuando el usuario no ha subido foto
-     */
-    getDefaultAvatarUrl(nombre: string, size: number = 150): string {
-        const encodedName = encodeURIComponent(nombre || 'Usuario');
-        return `https://ui-avatars.com/api/?name=${encodedName}&size=${size}&background=random&color=fff&bold=true`;
-    }
-
-    /**
-     * Obtener URL de imagen o avatar por defecto
-     */
-    getImageOrDefault(imageUrl: string | null | undefined, nombre: string, size: number = 150): string {
-        if (imageUrl && imageUrl.trim() !== '') {
-            // Si es un public_id de Cloudinary
-            if (!imageUrl.startsWith('http')) {
-                return this.getAvatarUrl(imageUrl, size);
-            }
-            return imageUrl;
-        }
-        return this.getDefaultAvatarUrl(nombre, size);
-    }
-
-    /**
-     * Validar archivo antes de subir
-     */
-    validateFile(file: File, options?: {
-        maxSizeMB?: number;
-        allowedTypes?: string[];
-    }): { valid: boolean; error?: string } {
-        const maxSize = (options?.maxSizeMB || 5) * 1024 * 1024; // Default 5MB
-        const allowedTypes = options?.allowedTypes || ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-
-        if (file.size > maxSize) {
-            return {
-                valid: false,
-                error: `El archivo excede el tamaño máximo de ${options?.maxSizeMB || 5}MB`
-            };
-        }
-
-        if (!allowedTypes.includes(file.type)) {
-            return {
-                valid: false,
-                error: 'Tipo de archivo no permitido. Usa JPG, PNG, GIF o WebP'
-            };
-        }
-
-        return { valid: true };
-    }
-
-    /**
-     * Convertir File a Base64 (para preview)
-     */
-    fileToBase64(file: File): Promise<string> {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result as string);
-            reader.onerror = error => reject(error);
-        });
-    }
+  /**
+   * Validar tamaño del archivo (máx 5MB por defecto)
+   */
+  isValidSize(file: File, maxSizeMB: number = 5): boolean {
+    const maxBytes = maxSizeMB * 1024 * 1024;
+    return file.size <= maxBytes;
+  }
 }

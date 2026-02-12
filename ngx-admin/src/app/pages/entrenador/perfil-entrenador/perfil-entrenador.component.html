@@ -150,6 +150,12 @@
                 <small class="text-muted">Esta ubicación se mostrará a los clientes</small>
               </div>
               <div class="mb-3">
+                <label class="label">Dirección de Entrenamiento *</label>
+                <input nbInput fullWidth formControlName="direccionEntrenamiento" 
+                       placeholder="Ej: Gimnasio XYZ, Calle Principal #123, Col. Centro">
+                <small class="text-muted">Dirección exacta donde se realizarán las sesiones presenciales. Esta será la ubicación que verán tus clientes al reservar.</small>
+              </div>
+              <div class="mb-3">
                 <label class="label">Biografía / Descripción *</label>
                 <textarea nbInput fullWidth formControlName="bio" rows="4" 
                           placeholder="Cuéntale a tus clientes sobre ti, tu experiencia y metodología..."></textarea>
@@ -209,19 +215,6 @@
                   </div>
                   <small class="text-muted">Tarifa para sesiones presenciales</small>
                 </div>
-                <div class="col-md-6 mb-3">
-                  <label class="label">
-                    <nb-icon icon="video-outline"></nb-icon>
-                    Precio Online (MXN/hora)
-                  </label>
-                  <div class="input-group">
-                    <span class="input-prefix">$</span>
-                    <input nbInput fullWidth type="number" formControlName="precioOnline" 
-                           placeholder="400" min="0" step="50">
-                    <span class="input-suffix">MXN</span>
-                  </div>
-                  <small class="text-muted">Tarifa para sesiones por videollamada</small>
-                </div>
               </div>
               
               <div class="pricing-preview" *ngIf="!editando && perfil">
@@ -230,40 +223,8 @@
                   <span class="price-amount">${{ perfil.precio || 0 }} MXN</span>
                   <span class="price-unit">/hora</span>
                 </div>
-                <div class="price-box online">
-                  <span class="price-label">Online</span>
-                  <span class="price-amount">${{ perfil.precioOnline || 0 }} MXN</span>
-                  <span class="price-unit">/hora</span>
-                </div>
               </div>
             </form>
-          </nb-card-body>
-        </nb-card>
-
-        <!-- Modalidades -->
-        <nb-card>
-          <nb-card-header>
-            <nb-icon icon="globe-outline"></nb-icon>
-            Modalidades de Sesión
-          </nb-card-header>
-          <nb-card-body>
-            <p class="text-muted mb-3">Selecciona las modalidades en las que ofreces tus servicios:</p>
-            
-            <div class="modalidades-grid">
-              <div class="modalidad-option" 
-                   *ngFor="let mod of modalidadesDisponibles"
-                   [class.selected]="modalidades.includes(mod.value)"
-                   [class.disabled]="!editando"
-                   (click)="editando && toggleModalidad(mod.value)">
-                <nb-icon [icon]="mod.value === 'presencial' ? 'home-outline' : 'video-outline'"></nb-icon>
-                <span>{{ mod.label }}</span>
-                <nb-icon *ngIf="modalidades.includes(mod.value)" icon="checkmark-circle-2" status="success"></nb-icon>
-              </div>
-            </div>
-            
-            <small *ngIf="modalidades.length === 0 && editando" class="text-danger">
-              Debes seleccionar al menos una modalidad
-            </small>
           </nb-card-body>
         </nb-card>
       </div>

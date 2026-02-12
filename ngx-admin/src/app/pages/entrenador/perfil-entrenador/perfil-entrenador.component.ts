@@ -63,6 +63,7 @@ export class PerfilEntrenadorComponent implements OnInit, OnDestroy {
       telefono: [{ value: '', disabled: true }],
       whatsapp: [{ value: '', disabled: true }],
       ciudad: [{ value: '', disabled: true }],
+      direccionEntrenamiento: [{ value: '', disabled: true }],
       activo: [{ value: true, disabled: true }]
     });
   }
@@ -97,6 +98,7 @@ export class PerfilEntrenadorComponent implements OnInit, OnDestroy {
           telefono: perfil.telefono || '',
           whatsapp: perfil.whatsapp || '',
           ciudad: perfil.ubicacion?.ciudad || '',
+          direccionEntrenamiento: perfil.direccionEntrenamiento || '',
           activo: perfil.activo !== false
         });
       }
@@ -171,18 +173,15 @@ export class PerfilEntrenadorComponent implements OnInit, OnDestroy {
       this.guardando = true;
       const formValue = this.perfilForm.value;
 
-      // Validar que tenga al menos un deporte y una modalidad
+      // Validar que tenga al menos un deporte
       if (this.deportes.length === 0) {
         this.toastrService.warning('Debes seleccionar al menos un deporte', 'Atención');
         this.guardando = false;
         return;
       }
 
-      if (this.modalidades.length === 0) {
-        this.toastrService.warning('Debes seleccionar al menos una modalidad', 'Atención');
-        this.guardando = false;
-        return;
-      }
+      // Modalidad siempre es presencial
+      this.modalidades = ['presencial'];
 
       const result = await this.entrenadorFirebase.actualizarPerfil({
         nombre: formValue.nombre,
@@ -198,6 +197,7 @@ export class PerfilEntrenadorComponent implements OnInit, OnDestroy {
         deportes: this.deportes,
         modalidades: this.modalidades,
         activo: formValue.activo,
+        direccionEntrenamiento: formValue.direccionEntrenamiento,
         ubicacion: {
           ...this.perfil?.ubicacion,
           ciudad: formValue.ciudad

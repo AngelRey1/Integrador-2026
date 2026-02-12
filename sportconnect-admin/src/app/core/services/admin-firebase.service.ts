@@ -29,6 +29,7 @@ export interface Entrenador {
     verificado: boolean;
     activo: boolean;
     fechaRegistro: Date;
+    direccionEntrenamiento?: string;
 }
 
 export interface Reserva {

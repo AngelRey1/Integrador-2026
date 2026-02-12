@@ -35,6 +35,7 @@ export interface Entrenador {
     telefono?: string;
     whatsapp?: string;
     email?: string;
+    direccionEntrenamiento?: string;
 }
 
 

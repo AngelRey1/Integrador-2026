@@ -165,41 +165,35 @@
         </form>
       </div>
 
-      <!-- PASO 2: Modalidad -->
+      <!-- PASO 2: Ubicación y Notas -->
       <div class="paso-container" *ngIf="pasoActual === 2">
         <h3 class="paso-titulo">
-          <nb-icon icon="options-outline"></nb-icon>
-          ¿Cómo prefieres entrenar?
+          <nb-icon icon="pin-outline"></nb-icon>
+          Ubicación del Entrenamiento
         </h3>
 
         <form [formGroup]="paso2Form" class="paso-form">
-          <div class="modalidad-cards">
-            <!-- Opción Presencial -->
-            <div class="modalidad-card" [class.selected]="paso2Form.get('modalidad')?.value === 'presencial'"
-              (click)="paso2Form.patchValue({ modalidad: 'presencial' })">
-              <nb-icon icon="people-outline"></nb-icon>
-              <h4>Presencial</h4>
-              <p>Entrenamiento en persona</p>
+          <!-- Dirección del entrenador -->
+          <div class="ubicacion-info">
+            <div class="ubicacion-card">
+              <nb-icon icon="navigate-outline" class="ubicacion-icon"></nb-icon>
+              <div class="ubicacion-content">
+                <h4>Dirección del entrenamiento</h4>
+                <p class="direccion-principal">{{ entrenador?.direccionEntrenamiento || 'No especificada' }}</p>
+                <small class="text-muted" *ngIf="entrenador?.ubicacion?.ciudad">
+                  {{ entrenador?.ubicacion?.ciudad }}
+                </small>
+              </div>
             </div>
-
-            <!-- Opción Online -->
-            <div class="modalidad-card" [class.selected]="paso2Form.get('modalidad')?.value === 'online'"
-              (click)="paso2Form.patchValue({ modalidad: 'online' })">
-              <nb-icon icon="monitor-outline"></nb-icon>
-              <h4>En línea</h4>
-              <p>Entrenamiento por videollamada</p>
-            </div>
-          </div>
-
-          <div class="form-group" *ngIf="paso2Form.get('modalidad')?.value === 'presencial'">
-            <label>Ubicación preferida *</label>
-            <input type="text" formControlName="ubicacion" placeholder="Gimnasio, parque, domicilio..."
-              class="form-input" />
+            <p class="ubicacion-nota">
+              <nb-icon icon="info-outline"></nb-icon>
+              Esta es la ubicación donde se llevará a cabo la sesión presencial.
+            </p>
           </div>
 
           <div class="form-group">
             <label>Notas adicionales</label>
-            <textarea formControlName="notas" placeholder="¿Algo que el entrenador deba saber?" class="form-textarea"
+            <textarea formControlName="notas" placeholder="¿Algo que el entrenador deba saber? (opcional)" class="form-textarea"
               rows="3"></textarea>
           </div>
         </form>
@@ -542,13 +536,11 @@
           </div>
 
           <div class="resumen-item">
-            <nb-icon icon="options-outline"></nb-icon>
+            <nb-icon icon="pin-outline"></nb-icon>
             <div>
-              <strong>Modalidad</strong>
-              <p>{{ paso2Form.get('modalidad')?.value === 'presencial' ? 'Presencial' : 'Online' }}</p>
-              <small *ngIf="paso2Form.get('modalidad')?.value === 'presencial'">
-                {{ paso2Form.get('ubicacion')?.value }}
-              </small>
+              <strong>Ubicación</strong>
+              <p>{{ entrenador?.direccionEntrenamiento || 'Por confirmar' }}</p>
+              <small class="text-muted">Sesión presencial</small>
             </div>
           </div>
 

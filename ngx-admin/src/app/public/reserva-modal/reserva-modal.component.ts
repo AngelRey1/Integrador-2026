@@ -42,7 +42,7 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
 
   pasos: Paso[] = [
     { numero: 1, titulo: 'Fecha y Hora', icono: 'calendar-outline', completado: false },
-    { numero: 2, titulo: 'Modalidad', icono: 'options-outline', completado: false },
+    { numero: 2, titulo: 'Ubicación', icono: 'pin-outline', completado: false },
     { numero: 3, titulo: 'Tus Datos', icono: 'person-outline', completado: false },
     { numero: 4, titulo: 'Pago', icono: 'credit-card-outline', completado: false },
     { numero: 5, titulo: 'Confirmación', icono: 'checkmark-circle-outline', completado: false }
@@ -118,8 +118,7 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
     });
 
     this.paso2Form = this.fb.group({
-      modalidad: ['presencial', Validators.required],
-      ubicacion: [''],
+      modalidad: ['presencial'], // Siempre presencial
       notas: ['']
     });
 

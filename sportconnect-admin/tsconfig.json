@@ -20,6 +20,10 @@
     "module": "ES2022",
     "useDefineForClassFields": false,
     "skipLibCheck": true,
+    "typeRoots": [
+      "./node_modules/@types"
+    ],
+    "types": [],
     "lib": [
       "ES2022",
       "dom"

@@ -1,340 +1,334 @@
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { switchMap, map, tap, catchError } from 'rxjs/operators';
+import { map, switchMap } from 'rxjs/operators';
 
-export interface User {
-    uid: string;
-    email: string;
-    nombre: string;
-    apellido: string;
-    nombreUsuario?: string;
-    telefono?: string;
-    fotoUrl?: string;
-    rol: 'CLIENTE' | 'ENTRENADOR' | 'ADMIN';
-    estado: 'ACTIVO' | 'PENDIENTE' | 'SUSPENDIDO' | 'RECHAZADO';
-    fechaRegistro: Date;
-    ultimoAcceso?: Date;
-    motivoRechazo?: string;
+export interface AuthResult {
+  success: boolean;
+  message: string;
+  user?: any;
 }
 
-export interface RegisterPayload {
-    email: string;
-    password: string;
-    nombre: string;
-    apellido: string;
-    rol: 'CLIENTE' | 'ENTRENADOR';
-    telefono?: string;
+export interface UserData {
+  uid: string;
+  email: string;
+  nombre: string;
+  apellido: string;
+  rol: 'CLIENTE' | 'ENTRENADOR' | 'ADMIN';
+  estado: 'ACTIVO' | 'PENDIENTE' | 'RECHAZADO' | 'SUSPENDIDO';
+  fechaRegistro: Date;
+  motivoRechazo?: string;
 }
 
-@Injectable({
-    providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class AuthFirebaseService {
-    private currentUser$ = new BehaviorSubject<User | null>(null);
-    private isLoading$ = new BehaviorSubject<boolean>(true);
+  private currentUser$ = new BehaviorSubject<UserData | null>(null);
+  private currentRole: string | null = null;
+  private tokenKey = 'firebase_user_data';
 
-    constructor(
-        private afAuth: AngularFireAuth,
-        private firestore: AngularFirestore,
-        private router: Router
-    ) {
-        // Escuchar cambios en el estado de autenticación
-        this.afAuth.authState.pipe(
-            switchMap(firebaseUser => {
-                if (firebaseUser) {
-                    // Usuario autenticado, obtener datos de Firestore
-                    return this.firestore.doc<User>(`users/${firebaseUser.uid}`).valueChanges().pipe(
-                        map(userData => userData ? { ...userData, uid: firebaseUser.uid } : null)
-                    );
-                } else {
-                    return of(null);
-                }
-            }),
-            tap(user => {
-                this.currentUser$.next(user);
-                this.isLoading$.next(false);
-            }),
-            catchError(error => {
-                console.error('Error en authState:', error);
-                this.isLoading$.next(false);
-                return of(null);
-            })
-        ).subscribe();
-    }
-
-    // ==================== REGISTRO ====================
-
-    async register(payload: RegisterPayload): Promise<{ success: boolean; message: string; user?: User }> {
-        try {
-            // 1. Crear usuario en Firebase Auth
-            const credential = await this.afAuth.createUserWithEmailAndPassword(
-                payload.email,
-                payload.password
-            );
-
-            if (!credential.user) {
-                throw new Error('No se pudo crear el usuario');
-            }
-
-            const uid = credential.user.uid;
-
-            // 2. Crear documento en Firestore
-            const userData: Omit<User, 'uid'> = {
-                email: payload.email.toLowerCase().trim(),
-                nombre: payload.nombre.trim(),
-                apellido: payload.apellido.trim(),
-                telefono: payload.telefono || '',
-                fotoUrl: '',
-                rol: payload.rol,
-                // Entrenadores requieren aprobación, clientes están activos desde el inicio
-                estado: payload.rol === 'ENTRENADOR' ? 'PENDIENTE' : 'ACTIVO',
-                fechaRegistro: new Date(),
-            };
-
-            await this.firestore.doc(`users/${uid}`).set(userData);
-
-            // 3. Si es entrenador, crear también perfil público vacío
-            if (payload.rol === 'ENTRENADOR') {
-                await this.firestore.collection('entrenadores').doc(uid).set({
-                    userId: uid,
-                    nombre: payload.nombre,
-                    apellidoPaterno: payload.apellido,
-                    foto: '',
-                    descripcion: '',
-                    deportes: [],
-                    especialidades: [],
-                    precio: 0,
-                    precioOnline: 0,
-                    modalidades: [],
-                    ubicacion: {},
-                    disponibilidad: {},
-                    calificacionPromedio: 0,
-                    totalReviews: 0,
-                    verificado: false,
-                    activo: false,
-                    fechaRegistro: new Date()
-                });
-            }
-
-            const message = payload.rol === 'ENTRENADOR'
-                ? 'Registro exitoso. Tu cuenta será revisada en 2-3 días hábiles.'
-                : 'Registro exitoso. ¡Ya puedes iniciar sesión!';
-
-            return {
-                success: true,
-                message,
-                user: { ...userData, uid }
-            };
-
-        } catch (error: any) {
-            console.error('Error en registro:', error);
-
-            // Traducir errores de Firebase al español
-            let message = 'Error al registrar usuario';
-            if (error.code === 'auth/email-already-in-use') {
-                message = 'Este correo electrónico ya está registrado';
-            } else if (error.code === 'auth/weak-password') {
-                message = 'La contraseña debe tener al menos 6 caracteres';
-            } else if (error.code === 'auth/invalid-email') {
-                message = 'El correo electrónico no es válido';
-            }
-
-            return { success: false, message };
-        }
-    }
-
-    // ==================== LOGIN ====================
-
-    async login(email: string, password: string, rolEsperado?: string): Promise<{ success: boolean; message: string; user?: User }> {
-        try {
-            // 1. Autenticar con Firebase
-            const credential = await this.afAuth.signInWithEmailAndPassword(email, password);
-
-            if (!credential.user) {
-                throw new Error('No se pudo iniciar sesión');
-            }
-
-            const uid = credential.user.uid;
-
-            // 2. Obtener datos del usuario de Firestore
-            const userDoc = await this.firestore.doc<User>(`users/${uid}`).get().toPromise();
-            const userData = userDoc?.data();
-
-            if (!userData) {
-                await this.afAuth.signOut();
-                return { success: false, message: 'Usuario no encontrado en la base de datos' };
-            }
-
-            // 3. Verificar rol si se especificó
-            if (rolEsperado && userData.rol !== rolEsperado) {
-                await this.afAuth.signOut();
-                return {
-                    success: false,
-                    message: `Esta cuenta es de tipo ${userData.rol}, no ${rolEsperado}`
-                };
-            }
-
-            // 4. Verificar estado de la cuenta
-            if (userData.estado === 'PENDIENTE') {
-                await this.afAuth.signOut();
-                return {
-                    success: false,
-                    message: 'Tu cuenta está pendiente de aprobación. Te notificaremos cuando sea aprobada.',
-                    user: { ...userData, uid }
-                };
-            }
-
-            if (userData.estado === 'RECHAZADO') {
-                await this.afAuth.signOut();
-                return {
-                    success: false,
-                    message: `Tu solicitud fue rechazada. Motivo: ${userData.motivoRechazo || 'No especificado'}`
-                };
-            }
-
-            if (userData.estado === 'SUSPENDIDO') {
-                await this.afAuth.signOut();
-                return {
-                    success: false,
-                    message: 'Tu cuenta ha sido suspendida. Contacta a soporte.'
-                };
-            }
-
-            // 5. Actualizar último acceso
-            await this.firestore.doc(`users/${uid}`).update({
-                ultimoAcceso: new Date()
-            });
-
-            return {
-                success: true,
-                message: '¡Bienvenido!',
-                user: { ...userData, uid }
-            };
-
-        } catch (error: any) {
-            console.error('Error en login:', error);
-
-            let message = 'Error al iniciar sesión';
-            if (error.code === 'auth/user-not-found') {
-                message = 'No existe una cuenta con este correo electrónico';
-            } else if (error.code === 'auth/wrong-password') {
-                message = 'Contraseña incorrecta';
-            } else if (error.code === 'auth/invalid-email') {
-                message = 'Correo electrónico no válido';
-            } else if (error.code === 'auth/too-many-requests') {
-                message = 'Demasiados intentos fallidos. Intenta más tarde.';
-            }
-
-            return { success: false, message };
-        }
-    }
-
-    // ==================== LOGOUT ====================
-
-    async logout(): Promise<void> {
-        try {
-            await this.afAuth.signOut();
-            this.currentUser$.next(null);
-            this.router.navigate(['/auth/login']);
-        } catch (error) {
-            console.error('Error al cerrar sesión:', error);
-        }
-    }
-
-    // ==================== RECUPERAR CONTRASEÑA ====================
-
-    async resetPassword(email: string): Promise<{ success: boolean; message: string }> {
-        try {
-            await this.afAuth.sendPasswordResetEmail(email);
-            return {
-                success: true,
-                message: 'Se ha enviado un correo para restablecer tu contraseña'
-            };
-        } catch (error: any) {
-            let message = 'Error al enviar el correo';
-            if (error.code === 'auth/user-not-found') {
-                message = 'No existe una cuenta con este correo electrónico';
-            }
-            return { success: false, message };
-        }
-    }
-
-    // ==================== GETTERS ====================
-
-    getCurrentUser(): Observable<User | null> {
-        return this.currentUser$.asObservable();
-    }
-
-    getCurrentUserValue(): User | null {
-        return this.currentUser$.value;
-    }
-
-    isLoading(): Observable<boolean> {
-        return this.isLoading$.asObservable();
-    }
-
-    isAuthenticated(): boolean {
-        return this.currentUser$.value !== null;
-    }
-
-    getRole(): string | null {
-        return this.currentUser$.value?.rol || null;
-    }
-
-    getUserId(): string | null {
-        return this.currentUser$.value?.uid || null;
-    }
-
-    // ==================== PERFIL ====================
-
-    async updateProfile(updates: Partial<User>): Promise<{ success: boolean; message: string }> {
-        try {
-            const uid = this.currentUser$.value?.uid;
-            if (!uid) {
-                return { success: false, message: 'Usuario no autenticado' };
-            }
-
-            await this.firestore.doc(`users/${uid}`).update(updates);
-            return { success: true, message: 'Perfil actualizado correctamente' };
-        } catch (error) {
-            console.error('Error al actualizar perfil:', error);
-            return { success: false, message: 'Error al actualizar el perfil' };
-        }
-    }
-
-    // ==================== COMPATIBILIDAD CON AUTH.SERVICE ANTERIOR ====================
-
-    // Estos métodos mantienen compatibilidad con el código existente
-    get token(): string | null {
-        // Firebase maneja tokens internamente, pero retornamos un indicador
-        return this.currentUser$.value ? 'firebase-token' : null;
-    }
-
-    currentUser(): Observable<any> {
-        return this.currentUser$.asObservable().pipe(
-            map(user => user ? {
-                sub: user.nombreUsuario || user.email,
-                email: user.email,
-                nombreUsuario: user.nombreUsuario || user.email.split('@')[0],
-                role: user.rol
-            } : null)
-        );
-    }
-
-    decodeToken(token: string): any {
-        // Firebase maneja tokens internamente
-        const user = this.currentUser$.value;
+  constructor(
+    private afAuth: AngularFireAuth,
+    private firestore: AngularFirestore
+  ) {
+    // Restaurar sesión si existe
+    this.restoreSession();
+    
+    // Escuchar cambios de autenticación
+    this.afAuth.authState.pipe(
+      switchMap(user => {
         if (user) {
-            return {
-                sub: user.nombreUsuario || user.email,
-                email: user.email,
-                nombreUsuario: user.nombreUsuario || user.email.split('@')[0],
-                role: user.rol
-            };
+          return this.firestore.collection('usuarios').doc(user.uid).valueChanges() as Observable<UserData>;
         }
-        return null;
+        return of(null);
+      })
+    ).subscribe(userData => {
+      if (userData) {
+        this.currentUser$.next(userData);
+        this.currentRole = userData.rol;
+        this.saveSession(userData);
+      }
+    });
+  }
+
+  private restoreSession(): void {
+    try {
+      const savedData = localStorage.getItem(this.tokenKey);
+      if (savedData) {
+        const userData = JSON.parse(savedData) as UserData;
+        this.currentUser$.next(userData);
+        this.currentRole = userData.rol;
+      }
+    } catch (e) {
+      console.warn('Error restaurando sesión:', e);
     }
+  }
+
+  private saveSession(userData: UserData): void {
+    try {
+      localStorage.setItem(this.tokenKey, JSON.stringify(userData));
+    } catch (e) {
+      console.warn('Error guardando sesión:', e);
+    }
+  }
+
+  private clearSession(): void {
+    localStorage.removeItem(this.tokenKey);
+    this.currentUser$.next(null);
+    this.currentRole = null;
+  }
+
+  async register(payload: { nombre: string; apellido: string; email: string; password: string; rol: string }): Promise<AuthResult> {
+    try {
+      const { nombre, apellido, email, password, rol } = payload;
+      
+      // Crear usuario en Firebase Auth
+      const credential = await this.afAuth.createUserWithEmailAndPassword(email, password);
+      
+      if (!credential.user) {
+        return { success: false, message: 'Error al crear el usuario' };
+      }
+
+      // Crear documento de usuario en Firestore
+      const userData: UserData = {
+        uid: credential.user.uid,
+        email: email,
+        nombre: nombre,
+        apellido: apellido,
+        rol: rol as 'CLIENTE' | 'ENTRENADOR' | 'ADMIN',
+        estado: rol === 'ENTRENADOR' ? 'PENDIENTE' : 'ACTIVO', // Entrenadores requieren aprobación
+        fechaRegistro: new Date()
+      };
+
+      await this.firestore.collection('usuarios').doc(credential.user.uid).set(userData);
+
+      // Si es entrenador, crear documento en colección de entrenadores
+      if (rol === 'ENTRENADOR') {
+        await this.firestore.collection('entrenadores').doc(credential.user.uid).set({
+          userId: credential.user.uid,
+          nombre: nombre,
+          apellidoPaterno: apellido,
+          email: email,
+          foto: '',
+          descripcion: '',
+          bio: '',
+          deportes: [],
+          especialidades: [],
+          certificaciones: [],
+          precio: 0,
+          precioOnline: 0,
+          modalidades: ['presencial'],
+          ubicacion: {
+            direccion: '',
+            ciudad: ''
+          },
+          disponibilidad: {},
+          calificacionPromedio: 0,
+          totalReviews: 0,
+          verificado: false,
+          activo: false,
+          fechaRegistro: new Date(),
+          direccionEntrenamiento: ''
+        });
+
+        return {
+          success: true,
+          message: 'Registro exitoso. Tu cuenta de entrenador está pendiente de aprobación.'
+        };
+      }
+
+      this.currentUser$.next(userData);
+      this.currentRole = rol;
+      this.saveSession(userData);
+
+      return {
+        success: true,
+        message: 'Registro exitoso. Bienvenido!',
+        user: userData
+      };
+    } catch (error: any) {
+      console.error('Error en registro:', error);
+      
+      let message = 'Error al registrar. Intenta de nuevo.';
+      if (error.code === 'auth/email-already-in-use') {
+        message = 'Este correo ya está registrado.';
+      } else if (error.code === 'auth/invalid-email') {
+        message = 'El correo electrónico no es válido.';
+      } else if (error.code === 'auth/weak-password') {
+        message = 'La contraseña es muy débil.';
+      }
+      
+      return { success: false, message };
+    }
+  }
+
+  async login(email: string, password: string, rol: string): Promise<AuthResult> {
+    try {
+      const credential = await this.afAuth.signInWithEmailAndPassword(email, password);
+      
+      if (!credential.user) {
+        return { success: false, message: 'Error al iniciar sesión' };
+      }
+
+      // Primero buscar en colección 'usuarios'
+      let userDoc = await this.firestore.collection('usuarios').doc(credential.user.uid).get().toPromise();
+      let userData = userDoc?.data() as UserData | undefined;
+
+      // Si no está en usuarios, buscar en 'entrenadores'
+      if (!userData) {
+        const entrenadorDoc = await this.firestore.collection('entrenadores').doc(credential.user.uid).get().toPromise();
+        const entrenadorData = entrenadorDoc?.data() as any;
+        
+        if (entrenadorData) {
+          // Convertir datos de entrenador a formato UserData
+          userData = {
+            uid: credential.user.uid,
+            email: entrenadorData.email || credential.user.email || '',
+            nombre: entrenadorData.nombre || '',
+            apellido: entrenadorData.apellidoPaterno || '',
+            rol: 'ENTRENADOR',
+            estado: entrenadorData.activo ? 'ACTIVO' : 'PENDIENTE',
+            fechaRegistro: entrenadorData.fechaRegistro || new Date()
+          };
+        }
+      }
+
+      // Si tampoco está en entrenadores, buscar por email en entrenadores
+      if (!userData) {
+        const entrenadoresSnapshot = await this.firestore.collection('entrenadores', ref => 
+          ref.where('email', '==', email).limit(1)
+        ).get().toPromise();
+        
+        if (entrenadoresSnapshot && !entrenadoresSnapshot.empty) {
+          const entrenadorData = entrenadoresSnapshot.docs[0].data() as any;
+          userData = {
+            uid: credential.user.uid,
+            email: entrenadorData.email || credential.user.email || '',
+            nombre: entrenadorData.nombre || '',
+            apellido: entrenadorData.apellidoPaterno || '',
+            rol: 'ENTRENADOR',
+            estado: entrenadorData.activo ? 'ACTIVO' : 'PENDIENTE',
+            fechaRegistro: entrenadorData.fechaRegistro || new Date()
+          };
+        }
+      }
+
+      if (!userData) {
+        // Si aún no encontramos, crear un userData básico con los datos de Firebase Auth
+        userData = {
+          uid: credential.user.uid,
+          email: credential.user.email || email,
+          nombre: credential.user.displayName?.split(' ')[0] || 'Usuario',
+          apellido: credential.user.displayName?.split(' ').slice(1).join(' ') || '',
+          rol: rol as 'CLIENTE' | 'ENTRENADOR' | 'ADMIN',
+          estado: 'ACTIVO',
+          fechaRegistro: new Date()
+        };
+      }
+
+      // Verificar rol si es necesario
+      if (rol !== 'ANY' && userData.rol !== rol) {
+        await this.afAuth.signOut();
+        return { success: false, message: `Esta cuenta no es de tipo ${rol.toLowerCase()}` };
+      }
+
+      // Verificar estado de la cuenta
+      if (userData.estado === 'PENDIENTE') {
+        await this.afAuth.signOut();
+        return { success: false, message: 'Tu cuenta está pendiente de aprobación' };
+      }
+
+      if (userData.estado === 'RECHAZADO') {
+        await this.afAuth.signOut();
+        return { success: false, message: `Tu solicitud fue rechazada: ${userData.motivoRechazo || 'Sin motivo especificado'}` };
+      }
+
+      if (userData.estado === 'SUSPENDIDO') {
+        await this.afAuth.signOut();
+        return { success: false, message: 'Tu cuenta ha sido suspendida' };
+      }
+
+      this.currentUser$.next(userData);
+      this.currentRole = userData.rol;
+      this.saveSession(userData);
+
+      return {
+        success: true,
+        message: 'Inicio de sesión exitoso',
+        user: userData
+      };
+    } catch (error: any) {
+      console.error('Error en login:', error);
+      
+      let message = 'Error al iniciar sesión. Intenta de nuevo.';
+      if (error.code === 'auth/user-not-found') {
+        message = 'No existe una cuenta con este correo.';
+      } else if (error.code === 'auth/wrong-password') {
+        message = 'Contraseña incorrecta.';
+      } else if (error.code === 'auth/invalid-email') {
+        message = 'El correo electrónico no es válido.';
+      } else if (error.code === 'auth/too-many-requests') {
+        message = 'Demasiados intentos. Intenta más tarde.';
+      } else if (error.code === 'auth/invalid-credential') {
+        message = 'Credenciales inválidas. Verifica tu correo y contraseña.';
+      }
+      
+      return { success: false, message };
+    }
+  }
+
+  async resetPassword(email: string): Promise<AuthResult> {
+    try {
+      await this.afAuth.sendPasswordResetEmail(email);
+      return {
+        success: true,
+        message: 'Se ha enviado un correo para restablecer tu contraseña'
+      };
+    } catch (error: any) {
+      console.error('Error al restablecer contraseña:', error);
+      
+      let message = 'Error al enviar el correo. Intenta de nuevo.';
+      if (error.code === 'auth/user-not-found') {
+        message = 'No existe una cuenta con este correo.';
+      } else if (error.code === 'auth/invalid-email') {
+        message = 'El correo electrónico no es válido.';
+      }
+      
+      return { success: false, message };
+    }
+  }
+
+  async logout(): Promise<void> {
+    await this.afAuth.signOut();
+    this.clearSession();
+  }
+
+  isAuthenticated(): boolean {
+    return this.currentUser$.value !== null;
+  }
+
+  getRole(): string | null {
+    return this.currentRole || this.currentUser$.value?.rol || null;
+  }
+
+  getCurrentUser(): Observable<UserData | null> {
+    return this.currentUser$.asObservable();
+  }
+
+  getCurrentUserValue(): UserData | null {
+    return this.currentUser$.value;
+  }
+
+  getUid(): string | null {
+    return this.currentUser$.value?.uid || null;
+  }
+
+  getNombreUsuario(): string | null {
+    const user = this.currentUser$.value;
+    return user ? `${user.nombre} ${user.apellido}` : null;
+  }
+
+  getEmail(): string | null {
+    return this.currentUser$.value?.email || null;
+  }
 }

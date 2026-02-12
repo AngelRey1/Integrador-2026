@@ -707,6 +707,70 @@
   }
 }
 
+// Ubicación info (Paso 2 - Solo presencial)
+.ubicacion-info {
+  margin-bottom: 1.5rem;
+
+  .ubicacion-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%);
+    border: 2px solid #00D09C;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+
+    .ubicacion-icon {
+      font-size: 2.5rem !important;
+      width: 2.5rem !important;
+      height: 2.5rem !important;
+      color: #00D09C;
+      flex-shrink: 0;
+    }
+
+    .ubicacion-content {
+      flex: 1;
+
+      h4 {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #64748B;
+        margin: 0 0 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .direccion-principal {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #0F172A;
+        margin: 0 0 0.25rem;
+      }
+
+      small {
+        color: #64748B;
+      }
+    }
+  }
+
+  .ubicacion-nota {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: #64748B;
+    margin: 0;
+
+    nb-icon {
+      font-size: 1rem !important;
+      width: 1rem !important;
+      height: 1rem !important;
+      color: #94A3B8;
+    }
+  }
+}
+
 // Info box
 .info-box {
   display: flex;
