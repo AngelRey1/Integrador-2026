@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { AngularFireStorage } from '@angular/fire/compat/storage';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -10,8 +9,7 @@ import { Observable } from 'rxjs';
 export class FirebaseService {
   constructor(
     private firestore: AngularFirestore,
-    private auth: AngularFireAuth,
-    private storage: AngularFireStorage
+    private auth: AngularFireAuth
   ) {}
 
   // ========== FIRESTORE (Base de Datos) ==========
@@ -104,32 +102,9 @@ export class FirebaseService {
     return this.auth.sendPasswordResetEmail(email);
   }
 
-  // ========== STORAGE (Almacenamiento de archivos) ==========
-
-  /**
-   * Subir un archivo
-   */
-  uploadFile(path: string, file: File): Observable<any> {
-    const ref = this.storage.ref(path);
-    const task = ref.put(file);
-    return task.snapshotChanges();
-  }
-
-  /**
-   * Obtener URL de descarga de un archivo
-   */
-  getDownloadURL(path: string): Observable<string> {
-    const ref = this.storage.ref(path);
-    return ref.getDownloadURL();
-  }
-
-  /**
-   * Eliminar un archivo
-   */
-  deleteFile(path: string): Promise<void> {
-    const ref = this.storage.ref(path);
-    return ref.delete().toPromise();
-  }
+  // ========== NOTAS ==========
+  // Firebase Storage fue removido porque requiere plan de pago.
+  // Las imágenes se almacenan como Base64 directamente en Firestore.
 }
 
 

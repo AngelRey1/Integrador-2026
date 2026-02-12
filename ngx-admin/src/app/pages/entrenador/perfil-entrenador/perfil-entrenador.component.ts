@@ -16,6 +16,13 @@ export class PerfilEntrenadorComponent implements OnInit, OnDestroy {
   loading = true;
   guardando = false;
 
+  // Para foto de perfil
+  fotoUrl: string | null = null;
+  fotoPreview: string | null = null;
+  selectedFile: File | null = null;
+  uploadingFoto = false;
+  uploadProgress = 0;
+
   perfil: Entrenador | null = null;
   especialidades: string[] = [];
   certificaciones: string[] = [];
@@ -79,6 +86,7 @@ export class PerfilEntrenadorComponent implements OnInit, OnDestroy {
         this.certificaciones = perfil.certificaciones || [];
         this.deportes = perfil.deportes || [];
         this.modalidades = perfil.modalidades || [];
+        this.fotoUrl = perfil.foto || null;
 
         this.perfilForm.patchValue({
           nombre: perfil.nombre,
@@ -208,6 +216,163 @@ export class PerfilEntrenadorComponent implements OnInit, OnDestroy {
 
   getDeportesDisponiblesFiltrados(): string[] {
     return this.deportesDisponibles.filter(d => !this.deportes.includes(d));
+  }
+
+  // ========== GESTIÓN DE FOTO DE PERFIL ==========
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      
+      // Validar tipo de archivo
+      if (!file.type.startsWith('image/')) {
+        this.toastrService.warning('Por favor selecciona una imagen', 'Formato inválido');
+        return;
+      }
+
+      // Validar tamaño (máximo 2MB para evitar problemas al comprimir)
+      if (file.size > 2 * 1024 * 1024) {
+        this.toastrService.warning('La imagen no debe superar los 2MB', 'Archivo muy grande');
+        return;
+      }
+
+      this.selectedFile = file;
+
+      // Crear preview
+      const reader = new FileReader();
+      reader.onload = (e: ProgressEvent<FileReader>) => {
+        this.fotoPreview = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  /**
+   * Comprimir imagen usando Canvas
+   * Redimensiona a máximo 400x400 y comprime a JPEG 80%
+   */
+  private compressImage(file: File, maxWidth: number = 400, quality: number = 0.8): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e: ProgressEvent<FileReader>) => {
+        const img = new Image();
+        img.onload = () => {
+          // Calcular nuevas dimensiones
+          let width = img.width;
+          let height = img.height;
+          
+          if (width > maxWidth) {
+            height = (height * maxWidth) / width;
+            width = maxWidth;
+          }
+          if (height > maxWidth) {
+            width = (width * maxWidth) / height;
+            height = maxWidth;
+          }
+
+          // Crear canvas y dibujar imagen redimensionada
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            reject(new Error('No se pudo obtener contexto del canvas'));
+            return;
+          }
+          
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          // Convertir a Base64 JPEG
+          const base64 = canvas.toDataURL('image/jpeg', quality);
+          resolve(base64);
+        };
+        img.onerror = () => reject(new Error('Error al cargar la imagen'));
+        img.src = e.target?.result as string;
+      };
+      reader.onerror = () => reject(new Error('Error al leer el archivo'));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async subirFoto(): Promise<void> {
+    if (!this.selectedFile || !this.perfil?.id) {
+      return;
+    }
+
+    this.uploadingFoto = true;
+    this.uploadProgress = 0;
+
+    try {
+      // Simular progreso inicial
+      this.uploadProgress = 20;
+
+      // Comprimir imagen a Base64
+      const base64Image = await this.compressImage(this.selectedFile, 400, 0.8);
+      
+      this.uploadProgress = 60;
+
+      // Verificar tamaño del Base64 (debe ser < 900KB para dejar margen en document)
+      const base64Size = base64Image.length * 0.75; // Aproximar bytes
+      if (base64Size > 900 * 1024) {
+        // Si es muy grande, comprimir más
+        const compressedBase64 = await this.compressImage(this.selectedFile, 300, 0.6);
+        this.uploadProgress = 80;
+        
+        // Guardar en Firestore
+        const result = await this.entrenadorFirebase.actualizarPerfil({
+          foto: compressedBase64
+        });
+
+        if (result.success) {
+          this.fotoUrl = compressedBase64;
+          this.fotoPreview = null;
+          this.selectedFile = null;
+          this.toastrService.success('Foto de perfil actualizada', 'Éxito');
+        } else {
+          this.toastrService.danger('Error al guardar la foto', 'Error');
+        }
+      } else {
+        this.uploadProgress = 80;
+        
+        // Guardar Base64 directamente en Firestore
+        const result = await this.entrenadorFirebase.actualizarPerfil({
+          foto: base64Image
+        });
+
+        if (result.success) {
+          this.fotoUrl = base64Image;
+          this.fotoPreview = null;
+          this.selectedFile = null;
+          this.toastrService.success('Foto de perfil actualizada', 'Éxito');
+        } else {
+          this.toastrService.danger('Error al guardar la foto', 'Error');
+        }
+      }
+
+      this.uploadProgress = 100;
+    } catch (error) {
+      console.error('Error al subir foto:', error);
+      this.toastrService.danger('Error al procesar la imagen', 'Error');
+    } finally {
+      this.uploadingFoto = false;
+    }
+  }
+
+  cancelarFoto(): void {
+    this.selectedFile = null;
+    this.fotoPreview = null;
+  }
+
+  getFotoActual(): string {
+    if (this.fotoPreview) {
+      return this.fotoPreview;
+    }
+    if (this.fotoUrl) {
+      return this.fotoUrl;
+    }
+    return 'assets/images/nick.png';
   }
 }
 

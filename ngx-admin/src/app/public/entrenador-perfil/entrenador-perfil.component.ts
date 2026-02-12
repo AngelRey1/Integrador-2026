@@ -310,15 +310,18 @@ export class EntrenadorPerfilComponent implements OnInit, OnDestroy {
     }
   ];
 
-  horarios: Horario[] = [
-    { dia: 'Lunes', disponible: true, horarios: ['06:00-08:00', '18:00-20:00'] },
-    { dia: 'Martes', disponible: true, horarios: ['06:00-08:00', '18:00-20:00'] },
-    { dia: 'Miércoles', disponible: true, horarios: ['06:00-08:00', '18:00-20:00'] },
-    { dia: 'Jueves', disponible: true, horarios: ['06:00-08:00', '18:00-20:00'] },
-    { dia: 'Viernes', disponible: true, horarios: ['06:00-08:00', '18:00-20:00'] },
-    { dia: 'Sábado', disponible: true, horarios: ['08:00-12:00'] },
-    { dia: 'Domingo', disponible: false, horarios: [] }
-  ];
+  horarios: Horario[] = [];
+
+  // Mapeo de nombres de días
+  private diasMapping: { [key: string]: string } = {
+    'lunes': 'Lunes',
+    'martes': 'Martes',
+    'miercoles': 'Miércoles',
+    'jueves': 'Jueves',
+    'viernes': 'Viernes',
+    'sabado': 'Sábado',
+    'domingo': 'Domingo'
+  };
 
   tabActiva = 'sobre-mi';
 
@@ -393,6 +396,39 @@ export class EntrenadorPerfilComponent implements OnInit, OnDestroy {
         'https://images.unsplash.com/photo-1579758629938-03607ccdbaba?w=800'
       ]
     };
+
+    // Cargar horarios desde la disponibilidad de Firebase
+    this.cargarHorariosDesdeDisponibilidad(e.disponibilidad);
+  }
+
+  /**
+   * Convierte la disponibilidad de Firebase al formato de horarios para mostrar
+   */
+  private cargarHorariosDesdeDisponibilidad(disponibilidad: any) {
+    const diasOrdenados = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
+    
+    this.horarios = diasOrdenados.map(diaKey => {
+      const nombreDia = this.diasMapping[diaKey];
+      const rangos = disponibilidad?.[diaKey] || [];
+      
+      if (Array.isArray(rangos) && rangos.length > 0) {
+        const horariosFormateados = rangos.map((rango: any) => {
+          return `${rango.inicio || '09:00'}-${rango.fin || '18:00'}`;
+        });
+        
+        return {
+          dia: nombreDia,
+          disponible: true,
+          horarios: horariosFormateados
+        };
+      } else {
+        return {
+          dia: nombreDia,
+          disponible: false,
+          horarios: []
+        };
+      }
+    });
   }
 
   private determinarNivel(e: EntrenadorFirebase): 'BASICO' | 'PROFESIONAL' | 'ELITE' {
@@ -437,6 +473,24 @@ export class EntrenadorPerfilComponent implements OnInit, OnDestroy {
         'https://images.unsplash.com/photo-1579758629938-03607ccdbaba?w=800'
       ]
     };
+
+    // Cargar horarios por defecto para mockups
+    this.cargarHorariosPorDefecto();
+  }
+
+  /**
+   * Cargar horarios por defecto cuando no hay datos de Firebase
+   */
+  private cargarHorariosPorDefecto() {
+    this.horarios = [
+      { dia: 'Lunes', disponible: true, horarios: ['09:00-13:00', '15:00-19:00'] },
+      { dia: 'Martes', disponible: true, horarios: ['09:00-13:00', '15:00-19:00'] },
+      { dia: 'Miércoles', disponible: true, horarios: ['09:00-13:00', '15:00-19:00'] },
+      { dia: 'Jueves', disponible: true, horarios: ['09:00-13:00', '15:00-19:00'] },
+      { dia: 'Viernes', disponible: true, horarios: ['09:00-13:00', '15:00-19:00'] },
+      { dia: 'Sábado', disponible: true, horarios: ['09:00-14:00'] },
+      { dia: 'Domingo', disponible: false, horarios: [] }
+    ];
   }
 
   getEstrellas(calificacion: number): string[] {

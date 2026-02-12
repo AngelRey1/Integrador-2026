@@ -47,6 +47,7 @@ export interface Reserva {
     claseId?: string;
     fecha: Date;
     hora: string;
+    horaFin?: string;
     duracion: number;
     precio: number;
     modalidad: 'presencial' | 'online';

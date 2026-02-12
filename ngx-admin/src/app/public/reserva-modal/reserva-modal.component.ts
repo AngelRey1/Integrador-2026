@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ClienteFirebaseService, Entrenador, Reserva } from '../../@core/services/cliente-firebase.service';
 import { StripeService, PaymentResult } from '../../@core/services/stripe.service';
 import { Subscription } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 interface Paso {
   numero: number;
@@ -15,6 +16,14 @@ interface Paso {
 interface Horario {
   hora: string;
   disponible: boolean;
+}
+
+// Rango de disponibilidad del entrenador para un día
+interface RangoDisponibilidad {
+  inicio: string;
+  fin: string;
+  capacidad: number;
+  tipoSesion: 'individual' | 'grupal' | 'ambos';
 }
 
 @Component({
@@ -47,17 +56,29 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
 
   // Opciones
   horariosDisponibles: Horario[] = []; // Changed to Object array
-  duraciones = [
-    { value: 30, label: '30 minutos' },
-    { value: 60, label: '1 hora' },
-    { value: 90, label: '1.5 horas' },
-    { value: 120, label: '2 horas' }
-  ];
+  
+  // Rangos de disponibilidad del entrenador para el día seleccionado
+  rangosDelDia: RangoDisponibilidad[] = [];
+  horasInicio: string[] = [];  // Horas de inicio disponibles
+  horasFin: string[] = [];     // Horas de fin disponibles (filtradas según hora inicio)
+  capacidadMaxima = 1;         // Capacidad máxima para el rango seleccionado
+  tipoSesionPermitida: 'individual' | 'grupal' | 'ambos' = 'ambos';
 
   modalidades = [
     { value: 'presencial', label: 'Presencial', icono: 'people-outline', desc: 'Entrenamiento en persona' },
     { value: 'online', label: 'En línea', icono: 'monitor-outline', desc: 'Entrenamiento por videollamada' }
   ];
+
+  // Mapeo de días de la semana (0=Domingo, 1=Lunes, etc.)
+  private diasSemana: { [key: number]: string } = {
+    0: 'domingo',
+    1: 'lunes',
+    2: 'martes',
+    3: 'miercoles',
+    4: 'jueves',
+    5: 'viernes',
+    6: 'sabado'
+  };
 
   enviando = false;
   reservaConfirmada = false;
@@ -91,8 +112,8 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
 
     this.paso1Form = this.fb.group({
       fecha: ['', Validators.required],
-      hora: ['', Validators.required],
-      duracion: [60, Validators.required],
+      horaInicio: ['', Validators.required],
+      horaFin: ['', Validators.required],
       cantidadPersonas: [1, [Validators.required, Validators.min(1)]]
     });
 
@@ -142,14 +163,44 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
       this.cargandoEntrenador = false;
     }
 
-    this.generarHorarios();
-
-    // Listener para cargar horarios ocupados cuando cambia la fecha
+    // Listener para cuando cambia la fecha
     this.paso1Form.get('fecha')?.valueChanges.subscribe((fecha) => {
-      if (fecha && this.entrenador?.id) {
-        this.cargarHorariosOcupados(this.entrenador.id, new Date(fecha));
+      // Limpiar selecciones de hora cuando cambia la fecha
+      this.paso1Form.patchValue({ horaInicio: '', horaFin: '' });
+      this.horasFin = [];
+      
+      if (fecha) {
+        // Cargar rangos de disponibilidad para el día seleccionado
+        this.cargarRangosDelDia(fecha);
+        
+        // Luego cargar horarios ocupados si tenemos entrenador
+        if (this.entrenador?.id) {
+          this.cargarHorariosOcupados(this.entrenador.id, new Date(fecha));
+        }
+      } else {
+        this.rangosDelDia = [];
+        this.horasInicio = [];
       }
       this.validarCupos();
+    });
+
+    // Listener para cuando cambia la hora de inicio
+    this.paso1Form.get('horaInicio')?.valueChanges.subscribe((horaInicio) => {
+      this.paso1Form.patchValue({ horaFin: '' });
+      
+      if (horaInicio) {
+        this.actualizarHorasFin(horaInicio);
+      } else {
+        this.horasFin = [];
+        this.capacidadMaxima = 1;
+      }
+    });
+
+    // Listener para cuando cambia la hora de fin
+    this.paso1Form.get('horaFin')?.valueChanges.subscribe((horaFin) => {
+      if (horaFin) {
+        this.actualizarCapacidadYTipo();
+      }
     });
 
     this.paso1Form.get('cantidadPersonas')?.valueChanges.subscribe(() => {
@@ -246,31 +297,207 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
 
   validarCupos() {
     const cantidad = this.paso1Form.get('cantidadPersonas')?.value || 1;
-    if (cantidad > this.cuposDisponibles) {
+    if (cantidad > this.capacidadMaxima) {
       this.paso1Form.get('cantidadPersonas')?.setErrors({ excedeCupos: true });
     } else {
       this.paso1Form.get('cantidadPersonas')?.setErrors(null);
     }
   }
 
-  generarHorarios() {
-    // Generar horarios de 8:00 a 20:00 usando datos REALES de Firebase
-    const horarios: Horario[] = [];
-    const fechaSeleccionada = this.paso1Form.get('fecha')?.value;
+  /**
+   * Carga los rangos de disponibilidad del entrenador para el día seleccionado
+   */
+  cargarRangosDelDia(fechaSeleccionada: string) {
+    // Parsear fecha manualmente para evitar problemas de timezone
+    const partes = fechaSeleccionada.split('-');
+    const fecha = new Date(parseInt(partes[0]), parseInt(partes[1]) - 1, parseInt(partes[2]));
+    const diaSemana = fecha.getDay();
+    const diaKey = this.diasSemana[diaSemana];
+    
+    console.log('Cargando rangos para:', fechaSeleccionada, '-> Día:', diaKey);
 
-    for (let hora = 8; hora <= 19; hora++) {
-      const horaStr = `${hora.toString().padStart(2, '0')}:00`;
-      // Verificar si este horario está ocupado (basado en reservas reales)
-      const disponible = !this.horariosOcupados.includes(horaStr);
-      horarios.push({ hora: horaStr, disponible });
-
-      if (hora < 19) {
-        const mediaHoraStr = `${hora.toString().padStart(2, '0')}:30`;
-        const disponibleMedia = !this.horariosOcupados.includes(mediaHoraStr);
-        horarios.push({ hora: mediaHoraStr, disponible: disponibleMedia });
-      }
+    // Si no hay entrenador, usar valores por defecto
+    if (!this.entrenador?.disponibilidad) {
+      this.cargarRangosPorDefecto();
+      return;
     }
-    this.horariosDisponibles = horarios;
+
+    // Obtener rangos del día
+    const disponibilidadDia = this.entrenador.disponibilidad[diaKey];
+    console.log('Disponibilidad del día:', disponibilidadDia);
+
+    if (!disponibilidadDia || !Array.isArray(disponibilidadDia) || disponibilidadDia.length === 0) {
+      // No hay disponibilidad para este día
+      this.rangosDelDia = [];
+      this.horasInicio = [];
+      return;
+    }
+
+    // Guardar rangos del día
+    this.rangosDelDia = disponibilidadDia.map((r: any) => ({
+      inicio: r.inicio || '09:00',
+      fin: r.fin || '18:00',
+      capacidad: r.capacidad || 1,
+      tipoSesion: r.tipoSesion || 'ambos'
+    }));
+
+    // Generar lista de horas de inicio disponibles (cada 30 min dentro de los rangos)
+    this.generarHorasInicio();
+  }
+
+  /**
+   * Genera la lista de horas de inicio disponibles basándose en los rangos del día
+   */
+  private generarHorasInicio() {
+    const horas: string[] = [];
+    
+    this.rangosDelDia.forEach(rango => {
+      const inicio = this.parseHora(rango.inicio);
+      const fin = this.parseHora(rango.fin);
+      
+      // Generar horas cada 30 minutos, dejando al menos 30 min antes del fin del rango
+      for (let minutos = inicio; minutos < fin - 30; minutos += 30) {
+        const horaStr = this.formatearHora(minutos);
+        // Verificar si no está ocupado
+        if (!this.horariosOcupados.includes(horaStr) && !horas.includes(horaStr)) {
+          horas.push(horaStr);
+        }
+      }
+    });
+
+    // Ordenar horas
+    horas.sort((a, b) => this.parseHora(a) - this.parseHora(b));
+    this.horasInicio = horas;
+  }
+
+  /**
+   * Actualiza las opciones de hora fin basándose en la hora de inicio seleccionada
+   */
+  actualizarHorasFin(horaInicioSeleccionada: string) {
+    const horas: string[] = [];
+    const inicioMin = this.parseHora(horaInicioSeleccionada);
+
+    // Encontrar el rango que contiene esta hora de inicio
+    const rangoActivo = this.rangosDelDia.find(rango => {
+      const rangoInicio = this.parseHora(rango.inicio);
+      const rangoFin = this.parseHora(rango.fin);
+      return inicioMin >= rangoInicio && inicioMin < rangoFin;
+    });
+
+    if (!rangoActivo) {
+      this.horasFin = [];
+      return;
+    }
+
+    const rangoFinMin = this.parseHora(rangoActivo.fin);
+
+    // Generar horas de fin posibles (mínimo 30 min después del inicio, hasta el fin del rango)
+    for (let minutos = inicioMin + 30; minutos <= rangoFinMin; minutos += 30) {
+      const horaStr = this.formatearHora(minutos);
+      horas.push(horaStr);
+    }
+
+    this.horasFin = horas;
+    
+    // Actualizar capacidad y tipo basándose en el rango
+    this.capacidadMaxima = rangoActivo.capacidad;
+    this.tipoSesionPermitida = rangoActivo.tipoSesion;
+    
+    // Validar cantidad de personas
+    const cantidadActual = this.paso1Form.get('cantidadPersonas')?.value || 1;
+    if (cantidadActual > this.capacidadMaxima) {
+      this.paso1Form.patchValue({ cantidadPersonas: this.capacidadMaxima });
+    }
+  }
+
+  /**
+   * Actualiza la capacidad máxima y tipo de sesión basándose en el rango seleccionado
+   */
+  actualizarCapacidadYTipo() {
+    const horaInicio = this.paso1Form.get('horaInicio')?.value;
+    if (!horaInicio) return;
+
+    const inicioMin = this.parseHora(horaInicio);
+    const rangoActivo = this.rangosDelDia.find(rango => {
+      const rangoInicio = this.parseHora(rango.inicio);
+      const rangoFin = this.parseHora(rango.fin);
+      return inicioMin >= rangoInicio && inicioMin < rangoFin;
+    });
+
+    if (rangoActivo) {
+      this.capacidadMaxima = rangoActivo.capacidad;
+      this.tipoSesionPermitida = rangoActivo.tipoSesion;
+    }
+    
+    this.validarCupos();
+  }
+
+  /**
+   * Carga rangos por defecto cuando el entrenador no tiene disponibilidad configurada
+   */
+  private cargarRangosPorDefecto() {
+    // Rango por defecto: 9am-7pm, capacidad 5, cualquier tipo
+    this.rangosDelDia = [{
+      inicio: '09:00',
+      fin: '19:00',
+      capacidad: 5,
+      tipoSesion: 'ambos'
+    }];
+    this.generarHorasInicio();
+  }
+
+  /**
+   * Mantener para compatibilidad - ahora usa el nuevo sistema
+   */
+  generarHorarios() {
+    const fechaSeleccionada = this.paso1Form.get('fecha')?.value;
+    if (fechaSeleccionada) {
+      this.cargarRangosDelDia(fechaSeleccionada);
+    }
+  }
+
+  /**
+   * Convierte una hora en formato "HH:MM" a minutos desde medianoche
+   */
+  private parseHora(hora: string): number {
+    const [h, m] = hora.split(':').map(Number);
+    return h * 60 + (m || 0);
+  }
+
+  /**
+   * Convierte minutos desde medianoche a formato "HH:MM"
+   */
+  private formatearHora(minutos: number): string {
+    const h = Math.floor(minutos / 60);
+    const m = minutos % 60;
+    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+  }
+
+  /**
+   * Calcula la duración de la sesión en minutos
+   */
+  getDuracionSesion(): number {
+    const horaInicio = this.paso1Form.get('horaInicio')?.value;
+    const horaFin = this.paso1Form.get('horaFin')?.value;
+    
+    if (!horaInicio || !horaFin) return 0;
+    
+    return this.parseHora(horaFin) - this.parseHora(horaInicio);
+  }
+
+  /**
+   * Formatea la duración para mostrar al usuario
+   */
+  getDuracionFormateada(): string {
+    const minutos = this.getDuracionSesion();
+    if (minutos === 0) return '';
+    
+    const horas = Math.floor(minutos / 60);
+    const mins = minutos % 60;
+    
+    if (horas === 0) return `${mins} minutos`;
+    if (mins === 0) return horas === 1 ? '1 hora' : `${horas} horas`;
+    return `${horas}h ${mins}min`;
   }
 
   siguiente() {
@@ -365,12 +592,45 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Procesar pago con OXXO usando Stripe real
+   * Procesar pago con OXXO
+   * Si simulatedMode=true, genera voucher simulado sin llamar al backend
    */
   procesarPagoOxxo() {
-    const montoEnCentavos = Math.round(this.calcularPrecioTotal() * 100);
+    const precioFinal = this.calcularPrecioTotal() || this.entrenador?.precio || 350;
     const email = this.paso4Form.get('emailOxxo')?.value || this.paso3Form.get('email')?.value;
     const nombre = this.paso3Form.get('nombre')?.value;
+
+    // Modo simulado: genera voucher fake sin llamar a Stripe
+    if (environment.stripe?.simulatedMode) {
+      console.log('Modo simulado: generando voucher OXXO fake');
+      
+      // Simular delay de procesamiento
+      setTimeout(() => {
+        this.procesandoPago = false;
+        
+        // Generar voucher simulado
+        const referenciaSimulada = this.generarReferenciaSimulada();
+        const fechaExpiracion = new Date();
+        fechaExpiracion.setDate(fechaExpiracion.getDate() + 3); // 3 días para pagar
+        
+        this.voucherOxxo = {
+          referencia: referenciaSimulada,
+          monto: precioFinal,
+          fechaExpiracion: fechaExpiracion,
+          codigoBarras: referenciaSimulada,
+          hostedVoucherUrl: undefined
+        };
+        
+        this.paymentIntentId = 'pi_simulated_' + Date.now();
+        this.mostrarVoucherOxxo = true;
+        console.log('Voucher OXXO simulado generado:', this.voucherOxxo);
+      }, 1500);
+      
+      return;
+    }
+
+    // Modo real: usar Stripe
+    const montoEnCentavos = Math.round(precioFinal * 100);
 
     // 1. Crear PaymentIntent en el backend
     this.stripeService.createOxxoPaymentIntent({
@@ -382,7 +642,7 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
       metadata: {
         entrenadorId: this.entrenador?.id || '',
         fecha: this.paso1Form.get('fecha')?.value,
-        hora: this.paso1Form.get('hora')?.value,
+        hora: `${this.paso1Form.get('horaInicio')?.value} - ${this.paso1Form.get('horaFin')?.value}`,
       }
     }).subscribe({
       next: async (response) => {
@@ -400,9 +660,6 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
         this.procesandoPago = false;
 
         if (result.success && result.oxxoVoucher) {
-          // Calcular el precio o usar valor por defecto
-          const precioFinal = this.calcularPrecioTotal() || this.entrenador?.precio || 350;
-          
           // Voucher generado exitosamente por Stripe
           this.voucherOxxo = {
             referencia: result.oxxoVoucher.number || this.generarReferenciaSimulada(),
@@ -457,7 +714,7 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
       metadata: {
         entrenadorId: this.entrenador?.id || '',
         fecha: this.paso1Form.get('fecha')?.value,
-        hora: this.paso1Form.get('hora')?.value,
+        hora: `${this.paso1Form.get('horaInicio')?.value} - ${this.paso1Form.get('horaFin')?.value}`,
       }
     }).subscribe({
       next: (response) => {
@@ -501,10 +758,11 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
 
     // Crear la reserva en Firebase
     const fechaReserva = new Date(this.paso1Form.get('fecha')?.value);
-    const horaSeleccionada = this.paso1Form.get('hora')?.value;
+    const horaInicio = this.paso1Form.get('horaInicio')?.value;
+    const horaFin = this.paso1Form.get('horaFin')?.value;
 
-    // Combinar fecha y hora
-    const [horas, minutos] = horaSeleccionada.split(':').map(Number);
+    // Combinar fecha y hora de inicio
+    const [horas, minutos] = horaInicio.split(':').map(Number);
     fechaReserva.setHours(horas, minutos, 0, 0);
 
     const reservaData: Omit<Reserva, 'id' | 'clienteId' | 'fechaCreacion'> = {
@@ -512,8 +770,9 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
       entrenadorNombre: this.entrenador.nombre + ' ' + (this.entrenador.apellidoPaterno || ''),
       clienteNombre: this.paso3Form.get('nombre')?.value,
       fecha: fechaReserva,
-      hora: horaSeleccionada,
-      duracion: this.paso1Form.get('duracion')?.value,
+      hora: horaInicio,
+      horaFin: horaFin,
+      duracion: this.getDuracionSesion(),
       precio: this.calcularPrecioTotal(),
       modalidad: this.paso2Form.get('modalidad')?.value,
       estado: 'PENDIENTE',
@@ -539,14 +798,14 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
   }
 
   calcularPrecioTotal(): number {
-    const duracion = this.paso1Form.get('duracion')?.value || 60;
+    const duracionMinutos = this.getDuracionSesion() || 60;
     const modalidad = this.paso2Form.get('modalidad')?.value;
     // Usar precio online si la modalidad es online
     const precioHora = modalidad === 'online' 
       ? (this.entrenador?.precioOnline || this.entrenador?.precio || 0)
       : (this.entrenador?.precio || 0);
     const personas = this.paso1Form.get('cantidadPersonas')?.value || 1;
-    return ((duracion / 60) * precioHora) * personas;
+    return ((duracionMinutos / 60) * precioHora) * personas;
   }
 
   cerrar() {

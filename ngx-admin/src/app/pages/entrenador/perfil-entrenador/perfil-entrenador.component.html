@@ -60,6 +60,62 @@
     <div class="row">
       <!-- COLUMNA IZQUIERDA - Información principal -->
       <div class="col-lg-8">
+        <!-- Foto de Perfil -->
+        <nb-card class="foto-card">
+          <nb-card-header>
+            <nb-icon icon="camera-outline"></nb-icon>
+            Foto de Perfil
+          </nb-card-header>
+          <nb-card-body>
+            <div class="foto-container">
+              <div class="foto-preview-wrapper">
+                <img [src]="getFotoActual()" 
+                     alt="Foto de perfil" 
+                     class="foto-preview"
+                     (error)="$event.target.src = 'assets/images/nick.png'">
+                <div class="foto-overlay" *ngIf="!uploadingFoto">
+                  <label for="foto-input" class="foto-edit-btn" [class.disabled]="uploadingFoto">
+                    <nb-icon icon="camera-outline"></nb-icon>
+                    <span>Cambiar foto</span>
+                  </label>
+                </div>
+              </div>
+              
+              <input type="file" 
+                     id="foto-input" 
+                     accept="image/*" 
+                     (change)="onFileSelected($event)"
+                     [disabled]="uploadingFoto"
+                     hidden>
+
+              <div class="foto-info">
+                <p class="text-muted mb-2">
+                  <small>Formatos: JPG, PNG, GIF. Máximo 5MB.</small>
+                </p>
+                
+                <!-- Progreso de subida -->
+                <div *ngIf="uploadingFoto" class="upload-progress">
+                  <nb-progress-bar [value]="uploadProgress" status="primary" size="tiny">
+                  </nb-progress-bar>
+                  <small class="text-muted">Subiendo... {{ uploadProgress | number:'1.0-0' }}%</small>
+                </div>
+                
+                <!-- Botones de acción cuando hay foto seleccionada -->
+                <div *ngIf="fotoPreview && !uploadingFoto" class="foto-actions">
+                  <button nbButton status="primary" size="small" (click)="subirFoto()">
+                    <nb-icon icon="upload-outline"></nb-icon>
+                    Guardar foto
+                  </button>
+                  <button nbButton status="basic" size="small" (click)="cancelarFoto()">
+                    <nb-icon icon="close-outline"></nb-icon>
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </nb-card-body>
+        </nb-card>
+
         <!-- Información personal -->
         <nb-card>
           <nb-card-header>

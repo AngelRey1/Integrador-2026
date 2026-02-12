@@ -1,0 +1,177 @@
+<div class="auth-container">
+  <!-- Panel izquierdo - Branding -->
+  <div class="auth-branding">
+    <div class="branding-content">
+      <div class="logo">
+        <span class="logo-icon">💪</span>
+        <span class="logo-text">SportConnect</span>
+      </div>
+      <h1>Únete como Entrenador</h1>
+      <p>Conecta con clientes que buscan alcanzar sus metas fitness. Ofrece tus servicios y haz crecer tu negocio.</p>
+      
+      <div class="features">
+        <div class="feature">
+          <span class="feature-icon">📅</span>
+          <span>Gestiona tu agenda fácilmente</span>
+        </div>
+        <div class="feature">
+          <span class="feature-icon">💰</span>
+          <span>Recibe pagos seguros</span>
+        </div>
+        <div class="feature">
+          <span class="feature-icon">📈</span>
+          <span>Haz crecer tu clientela</span>
+        </div>
+        <div class="feature">
+          <span class="feature-icon">⭐</span>
+          <span>Construye tu reputación</span>
+        </div>
+      </div>
+    </div>
+    <div class="branding-footer">
+      <p>¿Eres cliente? <a href="/buscar-entrenadores">Busca entrenadores aquí</a></p>
+    </div>
+  </div>
+
+  <!-- Panel derecho - Formulario -->
+  <div class="auth-form-panel">
+    <div class="form-container">
+      <div class="form-header">
+        <h2>Crear Cuenta de Entrenador</h2>
+        <p>Completa tus datos para registrarte</p>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="nombre">Nombre *</label>
+            <input 
+              type="text" 
+              id="nombre"
+              formControlName="nombre" 
+              placeholder="Tu nombre"
+              class="form-input"
+              [class.input-error]="form.get('nombre')?.invalid && form.get('nombre')?.touched"
+            />
+            <small class="error-text" *ngIf="form.get('nombre')?.invalid && form.get('nombre')?.touched">
+              El nombre es requerido
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label for="apellido">Apellido *</label>
+            <input 
+              type="text" 
+              id="apellido"
+              formControlName="apellido" 
+              placeholder="Tu apellido"
+              class="form-input"
+              [class.input-error]="form.get('apellido')?.invalid && form.get('apellido')?.touched"
+            />
+            <small class="error-text" *ngIf="form.get('apellido')?.invalid && form.get('apellido')?.touched">
+              El apellido es requerido
+            </small>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Correo electrónico *</label>
+          <input 
+            type="email" 
+            id="email"
+            formControlName="email" 
+            placeholder="tu@correo.com"
+            class="form-input"
+            [class.input-error]="form.get('email')?.invalid && form.get('email')?.touched"
+          />
+          <small class="error-text" *ngIf="form.get('email')?.invalid && form.get('email')?.touched">
+            <span *ngIf="form.get('email')?.errors?.['required']">El correo es requerido</span>
+            <span *ngIf="form.get('email')?.errors?.['email']">Ingresa un correo válido</span>
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Contraseña *</label>
+          <input 
+            type="password" 
+            id="password"
+            formControlName="password" 
+            placeholder="Mínimo 6 caracteres"
+            class="form-input"
+            [class.input-error]="form.get('password')?.invalid && form.get('password')?.touched"
+          />
+          <small class="error-text" *ngIf="form.get('password')?.invalid && form.get('password')?.touched">
+            <span *ngIf="form.get('password')?.errors?.['required']">La contraseña es requerida</span>
+            <span *ngIf="form.get('password')?.errors?.['minlength']">Mínimo 6 caracteres</span>
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirmar contraseña *</label>
+          <input 
+            type="password" 
+            id="confirmPassword"
+            formControlName="confirmPassword" 
+            placeholder="Repite tu contraseña"
+            class="form-input"
+            [class.input-error]="(form.get('confirmPassword')?.invalid || form.errors?.['mismatch']) && form.get('confirmPassword')?.touched"
+          />
+          <small class="error-text" *ngIf="form.get('confirmPassword')?.invalid && form.get('confirmPassword')?.touched">
+            Debes confirmar la contraseña
+          </small>
+          <small class="error-text" *ngIf="form.errors?.['mismatch'] && form.get('confirmPassword')?.touched">
+            Las contraseñas no coinciden
+          </small>
+        </div>
+
+        <!-- Info de aprobación -->
+        <div class="info-banner">
+          <span class="info-icon">ℹ️</span>
+          <div class="info-content">
+            <strong>Proceso de verificación</strong>
+            <p>Tu solicitud será revisada por nuestro equipo. Te notificaremos en 1-2 días hábiles.</p>
+          </div>
+        </div>
+
+        <div class="form-group checkbox-group">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="terminos" />
+            <span class="checkmark"></span>
+            <span>Acepto los <a href="/terminos" target="_blank">términos y condiciones</a> y la <a href="/privacidad" target="_blank">política de privacidad</a></span>
+          </label>
+          <small class="error-text" *ngIf="form.get('terminos')?.invalid && form.get('terminos')?.touched">
+            Debes aceptar los términos y condiciones
+          </small>
+        </div>
+
+        <!-- Mensajes de error/éxito -->
+        <div class="alert alert-error" *ngIf="errorMessage">
+          <span class="alert-icon">⚠️</span>
+          {{ errorMessage }}
+        </div>
+
+        <div class="alert alert-success" *ngIf="successMessage">
+          <span class="alert-icon">✅</span>
+          {{ successMessage }}
+        </div>
+
+        <button 
+          type="submit"
+          class="btn-submit"
+          [disabled]="form.invalid || loading"
+          [class.btn-loading]="loading"
+        >
+          <span *ngIf="!loading">Crear mi cuenta</span>
+          <span *ngIf="loading" class="loading-text">
+            <span class="spinner"></span>
+            Registrando...
+          </span>
+        </button>
+
+        <div class="login-link">
+          <p>¿Ya tienes cuenta? <a routerLink="/auth/login">Inicia sesión</a></p>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

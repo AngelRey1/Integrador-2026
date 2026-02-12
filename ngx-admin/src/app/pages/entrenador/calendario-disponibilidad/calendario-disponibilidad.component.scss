@@ -1,5 +1,18 @@
+.disponibilidad-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
 .page-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   margin-bottom: 0.5rem;
+  font-weight: 700;
+
+  nb-icon {
+    font-size: 1.5rem;
+  }
 }
 
 .text-hint {
@@ -7,20 +20,269 @@
   font-size: 0.875rem;
 }
 
-.horarios-grid {
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  gap: 1rem;
+}
+
+// Grid de días
+.dias-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+// Card de cada día
+.dia-card {
+  transition: all 0.3s ease;
+  border-radius: 12px;
+  overflow: hidden;
+
+  &.dia-habilitado {
+    border-left: 4px solid #00d68f;
+    
+    .dia-header {
+      background: linear-gradient(135deg, #f0fff4 0%, #e6ffed 100%);
+    }
+  }
+
+  &.dia-deshabilitado {
+    opacity: 0.7;
+    border-left: 4px solid #e4e9f2;
+    
+    .dia-header {
+      background: #f7f9fc;
+    }
+  }
+}
+
+.dia-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+}
+
+.dia-nombre {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #222b45;
+}
+
+// Contenedor de rangos
+.rangos-container {
+  display: flex;
+  flex-direction: column;
   gap: 0.75rem;
 }
 
-.mb-3 {
-  margin-bottom: 1rem;
+.rango-item {
+  padding: 0.75rem;
+  background: #f7f9fc;
+  border-radius: 8px;
+  border: 1px solid #e4e9f2;
 }
 
-.mb-4 {
-  margin-bottom: 1.5rem;
+.rango-inputs {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
-.mt-4 {
-  margin-top: 1.5rem;
+.hora-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.hora-label {
+  font-size: 0.7rem;
+  color: #8f9bb3;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.hora-select {
+  min-width: 90px;
+}
+
+.rango-separador {
+  color: #8f9bb3;
+  font-weight: 600;
+  padding: 0 0.25rem;
+  margin-top: 1rem;
+}
+
+.btn-eliminar {
+  margin-left: auto;
+  margin-top: 0.75rem;
+}
+
+.btn-agregar-rango {
+  margin-top: 0.75rem;
+  width: 100%;
+}
+
+// Día no disponible
+.dia-no-disponible {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  color: #8f9bb3;
+  text-align: center;
+
+  nb-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    opacity: 0.5;
+  }
+
+  span {
+    font-weight: 600;
+  }
+
+  small {
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+  }
+}
+
+// Configuración de capacidad y tipo
+.rango-config {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed #e4e9f2;
+  flex-wrap: wrap;
+}
+
+.config-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+  min-width: 120px;
+}
+
+.config-label {
+  font-size: 0.7rem;
+  color: #8f9bb3;
+  text-transform: uppercase;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+
+  nb-icon {
+    font-size: 0.875rem;
+  }
+}
+
+.capacidad-select,
+.tipo-select {
+  width: 100%;
+}
+
+// Resumen
+.resumen-card {
+  nb-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+  }
+}
+
+.resumen-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.resumen-item {
+  display: flex;
+  flex-direction: column;
+  padding: 0.75rem;
+  border-radius: 8px;
+  background: #f7f9fc;
+  border: 1px solid #e4e9f2;
+
+  &.disponible {
+    background: linear-gradient(135deg, #f0fff4 0%, #e6ffed 100%);
+    border-color: #00d68f;
+  }
+}
+
+.resumen-dia {
+  font-weight: 700;
+  color: #222b45;
+  margin-bottom: 0.25rem;
+}
+
+.resumen-horarios {
+  font-size: 0.875rem;
+  color: #00d68f;
+  font-weight: 500;
+
+  &.no-disponible {
+    color: #8f9bb3;
+    font-style: italic;
+  }
+}
+
+// Utilities
+.d-flex { display: flex; }
+.justify-content-between { justify-content: space-between; }
+.align-items-center { align-items: center; }
+.flex-wrap { flex-wrap: wrap; }
+.gap-2 { gap: 0.5rem; }
+.mb-0 { margin-bottom: 0; }
+.mb-4 { margin-bottom: 1.5rem; }
+.mt-3 { margin-top: 1rem; }
+.mt-4 { margin-top: 1.5rem; }
+.text-danger { color: #ff3d71; font-size: 0.75rem; }
+
+// Responsive
+@media (max-width: 768px) {
+  .dias-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rango-inputs {
+    flex-direction: column;
+    align-items: stretch;
+
+    .hora-grupo {
+      width: 100%;
+    }
+
+    .rango-separador {
+      display: none;
+    }
+
+    .btn-eliminar {
+      margin: 0.5rem 0 0 0;
+    }
+  }
+
+  .rango-config {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .config-grupo {
+    min-width: 100%;
+  }
+
+  .resumen-grid {
+    grid-template-columns: 1fr;
+  }
 }

@@ -12,7 +12,7 @@ admin.initializeApp();
 
 // Inicializar Stripe con la clave secreta desde variables de entorno
 const stripe = new Stripe(stripeSecretKey.value() || process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2023-10-16',
+  apiVersion: '2023-10-16' as any,
 });
 
 // Configurar CORS
@@ -34,14 +34,7 @@ export const createOxxoPaymentIntent = functions.https.onRequest((req, res) => {
     }
 
     try {
-      const {
-        amount,
-        currency = 'mxn',
-        customerEmail,
-        customerName,
-        description,
-        metadata = {}
-      } = req.body;
+      const { amount, currency = 'mxn', customerEmail, customerName, description, metadata = {} } = req.body;
 
       // Validaciones
       if (!amount || amount < 1000) { // Mínimo $10 MXN (1000 centavos)
@@ -68,7 +61,7 @@ export const createOxxoPaymentIntent = functions.https.onRequest((req, res) => {
           ...metadata,
           customerEmail,
           customerName,
-          createdAt: new Date().toISOString()
+          createdAt: new Date().toISOString(),
         },
         description: description || `Reserva SportConnect - ${customerName}`,
       });
@@ -112,14 +105,7 @@ export const createCardPaymentIntent = functions.https.onRequest((req, res) => {
     }
 
     try {
-      const {
-        amount,
-        currency = 'mxn',
-        customerEmail,
-        customerName,
-        description,
-        metadata = {}
-      } = req.body;
+      const { amount, currency = 'mxn', customerEmail, customerName, description, metadata = {} } = req.body;
 
       if (!amount || amount < 500) { // Mínimo $5 MXN
         res.status(400).json({ error: 'El monto mínimo es $5 MXN' });
@@ -134,7 +120,7 @@ export const createCardPaymentIntent = functions.https.onRequest((req, res) => {
           ...metadata,
           customerEmail,
           customerName,
-          createdAt: new Date().toISOString()
+          createdAt: new Date().toISOString(),
         },
         description: description || `Reserva SportConnect - ${customerName}`,
       });
@@ -211,7 +197,7 @@ export const getPaymentIntentStatus = functions.https.onRequest((req, res) => {
  * Configura este endpoint en Stripe Dashboard -> Webhooks
  */
 export const stripeWebhook = functions.https.onRequest(async (req, res) => {
-  const sig = req.headers['stripe-signature'];
+  const sig = req.headers['stripe-signature'] as string;
   const webhookSecret = functions.config().stripe?.webhook_secret || process.env.STRIPE_WEBHOOK_SECRET;
 
   if (!webhookSecret) {
@@ -223,11 +209,7 @@ export const stripeWebhook = functions.https.onRequest(async (req, res) => {
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(
-      req.rawBody,
-      sig as string,
-      webhookSecret
-    );
+    event = stripe.webhooks.constructEvent(req.rawBody, sig, webhookSecret);
   } catch (err: any) {
     console.error('Webhook signature verification failed:', err.message);
     res.status(400).send(`Webhook Error: ${err.message}`);

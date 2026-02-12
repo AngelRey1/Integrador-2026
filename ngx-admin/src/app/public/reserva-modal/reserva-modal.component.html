@@ -59,49 +59,95 @@
             <input type="date" formControlName="fecha" class="form-input" [min]="fechaMinima" />
           </div>
 
-          <!-- Selector de Horarios Visual -->
-          <div class="form-group">
-            <label>Horarios Disponibles *</label>
+          <!-- Selector de Horarios - Hora Inicio y Hora Fin -->
+          <div class="form-group" *ngIf="paso1Form.get('fecha')?.value">
+            <label>Horario de la sesión *</label>
             <div *ngIf="cargandoHorarios" class="loading-horarios">
               <nb-spinner status="primary" size="small"></nb-spinner>
               <span>Cargando disponibilidad...</span>
             </div>
-            <div class="horarios-grid" *ngIf="!cargandoHorarios">
-              <div *ngFor="let h of horariosDisponibles" class="horario-chip"
-                [class.selected]="paso1Form.get('hora')?.value === h.hora" [class.disabled]="!h.disponible"
-                (click)="h.disponible ? paso1Form.patchValue({hora: h.hora}) : null">
-                {{ h.hora }}
-                <span *ngIf="!h.disponible" class="agotado-label">Agotado</span>
+            
+            <!-- Mensaje cuando el entrenador no tiene disponibilidad para ese día -->
+            <div *ngIf="!cargandoHorarios && rangosDelDia.length === 0" class="no-horarios-msg warning">
+              <nb-icon icon="alert-circle-outline"></nb-icon>
+              <span>El entrenador no tiene disponibilidad para este día. Por favor selecciona otra fecha.</span>
+            </div>
+            
+            <!-- Selectores de hora inicio y fin -->
+            <div class="horario-rango-container" *ngIf="!cargandoHorarios && rangosDelDia.length > 0">
+              <div class="hora-selector">
+                <label class="hora-label">Desde</label>
+                <select formControlName="horaInicio" class="form-select hora-select">
+                  <option value="">Selecciona hora inicio</option>
+                  <option *ngFor="let hora of horasInicio" [value]="hora">{{ hora }}</option>
+                </select>
+              </div>
+              
+              <div class="hora-flecha">
+                <nb-icon icon="arrow-forward-outline"></nb-icon>
+              </div>
+              
+              <div class="hora-selector">
+                <label class="hora-label">Hasta</label>
+                <select formControlName="horaFin" class="form-select hora-select" 
+                        [disabled]="!paso1Form.get('horaInicio')?.value">
+                  <option value="">Selecciona hora fin</option>
+                  <option *ngFor="let hora of horasFin" [value]="hora">{{ hora }}</option>
+                </select>
               </div>
             </div>
-            <small class="error-text" *ngIf="paso1Form.get('hora')?.invalid && paso1Form.get('hora')?.touched">
-              Selecciona un horario disponible
+
+            <!-- Mostrar duración calculada -->
+            <div class="duracion-info" *ngIf="getDuracionSesion() > 0">
+              <nb-icon icon="clock-outline"></nb-icon>
+              <span>Duración: <strong>{{ getDuracionFormateada() }}</strong></span>
+            </div>
+
+            <!-- Mostrar rangos disponibles del entrenador -->
+            <div class="rangos-disponibles" *ngIf="!cargandoHorarios && rangosDelDia.length > 0">
+              <small class="rangos-label">Horarios disponibles del entrenador:</small>
+              <div class="rangos-chips">
+                <span *ngFor="let rango of rangosDelDia" class="rango-chip">
+                  {{ rango.inicio }} - {{ rango.fin }}
+                  <span class="capacidad-badge" *ngIf="rango.capacidad > 1">máx {{ rango.capacidad }} pers.</span>
+                </span>
+              </div>
+            </div>
+
+            <small class="error-text" *ngIf="paso1Form.get('horaInicio')?.invalid && paso1Form.get('horaInicio')?.touched">
+              Selecciona una hora de inicio
+            </small>
+            <small class="error-text" *ngIf="paso1Form.get('horaFin')?.invalid && paso1Form.get('horaFin')?.touched">
+              Selecciona una hora de fin
             </small>
           </div>
 
-          <div class="form-row">
-            <div class="form-group">
-              <label>Duración *</label>
-              <select formControlName="duracion" class="form-select">
-                <option *ngFor="let d of duraciones" [value]="d.value">
-                  {{ d.label }}
-                </option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Nº Personas *</label>
-              <input type="number" formControlName="cantidadPersonas" class="form-input" min="1"
-                [max]="cuposDisponibles" />
-              <small class="error-text" *ngIf="paso1Form.get('cantidadPersonas')?.hasError('excedeCupos')">
-                ¡Solo quedan {{ cuposDisponibles }} cupos!
-              </small>
+          <!-- Mensaje cuando no hay fecha seleccionada -->
+          <div class="form-group" *ngIf="!paso1Form.get('fecha')?.value">
+            <div class="no-horarios-msg">
+              <nb-icon icon="calendar-outline"></nb-icon>
+              <span>Selecciona una fecha para ver los horarios disponibles</span>
             </div>
           </div>
 
-          <div class="form-group cupos-info">
-            <label>Disponibilidad del día</label>
-            <div class="cupos-badge" [class.low]="cuposDisponibles < 5">
-              {{ cuposDisponibles }} cupos libres
+          <div class="form-group">
+            <label>Nº Personas *</label>
+            <input type="number" formControlName="cantidadPersonas" class="form-input" 
+                   min="1" [max]="capacidadMaxima" />
+            <small class="hint-text" *ngIf="capacidadMaxima > 1">
+              Capacidad máxima: {{ capacidadMaxima }} personas
+            </small>
+            <small class="error-text" *ngIf="paso1Form.get('cantidadPersonas')?.hasError('excedeCupos')">
+              ¡Capacidad máxima del entrenador: {{ capacidadMaxima }} personas!
+            </small>
+          </div>
+
+          <!-- Info de tipo de sesión permitida -->
+          <div class="form-group tipo-sesion-info" *ngIf="paso1Form.get('horaInicio')?.value && tipoSesionPermitida !== 'ambos'">
+            <div class="tipo-badge" [class.individual]="tipoSesionPermitida === 'individual'" 
+                 [class.grupal]="tipoSesionPermitida === 'grupal'">
+              <nb-icon [icon]="tipoSesionPermitida === 'individual' ? 'person-outline' : 'people-outline'"></nb-icon>
+              <span>Este horario es para sesiones {{ tipoSesionPermitida === 'individual' ? 'individuales' : 'grupales' }}</span>
             </div>
           </div>
 
@@ -111,7 +157,7 @@
               <strong>Total:</strong> ${{ calcularPrecioTotal() }} MXN
               <br>
               <small>
-                ${{ entrenador?.precio || 0 }} x {{ paso1Form.get('duracion')?.value / 60 }}h x {{
+                ${{ entrenador?.precio || 0 }} x {{ getDuracionFormateada() }} x {{
                 paso1Form.get('cantidadPersonas')?.value }} persona(s)
               </small>
             </div>
@@ -474,8 +520,8 @@
             <nb-icon icon="calendar-outline"></nb-icon>
             <div>
               <strong>Fecha y Hora</strong>
-              <p>{{ paso1Form.get('fecha')?.value | date:'fullDate':'':'es' }} a las {{ paso1Form.get('hora')?.value }}
-              </p>
+              <p>{{ paso1Form.get('fecha')?.value | date:'fullDate':'':'es' }}</p>
+              <small>{{ paso1Form.get('horaInicio')?.value }} - {{ paso1Form.get('horaFin')?.value }} ({{ getDuracionFormateada() }})</small>
             </div>
           </div>
 
@@ -491,7 +537,7 @@
             <nb-icon icon="clock-outline"></nb-icon>
             <div>
               <strong>Duración</strong>
-              <p>{{ paso1Form.get('duracion')?.value }} minutos</p>
+              <p>{{ getDuracionFormateada() }}</p>
             </div>
           </div>
 

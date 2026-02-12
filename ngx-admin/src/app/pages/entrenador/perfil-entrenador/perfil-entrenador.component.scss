@@ -390,3 +390,104 @@ nb-alert {
 .small { font-size: 0.85rem; }
 .text-danger { color: #ff3d71 !important; }
 
+// ========== FOTO DE PERFIL ==========
+.foto-card {
+  nb-card-body {
+    padding: 1.5rem;
+  }
+}
+
+.foto-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.foto-preview-wrapper {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
+
+  &:hover .foto-overlay {
+    opacity: 1;
+  }
+}
+
+.foto-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.foto-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.foto-edit-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  color: white;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  transition: background 0.2s ease;
+
+  &:hover:not(.disabled) {
+    background: rgba(255, 255, 255, 0.25);
+  }
+
+  &.disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  nb-icon {
+    font-size: 1.5rem;
+  }
+
+  span {
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+}
+
+.foto-info {
+  flex: 1;
+  min-width: 200px;
+}
+
+.upload-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+
+  nb-progress-bar {
+    width: 100%;
+    max-width: 250px;
+  }
+}
+
+.foto-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+

@@ -1,63 +1,113 @@
-<div class="login-container">
-  <div class="login-card">
-    <div class="login-header">
-      <h3>Iniciar Sesión</h3>
-      <p class="subtitle">Ingresa tus credenciales para acceder</p>
+<div class="auth-container">
+  <!-- Panel izquierdo - Branding -->
+  <div class="auth-branding">
+    <div class="branding-content">
+      <div class="logo">
+        <span class="logo-icon">💪</span>
+        <span class="logo-text">SportConnect</span>
+      </div>
+      <h1>Bienvenido de vuelta</h1>
+      <p>Accede a tu cuenta de entrenador y gestiona tus reservas, clientes y calendario desde un solo lugar.</p>
+      
+      <div class="features">
+        <div class="feature">
+          <span class="feature-icon">📊</span>
+          <span>Panel de control completo</span>
+        </div>
+        <div class="feature">
+          <span class="feature-icon">📅</span>
+          <span>Gestión de citas y horarios</span>
+        </div>
+        <div class="feature">
+          <span class="feature-icon">💬</span>
+          <span>Comunicación con clientes</span>
+        </div>
+        <div class="feature">
+          <span class="feature-icon">📈</span>
+          <span>Estadísticas de rendimiento</span>
+        </div>
+      </div>
     </div>
-    <div class="login-body">
+    <div class="branding-footer">
+      <p>¿Eres cliente? <a href="/buscar-entrenadores">Busca entrenadores aquí</a></p>
+    </div>
+  </div>
+
+  <!-- Panel derecho - Formulario -->
+  <div class="auth-form-panel">
+    <div class="form-container">
+      <div class="form-header">
+        <h2>Iniciar Sesión</h2>
+        <p>Ingresa tus credenciales para continuar</p>
+      </div>
+
       <form [formGroup]="form" (ngSubmit)="submit()">
         <div class="form-group">
-          <label for="email">Email</label>
+          <label for="email">Correo electrónico *</label>
           <input 
             type="email" 
             id="email"
             formControlName="email" 
-            placeholder="tu@email.com"
+            placeholder="tu@correo.com"
             class="form-input"
+            [class.input-error]="form.get('email')?.invalid && form.get('email')?.touched"
           />
           <small class="error-text" *ngIf="form.get('email')?.invalid && form.get('email')?.touched">
-            <span *ngIf="form.get('email')?.errors?.['required']">El email es requerido</span>
-            <span *ngIf="form.get('email')?.errors?.['email']">Email inválido</span>
+            <span *ngIf="form.get('email')?.errors?.['required']">El correo es requerido</span>
+            <span *ngIf="form.get('email')?.errors?.['email']">Ingresa un correo válido</span>
           </small>
         </div>
 
         <div class="form-group">
-          <label for="password">Contraseña</label>
+          <label for="password">Contraseña *</label>
           <input 
             type="password" 
             id="password"
-            formControlName="contrasena" 
+            formControlName="password" 
             placeholder="••••••••"
             class="form-input"
+            [class.input-error]="form.get('password')?.invalid && form.get('password')?.touched"
           />
-          <small class="error-text" *ngIf="form.get('contrasena')?.invalid && form.get('contrasena')?.touched">
-            <span *ngIf="form.get('contrasena')?.errors?.['required']">La contraseña es requerida</span>
-            <span *ngIf="form.get('contrasena')?.errors?.['minlength']">Mínimo 6 caracteres</span>
+          <small class="error-text" *ngIf="form.get('password')?.invalid && form.get('password')?.touched">
+            <span *ngIf="form.get('password')?.errors?.['required']">La contraseña es requerida</span>
+            <span *ngIf="form.get('password')?.errors?.['minlength']">Mínimo 6 caracteres</span>
           </small>
         </div>
 
-        <div class="form-group checkbox-group">
-          <label>
+        <div class="form-options">
+          <label class="checkbox-label">
             <input type="checkbox" formControlName="recordar" />
-            Recordar sesión
+            <span>Recordar sesión</span>
           </label>
+          <a (click)="forgotPassword()" class="forgot-link">¿Olvidaste tu contraseña?</a>
         </div>
 
-        <div class="error-message" *ngIf="errorMessage">
+        <!-- Mensajes de error/éxito -->
+        <div class="alert alert-error" *ngIf="errorMessage">
+          <span class="alert-icon">⚠️</span>
           {{ errorMessage }}
+        </div>
+
+        <div class="alert alert-success" *ngIf="successMessage">
+          <span class="alert-icon">✅</span>
+          {{ successMessage }}
         </div>
 
         <button 
           type="submit"
-          class="submit-button"
+          class="btn-submit"
           [disabled]="form.invalid || loading"
+          [class.btn-loading]="loading"
         >
           <span *ngIf="!loading">Iniciar Sesión</span>
-          <span *ngIf="loading">Iniciando sesión...</span>
+          <span *ngIf="loading" class="loading-text">
+            <span class="spinner"></span>
+            Iniciando...
+          </span>
         </button>
 
         <div class="register-link">
-          <p>¿No tienes cuenta? <a routerLink="/auth/register">Regístrate aquí</a></p>
+          <p>¿No tienes cuenta? <a routerLink="/auth/register">Regístrate como entrenador</a></p>
         </div>
       </form>
     </div>
