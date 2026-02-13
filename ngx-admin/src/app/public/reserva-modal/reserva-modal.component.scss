@@ -975,7 +975,7 @@
         background: #FFFFFF;
       }
 
-      input[type="radio"]:checked~.radio-content {
+      input[type="radio"]:checked ~ .radio-content {
         nb-icon {
           color: #00D09C;
         }
