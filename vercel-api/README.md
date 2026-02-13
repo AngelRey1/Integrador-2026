@@ -33,6 +33,15 @@ En el dashboard de Vercel:
 2. Agrega:
    - `STRIPE_SECRET_KEY` = tu clave secreta de Stripe (sk_test_...)
    - `STRIPE_WEBHOOK_SECRET` = (lo obtienes al configurar el webhook)
+   - `EMAIL_USER` = tu correo de Gmail
+   - `EMAIL_PASSWORD` = App Password de Gmail (ver instrucciones abajo)
+
+### Paso 5: Configurar Gmail para envío de correos
+1. Ve a https://myaccount.google.com/security
+2. Activa la verificación en 2 pasos
+3. Ve a https://myaccount.google.com/apppasswords
+4. Crea una nueva "App Password" para "Correo"
+5. Usa esa contraseña de 16 caracteres como `EMAIL_PASSWORD`
 
 ## 📡 Endpoints
 
