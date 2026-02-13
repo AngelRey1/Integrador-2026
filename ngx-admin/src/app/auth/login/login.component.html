@@ -3,33 +3,63 @@
   <div class="auth-branding">
     <div class="branding-content">
       <div class="logo">
-        <span class="logo-icon">💪</span>
+        <span class="logo-icon">{{ isClienteLogin ? '🏃' : '💪' }}</span>
         <span class="logo-text">SportConnect</span>
       </div>
-      <h1>Bienvenido de vuelta</h1>
-      <p>Accede a tu cuenta de entrenador y gestiona tus reservas, clientes y calendario desde un solo lugar.</p>
       
-      <div class="features">
-        <div class="feature">
-          <span class="feature-icon">📊</span>
-          <span>Panel de control completo</span>
+      <!-- Contenido para CLIENTE -->
+      <ng-container *ngIf="isClienteLogin">
+        <h1>¡Bienvenido de vuelta!</h1>
+        <p>Accede a tu cuenta de cliente y gestiona tus reservas, encuentra entrenadores y alcanza tus objetivos.</p>
+        
+        <div class="features">
+          <div class="feature">
+            <span class="feature-icon">🔍</span>
+            <span>Buscar entrenadores certificados</span>
+          </div>
+          <div class="feature">
+            <span class="feature-icon">📅</span>
+            <span>Agendar sesiones fácilmente</span>
+          </div>
+          <div class="feature">
+            <span class="feature-icon">💳</span>
+            <span>Pagos seguros</span>
+          </div>
+          <div class="feature">
+            <span class="feature-icon">⭐</span>
+            <span>Calificar tus entrenamientos</span>
+          </div>
         </div>
-        <div class="feature">
-          <span class="feature-icon">📅</span>
-          <span>Gestión de citas y horarios</span>
+      </ng-container>
+
+      <!-- Contenido para ENTRENADOR -->
+      <ng-container *ngIf="!isClienteLogin">
+        <h1>Bienvenido de vuelta</h1>
+        <p>Accede a tu cuenta de entrenador y gestiona tus reservas, clientes y calendario desde un solo lugar.</p>
+        
+        <div class="features">
+          <div class="feature">
+            <span class="feature-icon">📊</span>
+            <span>Panel de control completo</span>
+          </div>
+          <div class="feature">
+            <span class="feature-icon">📅</span>
+            <span>Gestión de citas y horarios</span>
+          </div>
+          <div class="feature">
+            <span class="feature-icon">💬</span>
+            <span>Comunicación con clientes</span>
+          </div>
+          <div class="feature">
+            <span class="feature-icon">📈</span>
+            <span>Estadísticas de rendimiento</span>
+          </div>
         </div>
-        <div class="feature">
-          <span class="feature-icon">💬</span>
-          <span>Comunicación con clientes</span>
-        </div>
-        <div class="feature">
-          <span class="feature-icon">📈</span>
-          <span>Estadísticas de rendimiento</span>
-        </div>
-      </div>
+      </ng-container>
     </div>
     <div class="branding-footer">
-      <p>¿Eres cliente? <a href="/buscar-entrenadores">Busca entrenadores aquí</a></p>
+      <p *ngIf="isClienteLogin">¿Eres entrenador? <a routerLink="/auth/login" [queryParams]="{rol: 'ENTRENADOR'}">Ingresa aquí</a></p>
+      <p *ngIf="!isClienteLogin">¿Eres cliente? <a routerLink="/auth/login" [queryParams]="{rol: 'CLIENTE'}">Ingresa aquí</a></p>
     </div>
   </div>
 
@@ -107,7 +137,8 @@
         </button>
 
         <div class="register-link">
-          <p>¿No tienes cuenta? <a routerLink="/auth/register">Regístrate como entrenador</a></p>
+          <p *ngIf="isClienteLogin">¿No tienes cuenta? <a routerLink="/auth/register" [queryParams]="{rol: 'CLIENTE'}">Regístrate como cliente</a></p>
+          <p *ngIf="!isClienteLogin">¿No tienes cuenta? <a routerLink="/auth/register" [queryParams]="{rol: 'ENTRENADOR'}">Regístrate como entrenador</a></p>
         </div>
       </form>
     </div>

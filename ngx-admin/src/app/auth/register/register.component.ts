@@ -13,6 +13,8 @@ export class RegisterComponent implements OnInit {
   loading = false;
   errorMessage = '';
   successMessage = '';
+  private requestedRole: string = 'CLIENTE'; // Por defecto cliente
+  isClienteRegistro: boolean = true; // Por defecto registro de cliente
 
   constructor(
     private fb: FormBuilder,
@@ -31,7 +33,11 @@ export class RegisterComponent implements OnInit {
   }
 
   ngOnInit() {
-    // No necesitamos pre-seleccionar rol ya que siempre es ENTRENADOR
+    // Leer el rol del query param
+    this.route.queryParams.subscribe(params => {
+      this.requestedRole = params['rol'] || 'CLIENTE';
+      this.isClienteRegistro = (this.requestedRole !== 'ENTRENADOR');
+    });
   }
 
   passwordsMatch(group: FormGroup) {
@@ -53,7 +59,7 @@ export class RegisterComponent implements OnInit {
     this.successMessage = '';
 
     const { nombre, apellido, email, password } = this.form.value;
-    const rol = 'ENTRENADOR'; // Siempre registrar como entrenador
+    const rol = this.requestedRole; // Usar el rol del query param
 
     const result = await this.authFirebase.register({
       nombre,
@@ -68,11 +74,19 @@ export class RegisterComponent implements OnInit {
     if (result.success) {
       this.successMessage = result.message;
       
-      // Entrenador: redirigir a página de login con mensaje de pendiente
+      // Redirigir según el rol
       setTimeout(() => {
-        this.router.navigate(['/auth/login'], {
-          queryParams: { email, pending: true }
-        });
+        if (rol === 'ENTRENADOR') {
+          // Entrenadores requieren aprobación
+          this.router.navigate(['/auth/login'], {
+            queryParams: { email, pending: true, rol: 'ENTRENADOR' }
+          });
+        } else {
+          // Clientes pueden entrar directo
+          this.router.navigate(['/auth/login'], {
+            queryParams: { email, registered: true, rol: 'CLIENTE' }
+          });
+        }
       }, 3000);
     } else {
       this.errorMessage = result.message;

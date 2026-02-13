@@ -21,6 +21,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   userPictureOnly: boolean = false;
   user: any;
   currentRole: string = 'cliente';
+  userRole: string = ''; // Rol del usuario para mostrar/ocultar botones
 
   // Notificaciones
   notificaciones: Notificacion[] = [];
@@ -69,6 +70,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.currentTheme = this.themeService.currentTheme;
     this.currentRole = this.authService.getRole() || 'cliente';
+    this.userRole = this.authService.getRole() || '';
 
     // Obtener nombre de usuario o email del token para mostrar en el header
     let nombreUsuario = '';
@@ -210,6 +212,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
     } else {
       this.router.navigate(['/pages/cliente/perfil']);
     }
+  }
+
+  volverASportConnect() {
+    // Navega a la landing page principal
+    this.router.navigate(['/']);
   }
 }
 

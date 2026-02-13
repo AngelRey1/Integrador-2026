@@ -13,6 +13,9 @@ export class LoginComponent implements OnInit {
   loading = false;
   errorMessage = '';
   successMessage = '';
+  private returnUrl: string | null = null;
+  private requestedRole: string | null = null;
+  isClienteLogin = true; // Por defecto cliente
 
   constructor(
     private fb: FormBuilder,
@@ -30,6 +33,9 @@ export class LoginComponent implements OnInit {
   ngOnInit() {
     // Verificar si hay parámetros de query (viene del registro)
     this.route.queryParams.subscribe(params => {
+      this.returnUrl = params['returnUrl'] || null;
+      this.requestedRole = params['rol'] || null;
+      this.isClienteLogin = this.requestedRole !== 'ENTRENADOR'; // Cliente por defecto
       if (params['email']) {
         this.form.patchValue({ email: params['email'] });
       }
@@ -60,13 +66,17 @@ export class LoginComponent implements OnInit {
     this.successMessage = '';
 
     const { email, password } = this.form.value;
-    const rol = 'ENTRENADOR'; // Login siempre como entrenador
+    const rol = this.requestedRole || 'CLIENTE'; // Por defecto cliente
 
     const result = await this.authFirebase.login(email, password, rol);
 
     this.loading = false;
 
     if (result.success) {
+      if (this.returnUrl) {
+        this.router.navigateByUrl(this.returnUrl);
+        return;
+      }
       this.redirectByRole();
     } else {
       this.errorMessage = result.message;
@@ -103,13 +113,14 @@ export class LoginComponent implements OnInit {
     const roleLower = role.toLowerCase();
 
     if (roleLower === 'cliente') {
-      this.router.navigate(['/pages/cliente/dashboard']);
+      // Clientes van a la landing page, no al dashboard
+      this.router.navigate(['/']);
     } else if (roleLower === 'entrenador') {
       this.router.navigate(['/pages/entrenador/dashboard']);
     } else if (roleLower === 'admin') {
       window.location.href = 'http://localhost:4300/admin/dashboard';
     } else {
-      this.router.navigate(['/pages/cliente/dashboard']);
+      this.router.navigate(['/']);
     }
   }
 }

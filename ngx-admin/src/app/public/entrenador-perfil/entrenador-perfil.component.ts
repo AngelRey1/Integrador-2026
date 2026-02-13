@@ -333,6 +333,10 @@ export class EntrenadorPerfilComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    // Habilitar scroll en la página pública (Nebular puede bloquearlo)
+    document.body.style.overflow = 'auto';
+    document.documentElement.style.overflow = 'auto';
+    
     this.route.params.subscribe(params => {
       this.entrenadorId = params['id'];
       this.loading = true;

@@ -240,6 +240,10 @@ export class PublicHomeComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
+    // Habilitar scroll en la landing page (Nebular puede bloquearlo)
+    document.body.style.overflow = 'auto';
+    document.documentElement.style.overflow = 'auto';
+    
     // Aleatorizar el orden de deportes al iniciar (para que sea diferente cada vez)
     this.deportes = this.shuffleArray([...this.deportes]);
 

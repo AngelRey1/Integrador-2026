@@ -1,16 +1,67 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
+import { AuthFirebaseService } from '../../@core/services/auth-firebase.service';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'ngx-shared-header',
   templateUrl: './shared-header.component.html',
   styleUrls: ['./shared-header.component.scss']
 })
-export class SharedHeaderComponent {
+export class SharedHeaderComponent implements OnInit, OnDestroy {
   isHidden = false;
   private lastScrollTop = 0;
+  menuOpen = false;
+  isLoggedIn = false;
+  userName = '';
+  userRole = '';
+  private authSubscription: Subscription;
 
-  constructor(private router: Router) {}
+  deportes = [
+    'Todos',
+    'Fútbol',
+    'CrossFit',
+    'Yoga',
+    'Natación',
+    'Running',
+    'Boxeo',
+    'Ciclismo',
+    'Tenis',
+    'Pilates',
+    'Basketball',
+    'Artes Marciales'
+  ];
+
+  constructor(
+    private router: Router,
+    private authFirebase: AuthFirebaseService,
+    private afAuth: AngularFireAuth
+  ) {}
+
+  ngOnInit() {
+    // Detectar estado de autenticación
+    this.authSubscription = this.afAuth.authState.subscribe(async (user) => {
+      if (user) {
+        this.isLoggedIn = true;
+        const userData = this.authFirebase.getCurrentUserValue();
+        if (userData) {
+          this.userName = `${userData.nombre} ${userData.apellido}`;
+          this.userRole = userData.rol;
+        }
+      } else {
+        this.isLoggedIn = false;
+        this.userName = '';
+        this.userRole = '';
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.authSubscription) {
+      this.authSubscription.unsubscribe();
+    }
+  }
 
   @HostListener('window:scroll', [])
   onWindowScroll() {
@@ -34,5 +85,46 @@ export class SharedHeaderComponent {
 
   goHome() {
     this.router.navigate(['/']);
+    this.menuOpen = false;
+  }
+
+  toggleMenu() {
+    this.menuOpen = !this.menuOpen;
+  }
+
+  filtrarPorDeporte(deporte: string) {
+    const deporteParam = deporte.toLowerCase();
+    this.router.navigate(['/entrenadores'], {
+      queryParams: { deporte: deporteParam === 'todos' ? null : deporteParam }
+    });
+    this.menuOpen = false;
+  }
+
+  irALogin(rol: 'CLIENTE' | 'ENTRENADOR') {
+    this.router.navigate(['/auth/login'], {
+      queryParams: { rol }
+    });
+    this.menuOpen = false;
+  }
+
+  irARegistro() {
+    this.router.navigate(['/auth/register']);
+    this.menuOpen = false;
+  }
+
+  irAPanelCliente() {
+    this.router.navigate(['/pages/cliente/dashboard']);
+    this.menuOpen = false;
+  }
+
+  irAPanelEntrenador() {
+    this.router.navigate(['/pages/entrenador/dashboard']);
+    this.menuOpen = false;
+  }
+
+  async cerrarSesion() {
+    await this.authFirebase.logout();
+    this.router.navigate(['/']);
+    this.menuOpen = false;
   }
 }

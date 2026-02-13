@@ -2,7 +2,9 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ClienteFirebaseService, Entrenador, Reserva } from '../../@core/services/cliente-firebase.service';
+import { AuthFirebaseService } from '../../@core/services/auth-firebase.service';
 import { StripeService, PaymentResult } from '../../@core/services/stripe.service';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { Subscription } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
@@ -39,6 +41,7 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
   cargandoEntrenador = true;
   horariosOcupados: string[] = [];
   private subscriptions: Subscription[] = [];
+  isLoggedIn = false;
 
   pasos: Paso[] = [
     { numero: 1, titulo: 'Fecha y Hora', icono: 'calendar-outline', completado: false },
@@ -106,7 +109,9 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
     private router: Router,
     private fb: FormBuilder,
     private clienteFirebase: ClienteFirebaseService,
-    private stripeService: StripeService
+    private stripeService: StripeService,
+    private authFirebase: AuthFirebaseService,
+    private afAuth: AngularFireAuth
   ) {
     this.fechaMinima = new Date().toISOString().split('T')[0];
 
@@ -154,6 +159,11 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
   cuposDisponibles = 10;
 
   ngOnInit() {
+    this.isLoggedIn = false;
+    const authSub = this.afAuth.authState.subscribe(user => {
+      this.isLoggedIn = !!user;
+    });
+    this.subscriptions.push(authSub);
     // 1. Obtener ID del entrenador de la URL y cargar desde Firebase
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
@@ -525,12 +535,21 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
       case 2:
         return this.paso2Form.valid;
       case 3:
-        return this.paso3Form.valid;
+        return this.isLoggedIn && this.paso3Form.valid;
       case 4:
         return this.paso4Form.valid;
       default:
         return true;
     }
+  }
+
+  irALogin() {
+    this.router.navigate(['/auth/login'], {
+      queryParams: {
+        returnUrl: this.router.url,
+        rol: 'CLIENTE'
+      }
+    });
   }
 
   /**

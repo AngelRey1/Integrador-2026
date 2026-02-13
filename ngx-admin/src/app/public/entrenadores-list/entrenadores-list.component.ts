@@ -303,6 +303,10 @@ export class EntrenadoresListComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    // Habilitar scroll en la página pública (Nebular puede bloquearlo)
+    document.body.style.overflow = 'auto';
+    document.documentElement.style.overflow = 'auto';
+    
     this.loading = true;
     
     // Cargar entrenadores desde Firebase
