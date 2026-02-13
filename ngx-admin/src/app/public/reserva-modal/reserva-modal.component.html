@@ -206,7 +206,15 @@
           Tus datos de contacto
         </h3>
 
-        <form [formGroup]="paso3Form" class="paso-form">
+        <div *ngIf="!isLoggedIn" class="no-horarios-msg warning">
+          <nb-icon icon="alert-circle-outline"></nb-icon>
+          <span>Para continuar con la reserva debes iniciar sesión.</span>
+          <button nbButton status="primary" size="small" (click)="irALogin()">
+            Iniciar sesión
+          </button>
+        </div>
+
+        <form *ngIf="isLoggedIn" [formGroup]="paso3Form" class="paso-form">
           <div class="form-group">
             <label>Nombre completo *</label>
             <input type="text" formControlName="nombre" placeholder="Tu nombre" class="form-input" />

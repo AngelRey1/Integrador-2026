@@ -212,6 +212,31 @@
     }
   }
 
+  // Botón "Volver a SportConnect"
+  .btn-volver-home {
+    margin-left: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+
+    nb-icon {
+      font-size: 1.125rem;
+    }
+
+    &:hover {
+      transform: translateY(-1px);
+    }
+
+    @include media-breakpoint-down(md) {
+      .btn-text {
+        display: none;
+      }
+    }
+  }
+
   @include media-breakpoint-down(sm) {
     .control-item {
       display: none;

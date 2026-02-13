@@ -4,6 +4,18 @@
       <nb-icon icon="menu-2-outline"></nb-icon>
     </a>
     <a class="logo" href="#" (click)="navigateHome()">Sport<span>Connect</span></a>
+    <!-- Botón para volver a SportConnect (solo clientes) -->
+    <button 
+      *ngIf="userRole && userRole.toLowerCase() === 'cliente'" 
+      class="btn-volver-home"
+      (click)="volverASportConnect()"
+      nbButton
+      status="primary"
+      size="small"
+      outline>
+      <nb-icon icon="home-outline"></nb-icon>
+      <span class="btn-text">Volver a SportConnect</span>
+    </button>
   </div>
 </div>
 

@@ -5,5 +5,111 @@
       <span class="logo-icon">⚽</span>
       <span class="logo-text">SportConnect</span>
     </div>
+
+    <!-- Botón de Menú -->
+    <button class="menu-toggle" (click)="toggleMenu()" [class.open]="menuOpen">
+      <nb-icon [icon]="menuOpen ? 'close-outline' : 'menu-outline'"></nb-icon>
+    </button>
   </div>
+
+  <!-- Panel desplegable del menú -->
+  <div class="menu-panel" [class.show]="menuOpen">
+    <div class="menu-content">
+      
+      <!-- Filtros de deportes -->
+      <div class="menu-section">
+        <h3 class="menu-section-title">
+          <nb-icon icon="heart-outline"></nb-icon>
+          Deportes
+        </h3>
+        <div class="categorias-grid">
+          <button 
+            *ngFor="let deporte of deportes" 
+            class="categoria-btn"
+            (click)="filtrarPorDeporte(deporte)">
+            {{ deporte }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Separador -->
+      <div class="menu-divider"></div>
+
+      <!-- Sección de autenticación -->
+      <div class="menu-section">
+        <h3 class="menu-section-title">
+          <nb-icon icon="person-outline"></nb-icon>
+          Mi cuenta
+        </h3>
+        
+        <!-- Si NO está logueado -->
+        <div *ngIf="!isLoggedIn" class="auth-section">
+          <p class="auth-subtitle">¿Cómo quieres ingresar?</p>
+          
+          <div class="auth-buttons">
+            <button class="auth-btn cliente" (click)="irALogin('CLIENTE')">
+              <nb-icon icon="person-outline"></nb-icon>
+              <div class="auth-btn-content">
+                <span class="auth-btn-title">Iniciar como Cliente</span>
+                <span class="auth-btn-desc">Reserva entrenamientos</span>
+              </div>
+            </button>
+
+            <button class="auth-btn entrenador" (click)="irALogin('ENTRENADOR')">
+              <nb-icon icon="star-outline"></nb-icon>
+              <div class="auth-btn-content">
+                <span class="auth-btn-title">Iniciar como Entrenador</span>
+                <span class="auth-btn-desc">Ofrece tus servicios</span>
+              </div>
+            </button>
+          </div>
+
+          <p class="auth-footer">
+            ¿No tienes cuenta? 
+            <a (click)="irARegistro()" class="link-registro">Regístrate aquí</a>
+          </p>
+        </div>
+
+        <!-- Si SÍ está logueado -->
+        <div *ngIf="isLoggedIn" class="user-section">
+          <div class="user-info">
+            <div class="user-avatar">
+              <nb-icon icon="person-outline"></nb-icon>
+            </div>
+            <div class="user-details">
+              <span class="user-name">{{ userName }}</span>
+              <span class="user-role">{{ userRole }}</span>
+            </div>
+          </div>
+
+          <div class="user-actions">
+            <button 
+              *ngIf="userRole === 'CLIENTE'" 
+              class="panel-btn cliente"
+              (click)="irAPanelCliente()">
+              <nb-icon icon="grid-outline"></nb-icon>
+              Panel de Cliente
+            </button>
+
+            <button 
+              *ngIf="userRole === 'ENTRENADOR'" 
+              class="panel-btn entrenador"
+              (click)="irAPanelEntrenador()">
+              <nb-icon icon="star-outline"></nb-icon>
+              Panel de Entrenador
+            </button>
+
+            <button class="logout-btn" (click)="cerrarSesion()">
+              <nb-icon icon="log-out-outline"></nb-icon>
+              Cerrar sesión
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Overlay para cerrar el menú al hacer clic fuera -->
+  <div class="menu-overlay" *ngIf="menuOpen" (click)="toggleMenu()"></div>
 </header>
