@@ -1,263 +1,289 @@
-<div class="admin-dashboard">
-  <!-- Header -->
-  <div class="dashboard-header">
-    <div>
-      <h1>Panel de Administración</h1>
-      <p>Bienvenido de vuelta, Admin. Aquí está el resumen de la plataforma.</p>
+<!-- HERO SECTION - Admin Dashboard -->
+<section class="hero-dashboard admin">
+  <div class="hero-content">
+    <h1 class="hero-title">Panel de Administración</h1>
+    <p class="hero-subtitle">Gestiona la plataforma, usuarios y transacciones</p>
+  </div>
+  <div class="hero-actions">
+    <button class="btn-action-hero" routerLink="/admin/reportes/estadisticas">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="20" x2="18" y2="10"></line>
+        <line x1="12" y1="20" x2="12" y2="4"></line>
+        <line x1="6" y1="20" x2="6" y2="14"></line>
+      </svg>
+      <span>Ver Estadísticas</span>
+    </button>
+  </div>
+</section>
+
+<!-- METRICS GRID - KPIs Premium -->
+<div class="metrics-premium-grid">
+  <div class="metric-card-large" routerLink="/admin/usuarios">
+    <div class="metric-icon">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+        <circle cx="9" cy="7" r="4"></circle>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+      </svg>
     </div>
-    <div class="header-actions">
-      <span class="date-badge">{{ today | date:'EEEE, d MMMM yyyy' }}</span>
+    <div class="metric-content">
+      <span class="metric-label">Usuarios Totales</span>
+      <span class="metric-value">{{ stats.totalUsers }}</span>
+      <span class="metric-trend positive">+12% este mes</span>
     </div>
   </div>
 
-  <!-- Stats Cards Row -->
-  <div class="stats-row">
-    <nb-card class="stat-card" accent="primary">
-      <nb-card-body>
-        <div class="stat-icon-wrapper primary">
-          <nb-icon icon="people-outline"></nb-icon>
-        </div>
-        <div class="stat-content">
-          <span class="stat-value">{{ stats.totalUsers }}</span>
-          <span class="stat-label">Usuarios Totales</span>
-          <span class="stat-trend up">
-            <nb-icon icon="arrow-upward-outline"></nb-icon> +12% este mes
-          </span>
-        </div>
-      </nb-card-body>
-    </nb-card>
-
-    <nb-card class="stat-card" accent="success">
-      <nb-card-body>
-        <div class="stat-icon-wrapper success">
-          <nb-icon icon="person-done-outline"></nb-icon>
-        </div>
-        <div class="stat-content">
-          <span class="stat-value">{{ stats.activeTrainers }}</span>
-          <span class="stat-label">Entrenadores Activos</span>
-          <span class="stat-trend up">
-            <nb-icon icon="arrow-upward-outline"></nb-icon> +5 nuevos
-          </span>
-        </div>
-      </nb-card-body>
-    </nb-card>
-
-    <nb-card class="stat-card" accent="info">
-      <nb-card-body>
-        <div class="stat-icon-wrapper info">
-          <nb-icon icon="calendar-outline"></nb-icon>
-        </div>
-        <div class="stat-content">
-          <span class="stat-value">{{ stats.totalReservations }}</span>
-          <span class="stat-label">Reservas del Mes</span>
-          <span class="stat-trend up">
-            <nb-icon icon="arrow-upward-outline"></nb-icon> +18% vs anterior
-          </span>
-        </div>
-      </nb-card-body>
-    </nb-card>
-
-    <nb-card class="stat-card" accent="warning">
-      <nb-card-body>
-        <div class="stat-icon-wrapper warning">
-          <nb-icon icon="credit-card-outline"></nb-icon>
-        </div>
-        <div class="stat-content">
-          <span class="stat-value">{{ stats.monthlyRevenue | currency:'MXN':'symbol':'1.0-0' }}</span>
-          <span class="stat-label">Ingresos del Mes</span>
-          <span class="stat-trend up">
-            <nb-icon icon="arrow-upward-outline"></nb-icon> +22%
-          </span>
-        </div>
-      </nb-card-body>
-    </nb-card>
+  <div class="metric-card-large" routerLink="/admin/entrenadores">
+    <div class="metric-icon">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+        <circle cx="8.5" cy="7" r="4"></circle>
+        <line x1="20" y1="8" x2="20" y2="14"></line>
+        <line x1="23" y1="11" x2="17" y2="11"></line>
+      </svg>
+    </div>
+    <div class="metric-content">
+      <span class="metric-label">Entrenadores Activos</span>
+      <span class="metric-value">{{ stats.activeTrainers }}</span>
+      <span class="metric-trend positive">+5 nuevos</span>
+    </div>
   </div>
 
-  <!-- Main Content Grid -->
-  <div class="dashboard-grid">
-    <!-- Pending Approvals -->
-    <nb-card class="pending-card">
-      <nb-card-header>
-        <div class="card-header-content">
-          <span>Solicitudes de Entrenadores Pendientes</span>
-          <nb-badge text="{{ pendingTrainers.length }}" status="warning"></nb-badge>
-        </div>
-      </nb-card-header>
-      <nb-card-body>
-        <div class="pending-list" *ngIf="pendingTrainers.length > 0">
-          <div class="pending-item" *ngFor="let trainer of pendingTrainers">
-            <div class="pending-info">
-              <nb-user 
-                [name]="trainer.name" 
-                [title]="trainer.specialty"
-                [picture]="trainer.avatar"
-                size="medium">
-              </nb-user>
-              <span class="pending-date">Solicitó: {{ trainer.requestDate | date:'dd/MM/yyyy' }}</span>
-            </div>
-            <div class="pending-actions">
-              <button nbButton status="success" size="small" (click)="approveTrainer(trainer)">
-                <nb-icon icon="checkmark-outline"></nb-icon>
-                Aprobar
-              </button>
-              <button nbButton status="danger" size="small" outline (click)="rejectTrainer(trainer)">
-                <nb-icon icon="close-outline"></nb-icon>
-                Rechazar
-              </button>
-              <button nbButton ghost size="small" (click)="viewTrainerProfile(trainer)">
-                <nb-icon icon="eye-outline"></nb-icon>
-              </button>
-            </div>
-          </div>
-        </div>
-        <div class="empty-state" *ngIf="pendingTrainers.length === 0">
-          <nb-icon icon="checkmark-circle-2-outline"></nb-icon>
-          <p>No hay solicitudes pendientes</p>
-        </div>
-      </nb-card-body>
-      <nb-card-footer>
-        <a routerLink="/admin/entrenadores/solicitudes">Ver todas las solicitudes</a>
-      </nb-card-footer>
-    </nb-card>
-
-    <!-- Recent Transactions -->
-    <nb-card class="transactions-card">
-      <nb-card-header>
-        <div class="card-header-content">
-          <span>Transacciones Recientes</span>
-          <nb-badge text="{{ stats.todayTransactions }}" status="info"></nb-badge>
-        </div>
-      </nb-card-header>
-      <nb-card-body>
-        <div class="transactions-list">
-          <div class="transaction-item" *ngFor="let tx of recentTransactions">
-            <div class="transaction-info">
-              <div class="transaction-icon" [ngClass]="tx.type">
-                <nb-icon [icon]="tx.type === 'payment' ? 'credit-card-outline' : 'trending-up-outline'"></nb-icon>
-              </div>
-              <div class="transaction-details">
-                <span class="tx-description">{{ tx.description }}</span>
-                <span class="tx-user">{{ tx.user }}</span>
-              </div>
-            </div>
-            <div class="transaction-amount" [ngClass]="tx.type">
-              {{ tx.type === 'payment' ? '+' : '-' }}{{ tx.amount | currency:'MXN':'symbol':'1.0-0' }}
-            </div>
-          </div>
-        </div>
-      </nb-card-body>
-      <nb-card-footer>
-        <a routerLink="/admin/pagos">Ver todos los pagos</a>
-      </nb-card-footer>
-    </nb-card>
+  <div class="metric-card-large" routerLink="/admin/pagos">
+    <div class="metric-icon">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+        <line x1="1" y1="10" x2="23" y2="10"></line>
+      </svg>
+    </div>
+    <div class="metric-content">
+      <span class="metric-label">Reservas del Mes</span>
+      <span class="metric-value">{{ stats.totalReservations }}</span>
+      <span class="metric-trend positive">+18% vs anterior</span>
+    </div>
   </div>
 
-  <!-- Second Row -->
-  <div class="dashboard-grid">
-    <!-- Recent Reports/Issues -->
-    <nb-card class="reports-card">
-      <nb-card-header>
-        <div class="card-header-content">
-          <span>Denuncias y Reportes</span>
-          <nb-badge text="{{ reports.length }}" status="danger"></nb-badge>
+  <div class="metric-card-large">
+    <div class="metric-icon">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="1" x2="12" y2="23"></line>
+        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+      </svg>
+    </div>
+    <div class="metric-content">
+      <span class="metric-label">Ingresos del Mes</span>
+      <span class="metric-value">{{ formatCurrency(stats.monthlyRevenue) }}</span>
+      <span class="metric-trend positive">+22%</span>
+    </div>
+  </div>
+</div>
+
+<div class="admin-dashboard-container">
+  <!-- LEFT COLUMN: Pending & Transactions -->
+  <div class="admin-main">
+    <!-- SOLICITUDES PENDIENTES -->
+    <div class="section-card">
+      <div class="section-header">
+        <div>
+          <h3 class="section-title">Solicitudes Pendientes</h3>
+          <span class="badge-count">{{ pendingTrainers.length }} por revisar</span>
         </div>
-      </nb-card-header>
-      <nb-card-body>
-        <div class="reports-list" *ngIf="reports.length > 0">
-          <div class="report-item" *ngFor="let report of reports" [ngClass]="report.priority">
-            <div class="report-priority" [ngClass]="report.priority">
-              {{ report.priority === 'high' ? '🔴' : report.priority === 'medium' ? '🟡' : '🟢' }}
-            </div>
-            <div class="report-content">
-              <span class="report-title">{{ report.title }}</span>
-              <span class="report-meta">{{ report.type }} • {{ report.date | date:'dd/MM' }}</span>
-            </div>
-            <button nbButton ghost size="small" (click)="viewReport(report)">
-              <nb-icon icon="arrow-forward-outline"></nb-icon>
+        <a class="section-action" routerLink="/admin/entrenadores/solicitudes">Ver todas</a>
+      </div>
+
+      <div *ngIf="pendingTrainers.length === 0" class="empty-state">
+        <svg class="icon-large" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <p>No hay solicitudes pendientes</p>
+      </div>
+
+      <div *ngIf="pendingTrainers.length > 0" class="admin-items-grid">
+        <div class="admin-item-card" *ngFor="let trainer of pendingTrainers">
+          <div class="item-avatar">
+            <img [src]="trainer.avatar || 'assets/images/default-avatar.png'" [alt]="trainer.name">
+          </div>
+          <div class="item-details">
+            <h5 class="item-name">{{ trainer.name }}</h5>
+            <p class="item-subtitle">{{ trainer.specialty }}</p>
+            <span class="item-date">{{ trainer.requestDate | date:'dd/MM/yyyy' }}</span>
+          </div>
+          <div class="item-actions">
+            <button class="btn-approve" (click)="approveTrainer(trainer)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 13l4 4L19 7"></path>
+              </svg>
+            </button>
+            <button class="btn-reject" (click)="rejectTrainer(trainer)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
             </button>
           </div>
         </div>
-        <div class="empty-state" *ngIf="reports.length === 0">
-          <nb-icon icon="shield-outline"></nb-icon>
-          <p>No hay reportes pendientes</p>
-        </div>
-      </nb-card-body>
-      <nb-card-footer>
-        <a routerLink="/admin/reportes/denuncias">Ver todos los reportes</a>
-      </nb-card-footer>
-    </nb-card>
+      </div>
+    </div>
 
-    <!-- Platform Stats -->
-    <nb-card class="platform-stats-card">
-      <nb-card-header>
-        <span>Estadísticas de la Plataforma</span>
-      </nb-card-header>
-      <nb-card-body>
-        <div class="platform-stat-row">
-          <span class="stat-name">Deportes Activos</span>
-          <span class="stat-bar">
-            <span class="bar-fill" [style.width.%]="85"></span>
-          </span>
-          <span class="stat-number">{{ stats.activeSports }}</span>
+    <!-- TRANSACCIONES RECIENTES -->
+    <div class="section-card">
+      <div class="section-header">
+        <div>
+          <h3 class="section-title">Transacciones Recientes</h3>
+          <span class="badge-count">{{ stats.todayTransactions }} hoy</span>
         </div>
-        <div class="platform-stat-row">
-          <span class="stat-name">Tasa de Conversión</span>
-          <span class="stat-bar">
-            <span class="bar-fill success" [style.width.%]="stats.conversionRate"></span>
-          </span>
-          <span class="stat-number">{{ stats.conversionRate }}%</span>
+        <a class="section-action" routerLink="/admin/pagos">Ver todas</a>
+      </div>
+
+      <div class="transactions-list">
+        <div class="transaction-item" *ngFor="let tx of recentTransactions">
+          <div class="tx-icon" [ngClass]="tx.type">
+            <svg *ngIf="tx.type === 'payment'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+              <line x1="1" y1="10" x2="23" y2="10"></line>
+            </svg>
+            <svg *ngIf="tx.type !== 'payment'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="1" x2="12" y2="23"></line>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+          </div>
+          <div class="tx-details">
+            <span class="tx-description">{{ tx.description }}</span>
+            <span class="tx-user">{{ tx.user }}</span>
+          </div>
+          <div class="tx-amount" [ngClass]="tx.type">
+            {{ tx.type === 'payment' ? '+' : '-' }}{{ formatCurrency(tx.amount) }}
+          </div>
         </div>
-        <div class="platform-stat-row">
-          <span class="stat-name">Satisfacción Promedio</span>
-          <span class="stat-bar">
-            <span class="bar-fill warning" [style.width.%]="stats.avgSatisfaction * 20"></span>
-          </span>
-          <span class="stat-number">{{ stats.avgSatisfaction }}/5 ⭐</span>
-        </div>
-        <div class="platform-stat-row">
-          <span class="stat-name">Retención de Usuarios</span>
-          <span class="stat-bar">
-            <span class="bar-fill info" [style.width.%]="stats.retentionRate"></span>
-          </span>
-          <span class="stat-number">{{ stats.retentionRate }}%</span>
-        </div>
-      </nb-card-body>
-    </nb-card>
+      </div>
+    </div>
   </div>
 
-  <!-- Quick Actions -->
-  <nb-card class="quick-actions-card">
-    <nb-card-header>
-      <span>Acciones Rápidas</span>
-    </nb-card-header>
-    <nb-card-body>
-      <div class="quick-actions-grid">
-        <button nbButton status="primary" routerLink="/admin/entrenadores/solicitudes">
-          <nb-icon icon="person-add-outline"></nb-icon>
-          Revisar Solicitudes
-        </button>
-        <button nbButton status="info" routerLink="/admin/usuarios">
-          <nb-icon icon="people-outline"></nb-icon>
-          Gestionar Usuarios
-        </button>
-        <button nbButton status="success" routerLink="/admin/pagos">
-          <nb-icon icon="credit-card-outline"></nb-icon>
-          Ver Pagos
-        </button>
-        <button nbButton status="warning" routerLink="/admin/reportes/estadisticas">
-          <nb-icon icon="bar-chart-outline"></nb-icon>
-          Generar Reporte
-        </button>
-        <button nbButton status="danger" routerLink="/admin/reportes/denuncias">
-          <nb-icon icon="alert-triangle-outline"></nb-icon>
-          Denuncias ({{ reports.length }})
-        </button>
-        <button nbButton outline routerLink="/admin/deportes">
-          <nb-icon icon="settings-2-outline"></nb-icon>
-          Configurar Deportes
-        </button>
+  <!-- RIGHT COLUMN: Reports & Quick Actions -->
+  <div class="admin-sidebar">
+    <!-- REPORTES Y DENUNCIAS -->
+    <div class="section-card">
+      <div class="section-header">
+        <div>
+          <h3 class="section-title">Reportes</h3>
+          <span class="badge-count danger">{{ reports.length }}</span>
+        </div>
       </div>
-    </nb-card-body>
-  </nb-card>
+
+      <div *ngIf="reports.length === 0" class="empty-state">
+        <svg class="icon-large" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+        </svg>
+        <p>Sin reportes pendientes</p>
+      </div>
+
+      <div *ngIf="reports.length > 0" class="reports-list">
+        <div class="report-item" *ngFor="let report of reports">
+          <span class="report-priority" [ngClass]="report.priority">
+            {{ report.priority === 'high' ? '🔴' : report.priority === 'medium' ? '🟡' : '🟢' }}
+          </span>
+          <div class="report-content">
+            <span class="report-title">{{ report.title }}</span>
+            <span class="report-meta">{{ report.type }} • {{ report.date | date:'dd/MM' }}</span>
+          </div>
+          <button class="btn-small-arrow" (click)="viewReport(report)">→</button>
+        </div>
+      </div>
+
+      <a class="section-link" routerLink="/admin/reportes/denuncias">Ver todos los reportes</a>
+    </div>
+
+    <!-- ESTADÍSTICAS PLATAFORMA -->
+    <div class="section-card">
+      <div class="section-header">
+        <h3 class="section-title">Estadísticas</h3>
+      </div>
+
+      <div class="stats-bars">
+        <div class="stat-bar-item">
+          <div class="stat-bar-header">
+            <span>Deportes Activos</span>
+            <span class="stat-number">{{ stats.activeSports }}</span>
+          </div>
+          <div class="stat-bar">
+            <div class="bar-fill" [style.width.%]="85"></div>
+          </div>
+        </div>
+
+        <div class="stat-bar-item">
+          <div class="stat-bar-header">
+            <span>Tasa de Conversión</span>
+            <span class="stat-number">{{ stats.conversionRate }}%</span>
+          </div>
+          <div class="stat-bar">
+            <div class="bar-fill success" [style.width.%]="stats.conversionRate"></div>
+          </div>
+        </div>
+
+        <div class="stat-bar-item">
+          <div class="stat-bar-header">
+            <span>Satisfacción Promedio</span>
+            <span class="stat-number">{{ stats.avgSatisfaction }}/5 ⭐</span>
+          </div>
+          <div class="stat-bar">
+            <div class="bar-fill warning" [style.width.%]="stats.avgSatisfaction * 20"></div>
+          </div>
+        </div>
+
+        <div class="stat-bar-item">
+          <div class="stat-bar-header">
+            <span>Retención de Usuarios</span>
+            <span class="stat-number">{{ stats.retentionRate }}%</span>
+          </div>
+          <div class="stat-bar">
+            <div class="bar-fill info" [style.width.%]="stats.retentionRate"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACCIONES RÁPIDAS -->
+    <div class="section-card quick-actions">
+      <div class="section-header">
+        <h3 class="section-title">Acciones Rápidas</h3>
+      </div>
+
+      <div class="quick-actions-list">
+        <a class="quick-action-btn" routerLink="/admin/entrenadores/solicitudes">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="8.5" cy="7" r="4"></circle>
+            <line x1="20" y1="8" x2="20" y2="14"></line>
+            <line x1="23" y1="11" x2="17" y2="11"></line>
+          </svg>
+          <span>Revisar Solicitudes</span>
+        </a>
+        <a class="quick-action-btn" routerLink="/admin/usuarios">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+          <span>Gestionar Usuarios</span>
+        </a>
+        <a class="quick-action-btn" routerLink="/admin/pagos">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+            <line x1="1" y1="10" x2="23" y2="10"></line>
+          </svg>
+          <span>Ver Pagos</span>
+        </a>
+        <a class="quick-action-btn" routerLink="/admin/reportes/estadisticas">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
+          </svg>
+          <span>Generar Reporte</span>
+        </a>
+      </div>
+    </div>
+  </div>
 </div>
 

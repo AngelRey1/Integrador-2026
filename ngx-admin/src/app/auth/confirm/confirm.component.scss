@@ -1,0 +1,219 @@
+.confirm-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  padding: 20px;
+}
+
+.confirm-card {
+  background: white;
+  border-radius: 16px;
+  padding: 40px;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.logo-container {
+  text-align: center;
+  margin-bottom: 30px;
+  
+  .logo {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1a2e;
+    
+    .accent {
+      color: #00d68f;
+    }
+  }
+}
+
+// Loading state
+.loading-state {
+  text-align: center;
+  padding: 40px 0;
+  
+  .spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #e0e0e0;
+    border-top-color: #00d68f;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+  }
+  
+  p {
+    color: #666;
+    font-size: 16px;
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+// Error state
+.error-state {
+  text-align: center;
+  
+  .error-icon {
+    font-size: 60px;
+    margin-bottom: 20px;
+  }
+  
+  h2 {
+    color: #ff3d71;
+    margin-bottom: 10px;
+  }
+  
+  p {
+    color: #666;
+    margin-bottom: 30px;
+    line-height: 1.6;
+  }
+}
+
+// Success state
+.success-state {
+  text-align: center;
+  
+  .success-icon {
+    font-size: 60px;
+    margin-bottom: 20px;
+  }
+  
+  h2 {
+    color: #00d68f;
+    margin-bottom: 15px;
+  }
+  
+  p {
+    color: #444;
+    margin-bottom: 10px;
+    line-height: 1.6;
+    
+    strong {
+      color: #1a1a2e;
+    }
+  }
+  
+  button {
+    margin-top: 20px;
+    
+    nb-icon {
+      margin-right: 8px;
+    }
+  }
+}
+
+// Register form state
+.register-state {
+  text-align: center;
+  
+  .success-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+  }
+  
+  h2 {
+    color: #00d68f;
+    margin-bottom: 10px;
+  }
+  
+  & > p {
+    color: #666;
+    margin-bottom: 20px;
+  }
+  
+  .email-info {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #f0f0f0;
+    padding: 10px 20px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    
+    nb-icon {
+      color: #00d68f;
+    }
+    
+    span {
+      color: #1a1a2e;
+      font-weight: 500;
+    }
+  }
+}
+
+.register-form {
+  text-align: left;
+  
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #1a1a2e;
+      font-size: 14px;
+    }
+    
+    input {
+      &::placeholder {
+        color: #aaa;
+      }
+    }
+  }
+  
+  button {
+    margin-top: 10px;
+    
+    nb-icon {
+      margin-right: 8px;
+    }
+  }
+}
+
+.login-link {
+  text-align: center;
+  margin-top: 25px;
+  color: #666;
+  
+  a {
+    color: #00d68f;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 500px) {
+  .confirm-card {
+    padding: 30px 20px;
+  }
+  
+  .register-form .form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  
+  .logo-container .logo {
+    font-size: 24px;
+  }
+}

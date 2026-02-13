@@ -5,13 +5,16 @@
     </a>
     <a class="logo" href="#" (click)="navigateHome()">Sport<span>Connect</span></a>
   </div>
-  <nb-select [selected]="currentTheme" (selectedChange)="changeTheme($event)" status="primary">
-    <nb-option *ngFor="let theme of themes" [value]="theme.value"> {{ theme.name }}</nb-option>
-  </nb-select>
 </div>
 
 <div class="header-container">
   <nb-actions size="small">
+
+    <nb-action class="control-item theme-selector">
+      <nb-select [selected]="currentTheme" (selectedChange)="changeTheme($event)" size="small">
+        <nb-option *ngFor="let theme of themes" [value]="theme.value"> {{ theme.name }}</nb-option>
+      </nb-select>
+    </nb-action>
 
     <nb-action class="control-item">
       <nb-search type="rotate-layout"></nb-search>

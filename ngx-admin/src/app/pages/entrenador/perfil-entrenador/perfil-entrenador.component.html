@@ -116,6 +116,71 @@
           </nb-card-body>
         </nb-card>
 
+        <!-- Galería de Fotos -->
+        <nb-card class="galeria-card">
+          <nb-card-header>
+            <nb-icon icon="image-outline"></nb-icon>
+            Galería de Fotos
+            <span class="badge-count">{{ galeria.length }}/6</span>
+          </nb-card-header>
+          <nb-card-body>
+            <p class="text-muted mb-3">
+              <small>Agrega fotos de tus entrenamientos, instalaciones o logros. Los clientes podrán verlas en tu perfil público.</small>
+            </p>
+            
+            <div class="galeria-grid">
+              <!-- Fotos existentes -->
+              <div *ngFor="let foto of galeria; let i = index" class="galeria-item">
+                <img [src]="foto" alt="Foto galería" class="galeria-img">
+                <button class="galeria-delete-btn" (click)="eliminarFotoGaleria(i)" title="Eliminar foto">
+                  <nb-icon icon="close-outline"></nb-icon>
+                </button>
+              </div>
+              
+              <!-- Preview de nueva foto -->
+              <div *ngIf="galeriaPreview" class="galeria-item preview">
+                <img [src]="galeriaPreview" alt="Nueva foto" class="galeria-img">
+                <div class="preview-overlay">
+                  <span>Nueva</span>
+                </div>
+              </div>
+              
+              <!-- Botón agregar (si hay espacio) -->
+              <div *ngIf="galeria.length < 6 && !galeriaPreview" class="galeria-item add-btn">
+                <label for="galeria-input" class="add-label">
+                  <nb-icon icon="plus-outline"></nb-icon>
+                  <span>Agregar</span>
+                </label>
+                <input type="file" 
+                       id="galeria-input" 
+                       accept="image/*" 
+                       (change)="onGaleriaFileSelected($event)"
+                       [disabled]="uploadingGaleria"
+                       hidden>
+              </div>
+            </div>
+            
+            <!-- Progreso de subida galería -->
+            <div *ngIf="uploadingGaleria" class="upload-progress mt-3">
+              <nb-progress-bar [value]="uploadGaleriaProgress" status="primary" size="tiny">
+              </nb-progress-bar>
+              <small class="text-muted">Subiendo foto... {{ uploadGaleriaProgress | number:'1.0-0' }}%</small>
+            </div>
+            
+            <!-- Botones de acción para nueva foto de galería -->
+            <div *ngIf="galeriaPreview && !uploadingGaleria" class="galeria-actions mt-3">
+              <button nbButton status="primary" size="small" (click)="subirFotoGaleria()">
+                <nb-icon icon="upload-outline"></nb-icon>
+                Subir foto
+              </button>
+              <button nbButton status="basic" size="small" (click)="cancelarFotoGaleria()">
+                <nb-icon icon="close-outline"></nb-icon>
+                Cancelar
+              </button>
+            </div>
+          </nb-card-body>
+        </nb-card>
+
         <!-- Información personal -->
         <nb-card>
           <nb-card-header>

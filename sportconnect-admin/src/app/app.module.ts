@@ -7,7 +7,8 @@ import {
   NbThemeModule, NbLayoutModule, NbSidebarModule, NbMenuModule,
   NbCardModule, NbIconModule, NbButtonModule, NbToastrModule,
   NbDialogModule, NbWindowModule, NbActionsModule, NbUserModule,
-  NbContextMenuModule, NbSearchModule, NbTooltipModule, NbBadgeModule
+  NbContextMenuModule, NbSearchModule, NbTooltipModule, NbBadgeModule,
+  NbSelectModule
 } from '@nebular/theme';
 import { NbEvaIconsModule } from '@nebular/eva-icons';
 
@@ -57,6 +58,7 @@ import { SharedModule } from './shared/shared.module';
     NbSearchModule,
     NbTooltipModule,
     NbBadgeModule,
+    NbSelectModule,
 
     CoreModule,
     SharedModule

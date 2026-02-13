@@ -52,6 +52,19 @@
       white-space: nowrap;
       text-decoration: none;
     }
+    
+    // Theme selector styling
+    .theme-selector {
+      nb-select {
+        min-width: 100px;
+        margin-right: 0.5rem;
+        
+        button {
+          padding: 0.375rem 0.75rem;
+          font-size: 0.8rem;
+        }
+      }
+    }
   }
 
   // Estilos de notificaciones

@@ -1,56 +1,57 @@
 /* SportConnect Admin - Estilos Globales */
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
 
 // Nebular Theming
 @import '@nebular/theme/styles/theming';
 @import '@nebular/theme/styles/themes/corporate';
 
-// Custom theme variables
+// Custom theme variables (UNIFICADO con panel Entrenador)
 $nb-themes: nb-register-theme((
-  // Primary colors
-  color-primary-100: #ccfff0,
-  color-primary-200: #99ffe2,
-  color-primary-300: #66ffd3,
-  color-primary-400: #33ffc5,
-  color-primary-500: #00d9a5,
-  color-primary-600: #00b386,
-  color-primary-700: #008c69,
-  color-primary-800: #00664c,
-  color-primary-900: #00402f,
+  // Primary colors (Verde SportConnect)
+  color-primary-100: #D4F8F0,
+  color-primary-200: #A8F0E1,
+  color-primary-300: #7CE8D2,
+  color-primary-400: #50E0C3,
+  color-primary-500: #00D09C,
+  color-primary-600: #00B386,
+  color-primary-700: #009670,
+  color-primary-800: #00795A,
+  color-primary-900: #005C44,
   
-  // Layout
-  layout-background-color: #edf1f7,
-  layout-text-color: #222b45,
+  // Layout (MISMO FONDO que entrenador)
+  layout-background-color: #F8FAFC,
+  layout-text-color: #111827,
   
   // Sidebar
   sidebar-background-color: #ffffff,
-  sidebar-text-color: #222b45,
+  sidebar-text-color: #111827,
   sidebar-width: 16rem,
-  sidebar-width-compact: 4rem,
+  sidebar-width-compact: 16rem,
   
-  // Header
-  header-background-color: #00d9a5,
-  header-text-color: #ffffff,
+  // Header (MISMO que entrenador - fondo blanco)
+  header-background-color: #FFFFFF,
+  header-text-color: #0F172A,
   header-height: 4rem,
+  header-shadow: 0 2px 8px rgba(0, 0, 0, 0.08),
   
   // Card
   card-background-color: #ffffff,
-  card-border-radius: 0.75rem,
-  card-shadow: 0 2px 12px rgba(0, 0, 0, 0.05),
+  card-border-radius: 1rem,
+  card-shadow: 0 2px 8px rgba(0, 0, 0, 0.08),
   
   // Menu
-  menu-item-icon-color: #8f9bb3,
-  menu-item-hover-background-color: #f7f9fc,
-  menu-item-active-background-color: rgba(0, 217, 165, 0.1),
-  menu-item-active-text-color: #00b386,
+  menu-item-icon-color: #6B7280,
+  menu-item-hover-background-color: #F8FAFC,
+  menu-item-active-background-color: rgba(0, 208, 156, 0.1),
+  menu-item-active-text-color: #00D09C,
   
   // Button
-  button-filled-primary-background-color: #00d9a5,
-  button-filled-primary-hover-background-color: #00b386,
-  button-border-radius: 0.5rem,
+  button-filled-primary-background-color: #00D09C,
+  button-filled-primary-hover-background-color: #00B386,
+  button-border-radius: 0.75rem,
   
-  // Font
-  font-family-primary: 'Open Sans, sans-serif',
+  // Font (UNIFICADO con entrenador)
+  font-family-primary: 'Space Grotesk, Inter, sans-serif',
 ), corporate, corporate);
 
 // Install Nebular
@@ -60,14 +61,17 @@ $nb-themes: nb-register-theme((
   @include nb-theme-global();
 }
 
-// Variables
-$primary: #00d9a5;
-$primary-dark: #00b386;
-$secondary: #0a7b8a;
-$danger: #ff3d71;
-$warning: #ffaa00;
-$success: #00d68f;
-$info: #0095ff;
+// Variables (UNIFICADAS con entrenador)
+$primary: #00D09C;
+$primary-dark: #00B386;
+$secondary: #0A7B8A;
+$danger: #EF4444;
+$warning: #F59E0B;
+$success: #10B981;
+$info: #3B82F6;
+$background: #F8FAFC;
+$text-primary: #111827;
+$text-secondary: #6B7280;
 
 // Reset
 * {
@@ -77,9 +81,10 @@ $info: #0095ff;
 html, body {
   margin: 0;
   padding: 0;
-  font-family: 'Open Sans', sans-serif;
-  background: #edf1f7;
+  font-family: 'Space Grotesk', 'Inter', sans-serif;
+  background: $background;
   min-height: 100vh;
+  color: $text-primary;
 }
 
 // Scrollbar
@@ -101,20 +106,22 @@ html, body {
   background: #a1a1a1;
 }
 
-// Header Override
+// Header Override (IGUAL que entrenador - fondo blanco)
 nb-layout-header.fixed {
-  background: linear-gradient(135deg, $primary 0%, $secondary 100%) !important;
+  background: #FFFFFF !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
   
   nav.fixed {
-    background: transparent !important;
+    background: #FFFFFF !important;
     box-shadow: none !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    width: 100% !important;
   }
 }
 
 .header-container {
-  width: 100%;
   display: flex;
-  justify-content: space-between;
   align-items: center;
   padding: 0 1rem;
   height: 100%;
@@ -126,7 +133,7 @@ nb-layout-header.fixed {
   gap: 0.75rem;
 
   .sidebar-toggle {
-    color: white;
+    color: #64748B;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -136,12 +143,12 @@ nb-layout-header.fixed {
     text-decoration: none;
 
     &:hover {
-      background: rgba(255, 255, 255, 0.15);
+      background: #F3F4F6;
     }
 
     nb-icon {
       font-size: 1.5rem;
-      color: white;
+      color: #64748B;
     }
   }
 
@@ -149,21 +156,28 @@ nb-layout-header.fixed {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    color: white;
+    color: #0F172A;
     text-decoration: none;
     font-weight: 700;
     font-size: 1.25rem;
+    padding-left: 1rem;
+    border-left: 1px solid #E2E8F0;
 
     .logo-icon {
-      font-size: 1.5rem;
+      display: none;
     }
 
     .logo-text {
       letter-spacing: -0.5px;
     }
 
+    span {
+      color: $primary;
+    }
+
     .logo-badge {
-      background: rgba(255, 255, 255, 0.2);
+      background: #F3F4F6;
+      color: #64748B;
       padding: 3px 10px;
       border-radius: 12px;
       font-size: 0.65rem;
@@ -178,26 +192,29 @@ nb-layout-header nb-actions {
   height: 100%;
   
   nb-action {
-    color: white !important;
+    color: #64748B !important;
     height: auto;
     padding: 0 0.75rem;
     
     nb-icon {
-      color: white !important;
+      color: #64748B !important;
       font-size: 1.25rem;
     }
     
     &:hover {
-      background: rgba(255, 255, 255, 0.1);
+      background: #F3F4F6;
     }
   }
   
   nb-user {
     .user-name {
-      color: white !important;
+      color: #0F172A !important;
     }
     .user-title {
-      color: rgba(255, 255, 255, 0.8) !important;
+      color: #64748B !important;
+    }
+    .user-picture {
+      border: 2px solid #E2E8F0 !important;
     }
   }
 }
@@ -210,14 +227,66 @@ nb-sidebar {
   .main-container {
     background: #ffffff !important;
     height: 100%;
+    width: 16rem !important;
   }
 
   .scrollable {
     padding: 0.5rem 0;
+    padding-bottom: 130px; // Espacio para el footer del sidebar
+    width: 16rem !important;
+  }
+  
+  // Forzar sidebar expandido siempre
+  &.menu-sidebar {
+    width: 16rem !important;
+    flex: 0 0 16rem !important;
+    
+    // Siempre mostrar texto del menú
+    .menu-title {
+      display: inline !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+    
+    .menu-icon {
+      margin-right: 0.75rem !important;
+    }
+  }
+  
+  // Evitar colapso compacto
+  &.compacted {
+    width: 16rem !important;
+    
+    .main-container {
+      width: 16rem !important;
+    }
+    
+    .scrollable {
+      width: 16rem !important;
+    }
+    
+    .menu-title {
+      display: inline !important;
+      opacity: 1 !important;
+    }
+  }
+}
+
+// Theme selector en header
+.theme-selector {
+  nb-select {
+    min-width: 100px;
+    
+    button {
+      padding: 0.375rem 0.75rem;
+      font-size: 0.8rem;
+    }
   }
 }
 
 nb-menu {
+  width: 100% !important;
+  
   .menu-group {
     padding: 1.25rem 1.5rem 0.5rem;
     font-size: 0.7rem;
@@ -225,6 +294,9 @@ nb-menu {
     text-transform: uppercase;
     letter-spacing: 1px;
     color: #8f9bb3;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
 
   .menu-item {
@@ -237,15 +309,22 @@ nb-menu {
       font-size: 0.9rem;
       border-left: 3px solid transparent;
       transition: all 0.2s ease;
+      display: flex !important;
+      align-items: center;
       
       .menu-icon {
         color: #8f9bb3;
         font-size: 1.25rem;
         margin-right: 0.75rem;
+        flex-shrink: 0;
       }
       
       .menu-title {
         font-weight: 500;
+        display: inline !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        white-space: nowrap;
       }
 
       &:hover {
@@ -438,18 +517,19 @@ nb-badge {
   padding: 0.25rem 0.5rem;
 }
 
-// User Component
+// User Component (colores para header blanco)
 nb-user {
   .user-container {
-    color: white;
+    color: #0F172A;
   }
   
   .user-picture {
-    border: 2px solid rgba(255, 255, 255, 0.3);
+    border: 2px solid #E2E8F0;
   }
   
   .user-name {
     font-weight: 600;
+    color: #0F172A;
   }
 }
 

@@ -1,0 +1,107 @@
+<div class="confirm-container">
+  <div class="confirm-card">
+    <!-- Logo -->
+    <div class="logo-container">
+      <span class="logo">Sport<span class="accent">Connect</span></span>
+    </div>
+
+    <!-- Loading state -->
+    <div *ngIf="loading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Verificando tu enlace...</p>
+    </div>
+
+    <!-- Token inválido -->
+    <div *ngIf="!loading && !tokenValid" class="error-state">
+      <div class="error-icon">❌</div>
+      <h2>Enlace Inválido</h2>
+      <p>Este enlace no es válido o ha expirado. Por favor solicita uno nuevo o contacta a soporte.</p>
+      <button nbButton status="primary" (click)="goToLogin()">
+        Ir al Login
+      </button>
+    </div>
+
+    <!-- Token válido - Usuario existe -->
+    <div *ngIf="!loading && tokenValid && userExists" class="success-state">
+      <div class="success-icon">✅</div>
+      <h2>¡Tu pago fue confirmado!</h2>
+      <p>Ya tienes una cuenta registrada con <strong>{{ tokenData?.email }}</strong>.</p>
+      <p>Inicia sesión para ver los detalles de tu reserva.</p>
+      
+      <button nbButton status="primary" size="large" (click)="loginExistingUser()">
+        <nb-icon icon="log-in-outline"></nb-icon>
+        Iniciar Sesión
+      </button>
+    </div>
+
+    <!-- Token válido - Formulario de registro -->
+    <div *ngIf="!loading && tokenValid && showRegisterForm" class="register-state">
+      <div class="success-icon">✅</div>
+      <h2>¡Pago Confirmado!</h2>
+      <p>Completa tu registro para acceder a tu reserva.</p>
+      
+      <div class="email-info">
+        <nb-icon icon="email-outline"></nb-icon>
+        <span>{{ tokenData?.email }}</span>
+      </div>
+
+      <form (ngSubmit)="register()" class="register-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nombre</label>
+            <input nbInput fullWidth 
+                   type="text" 
+                   [(ngModel)]="registerForm.nombre" 
+                   name="nombre"
+                   placeholder="Tu nombre"
+                   required>
+          </div>
+          <div class="form-group">
+            <label>Apellido</label>
+            <input nbInput fullWidth 
+                   type="text" 
+                   [(ngModel)]="registerForm.apellido" 
+                   name="apellido"
+                   placeholder="Tu apellido"
+                   required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Contraseña</label>
+          <input nbInput fullWidth 
+                 type="password" 
+                 [(ngModel)]="registerForm.password" 
+                 name="password"
+                 placeholder="Mínimo 6 caracteres"
+                 required>
+        </div>
+
+        <div class="form-group">
+          <label>Confirmar Contraseña</label>
+          <input nbInput fullWidth 
+                 type="password" 
+                 [(ngModel)]="registerForm.confirmPassword" 
+                 name="confirmPassword"
+                 placeholder="Repite tu contraseña"
+                 required>
+        </div>
+
+        <button nbButton 
+                status="primary" 
+                size="large" 
+                fullWidth 
+                type="submit"
+                [disabled]="registering">
+          <nb-icon icon="person-add-outline" *ngIf="!registering"></nb-icon>
+          <span *ngIf="!registering">Completar Registro</span>
+          <span *ngIf="registering">Registrando...</span>
+        </button>
+      </form>
+
+      <p class="login-link">
+        ¿Ya tienes cuenta? <a (click)="goToLogin()">Inicia sesión</a>
+      </p>
+    </div>
+  </div>
+</div>

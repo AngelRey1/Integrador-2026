@@ -3,14 +3,16 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { ReservaModalComponent } from '../reserva-modal/reserva-modal.component';
-import { ClienteFirebaseService, Entrenador as EntrenadorFirebase } from '../../@core/services/cliente-firebase.service';
+import { ClienteFirebaseService, Entrenador as EntrenadorFirebase, Review } from '../../@core/services/cliente-firebase.service';
 
 interface Resena {
-  id: number;
+  id: string;
   cliente: string;
+  clienteFoto?: string;
   calificacion: number;
   comentario: string;
   fecha: string;
+  respuestaEntrenador?: string;
 }
 
 interface Horario {
@@ -55,6 +57,11 @@ export class EntrenadorPerfilComponent implements OnInit, OnDestroy {
   entrenadorId: string;
   loading = true;
   private subscription: Subscription;
+  
+  // Lightbox para ver fotos en grande
+  lightboxAbierto: boolean = false;
+  lightboxIndex: number = 0;
+  lightboxFotoActual: string = '';
   
   entrenadoresData: Entrenador[] = [
     {
@@ -286,29 +293,10 @@ export class EntrenadorPerfilComponent implements OnInit, OnDestroy {
 
   entrenador!: EntrenadorPerfil;
 
-  resenas: Resena[] = [
-    {
-      id: 1,
-      cliente: 'María González',
-      calificacion: 5,
-      comentario: 'Excelente entrenador, muy profesional y atento. He visto resultados increíbles en 3 meses.',
-      fecha: '2026-01-15'
-    },
-    {
-      id: 2,
-      cliente: 'Juan Pérez',
-      calificacion: 5,
-      comentario: 'Carlos es el mejor! Sus sesiones son intensas pero efectivas. Totalmente recomendado.',
-      fecha: '2026-01-10'
-    },
-    {
-      id: 3,
-      cliente: 'Ana Martínez',
-      calificacion: 5,
-      comentario: 'Gran experiencia. Muy paciente y conocedor. Me ayudó a mejorar mi técnica significativamente.',
-      fecha: '2026-01-05'
-    }
-  ];
+  // Reseñas reales desde Firebase
+  resenas: Resena[] = [];
+  cargandoResenas = false;
+  private resenasSubscription: Subscription | null = null;
 
   horarios: Horario[] = [];
 
@@ -344,6 +332,43 @@ export class EntrenadorPerfilComponent implements OnInit, OnDestroy {
     if (this.subscription) {
       this.subscription.unsubscribe();
     }
+    if (this.resenasSubscription) {
+      this.resenasSubscription.unsubscribe();
+    }
+  }
+
+  /**
+   * Cargar reseñas reales desde Firebase
+   */
+  private cargarResenasFirebase(entrenadorId: string): void {
+    if (!entrenadorId) return;
+    
+    this.cargandoResenas = true;
+    this.resenasSubscription = this.clienteFirebase.getReviewsEntrenador(entrenadorId).subscribe({
+      next: (reviews: Review[]) => {
+        this.resenas = reviews.map(r => ({
+          id: r.id || '',
+          cliente: r.clienteNombre || 'Cliente',
+          clienteFoto: r.clienteFoto,
+          calificacion: r.calificacion || 5,
+          comentario: r.comentario || '',
+          fecha: r.fecha ? this.formatearFecha(r.fecha) : '',
+          respuestaEntrenador: r.respuestaEntrenador
+        }));
+        this.cargandoResenas = false;
+      },
+      error: (err) => {
+        console.error('Error cargando reseñas:', err);
+        this.resenas = [];
+        this.cargandoResenas = false;
+      }
+    });
+  }
+
+  private formatearFecha(fecha: any): string {
+    if (!fecha) return '';
+    const date = fecha.toDate ? fecha.toDate() : new Date(fecha);
+    return date.toISOString().split('T')[0];
   }
 
   private cargarEntrenadorFirebase(id: string) {
@@ -369,6 +394,29 @@ export class EntrenadorPerfilComponent implements OnInit, OnDestroy {
     const nombre = `${e.nombre} ${e.apellidoPaterno || ''}`.trim();
     const prefijo = e.nombre.toLowerCase();
 
+    // Usar galería real si existe, combinar con foto de perfil
+    const galeriaReal = (e as any).galeria || [];
+    const fotoPerfil = e.foto || '';
+    
+    // Construir array de fotos: primero la galería, luego la foto de perfil si no está incluida
+    let fotosFinales: string[] = [];
+    
+    if (galeriaReal.length > 0) {
+      fotosFinales = [...galeriaReal];
+      // Agregar foto de perfil si existe y no está ya en la galería
+      if (fotoPerfil && !fotosFinales.includes(fotoPerfil)) {
+        fotosFinales.unshift(fotoPerfil);
+      }
+    } else if (fotoPerfil) {
+      // Si no hay galería, usar solo foto de perfil
+      fotosFinales = [fotoPerfil];
+    }
+
+    // Limitar a máximo 6 fotos
+    fotosFinales = fotosFinales.slice(0, 6);
+
+    console.log('📸 Galería cargada:', fotosFinales.length, 'fotos');
+
     this.entrenador = {
       id: e.id || '',
       nombre: nombre,
@@ -387,15 +435,14 @@ export class EntrenadorPerfilComponent implements OnInit, OnDestroy {
       certificaciones: e.certificaciones || [`${e.deportes?.[0] || 'Fitness'} Certificado`],
       bio: e.bio || e.descripcion || 'Entrenador profesional dedicado a ayudarte a alcanzar tus metas.',
       logros: e.especialidades?.map(esp => `Especialista en ${esp}`) || ['Entrenador certificado'],
-      whatsapp: e.whatsapp || e.telefono || '',
+      whatsapp: '',
       email: e.email || `${prefijo}@sportconnect.com`,
       idiomas: ['Español'],
-      fotos: [
-        e.foto || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800',
-        'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800',
-        'https://images.unsplash.com/photo-1579758629938-03607ccdbaba?w=800'
-      ]
+      fotos: fotosFinales
     };
+
+    // Cargar reseñas reales desde Firebase
+    this.cargarResenasFirebase(e.id || '');
 
     // Cargar horarios desde la disponibilidad de Firebase
     this.cargarHorariosDesdeDisponibilidad(e.disponibilidad);
@@ -501,12 +548,41 @@ export class EntrenadorPerfilComponent implements OnInit, OnDestroy {
     return estrellas;
   }
 
-  contactarWhatsApp() {
-    if (!this.entrenador) return;
-    const mensaje = encodeURIComponent(
-      `Hola ${this.entrenador.nombre}, vi tu perfil en SportConnect y me gustaría reservar una sesión de ${this.entrenador.especialidad}.`
-    );
-    window.open(`https://wa.me/${this.entrenador.whatsapp}?text=${mensaje}`, '_blank');
+  /**
+   * Abre el lightbox para ver la foto en grande
+   */
+  abrirLightbox(index: number): void {
+    if (!this.entrenador?.fotos?.length) return;
+    this.lightboxIndex = index;
+    this.lightboxFotoActual = this.entrenador.fotos[index];
+    this.lightboxAbierto = true;
+    document.body.style.overflow = 'hidden'; // Prevenir scroll
+  }
+
+  /**
+   * Cierra el lightbox
+   */
+  cerrarLightbox(): void {
+    this.lightboxAbierto = false;
+    document.body.style.overflow = ''; // Restaurar scroll
+  }
+
+  /**
+   * Navega a la siguiente foto en el lightbox
+   */
+  lightboxSiguiente(): void {
+    if (!this.entrenador?.fotos?.length) return;
+    this.lightboxIndex = (this.lightboxIndex + 1) % this.entrenador.fotos.length;
+    this.lightboxFotoActual = this.entrenador.fotos[this.lightboxIndex];
+  }
+
+  /**
+   * Navega a la foto anterior en el lightbox
+   */
+  lightboxAnterior(): void {
+    if (!this.entrenador?.fotos?.length) return;
+    this.lightboxIndex = (this.lightboxIndex - 1 + this.entrenador.fotos.length) % this.entrenador.fotos.length;
+    this.lightboxFotoActual = this.entrenador.fotos[this.lightboxIndex];
   }
 
   cambiarTab(tab: string) {

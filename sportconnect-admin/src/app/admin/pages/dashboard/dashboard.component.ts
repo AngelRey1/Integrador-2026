@@ -159,5 +159,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
       currency: 'MXN'
     }).format(monto);
   }
+
+  formatCurrency(monto: number): string {
+    return this.formatearMoneda(monto);
+  }
 }
 

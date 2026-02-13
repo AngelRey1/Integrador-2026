@@ -23,8 +23,14 @@
               </span>
             </div>
 
-            <div class="galeria-fotos">
-              <img *ngFor="let foto of entrenador.fotos" [src]="foto" alt="Galería" class="foto-thumb" />
+            <!-- Galería de fotos adicionales -->
+            <div class="galeria-fotos" *ngIf="entrenador.fotos && entrenador.fotos.length > 1">
+              <img *ngFor="let foto of entrenador.fotos; let i = index" 
+                   [src]="foto" 
+                   alt="Ver foto" 
+                   class="foto-thumb"
+                   (click)="abrirLightbox(i)"
+                   title="Click para ver en grande" />
             </div>
           </div>
 
@@ -81,10 +87,6 @@
               <button class="btn-reservar" [routerLink]="['/entrenador/reservar', entrenador.id]">
                 <i eva-icon="calendar-outline" eva-pack="outline"></i>
                 Reservar
-              </button>
-              <button class="btn-whatsapp" (click)="contactarWhatsApp()">
-                <span class="whatsapp-icon"><nb-icon icon="message-circle-outline"></nb-icon></span>
-                WhatsApp
               </button>
             </div>
 
@@ -149,9 +151,6 @@
                   <p class="contacto-item">
                     <span class="icon">📧</span> {{ entrenador.email }}
                   </p>
-                  <p class="contacto-item">
-                    <span class="icon">📱</span> WhatsApp disponible
-                  </p>
                 </div>
               </div>
             </div>
@@ -172,7 +171,7 @@
               </div>
             </div>
             <p class="horarios-nota">
-              💡 <strong>Nota:</strong> Los horarios pueden variar. Confirma tu disponibilidad por WhatsApp.
+              💡 <strong>Nota:</strong> Los horarios pueden variar. Confirma tu disponibilidad al realizar la reserva.
             </p>
           </div>
 
@@ -193,12 +192,26 @@
               </div>
             </div>
 
-            <div class="resenas-lista">
+            <!-- Loading state -->
+            <div *ngIf="cargandoResenas" class="resenas-loading">
+              <nb-spinner size="medium" status="primary"></nb-spinner>
+              <p>Cargando reseñas...</p>
+            </div>
+
+            <!-- Sin reseñas -->
+            <div *ngIf="!cargandoResenas && resenas.length === 0" class="resenas-empty">
+              <nb-icon icon="message-circle-outline"></nb-icon>
+              <h3>Aún no hay reseñas</h3>
+              <p>Sé el primero en dejar una reseña después de tu sesión con este entrenador.</p>
+            </div>
+
+            <div class="resenas-lista" *ngIf="!cargandoResenas && resenas.length > 0">
               <div *ngFor="let resena of resenas" class="resena-card">
                 <div class="resena-header">
-                  <div class="cliente-avatar">
+                  <div class="cliente-avatar" *ngIf="!resena.clienteFoto">
                     {{ resena.cliente.charAt(0) }}
                   </div>
+                  <img *ngIf="resena.clienteFoto" [src]="resena.clienteFoto" [alt]="resena.cliente" class="cliente-avatar-img">
                   <div class="cliente-info">
                     <h4 class="cliente-nombre">{{ resena.cliente }}</h4>
                     <div class="resena-rating">
@@ -210,6 +223,15 @@
                   <span class="resena-fecha">{{ resena.fecha }}</span>
                 </div>
                 <p class="resena-comentario">{{ resena.comentario }}</p>
+                
+                <!-- Respuesta del entrenador -->
+                <div *ngIf="resena.respuestaEntrenador" class="respuesta-entrenador">
+                  <div class="respuesta-header">
+                    <nb-icon icon="corner-down-right-outline"></nb-icon>
+                    <span>Respuesta del entrenador</span>
+                  </div>
+                  <p class="respuesta-texto">{{ resena.respuestaEntrenador }}</p>
+                </div>
               </div>
             </div>
           </div>
@@ -219,6 +241,25 @@
       <!-- CTA Flotante -->
       <div class="cta-flotante">
         <div class="cta-content">
+        </div>
+      </div>
+    </div>
+
+    <!-- LIGHTBOX para ver fotos en grande -->
+    <div class="lightbox-overlay" *ngIf="lightboxAbierto" (click)="cerrarLightbox()">
+      <div class="lightbox-container" (click)="$event.stopPropagation()">
+        <button class="lightbox-close" (click)="cerrarLightbox()">×</button>
+        
+        <button class="lightbox-nav prev" (click)="lightboxAnterior()" *ngIf="entrenador?.fotos?.length > 1">‹</button>
+        
+        <div class="lightbox-image-container">
+          <img [src]="lightboxFotoActual" alt="Foto de galería" class="lightbox-image" />
+        </div>
+        
+        <button class="lightbox-nav next" (click)="lightboxSiguiente()" *ngIf="entrenador?.fotos?.length > 1">›</button>
+        
+        <div class="lightbox-counter" *ngIf="entrenador?.fotos?.length > 1">
+          {{ lightboxIndex + 1 }} / {{ entrenador.fotos.length }}
         </div>
       </div>
     </div>

@@ -3,12 +3,15 @@ import { NbMediaBreakpointsService, NbMenuService, NbSidebarService, NbThemeServ
 
 import { UserData } from '../../../@core/data/users';
 import { LayoutService } from '../../../@core/utils';
-import { map, takeUntil, filter } from 'rxjs/operators';
-import { Subject } from 'rxjs';
+import { map, takeUntil, filter, switchMap } from 'rxjs/operators';
+import { Subject, of } from 'rxjs';
 import { AuthService } from '../../../@core/services/auth.service';
 import { Router } from '@angular/router';
 import { NotificacionesFirebaseService, Notificacion } from '../../../@core/services/notificaciones-firebase.service';
 import { CloudinaryService } from '../../../@core/services/cloudinary.service';
+import { EntrenadorFirebaseService } from '../../../@core/services/entrenador-firebase.service';
+import { AngularFirestore } from '@angular/fire/compat/firestore';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
 
 @Component({
   selector: 'ngx-header',
@@ -63,31 +66,18 @@ export class HeaderComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private router: Router,
     private notificacionesService: NotificacionesFirebaseService,
-    private cloudinaryService: CloudinaryService
+    private cloudinaryService: CloudinaryService,
+    private entrenadorService: EntrenadorFirebaseService,
+    private firestore: AngularFirestore,
+    private afAuth: AngularFireAuth
   ) { }
 
   ngOnInit() {
     this.currentTheme = this.themeService.currentTheme;
     this.currentRole = this.authService.getRole() || 'cliente';
 
-    // Obtener nombre de usuario o email del token para mostrar en el header
-    let nombreUsuario = '';
-    let email = '';
-
-    try {
-      nombreUsuario = this.authService.getNombreUsuario() || '';
-      email = this.authService.getEmail() || '';
-    } catch (e) {
-      console.warn('Error obteniendo datos de usuario:', e);
-    }
-
-    const displayName = nombreUsuario || email || 'Usuario';
-
-    // Usar CloudinaryService para obtener avatar
-    this.user = {
-      name: displayName,
-      picture: this.cloudinaryService.getDefaultAvatarUrl(displayName, 128)
-    };
+    // Cargar datos reales del usuario desde Firebase
+    this.cargarDatosUsuario();
 
     // Cargar notificaciones en tiempo real
     this.cargarNotificaciones();
@@ -122,6 +112,50 @@ export class HeaderComponent implements OnInit, OnDestroy {
           this.goToProfile();
         }
       });
+  }
+
+  /**
+   * Cargar datos reales del usuario desde Firebase
+   */
+  cargarDatosUsuario(): void {
+    this.afAuth.authState.pipe(
+      switchMap(user => {
+        if (!user) {
+          // Si no hay usuario autenticado, usar datos del token
+          const nombreUsuario = this.authService.getNombreUsuario() || '';
+          const email = this.authService.getEmail() || '';
+          const displayName = nombreUsuario || email || 'Usuario';
+          this.user = {
+            name: displayName,
+            picture: this.cloudinaryService.getDefaultAvatarUrl(displayName, 128)
+          };
+          return of(null);
+        }
+
+        // Buscar datos del usuario en Firestore
+        if (this.currentRole === 'entrenador') {
+          return this.firestore.doc(`entrenadores/${user.uid}`).valueChanges();
+        } else {
+          return this.firestore.doc(`users/${user.uid}`).valueChanges();
+        }
+      }),
+      takeUntil(this.destroy$)
+    ).subscribe((userData: any) => {
+      if (userData) {
+        // Obtener nombre y foto real
+        const nombre = userData.nombre || userData.nombreCompleto || userData.email || 'Usuario';
+        const apellido = userData.apellidoPaterno || userData.apellido || '';
+        const displayName = apellido ? `${nombre} ${apellido}` : nombre;
+        
+        // Usar foto real si existe
+        const fotoUrl = userData.foto || userData.fotoUrl || '';
+        
+        this.user = {
+          name: displayName,
+          picture: fotoUrl || this.cloudinaryService.getDefaultAvatarUrl(displayName, 128)
+        };
+      }
+    });
   }
 
   cargarNotificaciones(): void {

@@ -23,6 +23,13 @@ export class PerfilEntrenadorComponent implements OnInit, OnDestroy {
   uploadingFoto = false;
   uploadProgress = 0;
 
+  // Para galería de fotos
+  galeria: string[] = [];
+  galeriaPreview: string | null = null;
+  selectedGaleriaFile: File | null = null;
+  uploadingGaleria = false;
+  uploadGaleriaProgress = 0;
+
   perfil: Entrenador | null = null;
   especialidades: string[] = [];
   certificaciones: string[] = [];
@@ -88,6 +95,7 @@ export class PerfilEntrenadorComponent implements OnInit, OnDestroy {
         this.deportes = perfil.deportes || [];
         this.modalidades = perfil.modalidades || [];
         this.fotoUrl = perfil.foto || null;
+        this.galeria = (perfil as any).galeria || [];
 
         this.perfilForm.patchValue({
           nombre: perfil.nombre,
@@ -373,6 +381,102 @@ export class PerfilEntrenadorComponent implements OnInit, OnDestroy {
       return this.fotoUrl;
     }
     return 'assets/images/nick.png';
+  }
+
+  // ========== GESTIÓN DE GALERÍA DE FOTOS ==========
+
+  onGaleriaFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      
+      if (!file.type.startsWith('image/')) {
+        this.toastrService.warning('Por favor selecciona una imagen', 'Formato inválido');
+        return;
+      }
+
+      if (file.size > 2 * 1024 * 1024) {
+        this.toastrService.warning('La imagen no debe superar los 2MB', 'Archivo muy grande');
+        return;
+      }
+
+      if (this.galeria.length >= 6) {
+        this.toastrService.warning('Máximo 6 fotos en la galería', 'Límite alcanzado');
+        return;
+      }
+
+      this.selectedGaleriaFile = file;
+
+      const reader = new FileReader();
+      reader.onload = (e: ProgressEvent<FileReader>) => {
+        this.galeriaPreview = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  async subirFotoGaleria(): Promise<void> {
+    if (!this.selectedGaleriaFile || !this.perfil?.id) {
+      return;
+    }
+
+    this.uploadingGaleria = true;
+    this.uploadGaleriaProgress = 0;
+
+    try {
+      this.uploadGaleriaProgress = 20;
+
+      const base64Image = await this.compressImage(this.selectedGaleriaFile, 800, 0.8);
+      
+      this.uploadGaleriaProgress = 60;
+
+      // Agregar a la galería
+      const nuevaGaleria = [...this.galeria, base64Image];
+      
+      this.uploadGaleriaProgress = 80;
+      
+      const result = await this.entrenadorFirebase.actualizarPerfil({
+        galeria: nuevaGaleria
+      } as any);
+
+      if (result.success) {
+        this.galeria = nuevaGaleria;
+        this.galeriaPreview = null;
+        this.selectedGaleriaFile = null;
+        this.toastrService.success('Foto agregada a la galería', 'Éxito');
+      } else {
+        this.toastrService.danger('Error al guardar la foto', 'Error');
+      }
+
+      this.uploadGaleriaProgress = 100;
+    } catch (error) {
+      console.error('Error al subir foto de galería:', error);
+      this.toastrService.danger('Error al procesar la imagen', 'Error');
+    } finally {
+      this.uploadingGaleria = false;
+    }
+  }
+
+  async eliminarFotoGaleria(index: number): Promise<void> {
+    if (index < 0 || index >= this.galeria.length) return;
+
+    const nuevaGaleria = this.galeria.filter((_, i) => i !== index);
+    
+    const result = await this.entrenadorFirebase.actualizarPerfil({
+      galeria: nuevaGaleria
+    } as any);
+
+    if (result.success) {
+      this.galeria = nuevaGaleria;
+      this.toastrService.success('Foto eliminada de la galería', 'Éxito');
+    } else {
+      this.toastrService.danger('Error al eliminar la foto', 'Error');
+    }
+  }
+
+  cancelarFotoGaleria(): void {
+    this.selectedGaleriaFile = null;
+    this.galeriaPreview = null;
   }
 }
 

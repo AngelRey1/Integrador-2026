@@ -6,6 +6,7 @@ import { RegisterComponent } from './auth/register/register.component';
 import { PendienteAprobacionComponent } from './auth/pendiente-aprobacion/pendiente-aprobacion.component';
 import { SolicitudRechazadaComponent } from './auth/solicitud-rechazada/solicitud-rechazada.component';
 import { CuentaAprobadaComponent } from './auth/cuenta-aprobada/cuenta-aprobada.component';
+import { ConfirmComponent } from './auth/confirm/confirm.component';
 
 export const routes: Routes = [
   // Ruta pública - Landing Page (SIN AuthGuard)
@@ -44,6 +45,10 @@ export const routes: Routes = [
       {
         path: 'cuenta-aprobada',
         component: CuentaAprobadaComponent,
+      },
+      {
+        path: 'confirm',
+        component: ConfirmComponent,
       },
       {
         path: '',
