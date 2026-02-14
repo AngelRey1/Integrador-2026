@@ -11,105 +11,129 @@
       <nb-icon [icon]="menuOpen ? 'close-outline' : 'menu-outline'"></nb-icon>
     </button>
   </div>
+</header>
 
-  <!-- Panel desplegable del menú -->
-  <div class="menu-panel" [class.show]="menuOpen">
-    <div class="menu-content">
+<!-- Sidebar lateral derecho -->
+<aside class="sidebar-menu" [class.show]="menuOpen">
+  <!-- Header del sidebar -->
+  <div class="sidebar-header">
+    <span class="sidebar-logo">⚽</span>
+    <span class="sidebar-title">SportConnect</span>
+    <button class="sidebar-close" (click)="toggleMenu()">
+      <nb-icon icon="close-outline"></nb-icon>
+    </button>
+  </div>
+
+  <div class="sidebar-content">
+    <!-- Sección de Deportes -->
+    <div class="sidebar-section">
+      <h3 class="sidebar-section-title">
+        <nb-icon icon="heart-outline"></nb-icon>
+        DEPORTES
+      </h3>
+      <div class="deportes-grid">
+        <button 
+          *ngFor="let deporte of deportes" 
+          class="deporte-chip"
+          (click)="filtrarPorDeporte(deporte)">
+          {{ deporte }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Separador decorativo -->
+    <div class="sidebar-divider">
+      <span class="divider-line"></span>
+    </div>
+
+    <!-- Sección Mi Cuenta -->
+    <div class="sidebar-section">
+      <h3 class="sidebar-section-title">
+        <nb-icon icon="person-outline"></nb-icon>
+        MI CUENTA
+      </h3>
       
-      <!-- Filtros de deportes -->
-      <div class="menu-section">
-        <h3 class="menu-section-title">
-          <nb-icon icon="heart-outline"></nb-icon>
-          Deportes
-        </h3>
-        <div class="categorias-grid">
+      <!-- Si NO está logueado -->
+      <div *ngIf="!isLoggedIn" class="auth-section">
+        <p class="auth-subtitle">¿Cómo quieres ingresar?</p>
+        
+        <div class="auth-buttons-stack">
+          <button class="auth-btn-modern cliente" (click)="irALogin('CLIENTE')">
+            <div class="auth-icon-wrapper">
+              <nb-icon icon="person-outline"></nb-icon>
+            </div>
+            <div class="auth-btn-info">
+              <span class="auth-btn-title">Iniciar como Cliente</span>
+              <span class="auth-btn-desc">Reserva entrenamientos</span>
+            </div>
+            <nb-icon icon="chevron-right-outline" class="auth-arrow"></nb-icon>
+          </button>
+
+          <button class="auth-btn-modern entrenador" (click)="irALogin('ENTRENADOR')">
+            <div class="auth-icon-wrapper">
+              <nb-icon icon="star-outline"></nb-icon>
+            </div>
+            <div class="auth-btn-info">
+              <span class="auth-btn-title">Iniciar como Entrenador</span>
+              <span class="auth-btn-desc">Ofrece tus servicios</span>
+            </div>
+            <nb-icon icon="chevron-right-outline" class="auth-arrow"></nb-icon>
+          </button>
+        </div>
+
+        <div class="auth-footer-box">
+          <p>¿No tienes cuenta?</p>
+          <a (click)="irARegistro()" class="link-registro-modern">
+            Regístrate aquí
+            <nb-icon icon="arrow-forward-outline"></nb-icon>
+          </a>
+        </div>
+      </div>
+
+      <!-- Si SÍ está logueado -->
+      <div *ngIf="isLoggedIn" class="user-section-modern">
+        <div class="user-card">
+          <div class="user-avatar-large">
+            <nb-icon icon="person-outline"></nb-icon>
+          </div>
+          <div class="user-details-modern">
+            <span class="user-name-large">{{ userName }}</span>
+            <span class="user-role-badge">{{ userRole }}</span>
+          </div>
+        </div>
+
+        <div class="user-actions-modern">
           <button 
-            *ngFor="let deporte of deportes" 
-            class="categoria-btn"
-            (click)="filtrarPorDeporte(deporte)">
-            {{ deporte }}
+            *ngIf="userRole === 'CLIENTE'" 
+            class="panel-btn-modern cliente"
+            (click)="irAPanelCliente()">
+            <nb-icon icon="grid-outline"></nb-icon>
+            Panel de Cliente
+          </button>
+
+          <button 
+            *ngIf="userRole === 'ENTRENADOR'" 
+            class="panel-btn-modern entrenador"
+            (click)="irAPanelEntrenador()">
+            <nb-icon icon="star-outline"></nb-icon>
+            Panel de Entrenador
+          </button>
+
+          <button class="logout-btn-modern" (click)="cerrarSesion()">
+            <nb-icon icon="log-out-outline"></nb-icon>
+            Cerrar sesión
           </button>
         </div>
       </div>
-
-      <!-- Separador -->
-      <div class="menu-divider"></div>
-
-      <!-- Sección de autenticación -->
-      <div class="menu-section">
-        <h3 class="menu-section-title">
-          <nb-icon icon="person-outline"></nb-icon>
-          Mi cuenta
-        </h3>
-        
-        <!-- Si NO está logueado -->
-        <div *ngIf="!isLoggedIn" class="auth-section">
-          <p class="auth-subtitle">¿Cómo quieres ingresar?</p>
-          
-          <div class="auth-buttons">
-            <button class="auth-btn cliente" (click)="irALogin('CLIENTE')">
-              <nb-icon icon="person-outline"></nb-icon>
-              <div class="auth-btn-content">
-                <span class="auth-btn-title">Iniciar como Cliente</span>
-                <span class="auth-btn-desc">Reserva entrenamientos</span>
-              </div>
-            </button>
-
-            <button class="auth-btn entrenador" (click)="irALogin('ENTRENADOR')">
-              <nb-icon icon="star-outline"></nb-icon>
-              <div class="auth-btn-content">
-                <span class="auth-btn-title">Iniciar como Entrenador</span>
-                <span class="auth-btn-desc">Ofrece tus servicios</span>
-              </div>
-            </button>
-          </div>
-
-          <p class="auth-footer">
-            ¿No tienes cuenta? 
-            <a (click)="irARegistro()" class="link-registro">Regístrate aquí</a>
-          </p>
-        </div>
-
-        <!-- Si SÍ está logueado -->
-        <div *ngIf="isLoggedIn" class="user-section">
-          <div class="user-info">
-            <div class="user-avatar">
-              <nb-icon icon="person-outline"></nb-icon>
-            </div>
-            <div class="user-details">
-              <span class="user-name">{{ userName }}</span>
-              <span class="user-role">{{ userRole }}</span>
-            </div>
-          </div>
-
-          <div class="user-actions">
-            <button 
-              *ngIf="userRole === 'CLIENTE'" 
-              class="panel-btn cliente"
-              (click)="irAPanelCliente()">
-              <nb-icon icon="grid-outline"></nb-icon>
-              Panel de Cliente
-            </button>
-
-            <button 
-              *ngIf="userRole === 'ENTRENADOR'" 
-              class="panel-btn entrenador"
-              (click)="irAPanelEntrenador()">
-              <nb-icon icon="star-outline"></nb-icon>
-              Panel de Entrenador
-            </button>
-
-            <button class="logout-btn" (click)="cerrarSesion()">
-              <nb-icon icon="log-out-outline"></nb-icon>
-              Cerrar sesión
-            </button>
-          </div>
-        </div>
-      </div>
-
     </div>
   </div>
 
-  <!-- Overlay para cerrar el menú al hacer clic fuera -->
-  <div class="menu-overlay" *ngIf="menuOpen" (click)="toggleMenu()"></div>
-</header>
+  <!-- Footer del sidebar -->
+  <div class="sidebar-footer">
+    <p>© 2026 SportConnect</p>
+    <p class="footer-tagline">Entrena con los mejores</p>
+  </div>
+</aside>
+
+<!-- Overlay para cerrar el menú al hacer clic fuera -->
+<div class="sidebar-overlay" [class.show]="menuOpen" (click)="toggleMenu()"></div>

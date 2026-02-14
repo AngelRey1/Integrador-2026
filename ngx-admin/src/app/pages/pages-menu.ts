@@ -50,6 +50,16 @@ const CLIENTE_MENU: NbMenuItem[] = [
     icon: 'person-outline',
     link: '/pages/cliente/perfil',
   },
+  {
+    title: 'NAVEGACIÓN',
+    group: true,
+  },
+  {
+    title: 'Ir a Página Principal',
+    icon: 'globe-outline',
+    link: '/home',
+    pathMatch: 'full',
+  },
 ];
 
 // Menú para ENTRENADORES
@@ -88,6 +98,16 @@ const ENTRENADOR_MENU: NbMenuItem[] = [
     title: 'Mis Ingresos',
     icon: 'trending-up-outline',
     link: '/pages/entrenador/mis-ingresos',
+  },
+  {
+    title: 'NAVEGACIÓN',
+    group: true,
+  },
+  {
+    title: 'Ir a Página Principal',
+    icon: 'globe-outline',
+    link: '/home',
+    pathMatch: 'full',
   },
 ];
 

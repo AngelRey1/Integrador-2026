@@ -29,10 +29,9 @@ export const environment = {
     // Clave pública (publishable key) - segura para el frontend
     publishableKey: 'pk_test_51SxfDODedWVOZwp7giJrXakkl5NUMPjOP9uZ6dFJxgm0CJevBt8vgQYLWNsaflSn3VOCj6PBhT0RLyjJYnFQqZuP00HRvBn0Yx',
     // URL del backend para Stripe (Vercel)
-    // CAMBIAR cuando despliegues a Vercel (ej: https://tu-proyecto.vercel.app)
-    functionsUrl: '',
+    functionsUrl: 'https://integrador-2026-rho.vercel.app',
     // Modo simulado: true = genera vouchers fake, false = usa Stripe real
-    simulatedMode: true
+    simulatedMode: false
   }
 };
 
