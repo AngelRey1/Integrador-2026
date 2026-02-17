@@ -99,9 +99,8 @@
             (ngModelChange)="aplicarFiltros(true)"
             class="select-pill"
           >
-            <option value="todos">Todos los deportes</option>
-            <option *ngFor="let deporte of deportes.slice(1)" [value]="deporte.toLowerCase()">
-              {{ deporte }}
+            <option *ngFor="let deporte of deportes" [value]="deporte.value">
+              {{ deporte.label }}
             </option>
           </select>
         </div>

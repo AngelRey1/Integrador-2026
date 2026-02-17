@@ -1,9 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ClienteFirebaseService, Entrenador as EntrenadorFirebase } from '../../../@core/services/cliente-firebase.service';
+import { NbToastrService } from '@nebular/theme';
+import { Subscription } from 'rxjs';
 
 interface Entrenador {
-  id: number;
+  id: string;
   nombre_completo: string;
   foto_url: string;
   especialidad: string;
@@ -30,7 +33,7 @@ interface MetodoPago {
   templateUrl: './agendar-sesion.component.html',
   styleUrls: ['./agendar-sesion.component.scss']
 })
-export class AgendarSesionComponent implements OnInit {
+export class AgendarSesionComponent implements OnInit, OnDestroy {
   // Stepper
   pasoActual = 0;
   
@@ -41,38 +44,12 @@ export class AgendarSesionComponent implements OnInit {
   paso4Form: FormGroup;
 
   // Datos
-  entrenadorId: number | null = null;
+  entrenadorId: string | null = null;
   entrenadorSeleccionado: Entrenador | null = null;
   
-  entrenadores: Entrenador[] = [
-    {
-      id: 1,
-      nombre_completo: 'Ana Pérez García',
-      foto_url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop&crop=face',
-      especialidad: 'Yoga & Pilates',
-      tarifa_por_hora: 30,
-      calificacion: 4.8,
-      total_resenas: 45
-    },
-    {
-      id: 2,
-      nombre_completo: 'Carlos Ruiz López',
-      foto_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face',
-      especialidad: 'CrossFit & Funcional',
-      tarifa_por_hora: 35,
-      calificacion: 4.9,
-      total_resenas: 67
-    },
-    {
-      id: 3,
-      nombre_completo: 'María González',
-      foto_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop&crop=face',
-      especialidad: 'Running & Atletismo',
-      tarifa_por_hora: 25,
-      calificacion: 4.7,
-      total_resenas: 32
-    }
-  ];
+  // Lista de entrenadores desde Firebase
+  entrenadores: Entrenador[] = [];
+  loadingEntrenadores = true;
 
   // Paso 2: Horarios disponibles
   fechaMinima = new Date();
@@ -109,11 +86,17 @@ export class AgendarSesionComponent implements OnInit {
   cargando = false;
   reservaConfirmada = false;
   numeroReserva = '';
+  
+  // Suscripciones
+  private subscriptions: Subscription[] = [];
+  private horariosOcupados: string[] = [];
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private clienteFirebase: ClienteFirebaseService,
+    private toastr: NbToastrService
   ) {
     // Inicializar formularios
     this.paso1Form = this.fb.group({
@@ -138,13 +121,19 @@ export class AgendarSesionComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Cargar entrenadores desde Firebase
+    this.cargarEntrenadores();
+
     // Verificar si viene ID de entrenador por parámetro
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
       if (id) {
-        this.entrenadorId = parseInt(id);
-        this.seleccionarEntrenador(this.entrenadorId);
-        this.paso1Form.patchValue({ entrenador_id: this.entrenadorId });
+        this.entrenadorId = id;
+        // Esperar a que se carguen los entrenadores
+        setTimeout(() => {
+          this.seleccionarEntrenador(id);
+          this.paso1Form.patchValue({ entrenador_id: id });
+        }, 500);
       }
     });
 
@@ -154,8 +143,41 @@ export class AgendarSesionComponent implements OnInit {
     });
   }
 
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
+
+  private cargarEntrenadores(): void {
+    this.loadingEntrenadores = true;
+    const sub = this.clienteFirebase.getEntrenadores().subscribe(
+      (entrenadores) => {
+        this.entrenadores = entrenadores.map(e => ({
+          id: e.id || '',
+          nombre_completo: `${e.nombre} ${e.apellidoPaterno || ''}`.trim(),
+          foto_url: e.foto || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face',
+          especialidad: e.deportes?.join(', ') || 'Entrenamiento',
+          tarifa_por_hora: e.precio || 300,
+          calificacion: e.calificacionPromedio || 5.0,
+          total_resenas: e.totalReviews || 0
+        }));
+        this.loadingEntrenadores = false;
+        
+        // Si venía con ID, seleccionar ahora
+        if (this.entrenadorId) {
+          this.seleccionarEntrenador(this.entrenadorId);
+        }
+      },
+      (error) => {
+        console.error('Error cargando entrenadores:', error);
+        this.loadingEntrenadores = false;
+        this.toastr.danger('Error al cargar entrenadores', 'Error');
+      }
+    );
+    this.subscriptions.push(sub);
+  }
+
   // Paso 1: Selección de entrenador
-  seleccionarEntrenador(id: number): void {
+  seleccionarEntrenador(id: string): void {
     this.entrenadorSeleccionado = this.entrenadores.find(e => e.id === id) || null;
     this.paso1Form.patchValue({ entrenador_id: id });
     this.calcularPrecio();
@@ -163,16 +185,29 @@ export class AgendarSesionComponent implements OnInit {
 
   // Paso 2: Generar horarios disponibles cuando se selecciona fecha
   onFechaSeleccionada(fecha: Date): void {
-    this.horariosDisponibles = this.generarHorariosDisponibles(fecha);
+    if (!this.entrenadorSeleccionado) return;
+    
+    // Obtener horarios ocupados del entrenador para esa fecha
+    this.clienteFirebase.getHorariosOcupados(this.entrenadorSeleccionado.id, fecha).subscribe(
+      (ocupados) => {
+        this.horariosOcupados = ocupados;
+        this.horariosDisponibles = this.generarHorariosDisponibles(fecha);
+      }
+    );
   }
 
   generarHorariosDisponibles(fecha: Date): string[] {
-    // Mock: generar horarios de 8:00 a 20:00
+    // Generar horarios de 8:00 a 20:00, excluyendo los ocupados
     const horarios: string[] = [];
     for (let hora = 8; hora <= 19; hora++) {
-      horarios.push(`${hora.toString().padStart(2, '0')}:00`);
-      if (hora < 19) {
-        horarios.push(`${hora.toString().padStart(2, '0')}:30`);
+      const h1 = `${hora.toString().padStart(2, '0')}:00`;
+      const h2 = `${hora.toString().padStart(2, '0')}:30`;
+      
+      if (!this.horariosOcupados.includes(h1)) {
+        horarios.push(h1);
+      }
+      if (hora < 19 && !this.horariosOcupados.includes(h2)) {
+        horarios.push(h2);
       }
     }
     return horarios;
@@ -219,19 +254,53 @@ export class AgendarSesionComponent implements OnInit {
     }
   }
 
-  // Confirmar reserva
-  confirmarReserva(): void {
-    if (!this.paso4Form.valid) return;
+  // Confirmar reserva - REAL con Firebase
+  async confirmarReserva(): Promise<void> {
+    if (!this.paso4Form.valid || !this.entrenadorSeleccionado) return;
 
     this.cargando = true;
 
-    // Simular llamada API
-    setTimeout(() => {
-      this.reservaConfirmada = true;
-      this.numeroReserva = 'RSV-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+    try {
+      const fecha = this.paso2Form.get('fecha')?.value;
+      const hora = this.paso2Form.get('hora')?.value;
+      const duracion = this.paso3Form.get('duracion')?.value;
+      const modalidad = this.paso3Form.get('modalidad')?.value;
+      const notas = this.paso3Form.get('notas')?.value;
+
+      // Calcular hora fin
+      const [h, m] = hora.split(':').map(Number);
+      const minutosTotales = h * 60 + m + (duracion * 60);
+      const horaFin = `${Math.floor(minutosTotales / 60).toString().padStart(2, '0')}:${(minutosTotales % 60).toString().padStart(2, '0')}`;
+
+      const result = await this.clienteFirebase.crearReserva({
+        entrenadorId: this.entrenadorSeleccionado.id,
+        entrenadorNombre: this.entrenadorSeleccionado.nombre_completo,
+        clienteNombre: '', // Se llena en el servicio
+        fecha: fecha,
+        hora: hora,
+        horaFin: horaFin,
+        duracion: duracion,
+        precio: this.totalFinal,
+        modalidad: modalidad,
+        estado: 'PENDIENTE',
+        notas: notas || '',
+        ubicacion: modalidad === 'presencial' ? 'Por confirmar' : 'Online'
+      });
+
+      if (result.success) {
+        this.reservaConfirmada = true;
+        this.numeroReserva = result.id || 'RSV-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+        this.pasoActual++;
+        this.toastr.success('Tu reserva ha sido creada', 'Reserva Confirmada');
+      } else {
+        this.toastr.danger(result.message, 'Error');
+      }
+    } catch (error) {
+      console.error('Error al confirmar reserva:', error);
+      this.toastr.danger('Error al procesar la reserva', 'Error');
+    } finally {
       this.cargando = false;
-      this.pasoActual++;
-    }, 2000);
+    }
   }
 
   // Finalizar y volver

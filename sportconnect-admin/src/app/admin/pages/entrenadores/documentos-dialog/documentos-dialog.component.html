@@ -1,0 +1,123 @@
+<div class="documentos-dialog">
+  <div class="dialog-header">
+    <div class="header-info">
+      <h2>Documentos de Verificación</h2>
+      <p>{{ entrenador.nombre }} {{ entrenador.apellidoPaterno }}</p>
+    </div>
+    <button nbButton ghost (click)="cerrar()">
+      <nb-icon icon="close-outline"></nb-icon>
+    </button>
+  </div>
+
+  <div class="dialog-content">
+    <!-- Loading -->
+    <div *ngIf="loading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando documentos...</p>
+    </div>
+
+    <!-- Sin documentos -->
+    <div *ngIf="!loading && !documentos" class="empty-state">
+      <span class="empty-icon">📄</span>
+      <h3>Sin documentos</h3>
+      <p>Este entrenador no ha subido documentos de verificación.</p>
+    </div>
+
+    <!-- Documentos disponibles -->
+    <div *ngIf="!loading && documentos" class="documentos-content">
+      <!-- Estado general -->
+      <div class="estado-badge-container">
+        <nb-badge [text]="getEstadoTexto()" [status]="getEstadoBadge()"></nb-badge>
+        <span class="fecha-subida" *ngIf="documentos.fechaSubida">
+          Subidos: {{ documentos.fechaSubida | date:'dd/MM/yyyy HH:mm' }}
+        </span>
+      </div>
+
+      <!-- Motivo de rechazo si aplica -->
+      <div class="rechazo-banner" *ngIf="documentos.estadoVerificacion === 'RECHAZADO' && documentos.motivoRechazo">
+        <nb-icon icon="alert-circle-outline"></nb-icon>
+        <div>
+          <strong>Motivo de rechazo:</strong>
+          <p>{{ documentos.motivoRechazo }}</p>
+        </div>
+      </div>
+
+      <!-- INE -->
+      <div class="documento-card">
+        <div class="documento-header">
+          <span class="documento-icon">🪪</span>
+          <div class="documento-info">
+            <h4>Identificación Oficial (INE/IFE)</h4>
+            <p *ngIf="documentos.ine">{{ documentos.ine.nombre }} · {{ (documentos.ine.tamano / 1024).toFixed(0) }} KB</p>
+            <p *ngIf="!documentos.ine" class="sin-documento">No subido</p>
+          </div>
+        </div>
+        <div class="documento-preview" *ngIf="documentos.ine">
+          <img *ngIf="esImagen(documentos.ine.tipo)" 
+               [src]="documentos.ine.base64" 
+               alt="INE"
+               (click)="abrirEnNuevaVentana(documentos.ine.base64)">
+          <div *ngIf="!esImagen(documentos.ine.tipo)" class="pdf-preview" (click)="abrirEnNuevaVentana(documentos.ine.base64)">
+            <span>📄</span>
+            <span>PDF</span>
+            <small>Click para ver</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Certificación -->
+      <div class="documento-card">
+        <div class="documento-header">
+          <span class="documento-icon">📜</span>
+          <div class="documento-info">
+            <h4>Certificación Deportiva</h4>
+            <p *ngIf="documentos.certificacion">{{ documentos.certificacion.nombre }} · {{ (documentos.certificacion.tamano / 1024).toFixed(0) }} KB</p>
+            <p *ngIf="!documentos.certificacion" class="sin-documento">No subido</p>
+          </div>
+        </div>
+        <div class="documento-preview" *ngIf="documentos.certificacion">
+          <img *ngIf="esImagen(documentos.certificacion.tipo)" 
+               [src]="documentos.certificacion.base64" 
+               alt="Certificación"
+               (click)="abrirEnNuevaVentana(documentos.certificacion.base64)">
+          <div *ngIf="!esImagen(documentos.certificacion.tipo)" class="pdf-preview" (click)="abrirEnNuevaVentana(documentos.certificacion.base64)">
+            <span>📄</span>
+            <span>PDF</span>
+            <small>Click para ver</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer con acciones -->
+  <div class="dialog-footer" *ngIf="!loading && documentos && documentos.estadoVerificacion === 'PENDIENTE'">
+    <!-- Input de rechazo -->
+    <div class="rechazo-input" *ngIf="mostrarInputRechazo">
+      <input type="text" 
+             [(ngModel)]="motivoRechazo" 
+             placeholder="Escribe el motivo del rechazo..."
+             class="form-control">
+      <div class="rechazo-actions">
+        <button nbButton size="small" status="basic" (click)="cancelarRechazo()">Cancelar</button>
+        <button nbButton size="small" status="danger" 
+                [disabled]="!motivoRechazo.trim() || procesando"
+                (click)="rechazarDocumentos()">
+          Confirmar Rechazo
+        </button>
+      </div>
+    </div>
+
+    <!-- Botones principales -->
+    <div class="action-buttons" *ngIf="!mostrarInputRechazo">
+      <button nbButton status="danger" outline (click)="mostrarRechazo()" [disabled]="procesando">
+        <nb-icon icon="close-circle-outline"></nb-icon>
+        Rechazar
+      </button>
+      <button nbButton status="success" (click)="aprobarDocumentos()" [disabled]="procesando">
+        <nb-icon icon="checkmark-circle-outline"></nb-icon>
+        Aprobar Documentos
+      </button>
+    </div>
+  </div>
+</div>

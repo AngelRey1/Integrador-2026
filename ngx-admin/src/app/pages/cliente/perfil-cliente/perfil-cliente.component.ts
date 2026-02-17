@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NbToastrService } from '@nebular/theme';
 import { AuthService } from '../../../@core/services/auth.service';
+import { ClienteFirebaseService } from '../../../@core/services/cliente-firebase.service';
+import { Subscription } from 'rxjs';
 
 interface Usuario {
   id: number;
@@ -43,7 +45,7 @@ interface ConfiguracionNotificaciones {
   templateUrl: './perfil-cliente.component.html',
   styleUrls: ['./perfil-cliente.component.scss']
 })
-export class PerfilClienteComponent implements OnInit {
+export class PerfilClienteComponent implements OnInit, OnDestroy {
   // Forms
   perfilForm: FormGroup;
   passwordForm: FormGroup;
@@ -57,6 +59,8 @@ export class PerfilClienteComponent implements OnInit {
   guardando = false;
   editandoPerfil = false;
   avatarPreview: string | ArrayBuffer | null = null;
+  cargandoPerfil = true;
+  private perfilSubscription: Subscription;
 
   // Opciones para selects
   generosDisponibles = [
@@ -121,7 +125,8 @@ export class PerfilClienteComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private toastrService: NbToastrService,
-    private authService: AuthService
+    private authService: AuthService,
+    private clienteFirebase: ClienteFirebaseService
   ) {
     // Obtener email y nombre de usuario del token JWT
     const tokenPayload = this.authService.decodeToken(this.authService.token || '');
@@ -192,24 +197,85 @@ export class PerfilClienteComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Actualizar email y nombre de usuario desde el token si está disponible
-    const tokenPayload = this.authService.decodeToken(this.authService.token || '');
-    if (tokenPayload) {
-      if (tokenPayload.email) {
-        this.usuario.email = tokenPayload.email;
+    // Cargar perfil desde Firebase
+    this.perfilSubscription = this.clienteFirebase.getMiPerfil().subscribe({
+      next: (perfil) => {
+        this.cargandoPerfil = false;
+        if (perfil) {
+          // Actualizar datos del usuario desde Firebase
+          this.usuario = {
+            ...this.usuario,
+            nombre: perfil.nombre || this.usuario.nombre,
+            apellidos: perfil.apellidos || this.usuario.apellidos,
+            email: perfil.email || this.usuario.email,
+            telefono: perfil.telefono || this.usuario.telefono,
+            fecha_nacimiento: perfil.fechaNacimiento?.toDate ? perfil.fechaNacimiento.toDate() : perfil.fechaNacimiento || this.usuario.fecha_nacimiento,
+            genero: perfil.genero || this.usuario.genero,
+            direccion: {
+              calle: perfil.direccion?.calle || this.usuario.direccion.calle,
+              ciudad: perfil.direccion?.ciudad || this.usuario.direccion.ciudad,
+              codigo_postal: perfil.direccion?.codigoPostal || this.usuario.direccion.codigo_postal,
+              pais: perfil.direccion?.pais || this.usuario.direccion.pais
+            },
+            avatar: perfil.foto || this.usuario.avatar
+          };
+          
+          // Actualizar preferencias si existen
+          if (perfil.preferencias) {
+            this.preferencias = {
+              deportes_favoritos: perfil.preferencias.deportesFavoritos || this.preferencias.deportes_favoritos,
+              nivel_experiencia: perfil.preferencias.nivelExperiencia || this.preferencias.nivel_experiencia,
+              objetivos: perfil.preferencias.objetivos || this.preferencias.objetivos,
+              dias_preferidos: perfil.preferencias.diasPreferidos || this.preferencias.dias_preferidos,
+              horario_preferido: perfil.preferencias.horarioPreferido || this.preferencias.horario_preferido,
+              presupuesto_mensual: perfil.preferencias.presupuestoMensual || this.preferencias.presupuesto_mensual
+            };
+          }
+          
+          // Actualizar notificaciones si existen
+          if (perfil.notificaciones) {
+            this.notificaciones = {
+              email_nuevas_reservas: perfil.notificaciones.emailReservas ?? this.notificaciones.email_nuevas_reservas,
+              email_recordatorios: perfil.notificaciones.emailRecordatorios ?? this.notificaciones.email_recordatorios,
+              email_promociones: perfil.notificaciones.emailPromociones ?? this.notificaciones.email_promociones,
+              sms_recordatorios: perfil.notificaciones.smsRecordatorios ?? this.notificaciones.sms_recordatorios,
+              push_notificaciones: perfil.notificaciones.pushNotificaciones ?? this.notificaciones.push_notificaciones
+            };
+          }
+          
+          this.avatarPreview = this.usuario.avatar;
+          this.cargarDatosUsuario();
+        } else {
+          // Si no hay perfil en Firebase, usar datos del token
+          const tokenPayload = this.authService.decodeToken(this.authService.token || '');
+          if (tokenPayload) {
+            if (tokenPayload.email) {
+              this.usuario.email = tokenPayload.email;
+            }
+            if (tokenPayload.nombreUsuario || tokenPayload.sub) {
+              this.usuario.nombreUsuario = tokenPayload.nombreUsuario || tokenPayload.sub;
+            }
+          }
+          this.cargarDatosUsuario();
+        }
+      },
+      error: (error) => {
+        this.cargandoPerfil = false;
+        console.error('Error al cargar perfil:', error);
+        // Continuar con datos del token si hay error
+        const tokenPayload = this.authService.decodeToken(this.authService.token || '');
+        if (tokenPayload?.email) {
+          this.usuario.email = tokenPayload.email;
+        }
+        this.cargarDatosUsuario();
       }
-      if (tokenPayload.nombreUsuario || tokenPayload.sub) {
-        this.usuario.nombreUsuario = tokenPayload.nombreUsuario || tokenPayload.sub;
-      }
-      
-      // Actualizar la foto para que sea consistente con el header (siempre de HOMBRE)
-      const nombreUsuario = tokenPayload.nombreUsuario || tokenPayload.sub || this.usuario.email;
-      const fotoId = this.generarFotoIdHombre(nombreUsuario || 'usuario');
-      this.usuario.avatar = `https://randomuser.me/api/portraits/men/${fotoId}.jpg`;
-      this.avatarPreview = this.usuario.avatar;
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.perfilSubscription) {
+      this.perfilSubscription.unsubscribe();
     }
-    
-    this.cargarDatosUsuario();
   }
 
   cargarDatosUsuario(): void {
@@ -266,35 +332,67 @@ export class PerfilClienteComponent implements OnInit {
       }
     };
 
-    // Simular guardado
-    setTimeout(() => {
+    // Guardar en Firebase
+    this.clienteFirebase.actualizarMiPerfil({
+      nombre: formValue.nombre,
+      apellidos: formValue.apellidos,
+      telefono: formValue.telefono,
+      fechaNacimiento: formValue.fecha_nacimiento,
+      genero: formValue.genero,
+      direccion: {
+        calle: formValue.calle,
+        ciudad: formValue.ciudad,
+        codigoPostal: formValue.codigo_postal,
+        pais: formValue.pais
+      }
+    }).then(result => {
       this.guardando = false;
-      this.editandoPerfil = false;
-      this.perfilForm.disable();
-      this.toastrService.success('Perfil actualizado correctamente', 'Éxito');
-      console.log('Usuario actualizado:', this.usuario);
-    }, 1000);
+      if (result.success) {
+        this.editandoPerfil = false;
+        this.perfilForm.disable();
+        this.toastrService.success(result.message, 'Éxito');
+      } else {
+        this.toastrService.danger(result.message, 'Error');
+      }
+    }).catch(error => {
+      this.guardando = false;
+      this.toastrService.danger('Error al guardar el perfil', 'Error');
+      console.error('Error guardando perfil:', error);
+    });
   }
 
-  onFileSelected(event: any): void {
+  async onFileSelected(event: any): Promise<void> {
     const file = event.target.files[0];
     if (file) {
-      if (file.size > 2000000) { // 2MB
-        this.toastrService.warning('La imagen no debe superar 2MB', 'Advertencia');
+      if (file.size > 600000) { // 600KB para base64
+        this.toastrService.warning('La imagen no debe superar 600KB', 'Advertencia');
         return;
       }
 
       const reader = new FileReader();
-      reader.onload = (e) => {
-        this.avatarPreview = e.target?.result || null;
-        this.usuario.avatar = this.avatarPreview as string;
-        this.toastrService.success('Foto de perfil actualizada', 'Éxito');
+      reader.onload = async (e) => {
+        const base64 = e.target?.result as string;
+        this.avatarPreview = base64;
+        
+        // Guardar en Firebase
+        this.guardando = true;
+        const result = await this.clienteFirebase.actualizarFotoPerfil(base64);
+        this.guardando = false;
+        
+        if (result.success) {
+          this.usuario.avatar = base64;
+          this.toastrService.success('Foto de perfil actualizada', 'Éxito');
+        } else {
+          this.toastrService.danger(result.message, 'Error');
+          // Revertir preview
+          this.avatarPreview = this.usuario.avatar;
+        }
       };
       reader.readAsDataURL(file);
     }
   }
 
-  cambiarPassword(): void {
+  async cambiarPassword(): Promise<void> {
     if (this.passwordForm.invalid) {
       Object.keys(this.passwordForm.controls).forEach(key => {
         this.passwordForm.get(key)?.markAsTouched();
@@ -304,13 +402,20 @@ export class PerfilClienteComponent implements OnInit {
 
     this.guardando = true;
 
-    // Simular cambio de contraseña
-    setTimeout(() => {
-      this.guardando = false;
+    const formValue = this.passwordForm.value;
+    const result = await this.clienteFirebase.cambiarPassword(
+      formValue.password_actual,
+      formValue.password_nueva
+    );
+
+    this.guardando = false;
+    
+    if (result.success) {
       this.passwordForm.reset();
-      this.toastrService.success('Contraseña actualizada correctamente', 'Éxito');
-      console.log('Contraseña cambiada');
-    }, 1000);
+      this.toastrService.success(result.message, 'Éxito');
+    } else {
+      this.toastrService.danger(result.message, 'Error');
+    }
   }
 
   passwordMatchValidator(form: FormGroup): { [key: string]: boolean } | null {
@@ -362,24 +467,47 @@ export class PerfilClienteComponent implements OnInit {
     return this.preferencias.dias_preferidos.includes(dia);
   }
 
-  guardarPreferencias(): void {
+  async guardarPreferencias(): Promise<void> {
     this.guardando = true;
     
-    setTimeout(() => {
-      this.guardando = false;
+    const result = await this.clienteFirebase.actualizarMiPerfil({
+      preferencias: {
+        deportesFavoritos: this.preferencias.deportes_favoritos,
+        nivelExperiencia: this.preferencias.nivel_experiencia,
+        objetivos: this.preferencias.objetivos,
+        diasPreferidos: this.preferencias.dias_preferidos,
+        horarioPreferido: this.preferencias.horario_preferido,
+        presupuestoMensual: this.preferencias.presupuesto_mensual
+      }
+    });
+    
+    this.guardando = false;
+    if (result.success) {
       this.toastrService.success('Preferencias actualizadas correctamente', 'Éxito');
-      console.log('Preferencias actualizadas:', this.preferencias);
-    }, 1000);
+    } else {
+      this.toastrService.danger(result.message, 'Error');
+    }
   }
 
-  guardarNotificaciones(): void {
+  async guardarNotificaciones(): Promise<void> {
     this.guardando = true;
     
-    setTimeout(() => {
-      this.guardando = false;
+    const result = await this.clienteFirebase.actualizarMiPerfil({
+      notificaciones: {
+        emailReservas: this.notificaciones.email_nuevas_reservas,
+        emailRecordatorios: this.notificaciones.email_recordatorios,
+        emailPromociones: this.notificaciones.email_promociones,
+        smsRecordatorios: this.notificaciones.sms_recordatorios,
+        pushNotificaciones: this.notificaciones.push_notificaciones
+      }
+    });
+    
+    this.guardando = false;
+    if (result.success) {
       this.toastrService.success('Configuración de notificaciones actualizada', 'Éxito');
-      console.log('Notificaciones actualizadas:', this.notificaciones);
-    }, 1000);
+    } else {
+      this.toastrService.danger(result.message, 'Error');
+    }
   }
 
   eliminarCuenta(): void {

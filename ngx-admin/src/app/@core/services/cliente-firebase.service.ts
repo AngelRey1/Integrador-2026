@@ -459,4 +459,135 @@ export class ClienteFirebaseService {
             })
         );
     }
+
+    // ==================== PERFIL CLIENTE ====================
+
+    /**
+     * Obtener mi perfil de cliente
+     */
+    getMiPerfil(): Observable<any> {
+        return this.afAuth.authState.pipe(
+            switchMap(user => {
+                if (!user) return of(null);
+                return this.firestore.doc(`clientes/${user.uid}`).valueChanges();
+            })
+        );
+    }
+
+    /**
+     * Actualizar mi perfil de cliente
+     */
+    async actualizarMiPerfil(datos: {
+        nombre?: string;
+        apellidos?: string;
+        telefono?: string;
+        fechaNacimiento?: Date;
+        genero?: string;
+        direccion?: {
+            calle?: string;
+            ciudad?: string;
+            codigoPostal?: string;
+            pais?: string;
+        };
+        foto?: string;
+        preferencias?: {
+            deportesFavoritos?: string[];
+            nivelExperiencia?: string;
+            objetivos?: string[];
+            diasPreferidos?: string[];
+            horarioPreferido?: string;
+            presupuestoMensual?: number;
+        };
+        notificaciones?: {
+            emailReservas?: boolean;
+            emailRecordatorios?: boolean;
+            emailPromociones?: boolean;
+            smsRecordatorios?: boolean;
+            pushNotificaciones?: boolean;
+        };
+    }): Promise<{ success: boolean; message: string }> {
+        try {
+            const user = await this.afAuth.currentUser;
+            if (!user) {
+                return { success: false, message: 'Usuario no autenticado' };
+            }
+
+            await this.firestore.doc(`clientes/${user.uid}`).set(
+                {
+                    ...datos,
+                    email: user.email,
+                    updatedAt: new Date()
+                },
+                { merge: true }
+            );
+
+            return { success: true, message: 'Perfil actualizado correctamente' };
+        } catch (error) {
+            console.error('Error al actualizar perfil:', error);
+            return { success: false, message: 'Error al actualizar el perfil' };
+        }
+    }
+
+    /**
+     * Subir foto de perfil (Base64)
+     */
+    async actualizarFotoPerfil(fotoBase64: string): Promise<{ success: boolean; message: string }> {
+        try {
+            const user = await this.afAuth.currentUser;
+            if (!user) {
+                return { success: false, message: 'Usuario no autenticado' };
+            }
+
+            // Validar tamaño (max ~900KB en base64 = ~600KB archivo original)
+            if (fotoBase64.length > 900000) {
+                return { success: false, message: 'La imagen es demasiado grande. Máximo 600KB.' };
+            }
+
+            await this.firestore.doc(`clientes/${user.uid}`).set(
+                { foto: fotoBase64, updatedAt: new Date() },
+                { merge: true }
+            );
+
+            return { success: true, message: 'Foto actualizada correctamente' };
+        } catch (error) {
+            console.error('Error al actualizar foto:', error);
+            return { success: false, message: 'Error al actualizar la foto' };
+        }
+    }
+
+    /**
+     * Cambiar contraseña del usuario
+     */
+    async cambiarPassword(passwordActual: string, passwordNueva: string): Promise<{ success: boolean; message: string }> {
+        try {
+            const user = await this.afAuth.currentUser;
+            if (!user || !user.email) {
+                return { success: false, message: 'Usuario no autenticado' };
+            }
+
+            // Importar firebase para reauthenticate
+            const firebase = await import('firebase/compat/app');
+            const credential = firebase.default.auth.EmailAuthProvider.credential(
+                user.email,
+                passwordActual
+            );
+
+            // Reautenticar antes de cambiar contraseña
+            await user.reauthenticateWithCredential(credential);
+            
+            // Cambiar la contraseña
+            await user.updatePassword(passwordNueva);
+
+            return { success: true, message: 'Contraseña actualizada correctamente' };
+        } catch (error: any) {
+            console.error('Error al cambiar contraseña:', error);
+            if (error.code === 'auth/wrong-password') {
+                return { success: false, message: 'La contraseña actual es incorrecta' };
+            }
+            if (error.code === 'auth/weak-password') {
+                return { success: false, message: 'La nueva contraseña es muy débil' };
+            }
+            return { success: false, message: 'Error al cambiar la contraseña' };
+        }
+    }
 }

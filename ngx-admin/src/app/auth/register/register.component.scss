@@ -423,3 +423,255 @@ $white: #ffffff;
     }
   }
 }
+
+// Step Indicator
+.step-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba($white, 0.1);
+
+  .step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+
+    .step-number {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba($white, 0.2);
+      color: rgba($white, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+    }
+
+    .step-label {
+      color: rgba($white, 0.5);
+      font-size: 0.75rem;
+      transition: all 0.3s ease;
+    }
+
+    &.active {
+      .step-number {
+        background: $primary-color;
+        color: $white;
+        box-shadow: 0 0 15px rgba($primary-color, 0.5);
+      }
+      .step-label {
+        color: $white;
+      }
+    }
+
+    &.completed {
+      .step-number {
+        background: $success-color;
+        color: $white;
+      }
+      .step-label {
+        color: rgba($white, 0.7);
+      }
+    }
+  }
+
+  .step-line {
+    width: 60px;
+    height: 3px;
+    background: rgba($white, 0.2);
+    margin: 0 1rem;
+    margin-bottom: 1.5rem;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+
+    &.active {
+      background: $primary-color;
+    }
+  }
+}
+
+// Documentos Section
+.documentos-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.documento-upload {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 1.25rem;
+  border: 1px solid $border-color;
+}
+
+.documento-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+
+  .documento-icon {
+    font-size: 2rem;
+  }
+
+  h4 {
+    margin: 0 0 0.25rem 0;
+    color: $text-dark;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  p {
+    margin: 0;
+    color: $text-muted;
+    font-size: 0.85rem;
+  }
+}
+
+.upload-area {
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover .upload-placeholder {
+    border-color: $primary-color;
+    background: rgba($primary-color, 0.05);
+  }
+}
+
+.upload-placeholder {
+  border: 2px dashed $border-color;
+  border-radius: 10px;
+  padding: 2rem;
+  text-align: center;
+  transition: all 0.2s ease;
+
+  span:first-child {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    margin: 0 0 0.25rem 0;
+    color: $text-dark;
+    font-weight: 500;
+  }
+
+  small {
+    color: $text-muted;
+    font-size: 0.8rem;
+  }
+
+  &.uploading {
+    border-color: $primary-color;
+    background: rgba($primary-color, 0.05);
+  }
+}
+
+.documento-preview {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: $white;
+  border: 1px solid $border-color;
+  border-radius: 10px;
+  padding: 0.75rem;
+
+  .preview-content {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .pdf-preview {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+      color: $text-muted;
+
+      span:first-child {
+        font-size: 1.5rem;
+      }
+
+      span:last-child {
+        font-size: 0.65rem;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+    }
+  }
+
+  .preview-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+
+    .file-name {
+      color: $text-dark;
+      font-weight: 500;
+      font-size: 0.9rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .file-size {
+      color: $text-muted;
+      font-size: 0.8rem;
+    }
+  }
+
+  .btn-remove {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: #fee2e2;
+    color: $error-color;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: $error-color;
+      color: $white;
+    }
+  }
+}
+
+.btn-back-step {
+  background: transparent;
+  border: none;
+  color: $text-muted;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0.5rem 0;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: $primary-color;
+  }
+}

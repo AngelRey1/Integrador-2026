@@ -41,22 +41,22 @@ export class EntrenadoresListComponent implements OnInit, OnDestroy {
   };
 
   deportes = [
-    'Todos',
-    'Fútbol',
-    'CrossFit',
-    'Yoga',
-    'Natación',
-    'Running',
-    'Boxeo',
-    'Ciclismo',
-    'Tenis',
-    'Pilates',
-    'Zumba',
-    'Functional Training',
-    'Spinning',
-    'Artes Marciales',
-    'Ballet Fitness',
-    'Calistenia'
+    { value: 'todos', label: 'Todos los deportes' },
+    { value: 'futbol', label: 'Fútbol' },
+    { value: 'crossfit', label: 'CrossFit' },
+    { value: 'yoga', label: 'Yoga' },
+    { value: 'natacion', label: 'Natación' },
+    { value: 'running', label: 'Running' },
+    { value: 'boxeo', label: 'Boxeo' },
+    { value: 'ciclismo', label: 'Ciclismo' },
+    { value: 'tenis', label: 'Tenis' },
+    { value: 'pilates', label: 'Pilates' },
+    { value: 'zumba', label: 'Zumba' },
+    { value: 'functional', label: 'Functional Training' },
+    { value: 'spinning', label: 'Spinning' },
+    { value: 'artes-marciales', label: 'Artes Marciales' },
+    { value: 'ballet', label: 'Ballet Fitness' },
+    { value: 'calistenia', label: 'Calistenia' }
   ];
 
   // Lista de entrenadores (se carga desde Firebase)
@@ -332,9 +332,9 @@ export class EntrenadoresListComponent implements OnInit, OnDestroy {
       }
     });
 
-    // Suscripción a cambios en query params
+    // Suscripción a cambios en query params (solo procesar si hay parámetros nuevos)
     this.route.queryParams.subscribe(params => {
-      if (!this.loading) {
+      if (!this.loading && (params['deporte'] || params['q'])) {
         this.procesarQueryParamsFromEvent(params);
       }
     });
@@ -381,36 +381,32 @@ export class EntrenadoresListComponent implements OnInit, OnDestroy {
   }
 
   private procesarQueryParamsFromEvent(params: any): void {
-    // Reset filtros
-    this.filtros.deporte = 'todos';
-    this.searchQuery = '';
-    this.deporteActual = '';
-
+    // Solo resetear si viene de query params de URL
     if (params['deporte']) {
       const normalizado = params['deporte'].toLowerCase();
       const mapaDeportes: Record<string, string> = {
-        futbol: 'Fútbol',
-        fútbol: 'Fútbol',
-        crossfit: 'CrossFit',
-        yoga: 'Yoga',
-        natacion: 'Natación',
-        natación: 'Natación',
-        running: 'Running',
-        boxeo: 'Boxeo',
-        ciclismo: 'Ciclismo',
-        tenis: 'Tenis',
-        pilates: 'Pilates',
-        zumba: 'Zumba',
-        funcional: 'Functional Training',
-        functional: 'Functional Training',
-        'functional training': 'Functional Training',
-        spinning: 'Spinning',
-        artes: 'Artes Marciales',
-        'artes marciales': 'Artes Marciales',
-        ballet: 'Ballet Fitness',
-        calistenia: 'Calistenia'
+        futbol: 'futbol',
+        fútbol: 'futbol',
+        crossfit: 'crossfit',
+        yoga: 'yoga',
+        natacion: 'natacion',
+        natación: 'natacion',
+        running: 'running',
+        boxeo: 'boxeo',
+        ciclismo: 'ciclismo',
+        tenis: 'tenis',
+        pilates: 'pilates',
+        zumba: 'zumba',
+        funcional: 'functional',
+        functional: 'functional',
+        'functional training': 'functional',
+        spinning: 'spinning',
+        artes: 'artes-marciales',
+        'artes marciales': 'artes-marciales',
+        ballet: 'ballet',
+        calistenia: 'calistenia'
       };
-      this.filtros.deporte = mapaDeportes[normalizado] || params['deporte'];
+      this.filtros.deporte = mapaDeportes[normalizado] || normalizado;
       this.deporteActual = this.filtros.deporte;
     }
     if (params['q']) {
@@ -425,7 +421,7 @@ export class EntrenadoresListComponent implements OnInit, OnDestroy {
     // Filtrar destacados por el deporte actual
     if (this.deporteActual && this.deporteActual !== 'todos') {
       this.entrenadoresDestacados = this.entrenadores.filter(e => 
-        e.destacado && e.deportes.some(d => d.toLowerCase() === this.deporteActual.toLowerCase())
+        e.destacado && e.deportes.some(d => this.normalizarDeporte(d) === this.deporteActual)
       );
     } else {
       // Si no hay deporte específico, mostrar todos los destacados
@@ -462,9 +458,9 @@ export class EntrenadoresListComponent implements OnInit, OnDestroy {
 
       // Filtro de deporte
       if (this.filtros.deporte !== 'todos') {
-        if (!e.deportes.some(d => d.toLowerCase() === this.filtros.deporte.toLowerCase())) {
-          return false;
-        }
+        const deporteNormalizado = this.filtros.deporte;
+        const match = e.deportes.some(d => this.normalizarDeporte(d) === deporteNormalizado);
+        if (!match) return false;
       }
 
       // Filtro de precio
@@ -504,6 +500,33 @@ export class EntrenadoresListComponent implements OnInit, OnDestroy {
 
   verPerfil(entrenador: Entrenador) {
     this.router.navigate(['/entrenador', entrenador.id]);
+  }
+
+  // Normaliza un nombre de deporte para comparación
+  normalizarDeporte(deporte: string): string {
+    const mapeo: { [key: string]: string } = {
+      'fútbol': 'futbol',
+      'futbol': 'futbol',
+      'natación': 'natacion',
+      'natacion': 'natacion',
+      'crossfit': 'crossfit',
+      'yoga': 'yoga',
+      'running': 'running',
+      'boxeo': 'boxeo',
+      'ciclismo': 'ciclismo',
+      'tenis': 'tenis',
+      'pilates': 'pilates',
+      'zumba': 'zumba',
+      'functional training': 'functional',
+      'functional': 'functional',
+      'spinning': 'spinning',
+      'artes marciales': 'artes-marciales',
+      'ballet fitness': 'ballet',
+      'ballet': 'ballet',
+      'calistenia': 'calistenia'
+    };
+    const lower = deporte.toLowerCase();
+    return mapeo[lower] || lower.replace(/\s+/g, '-').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   }
 
   getEstrellas(calificacion: number): string[] {

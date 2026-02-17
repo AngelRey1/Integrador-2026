@@ -40,20 +40,33 @@
         
         <div class="features">
           <div class="feature">
-            <span class="feature-icon">📅</span>
-            <span>Gestiona tu agenda fácilmente</span>
+            <span class="feature-icon">�</span>
+            <span>Sube tu identificación oficial</span>
+          </div>
+          <div class="feature">
+            <span class="feature-icon">📜</span>
+            <span>Verifica tus certificaciones</span>
+          </div>
+          <div class="feature">
+            <span class="feature-icon">✅</span>
+            <span>Obtén el badge de verificado</span>
           </div>
           <div class="feature">
             <span class="feature-icon">💰</span>
             <span>Recibe pagos seguros</span>
           </div>
-          <div class="feature">
-            <span class="feature-icon">📈</span>
-            <span>Haz crecer tu clientela</span>
+        </div>
+
+        <!-- Indicador de pasos -->
+        <div class="step-indicator" *ngIf="!isClienteRegistro">
+          <div class="step" [class.active]="pasoActual === 1" [class.completed]="pasoActual > 1">
+            <span class="step-number">1</span>
+            <span class="step-label">Datos personales</span>
           </div>
-          <div class="feature">
-            <span class="feature-icon">⭐</span>
-            <span>Construye tu reputación</span>
+          <div class="step-line" [class.active]="pasoActual > 1"></div>
+          <div class="step" [class.active]="pasoActual === 2">
+            <span class="step-number">2</span>
+            <span class="step-label">Documentos</span>
           </div>
         </div>
       </ng-container>
@@ -69,140 +82,239 @@
     <div class="form-container">
       <div class="form-header">
         <h2 *ngIf="isClienteRegistro">Crear Cuenta de Cliente</h2>
-        <h2 *ngIf="!isClienteRegistro">Crear Cuenta de Entrenador</h2>
-        <p>Completa tus datos para registrarte</p>
+        <h2 *ngIf="!isClienteRegistro && pasoActual === 1">Paso 1: Datos Personales</h2>
+        <h2 *ngIf="!isClienteRegistro && pasoActual === 2">Paso 2: Documentos de Verificación</h2>
+        <p *ngIf="pasoActual === 1">Completa tus datos para registrarte</p>
+        <p *ngIf="pasoActual === 2">Sube tu identificación y certificaciones</p>
       </div>
 
       <form [formGroup]="form" (ngSubmit)="submit()">
-        <div class="form-row">
+        <!-- PASO 1: Datos personales -->
+        <div *ngIf="pasoActual === 1">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="nombre">Nombre *</label>
+              <input 
+                type="text" 
+                id="nombre"
+                formControlName="nombre" 
+                placeholder="Tu nombre"
+                class="form-input"
+                [class.input-error]="form.get('nombre')?.invalid && form.get('nombre')?.touched"
+              />
+              <small class="error-text" *ngIf="form.get('nombre')?.invalid && form.get('nombre')?.touched">
+                El nombre es requerido
+              </small>
+            </div>
+
+            <div class="form-group">
+              <label for="apellido">Apellido *</label>
+              <input 
+                type="text" 
+                id="apellido"
+                formControlName="apellido" 
+                placeholder="Tu apellido"
+                class="form-input"
+                [class.input-error]="form.get('apellido')?.invalid && form.get('apellido')?.touched"
+              />
+              <small class="error-text" *ngIf="form.get('apellido')?.invalid && form.get('apellido')?.touched">
+                El apellido es requerido
+              </small>
+            </div>
+          </div>
+
           <div class="form-group">
-            <label for="nombre">Nombre *</label>
+            <label for="email">Correo electrónico *</label>
             <input 
-              type="text" 
-              id="nombre"
-              formControlName="nombre" 
-              placeholder="Tu nombre"
+              type="email" 
+              id="email"
+              formControlName="email" 
+              placeholder="tu@correo.com"
               class="form-input"
-              [class.input-error]="form.get('nombre')?.invalid && form.get('nombre')?.touched"
+              [class.input-error]="form.get('email')?.invalid && form.get('email')?.touched"
             />
-            <small class="error-text" *ngIf="form.get('nombre')?.invalid && form.get('nombre')?.touched">
-              El nombre es requerido
+            <small class="error-text" *ngIf="form.get('email')?.invalid && form.get('email')?.touched">
+              <span *ngIf="form.get('email')?.errors?.['required']">El correo es requerido</span>
+              <span *ngIf="form.get('email')?.errors?.['email']">Ingresa un correo válido</span>
             </small>
           </div>
 
           <div class="form-group">
-            <label for="apellido">Apellido *</label>
+            <label for="password">Contraseña *</label>
             <input 
-              type="text" 
-              id="apellido"
-              formControlName="apellido" 
-              placeholder="Tu apellido"
+              type="password" 
+              id="password"
+              formControlName="password" 
+              placeholder="Mínimo 6 caracteres"
               class="form-input"
-              [class.input-error]="form.get('apellido')?.invalid && form.get('apellido')?.touched"
+              [class.input-error]="form.get('password')?.invalid && form.get('password')?.touched"
             />
-            <small class="error-text" *ngIf="form.get('apellido')?.invalid && form.get('apellido')?.touched">
-              El apellido es requerido
+            <small class="error-text" *ngIf="form.get('password')?.invalid && form.get('password')?.touched">
+              <span *ngIf="form.get('password')?.errors?.['required']">La contraseña es requerida</span>
+              <span *ngIf="form.get('password')?.errors?.['minlength']">Mínimo 6 caracteres</span>
             </small>
           </div>
-        </div>
 
-        <div class="form-group">
-          <label for="email">Correo electrónico *</label>
-          <input 
-            type="email" 
-            id="email"
-            formControlName="email" 
-            placeholder="tu@correo.com"
-            class="form-input"
-            [class.input-error]="form.get('email')?.invalid && form.get('email')?.touched"
-          />
-          <small class="error-text" *ngIf="form.get('email')?.invalid && form.get('email')?.touched">
-            <span *ngIf="form.get('email')?.errors?.['required']">El correo es requerido</span>
-            <span *ngIf="form.get('email')?.errors?.['email']">Ingresa un correo válido</span>
-          </small>
-        </div>
-
-        <div class="form-group">
-          <label for="password">Contraseña *</label>
-          <input 
-            type="password" 
-            id="password"
-            formControlName="password" 
-            placeholder="Mínimo 6 caracteres"
-            class="form-input"
-            [class.input-error]="form.get('password')?.invalid && form.get('password')?.touched"
-          />
-          <small class="error-text" *ngIf="form.get('password')?.invalid && form.get('password')?.touched">
-            <span *ngIf="form.get('password')?.errors?.['required']">La contraseña es requerida</span>
-            <span *ngIf="form.get('password')?.errors?.['minlength']">Mínimo 6 caracteres</span>
-          </small>
-        </div>
-
-        <div class="form-group">
-          <label for="confirmPassword">Confirmar contraseña *</label>
-          <input 
-            type="password" 
-            id="confirmPassword"
-            formControlName="confirmPassword" 
-            placeholder="Repite tu contraseña"
-            class="form-input"
-            [class.input-error]="(form.get('confirmPassword')?.invalid || form.errors?.['mismatch']) && form.get('confirmPassword')?.touched"
-          />
-          <small class="error-text" *ngIf="form.get('confirmPassword')?.invalid && form.get('confirmPassword')?.touched">
-            Debes confirmar la contraseña
-          </small>
-          <small class="error-text" *ngIf="form.errors?.['mismatch'] && form.get('confirmPassword')?.touched">
-            Las contraseñas no coinciden
-          </small>
-        </div>
-
-        <!-- Info de aprobación (solo para entrenadores) -->
-        <div class="info-banner" *ngIf="!isClienteRegistro">
-          <span class="info-icon">ℹ️</span>
-          <div class="info-content">
-            <strong>Proceso de verificación</strong>
-            <p>Tu solicitud será revisada por nuestro equipo. Te notificaremos en 1-2 días hábiles.</p>
+          <div class="form-group">
+            <label for="confirmPassword">Confirmar contraseña *</label>
+            <input 
+              type="password" 
+              id="confirmPassword"
+              formControlName="confirmPassword" 
+              placeholder="Repite tu contraseña"
+              class="form-input"
+              [class.input-error]="(form.get('confirmPassword')?.invalid || form.errors?.['mismatch']) && form.get('confirmPassword')?.touched"
+            />
+            <small class="error-text" *ngIf="form.get('confirmPassword')?.invalid && form.get('confirmPassword')?.touched">
+              Debes confirmar la contraseña
+            </small>
+            <small class="error-text" *ngIf="form.errors?.['mismatch'] && form.get('confirmPassword')?.touched">
+              Las contraseñas no coinciden
+            </small>
           </div>
+
+          <!-- Botón continuar para entrenadores -->
+          <button 
+            *ngIf="!isClienteRegistro"
+            type="button"
+            class="btn-submit"
+            (click)="irAPasoDocumentos()"
+          >
+            Continuar al paso 2
+          </button>
         </div>
 
-        <div class="form-group checkbox-group">
-          <label class="checkbox-label">
-            <input type="checkbox" formControlName="terminos" />
-            <span class="checkmark"></span>
-            <span>Acepto los <a href="/terminos" target="_blank">términos y condiciones</a> y la <a href="/privacidad" target="_blank">política de privacidad</a></span>
-          </label>
-          <small class="error-text" *ngIf="form.get('terminos')?.invalid && form.get('terminos')?.touched">
-            Debes aceptar los términos y condiciones
-          </small>
+        <!-- PASO 2: Documentos (solo entrenadores) -->
+        <div *ngIf="!isClienteRegistro && pasoActual === 2" class="documentos-section">
+          <!-- Subir INE -->
+          <div class="documento-upload">
+            <div class="documento-header">
+              <span class="documento-icon">🪪</span>
+              <div>
+                <h4>Identificación Oficial (INE/IFE) *</h4>
+                <p>Sube una foto clara de tu identificación vigente</p>
+              </div>
+            </div>
+
+            <div class="upload-area" *ngIf="!documentoINE" (click)="ineInput.click()">
+              <input #ineInput type="file" accept="image/*,application/pdf" (change)="onINESelected($event)" hidden>
+              <div class="upload-placeholder" [class.uploading]="uploadingINE">
+                <span *ngIf="!uploadingINE">📤</span>
+                <span *ngIf="uploadingINE" class="spinner"></span>
+                <p *ngIf="!uploadingINE">Haz clic para subir tu INE</p>
+                <p *ngIf="uploadingINE">Procesando...</p>
+                <small>JPG, PNG o PDF (máx. 2MB)</small>
+              </div>
+            </div>
+
+            <div class="documento-preview" *ngIf="documentoINE">
+              <div class="preview-content">
+                <img *ngIf="inePreview" [src]="inePreview" alt="INE Preview">
+                <div *ngIf="!inePreview" class="pdf-preview">
+                  <span>📄</span>
+                  <span>PDF</span>
+                </div>
+              </div>
+              <div class="preview-info">
+                <span class="file-name">{{ documentoINE.nombre }}</span>
+                <span class="file-size">{{ (documentoINE.tamano / 1024).toFixed(0) }} KB</span>
+              </div>
+              <button type="button" class="btn-remove" (click)="eliminarINE()">✕</button>
+            </div>
+          </div>
+
+          <!-- Subir Certificación -->
+          <div class="documento-upload">
+            <div class="documento-header">
+              <span class="documento-icon">📜</span>
+              <div>
+                <h4>Certificación Deportiva *</h4>
+                <p>Certificado de entrenador, diploma o constancia de estudios</p>
+              </div>
+            </div>
+
+            <div class="upload-area" *ngIf="!documentoCertificacion" (click)="certInput.click()">
+              <input #certInput type="file" accept="image/*,application/pdf" (change)="onCertificacionSelected($event)" hidden>
+              <div class="upload-placeholder" [class.uploading]="uploadingCert">
+                <span *ngIf="!uploadingCert">📤</span>
+                <span *ngIf="uploadingCert" class="spinner"></span>
+                <p *ngIf="!uploadingCert">Haz clic para subir tu certificación</p>
+                <p *ngIf="uploadingCert">Procesando...</p>
+                <small>JPG, PNG o PDF (máx. 2MB)</small>
+              </div>
+            </div>
+
+            <div class="documento-preview" *ngIf="documentoCertificacion">
+              <div class="preview-content">
+                <img *ngIf="certPreview" [src]="certPreview" alt="Certificación Preview">
+                <div *ngIf="!certPreview" class="pdf-preview">
+                  <span>📄</span>
+                  <span>PDF</span>
+                </div>
+              </div>
+              <div class="preview-info">
+                <span class="file-name">{{ documentoCertificacion.nombre }}</span>
+                <span class="file-size">{{ (documentoCertificacion.tamano / 1024).toFixed(0) }} KB</span>
+              </div>
+              <button type="button" class="btn-remove" (click)="eliminarCertificacion()">✕</button>
+            </div>
+          </div>
+
+          <button type="button" class="btn-back-step" (click)="volverAPasoDatos()">
+            ← Volver al paso 1
+          </button>
         </div>
 
-        <!-- Mensajes de error/éxito -->
-        <div class="alert alert-error" *ngIf="errorMessage">
-          <span class="alert-icon">⚠️</span>
-          {{ errorMessage }}
-        </div>
+        <!-- Términos y condiciones (visible en paso 1 para clientes, paso 2 para entrenadores) -->
+        <div *ngIf="isClienteRegistro || pasoActual === 2">
+          <!-- Info de aprobación (solo para entrenadores) -->
+          <div class="info-banner" *ngIf="!isClienteRegistro">
+            <span class="info-icon">ℹ️</span>
+            <div class="info-content">
+              <strong>Proceso de verificación</strong>
+              <p>Tu solicitud será revisada por nuestro equipo. Te notificaremos en 1-2 días hábiles.</p>
+            </div>
+          </div>
 
-        <div class="alert alert-success" *ngIf="successMessage">
-          <span class="alert-icon">✅</span>
-          {{ successMessage }}
-        </div>
+          <div class="form-group checkbox-group">
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="terminos" />
+              <span class="checkmark"></span>
+              <span>Acepto los <a href="/terminos" target="_blank">términos y condiciones</a> y la <a href="/privacidad" target="_blank">política de privacidad</a></span>
+            </label>
+            <small class="error-text" *ngIf="form.get('terminos')?.invalid && form.get('terminos')?.touched">
+              Debes aceptar los términos y condiciones
+            </small>
+          </div>
 
-        <button 
-          type="submit"
-          class="btn-submit"
-          [disabled]="form.invalid || loading"
-          [class.btn-loading]="loading"
-        >
-          <span *ngIf="!loading">Crear mi cuenta</span>
-          <span *ngIf="loading" class="loading-text">
-            <span class="spinner"></span>
-            Registrando...
-          </span>
-        </button>
+          <!-- Mensajes de error/éxito -->
+          <div class="alert alert-error" *ngIf="errorMessage">
+            <span class="alert-icon">⚠️</span>
+            {{ errorMessage }}
+          </div>
 
-        <div class="login-link">
-          <p *ngIf="isClienteRegistro">¿Ya tienes cuenta? <a [routerLink]="['/auth/login']" [queryParams]="{rol: 'CLIENTE'}">Inicia sesión como cliente</a></p>
-          <p *ngIf="!isClienteRegistro">¿Ya tienes cuenta? <a [routerLink]="['/auth/login']" [queryParams]="{rol: 'ENTRENADOR'}">Inicia sesión como entrenador</a></p>
+          <div class="alert alert-success" *ngIf="successMessage">
+            <span class="alert-icon">✅</span>
+            {{ successMessage }}
+          </div>
+
+          <button 
+            type="submit"
+            class="btn-submit"
+            [disabled]="form.invalid || loading || (!isClienteRegistro && (!documentoINE || !documentoCertificacion))"
+            [class.btn-loading]="loading"
+          >
+            <span *ngIf="!loading">Crear mi cuenta</span>
+            <span *ngIf="loading" class="loading-text">
+              <span class="spinner"></span>
+              Registrando...
+            </span>
+          </button>
+
+          <div class="login-link">
+            <p *ngIf="isClienteRegistro">¿Ya tienes cuenta? <a [routerLink]="['/auth/login']" [queryParams]="{rol: 'CLIENTE'}">Inicia sesión como cliente</a></p>
+            <p *ngIf="!isClienteRegistro">¿Ya tienes cuenta? <a [routerLink]="['/auth/login']" [queryParams]="{rol: 'ENTRENADOR'}">Inicia sesión como entrenador</a></p>
+          </div>
         </div>
       </form>
     </div>

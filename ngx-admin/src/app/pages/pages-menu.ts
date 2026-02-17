@@ -42,6 +42,11 @@ const CLIENTE_MENU: NbMenuItem[] = [
     link: '/pages/cliente/mis-resenas',
   },
   {
+    title: 'Mensajes',
+    icon: 'message-circle-outline',
+    link: '/pages/cliente/chat',
+  },
+  {
     title: 'CUENTA',
     group: true,
   },
@@ -98,6 +103,11 @@ const ENTRENADOR_MENU: NbMenuItem[] = [
     title: 'Mis Ingresos',
     icon: 'trending-up-outline',
     link: '/pages/entrenador/mis-ingresos',
+  },
+  {
+    title: 'Mensajes',
+    icon: 'message-circle-outline',
+    link: '/pages/entrenador/chat',
   },
   {
     title: 'NAVEGACIÓN',

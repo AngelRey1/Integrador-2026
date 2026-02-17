@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NbToastrService } from '@nebular/theme';
 import { ClienteFirebaseService, Pago as PagoFirebase } from '../../../@core/services/cliente-firebase.service';
+import { ReciboService } from '../../../@core/services/recibo.service';
 import { Subscription } from 'rxjs';
 
 interface Pago {
@@ -66,7 +67,8 @@ export class MisPagosComponent implements OnInit, OnDestroy {
 
   constructor(
     private clienteFirebase: ClienteFirebaseService,
-    private toastr: NbToastrService
+    private toastr: NbToastrService,
+    private reciboService: ReciboService
   ) { }
 
   ngOnInit(): void {
@@ -187,16 +189,55 @@ export class MisPagosComponent implements OnInit, OnDestroy {
   }
 
   descargarRecibo(pago: Pago): void {
-    this.toastr.primary(
-      `Descargando recibo ${pago.numero_transaccion}...`,
-      'Descarga Iniciada',
-      { duration: 3000, icon: 'download-outline' }
+    this.reciboService.generarRecibo({
+      numero: pago.numero_transaccion,
+      fecha: pago.fecha,
+      cliente: {
+        nombre: 'Cliente' // Se obtiene del usuario actual
+      },
+      entrenador: {
+        nombre: pago.entrenador,
+        especialidad: pago.concepto
+      },
+      sesion: {
+        fecha: pago.fecha,
+        hora: '00:00',
+        duracion: 60,
+        modalidad: 'Presencial'
+      },
+      pago: {
+        subtotal: pago.monto,
+        total: pago.monto,
+        metodoPago: pago.metodo_pago,
+        estado: pago.estado
+      }
+    });
+    this.toastr.success(
+      `Recibo ${pago.numero_transaccion} generado`,
+      'Recibo Listo',
+      { duration: 3000, icon: 'checkmark-outline' }
     );
   }
 
   descargarTodos(): void {
+    const pagosCompletados = this.pagosFiltrados.filter(p => p.estado === 'COMPLETADO');
+    if (pagosCompletados.length === 0) {
+      this.toastr.warning(
+        'No hay pagos completados para descargar',
+        'Sin Recibos',
+        { duration: 3000, icon: 'alert-circle-outline' }
+      );
+      return;
+    }
+    
+    pagosCompletados.forEach((pago, index) => {
+      setTimeout(() => {
+        this.descargarRecibo(pago);
+      }, index * 500); // Espaciar las descargas
+    });
+    
     this.toastr.primary(
-      'Preparando descarga de todos los recibos...',
+      `Generando ${pagosCompletados.length} recibos...`,
       'Descarga Múltiple',
       { duration: 3000, icon: 'download-outline' }
     );

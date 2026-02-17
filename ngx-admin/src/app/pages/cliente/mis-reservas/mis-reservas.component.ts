@@ -2,6 +2,8 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { NbDialogService, NbToastrService } from '@nebular/theme';
 import { ClienteFirebaseService, Reserva as ReservaFirebase } from '../../../@core/services/cliente-firebase.service';
+import { ReciboService } from '../../../@core/services/recibo.service';
+import { ResenaDialogComponent } from '../resena-dialog/resena-dialog.component';
 import { Subscription } from 'rxjs';
 
 type EstadoReserva = 'PENDIENTE' | 'CONFIRMADA' | 'COMPLETADA' | 'CANCELADA';
@@ -48,7 +50,8 @@ export class MisReservasComponent implements OnInit, OnDestroy {
     private dialogService: NbDialogService,
     private router: Router,
     private toastr: NbToastrService,
-    private clienteFirebase: ClienteFirebaseService
+    private clienteFirebase: ClienteFirebaseService,
+    private reciboService: ReciboService
   ) { }
 
   ngOnInit(): void {
@@ -184,21 +187,56 @@ export class MisReservasComponent implements OnInit, OnDestroy {
   }
 
   dejarResena(reserva: Reserva): void {
-    this.router.navigate(['/pages/cliente/mis-resenas'], {
-      queryParams: {
-        nueva: true,
-        entrenador: reserva.entrenador.nombre,
-        entrenadorId: reserva.entrenador.id,
-        sesion: reserva.id
+    this.dialogService.open(ResenaDialogComponent, {
+      context: {
+        reservaId: reserva.id,
+        entrenadorId: reserva.entrenador.id || '',
+        entrenadorNombre: reserva.entrenador.nombre,
+        entrenadorFoto: reserva.entrenador.foto_url
+      },
+      closeOnBackdropClick: true,
+      closeOnEsc: true
+    }).onClose.subscribe((result: any) => {
+      if (result?.success) {
+        this.toastr.success(result.message, '¡Reseña Publicada!', {
+          duration: 4000,
+          icon: 'star-outline'
+        });
+      } else if (result && !result.success) {
+        this.toastr.danger(result.message, 'Error');
       }
     });
   }
 
   descargarRecibo(reserva: Reserva): void {
-    this.toastr.primary(
-      `Descargando recibo de la reserva ${reserva.numero_reserva}...`,
-      'Descarga Iniciada',
-      { duration: 3000, icon: 'download-outline' }
+    this.reciboService.generarRecibo({
+      numero: reserva.numero_reserva,
+      fecha: reserva.fecha_creacion || new Date(),
+      cliente: {
+        nombre: 'Cliente' // Se obtendría del usuario logueado
+      },
+      entrenador: {
+        nombre: reserva.entrenador.nombre,
+        especialidad: reserva.entrenador.especialidad
+      },
+      sesion: {
+        fecha: reserva.fecha,
+        hora: reserva.hora,
+        duracion: reserva.duracion * 60, // convertir a minutos
+        modalidad: reserva.modalidad
+      },
+      pago: {
+        subtotal: reserva.precio_total,
+        total: reserva.precio_total,
+        metodoPago: 'Tarjeta',
+        estado: reserva.estado === 'COMPLETADA' ? 'COMPLETADO' : 'PENDIENTE'
+      }
+    });
+
+    this.toastr.success(
+      'Se abrió el recibo en una nueva ventana',
+      'Recibo Generado',
+      { duration: 3000, icon: 'file-text-outline' }
     );
   }
 

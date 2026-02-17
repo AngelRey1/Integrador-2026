@@ -78,9 +78,19 @@ export class AuthFirebaseService {
     this.currentRole = null;
   }
 
-  async register(payload: { nombre: string; apellido: string; email: string; password: string; rol: string }): Promise<AuthResult> {
+  async register(payload: { 
+    nombre: string; 
+    apellido: string; 
+    email: string; 
+    password: string; 
+    rol: string;
+    documentos?: {
+      ine: { nombre: string; tipo: string; base64: string; tamano: number } | null;
+      certificacion: { nombre: string; tipo: string; base64: string; tamano: number } | null;
+    }
+  }): Promise<AuthResult> {
     try {
-      const { nombre, apellido, email, password, rol } = payload;
+      const { nombre, apellido, email, password, rol, documentos } = payload;
       
       // Crear usuario en Firebase Auth
       const credential = await this.afAuth.createUserWithEmailAndPassword(email, password);
@@ -104,7 +114,7 @@ export class AuthFirebaseService {
 
       // Si es entrenador, crear documento en colección de entrenadores
       if (rol === 'ENTRENADOR') {
-        await this.firestore.collection('entrenadores').doc(credential.user.uid).set({
+        const entrenadorData: any = {
           userId: credential.user.uid,
           nombre: nombre,
           apellidoPaterno: apellido,
@@ -128,8 +138,17 @@ export class AuthFirebaseService {
           verificado: false,
           activo: false,
           fechaRegistro: new Date(),
-          direccionEntrenamiento: ''
-        });
+          direccionEntrenamiento: '',
+          // Documentos de verificación
+          documentos: {
+            ine: documentos?.ine || null,
+            certificacion: documentos?.certificacion || null,
+            fechaSubida: new Date(),
+            estadoVerificacion: 'PENDIENTE'
+          }
+        };
+
+        await this.firestore.collection('entrenadores').doc(credential.user.uid).set(entrenadorData);
 
         return {
           success: true,

@@ -16,11 +16,27 @@ export interface Usuario {
     fotoUrl?: string;
 }
 
+export interface DocumentoVerificacion {
+    nombre: string;
+    tipo: string;
+    base64: string;
+    tamano: number;
+}
+
+export interface DocumentosEntrenador {
+    ine: DocumentoVerificacion | null;
+    certificacion: DocumentoVerificacion | null;
+    fechaSubida: Date;
+    estadoVerificacion: 'PENDIENTE' | 'APROBADO' | 'RECHAZADO';
+    motivoRechazo?: string;
+}
+
 export interface Entrenador {
     id?: string;
     userId: string;
     nombre: string;
     apellidoPaterno: string;
+    email?: string;
     foto?: string;
     deportes: string[];
     precio: number;
@@ -30,6 +46,7 @@ export interface Entrenador {
     activo: boolean;
     fechaRegistro: Date;
     direccionEntrenamiento?: string;
+    documentos?: DocumentosEntrenador;
 }
 
 export interface Reserva {
@@ -158,6 +175,63 @@ export class AdminFirebaseService {
     getEntrenador(id: string): Observable<Entrenador | undefined> {
         return this.firestore.doc<Entrenador>(`entrenadores/${id}`)
             .valueChanges({ idField: 'id' });
+    }
+
+    // Obtener documentos de verificación de un entrenador
+    async getDocumentosEntrenador(id: string): Promise<DocumentosEntrenador | null> {
+        try {
+            const doc = await this.firestore.doc(`entrenadores/${id}`).get().toPromise();
+            const data = doc?.data() as Entrenador | undefined;
+            return data?.documentos || null;
+        } catch (error) {
+            console.error('Error obteniendo documentos:', error);
+            return null;
+        }
+    }
+
+    // Aprobar documentos de entrenador
+    async aprobarDocumentos(id: string): Promise<{ success: boolean; message: string }> {
+        try {
+            await this.firestore.doc(`entrenadores/${id}`).update({
+                'documentos.estadoVerificacion': 'APROBADO',
+                verificado: true,
+                activo: true,
+                fechaAprobacion: new Date()
+            });
+
+            // Actualizar estado en usuarios
+            await this.firestore.doc(`usuarios/${id}`).update({
+                estado: 'ACTIVO'
+            });
+
+            return { success: true, message: 'Documentos aprobados y entrenador activado' };
+        } catch (error) {
+            console.error('Error:', error);
+            return { success: false, message: 'Error al aprobar documentos' };
+        }
+    }
+
+    // Rechazar documentos con motivo
+    async rechazarDocumentos(id: string, motivo: string): Promise<{ success: boolean; message: string }> {
+        try {
+            await this.firestore.doc(`entrenadores/${id}`).update({
+                'documentos.estadoVerificacion': 'RECHAZADO',
+                'documentos.motivoRechazo': motivo,
+                verificado: false,
+                activo: false
+            });
+
+            // Actualizar estado en usuarios
+            await this.firestore.doc(`usuarios/${id}`).update({
+                estado: 'RECHAZADO',
+                motivoRechazo: motivo
+            });
+
+            return { success: true, message: 'Documentos rechazados' };
+        } catch (error) {
+            console.error('Error:', error);
+            return { success: false, message: 'Error al rechazar documentos' };
+        }
     }
 
     async verificarEntrenador(id: string): Promise<{ success: boolean; message: string }> {

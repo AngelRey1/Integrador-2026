@@ -8,6 +8,7 @@ import { MisPagosComponent } from './mis-pagos/mis-pagos.component';
 import { MisResenasComponent } from './mis-resenas/mis-resenas.component';
 import { PerfilClienteComponent } from './perfil-cliente/perfil-cliente.component';
 import { CatalogosClienteComponent } from './catalogos-cliente/catalogos-cliente.component';
+import { ChatComponent } from './chat/chat.component';
 
 const routes: Routes = [
   {
@@ -40,6 +41,10 @@ const routes: Routes = [
       {
         path: 'mis-resenas',
         component: MisResenasComponent
+      },
+      {
+        path: 'chat',
+        component: ChatComponent
       },
       {
         path: 'catalogos',  // Oculto del menú pero accesible

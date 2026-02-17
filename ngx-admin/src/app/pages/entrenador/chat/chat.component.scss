@@ -1,0 +1,373 @@
+@import '../../../@theme/styles/themes';
+
+@include nb-install-component() {
+  .chat-container {
+    display: flex;
+    height: calc(100vh - 180px);
+    min-height: 500px;
+    background: nb-theme(card-background-color);
+    border-radius: nb-theme(card-border-radius);
+    overflow: hidden;
+    box-shadow: nb-theme(card-shadow);
+  }
+
+  // Panel de conversaciones
+  .conversaciones-panel {
+    width: 320px;
+    border-right: 1px solid nb-theme(divider-color);
+    display: flex;
+    flex-direction: column;
+    background: nb-theme(background-basic-color-1);
+
+    .panel-header {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid nb-theme(divider-color);
+      background: nb-theme(background-basic-color-2);
+      
+      h5 {
+        margin: 0;
+        font-weight: 600;
+        color: nb-theme(text-basic-color);
+      }
+    }
+
+    .conversaciones-list {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .conversacion-item {
+      display: flex;
+      align-items: center;
+      padding: 0.875rem 1rem;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      border-bottom: 1px solid nb-theme(divider-color);
+
+      &:hover {
+        background: nb-theme(background-basic-color-2);
+      }
+
+      &.activa {
+        background: nb-theme(color-primary-transparent-100);
+        border-left: 3px solid nb-theme(color-primary-500);
+      }
+
+      .avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, nb-theme(color-success-500), nb-theme(color-success-700));
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 1rem;
+        flex-shrink: 0;
+      }
+
+      .info {
+        flex: 1;
+        margin-left: 0.75rem;
+        min-width: 0;
+
+        .nombre {
+          font-weight: 600;
+          color: nb-theme(text-basic-color);
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .ultimo-mensaje {
+          font-size: 0.8125rem;
+          color: nb-theme(text-hint-color);
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          margin-top: 0.25rem;
+        }
+      }
+
+      .meta {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        margin-left: 0.5rem;
+
+        .fecha {
+          font-size: 0.75rem;
+          color: nb-theme(text-hint-color);
+        }
+
+        .badge {
+          background: nb-theme(color-primary-500);
+          color: #fff;
+          font-size: 0.75rem;
+          font-weight: 600;
+          padding: 0.125rem 0.5rem;
+          border-radius: 10px;
+          margin-top: 0.25rem;
+        }
+      }
+    }
+
+    .no-conversaciones {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1.5rem;
+      text-align: center;
+      color: nb-theme(text-hint-color);
+
+      nb-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+      }
+
+      p {
+        margin: 0 0 0.5rem;
+        font-weight: 500;
+      }
+
+      small {
+        font-size: 0.8125rem;
+      }
+    }
+
+    .loading-state {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem;
+    }
+  }
+
+  // Panel de chat
+  .chat-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: nb-theme(background-basic-color-1);
+
+    .chat-header {
+      display: flex;
+      align-items: center;
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid nb-theme(divider-color);
+      background: nb-theme(background-basic-color-2);
+
+      .avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, nb-theme(color-success-500), nb-theme(color-success-700));
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+      }
+
+      .info {
+        margin-left: 0.75rem;
+
+        .nombre {
+          font-weight: 600;
+          color: nb-theme(text-basic-color);
+        }
+
+        .estado {
+          font-size: 0.8125rem;
+          color: nb-theme(text-hint-color);
+        }
+      }
+    }
+
+    .mensajes-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      background: nb-theme(background-basic-color-1);
+    }
+
+    .mensaje {
+      display: flex;
+      max-width: 70%;
+
+      &.enviado {
+        align-self: flex-end;
+
+        .mensaje-content {
+          background: nb-theme(color-primary-500);
+          color: #fff;
+          border-radius: 1rem 1rem 0.25rem 1rem;
+
+          .hora {
+            color: rgba(255, 255, 255, 0.7);
+          }
+        }
+      }
+
+      &.recibido {
+        align-self: flex-start;
+
+        .mensaje-content {
+          background: nb-theme(background-basic-color-3);
+          color: nb-theme(text-basic-color);
+          border-radius: 1rem 1rem 1rem 0.25rem;
+
+          .hora {
+            color: nb-theme(text-hint-color);
+          }
+        }
+      }
+
+      .mensaje-content {
+        padding: 0.75rem 1rem;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+
+        p {
+          margin: 0;
+          line-height: 1.4;
+          word-wrap: break-word;
+        }
+
+        .hora {
+          display: block;
+          font-size: 0.6875rem;
+          margin-top: 0.5rem;
+          text-align: right;
+        }
+      }
+    }
+
+    .no-mensajes {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      text-align: center;
+      color: nb-theme(text-hint-color);
+
+      nb-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+      }
+
+      p {
+        margin: 0 0 0.5rem;
+        font-weight: 500;
+      }
+
+      small {
+        font-size: 0.8125rem;
+      }
+    }
+
+    .input-container {
+      display: flex;
+      align-items: flex-end;
+      padding: 1rem 1.25rem;
+      border-top: 1px solid nb-theme(divider-color);
+      background: nb-theme(background-basic-color-2);
+      gap: 0.75rem;
+
+      textarea {
+        flex: 1;
+        resize: none;
+        border: 1px solid nb-theme(divider-color);
+        border-radius: 1.5rem;
+        padding: 0.75rem 1.25rem;
+        font-size: 0.9375rem;
+        background: nb-theme(background-basic-color-1);
+        color: nb-theme(text-basic-color);
+        outline: none;
+        max-height: 120px;
+        transition: border-color 0.2s ease;
+
+        &:focus {
+          border-color: nb-theme(color-primary-500);
+        }
+
+        &::placeholder {
+          color: nb-theme(text-hint-color);
+        }
+      }
+
+      button {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        nb-icon {
+          font-size: 1.25rem;
+        }
+      }
+    }
+
+    .no-chat-selected {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      text-align: center;
+      color: nb-theme(text-hint-color);
+      padding: 2rem;
+
+      .big-icon {
+        font-size: 5rem;
+        opacity: 0.3;
+        margin-bottom: 1.5rem;
+      }
+
+      h4 {
+        margin: 0 0 0.5rem;
+        color: nb-theme(text-basic-color);
+      }
+
+      p {
+        margin: 0;
+        font-size: 0.9375rem;
+      }
+    }
+  }
+
+  // Responsive
+  @media (max-width: 768px) {
+    .chat-container {
+      flex-direction: column;
+      height: auto;
+      min-height: 100vh;
+    }
+
+    .conversaciones-panel {
+      width: 100%;
+      max-height: 200px;
+      border-right: none;
+      border-bottom: 1px solid nb-theme(divider-color);
+    }
+
+    .chat-panel {
+      min-height: 400px;
+    }
+
+    .mensaje {
+      max-width: 85% !important;
+    }
+  }
+}

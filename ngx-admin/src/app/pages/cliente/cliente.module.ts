@@ -38,6 +38,8 @@ import {
 import { NbEvaIconsModule } from '@nebular/eva-icons';
 
 import { ClienteRoutingModule } from './cliente-routing.module';
+import { ResenaDialogComponent } from './resena-dialog/resena-dialog.component';
+import { ChatComponent } from './chat/chat.component';
 
 @NgModule({
   declarations: [
@@ -48,7 +50,9 @@ import { ClienteRoutingModule } from './cliente-routing.module';
     MisPagosComponent,
     MisResenasComponent,
     CatalogosClienteComponent,
-    PerfilClienteComponent
+    PerfilClienteComponent,
+    ResenaDialogComponent,
+    ChatComponent
   ],
   imports: [
     CommonModule,

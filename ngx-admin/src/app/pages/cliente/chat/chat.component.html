@@ -1,0 +1,99 @@
+<div class="chat-container">
+  <!-- Lista de conversaciones -->
+  <div class="conversaciones-panel">
+    <div class="panel-header">
+      <h5>Mis Conversaciones</h5>
+    </div>
+    
+    <div class="conversaciones-list" *ngIf="!loading">
+      <div 
+        *ngFor="let conv of conversaciones" 
+        class="conversacion-item"
+        [class.activa]="conversacionActiva?.id === conv.id"
+        (click)="seleccionarConversacion(conv)">
+        <div class="avatar">
+          {{ getIniciales(conv.entrenadorNombre) }}
+        </div>
+        <div class="info">
+          <div class="nombre">{{ conv.entrenadorNombre }}</div>
+          <div class="ultimo-mensaje">{{ conv.ultimoMensaje || 'Sin mensajes' }}</div>
+        </div>
+        <div class="meta">
+          <span class="fecha">{{ formatearFecha(conv.ultimoMensajeTimestamp) }}</span>
+          <span class="badge" *ngIf="conv.noLeidosCliente > 0">{{ conv.noLeidosCliente }}</span>
+        </div>
+      </div>
+      
+      <div *ngIf="conversaciones.length === 0" class="no-conversaciones">
+        <nb-icon icon="message-circle-outline"></nb-icon>
+        <p>No tienes conversaciones</p>
+        <small>Inicia un chat desde el perfil de un entrenador</small>
+      </div>
+    </div>
+    
+    <div *ngIf="loading" class="loading-state">
+      <nb-spinner status="primary" size="medium"></nb-spinner>
+    </div>
+  </div>
+  
+  <!-- Panel de chat -->
+  <div class="chat-panel">
+    <ng-container *ngIf="conversacionActiva; else noChat">
+      <!-- Header del chat -->
+      <div class="chat-header">
+        <div class="avatar">
+          {{ getIniciales(conversacionActiva.entrenadorNombre) }}
+        </div>
+        <div class="info">
+          <div class="nombre">{{ conversacionActiva.entrenadorNombre }}</div>
+          <div class="estado">Entrenador</div>
+        </div>
+      </div>
+      
+      <!-- Mensajes -->
+      <div class="mensajes-container" #mensajesContainer>
+        <div 
+          *ngFor="let mensaje of mensajes" 
+          class="mensaje"
+          [class.enviado]="mensaje.senderTipo === 'cliente'"
+          [class.recibido]="mensaje.senderTipo === 'entrenador'">
+          <div class="mensaje-content">
+            <p>{{ mensaje.texto }}</p>
+            <span class="hora">{{ formatearFecha(mensaje.timestamp) }}</span>
+          </div>
+        </div>
+        
+        <div *ngIf="mensajes.length === 0" class="no-mensajes">
+          <nb-icon icon="message-square-outline"></nb-icon>
+          <p>Inicia la conversación</p>
+          <small>Envía un mensaje para comenzar</small>
+        </div>
+      </div>
+      
+      <!-- Input de mensaje -->
+      <div class="input-container">
+        <textarea 
+          [(ngModel)]="nuevoMensaje"
+          placeholder="Escribe un mensaje..."
+          rows="1"
+          (keypress)="onKeyPress($event)"
+          [disabled]="enviando"></textarea>
+        <button 
+          nbButton 
+          status="primary" 
+          [disabled]="!nuevoMensaje.trim() || enviando"
+          (click)="enviarMensaje()">
+          <nb-icon icon="paper-plane-outline"></nb-icon>
+        </button>
+      </div>
+    </ng-container>
+    
+    <ng-template #noChat>
+      <div class="no-chat-selected">
+        <nb-icon icon="message-circle-outline" class="big-icon"></nb-icon>
+        <h4>Selecciona una conversación</h4>
+        <p>Elige una conversación de la lista para ver los mensajes</p>
+      </div>
+    </ng-template>
+  </div>
+</div>

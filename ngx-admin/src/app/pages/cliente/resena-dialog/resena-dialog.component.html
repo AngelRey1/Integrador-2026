@@ -1,0 +1,71 @@
+<div class="resena-dialog">
+  <div class="dialog-header">
+    <h2>Deja tu Reseña</h2>
+    <button nbButton ghost (click)="cerrar()">
+      <nb-icon icon="close-outline"></nb-icon>
+    </button>
+  </div>
+
+  <div class="dialog-content">
+    <!-- Info del entrenador -->
+    <div class="entrenador-info">
+      <div class="avatar">
+        <img *ngIf="entrenadorFoto" [src]="entrenadorFoto" [alt]="entrenadorNombre">
+        <div *ngIf="!entrenadorFoto" class="avatar-placeholder">
+          {{ entrenadorNombre.charAt(0) }}
+        </div>
+      </div>
+      <div class="info">
+        <h3>{{ entrenadorNombre }}</h3>
+        <p>¿Cómo fue tu experiencia?</p>
+      </div>
+    </div>
+
+    <!-- Rating con estrellas -->
+    <div class="rating-section">
+      <p class="rating-label">Tu calificación</p>
+      <div class="stars-container" (mouseleave)="clearHover()">
+        <span *ngFor="let star of [1, 2, 3, 4, 5]"
+              [class]="getStarClass(star)"
+              (click)="setRating(star)"
+              (mouseenter)="setHoverRating(star)">
+          ★
+        </span>
+      </div>
+      <p class="rating-text" *ngIf="calificacion > 0">
+        <span *ngIf="calificacion === 1">Malo</span>
+        <span *ngIf="calificacion === 2">Regular</span>
+        <span *ngIf="calificacion === 3">Bueno</span>
+        <span *ngIf="calificacion === 4">Muy bueno</span>
+        <span *ngIf="calificacion === 5">Excelente</span>
+      </p>
+    </div>
+
+    <!-- Comentario -->
+    <div class="comentario-section">
+      <label>Comentario (opcional)</label>
+      <textarea 
+        [(ngModel)]="comentario"
+        placeholder="Cuéntanos sobre tu experiencia con este entrenador..."
+        rows="4"
+        maxlength="500">
+      </textarea>
+      <small class="char-count">{{ comentario.length }}/500</small>
+    </div>
+  </div>
+
+  <div class="dialog-footer">
+    <button nbButton status="basic" (click)="cerrar()" [disabled]="guardando">
+      Cancelar
+    </button>
+    <button nbButton status="success" 
+            (click)="guardarResena()" 
+            [disabled]="calificacion === 0 || guardando">
+      <span *ngIf="!guardando">
+        <nb-icon icon="checkmark-outline"></nb-icon>
+        Publicar Reseña
+      </span>
+      <span *ngIf="guardando">Guardando...</span>
+    </button>
+  </div>
+</div>

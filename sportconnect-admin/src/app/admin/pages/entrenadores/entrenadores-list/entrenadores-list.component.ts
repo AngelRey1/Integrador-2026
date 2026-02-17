@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { NbToastrService } from '@nebular/theme';
+import { NbToastrService, NbDialogService } from '@nebular/theme';
 import { AdminFirebaseService, Entrenador as EntrenadorFirebase } from '../../../../core/services/admin-firebase.service';
+import { DocumentosDialogComponent } from '../documentos-dialog/documentos-dialog.component';
 import { Subscription } from 'rxjs';
 
 interface Entrenador {
@@ -14,6 +15,7 @@ interface Entrenador {
   rating: number;
   clientes: number;
   documentos: boolean;
+  entrenadorOriginal?: EntrenadorFirebase;
 }
 
 @Component({
@@ -38,7 +40,8 @@ export class EntrenadoresListComponent implements OnInit, OnDestroy {
 
   constructor(
     private adminFirebase: AdminFirebaseService,
-    private toastr: NbToastrService
+    private toastr: NbToastrService,
+    private dialogService: NbDialogService
   ) { }
 
   ngOnInit(): void {
@@ -80,14 +83,15 @@ export class EntrenadoresListComponent implements OnInit, OnDestroy {
     return {
       id: e.id || '',
       nombre: `${e.nombre} ${e.apellidoPaterno}`,
-      email: '',
+      email: e.email || '',
       especialidad: e.deportes?.join(', ') || 'General',
       estado: estado,
       fechaSolicitud: fechaSolicitud,
       avatar: e.foto || '',
       rating: e.calificacionPromedio || 0,
       clientes: 0,
-      documentos: true
+      documentos: !!e.documentos?.ine || !!e.documentos?.certificacion,
+      entrenadorOriginal: e
     };
   }
 
@@ -133,11 +137,31 @@ export class EntrenadoresListComponent implements OnInit, OnDestroy {
   }
 
   verPerfil(entrenador: Entrenador): void {
-    this.toastr.info(`Perfil de ${entrenador.nombre}`, 'Ver Perfil');
+    // Por ahora abre el diálogo de documentos que también muestra info del perfil
+    this.verDocumentos(entrenador);
   }
 
   verDocumentos(entrenador: Entrenador): void {
-    this.toastr.info(`Documentos de ${entrenador.nombre}`, 'Ver Documentos');
+    if (!entrenador.entrenadorOriginal) {
+      this.toastr.warning('No se pudo cargar la información del entrenador', 'Error');
+      return;
+    }
+
+    this.dialogService.open(DocumentosDialogComponent, {
+      context: {
+        entrenador: entrenador.entrenadorOriginal
+      },
+      closeOnBackdropClick: true,
+      closeOnEsc: true
+    }).onClose.subscribe((result: any) => {
+      if (result?.success) {
+        if (result.action === 'aprobado') {
+          this.toastr.success(result.message, 'Documentos Aprobados');
+        } else if (result.action === 'rechazado') {
+          this.toastr.warning(result.message, 'Documentos Rechazados');
+        }
+      }
+    });
   }
 }
 

@@ -412,13 +412,35 @@ $border-color: #E2E8F0;
 
 .select-pill {
   border: none;
-  background: transparent;
+  background-color: transparent;
   outline: none;
   font-size: 0.95rem;
-  color: $secondary-color;
+  color: $secondary-color !important;
   font-weight: 600;
   cursor: pointer;
   min-width: 150px;
+  padding-right: 1.5rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2300D09C' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.25rem center;
+  
+  // Asegurar que el texto se vea en todos los navegadores
+  &:focus,
+  &:active,
+  &:valid {
+    color: $secondary-color !important;
+  }
+  
+  option {
+    color: #333;
+    background: #fff;
+    font-weight: 500;
+    padding: 0.5rem;
+  }
+  
+  option:checked {
+    background: linear-gradient(0deg, #e6f7f4 0%, #e6f7f4 100%);
+  }
 }
 
 .range-wrapper {

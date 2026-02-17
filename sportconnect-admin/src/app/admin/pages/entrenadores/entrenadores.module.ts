@@ -1,13 +1,15 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 import { 
   NbCardModule, NbIconModule, NbButtonModule, NbBadgeModule,
-  NbUserModule, NbTooltipModule
+  NbUserModule, NbTooltipModule, NbDialogModule, NbInputModule
 } from '@nebular/theme';
 
 import { EntrenadoresListComponent } from './entrenadores-list/entrenadores-list.component';
+import { DocumentosDialogComponent } from './documentos-dialog/documentos-dialog.component';
 
 const routes: Routes = [
   {
@@ -19,9 +21,11 @@ const routes: Routes = [
 @NgModule({
   declarations: [
     EntrenadoresListComponent,
+    DocumentosDialogComponent,
   ],
   imports: [
     CommonModule,
+    FormsModule,
     RouterModule.forChild(routes),
     NbCardModule,
     NbIconModule,
@@ -29,6 +33,8 @@ const routes: Routes = [
     NbBadgeModule,
     NbUserModule,
     NbTooltipModule,
+    NbDialogModule.forChild(),
+    NbInputModule,
   ],
 })
 export class EntrenadoresModule { }
