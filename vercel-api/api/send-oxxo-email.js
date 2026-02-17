@@ -32,7 +32,7 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const { customerEmail, customerName, amount, oxxoNumber, expiresAt } = req.body;
+    const { customerEmail, customerName, amount, oxxoNumber, expiresAt, entrenadorNombre, fecha, hora } = req.body;
 
     // Validar datos requeridos
     if (!customerEmail || !customerName || !amount || !oxxoNumber) {
@@ -63,6 +63,24 @@ module.exports = async function handler(req, res) {
           minute: '2-digit'
         })
       : 'En 3 días';
+
+    // Formatear detalles de la reserva
+    const fechaReserva = fecha 
+      ? new Date(fecha).toLocaleDateString('es-MX', { 
+          weekday: 'long', 
+          day: 'numeric', 
+          month: 'long', 
+          year: 'numeric' 
+        }) 
+      : '';
+    const detallesReserva = (entrenadorNombre || fechaReserva || hora) ? `
+      <div style="background: #e8f5e9; border-radius: 12px; padding: 20px; margin: 20px 0;">
+        <h3 style="margin: 0 0 15px 0; color: #222;">📅 Detalles de tu reserva:</h3>
+        ${entrenadorNombre ? `<p style="margin: 5px 0;"><strong>Entrenador:</strong> ${entrenadorNombre}</p>` : ''}
+        ${fechaReserva ? `<p style="margin: 5px 0;"><strong>Fecha:</strong> ${fechaReserva}</p>` : ''}
+        ${hora ? `<p style="margin: 5px 0;"><strong>Horario:</strong> ${hora}</p>` : ''}
+      </div>
+    ` : '';
 
     const mailOptions = {
       from: `"SportConnect" <${process.env.EMAIL_USER}>`,
@@ -98,6 +116,8 @@ module.exports = async function handler(req, res) {
             <div class="content">
               <h2 style="text-align: center;">¡Hola ${customerName}!</h2>
               <p style="text-align: center; color: #666;">Tu solicitud de pago ha sido generada. Usa estas instrucciones para pagar en OXXO.</p>
+              
+              ${detallesReserva}
               
               <div class="oxxo-box">
                 <p style="margin: 0; font-weight: 600;">🏪 Número de referencia OXXO:</p>

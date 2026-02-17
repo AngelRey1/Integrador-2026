@@ -31,8 +31,9 @@ module.exports = async function handler(req, res) {
     }
 
     // Crear el PaymentIntent para OXXO
+    // NOTA: El frontend ya envía el monto en centavos
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(amount * 100), // Stripe usa centavos
+      amount: Math.round(amount), // Ya viene en centavos desde el frontend
       currency: 'mxn',
       payment_method_types: ['oxxo'],
       description: description || 'Reserva SportConnect',

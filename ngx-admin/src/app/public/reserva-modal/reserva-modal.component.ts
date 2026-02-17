@@ -688,6 +688,21 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
           };
           this.mostrarVoucherOxxo = true;
           console.log('Voucher OXXO generado:', this.voucherOxxo);
+
+          // Enviar email con instrucciones de OXXO
+          this.stripeService.sendOxxoEmail({
+            customerEmail: email,
+            customerName: nombre,
+            amount: Math.round(precioFinal * 100), // En centavos
+            oxxoNumber: this.voucherOxxo.referencia,
+            expiresAt: Math.floor(this.voucherOxxo.fechaExpiracion.getTime() / 1000),
+            entrenadorNombre: this.entrenador?.nombre || '',
+            fecha: this.paso1Form.get('fecha')?.value,
+            hora: `${this.paso1Form.get('horaInicio')?.value} - ${this.paso1Form.get('horaFin')?.value}`
+          }).subscribe({
+            next: () => console.log('✅ Email de OXXO enviado exitosamente'),
+            error: (err) => console.warn('⚠️ No se pudo enviar email de OXXO:', err)
+          });
         } else {
           // Error al confirmar
           this.stripeError = result.error || 'Error al generar el voucher OXXO';
@@ -873,6 +888,16 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
     const telefono = this.entrenador?.whatsapp || '529999999999';
     const mensaje = `Hola ${this.entrenador?.nombre}, me gustaría agendar una sesión.`;
     window.open(`https://wa.me/${telefono}?text=${encodeURIComponent(mensaje)}`, '_blank');
+  }
+
+  /**
+   * Formatear referencia OXXO con espacios cada 4 dígitos (estilo Mercado Libre)
+   */
+  formatearReferencia(referencia: string): string {
+    if (!referencia) return '';
+    // Eliminar espacios existentes y formatear cada 4 caracteres
+    const limpio = referencia.replace(/\s/g, '');
+    return limpio.match(/.{1,4}/g)?.join(' ') || limpio;
   }
 
   /**

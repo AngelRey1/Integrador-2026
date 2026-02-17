@@ -44,9 +44,9 @@ export class StripeService {
   private apiUrl: string;
 
   constructor(private http: HttpClient) {
-    // URL base para las Cloud Functions de Firebase o Vercel
+    // URL base para Vercel API
     this.apiUrl = environment.stripe?.functionsUrl || 
-                  'https://us-central1-sportconecta-6d1ce.cloudfunctions.net';
+                  'https://integrador-2026-rho.vercel.app';
     
     // Inicializar Stripe con la clave pública
     if (typeof Stripe !== 'undefined') {
@@ -59,7 +59,7 @@ export class StripeService {
    */
   createOxxoPaymentIntent(request: PaymentIntentRequest): Observable<PaymentIntentResponse> {
     return this.http.post<PaymentIntentResponse>(
-      `${this.apiUrl}/createOxxoPaymentIntent`,
+      `${this.apiUrl}/api/create-oxxo-payment`,
       request
     );
   }
@@ -69,7 +69,7 @@ export class StripeService {
    */
   createCardPaymentIntent(request: PaymentIntentRequest): Observable<PaymentIntentResponse> {
     return this.http.post<PaymentIntentResponse>(
-      `${this.apiUrl}/createCardPaymentIntent`,
+      `${this.apiUrl}/api/create-card-payment`,
       request
     );
   }
@@ -174,5 +174,21 @@ export class StripeService {
    */
   cancelPaymentIntent(paymentIntentId: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/cancelPaymentIntent`, { paymentIntentId });
+  }
+
+  /**
+   * Enviar email con instrucciones de pago OXXO
+   */
+  sendOxxoEmail(data: {
+    customerEmail: string;
+    customerName: string;
+    amount: number;
+    oxxoNumber: string;
+    expiresAt: number;
+    entrenadorNombre?: string;
+    fecha?: string;
+    hora?: string;
+  }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/api/send-oxxo-email`, data);
   }
 }

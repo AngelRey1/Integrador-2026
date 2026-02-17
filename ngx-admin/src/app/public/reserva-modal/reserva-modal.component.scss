@@ -1877,3 +1877,315 @@
     transform: translateY(0);
   }
 }
+
+// =====================================
+// VOUCHER OXXO - ESTILO MERCADO LIBRE
+// =====================================
+
+.voucher-oxxo-ml {
+  animation: fadeIn 0.4s ease-out;
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 0 !important;
+  background: #f5f5f5;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.voucher-ml-header {
+  background: #ffffff;
+  text-align: center;
+  padding: 2rem 1.5rem;
+  border-bottom: 1px solid #ededed;
+
+  .voucher-icon-circle {
+    width: 56px;
+    height: 56px;
+    background: #e8f5e9;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+
+    svg {
+      width: 32px;
+      height: 32px;
+    }
+  }
+
+  .voucher-subtitle {
+    font-size: 0.875rem;
+    color: #666;
+    margin: 0 0 0.5rem;
+  }
+
+  .voucher-title {
+    font-size: 1.375rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+    line-height: 1.4;
+  }
+}
+
+.voucher-ml-card {
+  background: #ffffff;
+  margin: 0;
+}
+
+.voucher-datos-header {
+  background: #f5f5f5;
+  padding: 1rem 1.5rem;
+  font-size: 0.9rem;
+  color: #333;
+  font-weight: 500;
+  border-bottom: 1px solid #ededed;
+}
+
+.voucher-barcode-container {
+  padding: 1.5rem;
+  text-align: center;
+  background: #fff;
+  border-bottom: 1px solid #ededed;
+
+  .barcode-visual {
+    margin-bottom: 0.75rem;
+  }
+
+  .barcode-svg {
+    width: 100%;
+    max-width: 280px;
+    height: 50px;
+  }
+
+  .barcode-number {
+    font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+    font-size: 0.9rem;
+    color: #333;
+    letter-spacing: 1px;
+  }
+}
+
+.voucher-datos-list {
+  padding: 0;
+}
+
+.voucher-dato-item {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #ededed;
+
+  .dato-label {
+    font-size: 0.8rem;
+    color: #999;
+    margin-bottom: 0.25rem;
+    font-weight: 500;
+  }
+
+  .dato-value {
+    font-size: 0.95rem;
+    color: #333;
+  }
+
+  .dato-referencia {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .referencia-number {
+    font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: 1px;
+  }
+
+  .btn-copiar-mini {
+    background: none;
+    border: none;
+    color: #3483fa;
+    cursor: pointer;
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s;
+
+    &:hover {
+      color: #2968c8;
+    }
+
+    nb-icon {
+      font-size: 1.1rem;
+    }
+  }
+
+  &.monto-item {
+    .dato-monto {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .monto-valor {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #333;
+    }
+
+    .monto-nota {
+      font-size: 0.75rem;
+      color: #999;
+      margin-top: 0.25rem;
+    }
+  }
+}
+
+.voucher-acreditacion {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
+  color: #666;
+  font-size: 0.875rem;
+  border-bottom: 1px solid #ededed;
+
+  nb-icon {
+    font-size: 1.1rem;
+    color: #999;
+  }
+}
+
+.voucher-alerta-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: #e8f4fd;
+  margin: 1rem;
+  border-radius: 6px;
+
+  nb-icon {
+    font-size: 1.25rem;
+    color: #3483fa;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+  }
+
+  span {
+    font-size: 0.875rem;
+    color: #333;
+    line-height: 1.4;
+  }
+}
+
+.voucher-ml-actions {
+  padding: 1rem 1.5rem;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  .btn-guardar-datos {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: #3483fa;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0.5rem;
+    text-decoration: none;
+    transition: color 0.2s;
+
+    &:hover {
+      color: #2968c8;
+    }
+
+    nb-icon {
+      font-size: 1.1rem;
+    }
+  }
+
+  .btn-ver-donde-pagar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ff7733;
+    color: #fff;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 0.875rem 1.5rem;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background 0.2s;
+
+    &:hover {
+      background: #e66a2d;
+    }
+  }
+
+  .btn-continuar-ml {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #00d09c 0%, #00b88a 100%);
+    color: #fff;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 0.875rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      background: linear-gradient(135deg, #00b88a 0%, #00a67c 100%);
+      transform: translateY(-1px);
+    }
+  }
+}
+
+.voucher-email-nota {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
+  font-size: 0.8rem;
+  color: #666;
+  background: #f5f5f5;
+  margin: 0;
+  text-align: center;
+
+  nb-icon {
+    font-size: 1rem;
+    color: #999;
+  }
+
+  strong {
+    color: #333;
+  }
+}
+
+.voucher-fecha-limite {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
+  background: #fff8e6;
+  font-size: 0.85rem;
+  color: #856404;
+  border-top: 1px solid #ffeeba;
+
+  nb-icon {
+    font-size: 1.1rem;
+    color: #e6a700;
+  }
+
+  strong {
+    color: #664d03;
+  }
+}
