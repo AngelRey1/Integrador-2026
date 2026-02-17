@@ -14,7 +14,7 @@ import { AngularFireAuth } from '@angular/fire/compat/auth';
 })
 export class AppComponent implements OnInit, OnDestroy {
   private destroy$: Subject<void> = new Subject<void>();
-  title = 'SportConnect Admin';
+  title = 'Sportconnecta Admin';
   userPictureOnly: boolean = false;
   
   // Admin user data
@@ -87,7 +87,7 @@ export class AppComponent implements OnInit, OnDestroy {
   // Menú de usuario (header)
   userMenu: NbMenuItem[] = [
     { title: 'Perfil', data: { action: 'profile' } },
-    { title: 'Ir a SportConnect', url: 'http://localhost:4200' },
+    { title: 'Ir a Sportconnecta', url: 'http://localhost:4200' },
     { title: 'Cerrar Sesión', data: { action: 'logout' } }
   ];
 

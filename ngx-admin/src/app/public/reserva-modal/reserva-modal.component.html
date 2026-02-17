@@ -369,152 +369,133 @@
         </button>
       </div>
 
-      <!-- VOUCHER OXXO - Estilo Mercado Libre -->
-      <div class="paso-container voucher-oxxo-ml" *ngIf="pasoActual === 4 && mostrarVoucherOxxo && voucherOxxo">
+      <!-- VOUCHER OXXO - Estilo Sportconnecta -->
+      <div class="paso-container voucher-sportconnect" *ngIf="pasoActual === 4 && mostrarVoucherOxxo && voucherOxxo">
         
-        <!-- Header con icono -->
-        <div class="voucher-ml-header">
-          <div class="voucher-icon-circle">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="12" cy="12" r="10" stroke="#00a650" stroke-width="2"/>
-              <text x="12" y="16" text-anchor="middle" font-size="12" fill="#00a650" font-weight="bold">$</text>
-            </svg>
+        <!-- Header degradado -->
+        <div class="voucher-sc-header">
+          <div class="sc-logo">
+            <span class="logo-sport">Sport</span><span class="logo-connect">Connect</span>
           </div>
-          <p class="voucher-subtitle">¡Estás a un paso!</p>
-          <h2 class="voucher-title">Paga ${{ voucherOxxo.monto | number:'1.0-0' }} en OXXO para<br>finalizar tu compra</h2>
+          <div class="sc-badge-oxxo">PAGO EN OXXO</div>
         </div>
 
-        <!-- Caja de datos de pago -->
-        <div class="voucher-ml-card">
-          <div class="voucher-datos-header">
-            <span>Realiza el pago con estos datos</span>
+        <!-- Monto destacado -->
+        <div class="voucher-sc-monto">
+          <span class="monto-label">Total a pagar</span>
+          <div class="monto-display">
+            <span class="monto-simbolo">$</span>
+            <span class="monto-cantidad">{{ voucherOxxo.monto | number:'1.0-0' }}</span>
+            <span class="monto-moneda">MXN</span>
+          </div>
+        </div>
+
+        <!-- Tarjeta de referencia -->
+        <div class="voucher-sc-card">
+          <div class="card-title">
+            <nb-icon icon="credit-card-outline"></nb-icon>
+            <span>Datos para tu pago</span>
           </div>
 
-          <!-- Código de barras -->
-          <div class="voucher-barcode-container">
-            <div class="barcode-visual">
-              <svg class="barcode-svg" viewBox="0 0 200 50">
-                <rect x="5" y="5" width="2" height="40" fill="#000"/>
-                <rect x="9" y="5" width="1" height="40" fill="#000"/>
-                <rect x="12" y="5" width="3" height="40" fill="#000"/>
-                <rect x="17" y="5" width="1" height="40" fill="#000"/>
-                <rect x="20" y="5" width="2" height="40" fill="#000"/>
-                <rect x="25" y="5" width="1" height="40" fill="#000"/>
-                <rect x="28" y="5" width="3" height="40" fill="#000"/>
-                <rect x="33" y="5" width="2" height="40" fill="#000"/>
-                <rect x="37" y="5" width="1" height="40" fill="#000"/>
-                <rect x="40" y="5" width="2" height="40" fill="#000"/>
-                <rect x="45" y="5" width="3" height="40" fill="#000"/>
-                <rect x="50" y="5" width="1" height="40" fill="#000"/>
-                <rect x="53" y="5" width="2" height="40" fill="#000"/>
-                <rect x="58" y="5" width="1" height="40" fill="#000"/>
-                <rect x="61" y="5" width="3" height="40" fill="#000"/>
-                <rect x="66" y="5" width="2" height="40" fill="#000"/>
-                <rect x="70" y="5" width="1" height="40" fill="#000"/>
-                <rect x="73" y="5" width="2" height="40" fill="#000"/>
-                <rect x="78" y="5" width="3" height="40" fill="#000"/>
-                <rect x="83" y="5" width="1" height="40" fill="#000"/>
-                <rect x="86" y="5" width="2" height="40" fill="#000"/>
-                <rect x="91" y="5" width="1" height="40" fill="#000"/>
-                <rect x="94" y="5" width="3" height="40" fill="#000"/>
-                <rect x="99" y="5" width="2" height="40" fill="#000"/>
-                <rect x="103" y="5" width="1" height="40" fill="#000"/>
-                <rect x="106" y="5" width="2" height="40" fill="#000"/>
-                <rect x="111" y="5" width="3" height="40" fill="#000"/>
-                <rect x="116" y="5" width="1" height="40" fill="#000"/>
-                <rect x="119" y="5" width="2" height="40" fill="#000"/>
-                <rect x="124" y="5" width="1" height="40" fill="#000"/>
-                <rect x="127" y="5" width="3" height="40" fill="#000"/>
-                <rect x="132" y="5" width="2" height="40" fill="#000"/>
-                <rect x="136" y="5" width="1" height="40" fill="#000"/>
-                <rect x="139" y="5" width="2" height="40" fill="#000"/>
-                <rect x="144" y="5" width="3" height="40" fill="#000"/>
-                <rect x="149" y="5" width="1" height="40" fill="#000"/>
-                <rect x="152" y="5" width="2" height="40" fill="#000"/>
-                <rect x="157" y="5" width="1" height="40" fill="#000"/>
-                <rect x="160" y="5" width="3" height="40" fill="#000"/>
-                <rect x="165" y="5" width="2" height="40" fill="#000"/>
-                <rect x="169" y="5" width="1" height="40" fill="#000"/>
-                <rect x="172" y="5" width="2" height="40" fill="#000"/>
-                <rect x="177" y="5" width="3" height="40" fill="#000"/>
-                <rect x="182" y="5" width="1" height="40" fill="#000"/>
-                <rect x="185" y="5" width="2" height="40" fill="#000"/>
-                <rect x="190" y="5" width="1" height="40" fill="#000"/>
-                <rect x="193" y="5" width="2" height="40" fill="#000"/>
-              </svg>
-            </div>
-            <span class="barcode-number">{{ voucherOxxo.referencia }}</span>
+          <!-- Código de barras minimalista -->
+          <div class="sc-barcode">
+            <div class="barcode-lines"></div>
+            <span class="barcode-ref">{{ voucherOxxo.referencia }}</span>
           </div>
 
-          <!-- Datos del pago -->
-          <div class="voucher-datos-list">
-            <div class="voucher-dato-item">
-              <span class="dato-label">Tipo de pago</span>
-              <span class="dato-value">Servicios de SportConnect</span>
+          <!-- Referencia grande -->
+          <div class="sc-referencia-box">
+            <span class="ref-label">REFERENCIA DE PAGO</span>
+            <div class="ref-numero-container">
+              <span class="ref-numero">{{ formatearReferencia(voucherOxxo.referencia) }}</span>
+              <button class="btn-copy" (click)="copiarReferencia()" title="Copiar">
+                <nb-icon icon="copy-outline"></nb-icon>
+              </button>
             </div>
-            
-            <div class="voucher-dato-item">
-              <span class="dato-label">Referencia</span>
-              <div class="dato-referencia">
-                <span class="dato-value referencia-number">{{ formatearReferencia(voucherOxxo.referencia) }}</span>
-                <button class="btn-copiar-mini" (click)="copiarReferencia()" title="Copiar referencia">
-                  <nb-icon icon="copy-outline"></nb-icon>
-                </button>
+          </div>
+
+          <!-- Info de la reserva -->
+          <div class="sc-info-grid">
+            <div class="info-item">
+              <nb-icon icon="person-outline"></nb-icon>
+              <div class="info-text">
+                <span class="info-label">Entrenador</span>
+                <span class="info-value">{{ entrenador?.nombre }}</span>
               </div>
             </div>
-            
-            <div class="voucher-dato-item monto-item">
-              <span class="dato-label">Monto a pagar</span>
-              <div class="dato-monto">
-                <span class="monto-valor">${{ voucherOxxo.monto | number:'1.0-0' }}</span>
-                <span class="monto-nota">No incluye comisión por operación de OXXO.</span>
+            <div class="info-item">
+              <nb-icon icon="pricetag-outline"></nb-icon>
+              <div class="info-text">
+                <span class="info-label">Servicio</span>
+                <span class="info-value">Reserva deportiva</span>
               </div>
             </div>
           </div>
+        </div>
 
-          <!-- Nota de acreditación -->
-          <div class="voucher-acreditacion">
-            <nb-icon icon="clock-outline"></nb-icon>
-            <span>Pagas y se acredita al instante.</span>
+        <!-- Pasos de instrucciones -->
+        <div class="voucher-sc-steps">
+          <h4>¿Cómo pagar?</h4>
+          <div class="steps-list">
+            <div class="step-item">
+              <div class="step-number">1</div>
+              <span>Ve a cualquier <strong>tienda OXXO</strong></span>
+            </div>
+            <div class="step-item">
+              <div class="step-number">2</div>
+              <span>Solicita un <strong>pago de servicio</strong></span>
+            </div>
+            <div class="step-item">
+              <div class="step-number">3</div>
+              <span>Proporciona la <strong>referencia</strong></span>
+            </div>
+            <div class="step-item">
+              <div class="step-number">4</div>
+              <span>Paga <strong>${{ voucherOxxo.monto | number:'1.0-0' }} MXN</strong> en efectivo</span>
+            </div>
           </div>
+        </div>
 
-          <!-- Alerta informativa -->
-          <div class="voucher-alerta-info">
-            <nb-icon icon="info-outline"></nb-icon>
-            <span>Te confirmaremos tu reserva cuando se acredite el pago.</span>
+        <!-- Alerta de tiempo -->
+        <div class="voucher-sc-alerta">
+          <nb-icon icon="clock-outline"></nb-icon>
+          <div class="alerta-content">
+            <span class="alerta-titulo">Fecha límite de pago</span>
+            <span class="alerta-fecha">{{ formatearFechaExpiracionVoucher(voucherOxxo.fechaExpiracion) }}</span>
           </div>
+        </div>
+
+        <!-- Nota de confirmación -->
+        <div class="voucher-sc-nota">
+          <nb-icon icon="checkmark-circle-outline"></nb-icon>
+          <span>Tu reserva se confirmará <strong>al instante</strong> cuando acredites el pago</span>
         </div>
 
         <!-- Acciones -->
-        <div class="voucher-ml-actions">
-          <a class="btn-guardar-datos" (click)="descargarVoucher()">
+        <div class="voucher-sc-actions">
+          <button class="btn-sc-primary" (click)="confirmarPagoOxxo()">
+            <nb-icon icon="arrow-forward-outline"></nb-icon>
+            Continuar con mi reserva
+          </button>
+          
+          <button class="btn-sc-secondary" (click)="descargarVoucher()">
             <nb-icon icon="download-outline"></nb-icon>
-            Guardar estos datos
-          </a>
+            Descargar voucher
+          </button>
           
           <a *ngIf="voucherOxxo?.hostedVoucherUrl" 
              [href]="voucherOxxo.hostedVoucherUrl" 
              target="_blank" 
-             class="btn-ver-donde-pagar">
-            Ver dónde pagar
+             class="btn-sc-link">
+            <nb-icon icon="pin-outline"></nb-icon>
+            Ver tiendas cercanas
           </a>
-          
-          <button class="btn-continuar-ml" (click)="confirmarPagoOxxo()">
-            Continuar con mi reserva
-          </button>
         </div>
 
-        <!-- Nota de email -->
-        <p class="voucher-email-nota">
-          <nb-icon icon="email-outline"></nb-icon>
-          También enviamos estas instrucciones a: <strong>{{ paso4Form.get('emailOxxo')?.value || paso3Form.get('email')?.value }}</strong>
+        <!-- Email nota -->
+        <p class="voucher-sc-email">
+          También enviamos estos datos a: <strong>{{ paso4Form.get('emailOxxo')?.value || paso3Form.get('email')?.value }}</strong>
         </p>
-
-        <!-- Fecha límite -->
-        <div class="voucher-fecha-limite">
-          <nb-icon icon="alert-triangle-outline"></nb-icon>
-          <span>Tienes hasta el <strong>{{ voucherOxxo.fechaExpiracion | date:'EEEE d \'de\' MMMM \'a las\' HH:mm' }}</strong> para realizar el pago</span>
-        </div>
       </div>
 
       <!-- PASO 5: Confirmación / Resumen -->

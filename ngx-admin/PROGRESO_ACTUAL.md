@@ -1,4 +1,4 @@
-# 🎉 SportConnect - Resumen del Progreso
+# 🎉 Sportconnecta - Resumen del Progreso
 
 ## ✅ Completado Hasta Ahora
 

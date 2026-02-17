@@ -62,6 +62,6 @@ export class SolicitudRechazadaComponent {
 
   contactarSoporte() {
     // Abrir email o chat de soporte
-    window.location.href = 'mailto:soporte@sportconnect.com?subject=Consulta sobre solicitud rechazada';
+    window.location.href = 'mailto:sportconnecta@gmail.com?subject=Consulta sobre solicitud rechazada';
   }
 }

@@ -1,7 +1,7 @@
-# 🏋️ SportConnect - Plataforma de Fitness
+# 🏋️ Sportconnecta - Plataforma de Fitness
 
 ## 📋 Descripción
-SportConnect es una plataforma integral que conecta entrenadores personales con clientes, facilitando la reserva de sesiones de entrenamiento, gestión de pagos y seguimiento del progreso.
+Sportconnecta es una plataforma integral que conecta entrenadores personales con clientes, facilitando la reserva de sesiones de entrenamiento, gestión de pagos y seguimiento del progreso.
 
 ---
 
@@ -58,7 +58,7 @@ npm start
 ### Administrador
 | Campo | Valor |
 |-------|-------|
-| Email | admin@sportconnect.com |
+| Email | admin@sportconnecta.com |
 | Contraseña | admin123 |
 
 ---

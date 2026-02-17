@@ -1,5 +1,5 @@
 // ============================================
-// GLOBAL SPORTCONNECT CONFIGURATION
+// GLOBAL SPORTCONNECTA CONFIGURATION
 // Variables globales para toda la aplicación
 // ============================================
 
@@ -14,7 +14,7 @@ export const CURRENCY_CONFIG = {
   }).format(amount)
 };
 
-// Colores SportConnect (Matching Landing Page)
+// Colores Sportconnecta (Matching Landing Page)
 export const SPORTCONNECT_COLORS = {
   primary: '#00D09C',
   primaryDark: '#00B386',

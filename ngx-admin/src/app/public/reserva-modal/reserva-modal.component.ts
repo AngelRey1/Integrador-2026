@@ -891,13 +891,29 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Formatear referencia OXXO con espacios cada 4 dígitos (estilo Mercado Libre)
+   * Formatear referencia OXXO con espacios cada 4 dígitos
    */
   formatearReferencia(referencia: string): string {
     if (!referencia) return '';
-    // Eliminar espacios existentes y formatear cada 4 caracteres
     const limpio = referencia.replace(/\s/g, '');
     return limpio.match(/.{1,4}/g)?.join(' ') || limpio;
+  }
+
+  /**
+   * Formatear fecha de expiración en español
+   */
+  formatearFechaExpiracionVoucher(fecha: Date): string {
+    if (!fecha) return '';
+    const dias = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+    const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+    
+    const dia = dias[fecha.getDay()];
+    const numeroDia = fecha.getDate();
+    const mes = meses[fecha.getMonth()];
+    const hora = fecha.getHours().toString().padStart(2, '0');
+    const minutos = fecha.getMinutes().toString().padStart(2, '0');
+    
+    return `${dia} ${numeroDia} de ${mes} a las ${hora}:${minutos}`;
   }
 
   /**
@@ -922,80 +938,226 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Descargar voucher OXXO como imagen/PDF
+   * Descargar voucher OXXO como HTML con diseño Sportconnecta
    */
   descargarVoucher() {
     if (!this.voucherOxxo) return;
 
-    // Crear contenido HTML del voucher
-    const contenidoVoucher = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>Voucher OXXO - ${this.voucherOxxo.referencia}</title>
-        <style>
-          body { font-family: Arial, sans-serif; padding: 20px; max-width: 400px; margin: 0 auto; }
-          .voucher { border: 2px solid #d4292c; border-radius: 10px; padding: 20px; }
-          .header { text-align: center; border-bottom: 1px dashed #ccc; padding-bottom: 15px; margin-bottom: 15px; }
-          .oxxo-logo { background: #d4292c; color: white; font-weight: bold; font-size: 24px; padding: 10px 20px; display: inline-block; border-radius: 5px; }
-          .monto { text-align: center; font-size: 32px; font-weight: bold; color: #d4292c; margin: 20px 0; }
-          .referencia { text-align: center; background: #f5f5f5; padding: 15px; border-radius: 5px; margin: 15px 0; }
-          .referencia-numero { font-size: 24px; font-weight: bold; letter-spacing: 2px; }
-          .expiracion { color: #ff6b6b; text-align: center; margin: 15px 0; }
-          .instrucciones { background: #f9f9f9; padding: 15px; border-radius: 5px; }
-          .instrucciones ol { margin: 10px 0; padding-left: 20px; }
-          .instrucciones li { margin: 8px 0; }
-        </style>
-      </head>
-      <body>
-        <div class="voucher">
-          <div class="header">
-            <div class="oxxo-logo">OXXO</div>
-            <p>Ficha de pago</p>
-          </div>
-          <div class="monto">$${this.voucherOxxo.monto} MXN</div>
-          <div class="referencia">
-            <p>Referencia de pago:</p>
-            <div class="referencia-numero">${this.voucherOxxo.referencia}</div>
-          </div>
-          <div class="expiracion">
-            ⚠️ Paga antes del ${this.voucherOxxo.fechaExpiracion.toLocaleDateString('es-MX')}
-          </div>
-          <div class="instrucciones">
-            <strong>Instrucciones:</strong>
-            <ol>
-              <li>Acude a cualquier tienda OXXO</li>
-              <li>Indica que deseas realizar un pago de servicio</li>
-              <li>Proporciona la referencia: ${this.voucherOxxo.referencia}</li>
-              <li>Paga $${this.voucherOxxo.monto} MXN en efectivo</li>
-              <li>Conserva tu ticket como comprobante</li>
-            </ol>
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
+    const fechaFormateada = this.formatearFechaExpiracionVoucher(this.voucherOxxo.fechaExpiracion);
+    const referenciaFormateada = this.formatearReferencia(this.voucherOxxo.referencia);
 
-    // Crear blob y descargar
+    const contenidoVoucher = `
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Voucher OXXO - Sportconnecta</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+    .voucher-container {
+      max-width: 420px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+    }
+    .voucher-header {
+      background: linear-gradient(135deg, #3366ff 0%, #00d68f 100%);
+      padding: 30px;
+      text-align: center;
+      color: white;
+    }
+    .logo-text {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -1px;
+    }
+    .logo-text span { color: #00d68f; }
+    .header-subtitle {
+      margin-top: 10px;
+      opacity: 0.9;
+      font-size: 14px;
+    }
+    .monto-section {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      padding: 25px;
+      text-align: center;
+      border-bottom: 2px dashed #dee2e6;
+    }
+    .monto-label { color: #666; font-size: 14px; margin-bottom: 5px; }
+    .monto-valor {
+      font-size: 48px;
+      font-weight: 800;
+      color: #1a1a2e;
+      line-height: 1;
+    }
+    .monto-currency { font-size: 20px; color: #666; }
+    .oxxo-badge {
+      display: inline-block;
+      background: #d4292c;
+      color: white;
+      font-weight: bold;
+      font-size: 18px;
+      padding: 8px 20px;
+      border-radius: 8px;
+      margin-top: 15px;
+    }
+    .datos-pago {
+      padding: 25px;
+    }
+    .dato-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .dato-row:last-child { border-bottom: none; }
+    .dato-label { color: #666; font-size: 14px; }
+    .dato-value { font-weight: 600; color: #1a1a2e; font-size: 16px; }
+    .referencia-box {
+      background: #f8f9fa;
+      border: 2px solid #3366ff;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      margin: 20px 0;
+    }
+    .referencia-label { color: #3366ff; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+    .referencia-numero {
+      font-size: 26px;
+      font-weight: 800;
+      color: #1a1a2e;
+      letter-spacing: 3px;
+      margin-top: 10px;
+      font-family: 'Courier New', monospace;
+    }
+    .barcode {
+      height: 60px;
+      background: repeating-linear-gradient(
+        90deg,
+        #000 0px, #000 2px,
+        #fff 2px, #fff 4px,
+        #000 4px, #000 5px,
+        #fff 5px, #fff 8px,
+        #000 8px, #000 11px,
+        #fff 11px, #fff 13px
+      );
+      margin: 15px auto 0;
+      max-width: 200px;
+      border-radius: 4px;
+    }
+    .instrucciones {
+      background: #f0f7ff;
+      margin: 0 25px 25px;
+      padding: 20px;
+      border-radius: 12px;
+      border-left: 4px solid #3366ff;
+    }
+    .instrucciones h4 {
+      color: #3366ff;
+      margin-bottom: 15px;
+      font-size: 14px;
+    }
+    .instrucciones ol {
+      padding-left: 20px;
+      color: #444;
+      font-size: 14px;
+      line-height: 1.8;
+    }
+    .fecha-limite {
+      background: linear-gradient(135deg, #fff5f5 0%, #ffe0e0 100%);
+      padding: 15px 25px;
+      text-align: center;
+      color: #c0392b;
+      font-size: 13px;
+    }
+    .fecha-limite strong { display: block; margin-top: 5px; }
+    .footer {
+      background: #1a1a2e;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      font-size: 12px;
+    }
+    .footer a { color: #00d68f; text-decoration: none; }
+    @media print {
+      body { background: white; padding: 0; }
+      .voucher-container { box-shadow: none; border: 1px solid #ddd; }
+    }
+  </style>
+</head>
+<body>
+  <div class="voucher-container">
+    <div class="voucher-header">
+      <div class="logo-text">Sportconnecta</div>
+      <p class="header-subtitle">Ficha de pago para tu reserva</p>
+    </div>
+    
+    <div class="monto-section">
+      <div class="monto-label">Monto a pagar</div>
+      <div class="monto-valor">$${this.voucherOxxo.monto.toLocaleString('es-MX')}</div>
+      <div class="monto-currency">MXN</div>
+      <div class="oxxo-badge">Paga en OXXO</div>
+    </div>
+    
+    <div class="datos-pago">
+      <div class="referencia-box">
+        <div class="referencia-label">Referencia de pago</div>
+        <div class="referencia-numero">${referenciaFormateada}</div>
+        <div class="barcode"></div>
+      </div>
+      
+      <div class="dato-row">
+        <span class="dato-label">Servicio</span>
+        <span class="dato-value">Reserva Sportconnecta</span>
+      </div>
+      <div class="dato-row">
+        <span class="dato-label">Entrenador</span>
+        <span class="dato-value">${this.entrenador?.nombre || 'N/A'}</span>
+      </div>
+    </div>
+    
+    <div class="instrucciones">
+      <h4>📋 Instrucciones de pago</h4>
+      <ol>
+        <li>Acude a cualquier <strong>tienda OXXO</strong></li>
+        <li>Indica que harás un <strong>pago de servicio</strong></li>
+        <li>Dicta la referencia: <strong>${referenciaFormateada}</strong></li>
+        <li>Paga <strong>$${this.voucherOxxo.monto.toLocaleString('es-MX')} MXN</strong> en efectivo</li>
+        <li><strong>Conserva tu ticket</strong> como comprobante</li>
+      </ol>
+    </div>
+    
+    <div class="fecha-limite">
+      ⚠️ Fecha límite de pago
+      <strong>${fechaFormateada}</strong>
+    </div>
+    
+    <div class="footer">
+      <p>¿Dudas? Contáctanos en <a href="mailto:sportconnecta@gmail.com">sportconnecta@gmail.com</a></p>
+      <p style="margin-top: 5px; opacity: 0.7;">© ${new Date().getFullYear()} Sportconnecta</p>
+    </div>
+  </div>
+</body>
+</html>`;
+
     const blob = new Blob([contenidoVoucher], { type: 'text/html' });
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `voucher-oxxo-${this.voucherOxxo.referencia}.html`;
+    link.download = `voucher-sportconnecta-${this.voucherOxxo.referencia}.html`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     window.URL.revokeObjectURL(url);
-  }
-
-  /**
-   * Formatear referencia OXXO con espacios para mejor legibilidad
-   * Ej: 38982927518118 -> 3898 2927 5181 18
-   */
-  formatearReferencia(referencia: string): string {
-    if (!referencia) return '0000 0000 0000 00';
-    // Agrupar en bloques de 4 dígitos
-    return referencia.replace(/(.{4})/g, '$1 ').trim();
   }
 
   /**

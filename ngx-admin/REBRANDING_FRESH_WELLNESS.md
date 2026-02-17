@@ -1,8 +1,8 @@
-# 🎨 SportConnect - REBRANDING: FRESH WELLNESS
+# 🎨 Sportconnecta - REBRANDING: FRESH WELLNESS
 
 ## Identidad Visual Actualizada
 
-SportConnect ha sido completamente rediseñado con una paleta de colores **Fresh Wellness** que transmite confianza, modernidad, salud y energía.
+Sportconnecta ha sido completamente rediseñado con una paleta de colores **Fresh Wellness** que transmite confianza, modernidad, salud y energía.
 
 ---
 
@@ -167,4 +167,4 @@ Todos los cambios están en:
 
 ---
 
-**SportConnect es ahora una plataforma moderna, profesional y energética. 🎯**
+**Sportconnecta es ahora una plataforma moderna, profesional y energética. 🎯**

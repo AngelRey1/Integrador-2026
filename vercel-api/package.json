@@ -1,7 +1,7 @@
 {
-  "name": "sportconnect-stripe-api",
+  "name": "sportconnecta-stripe-api",
   "version": "1.0.0",
-  "description": "API de Stripe para SportConnect - Vercel Serverless Functions",
+  "description": "API de Stripe para Sportconnecta - Vercel Serverless Functions",
   "scripts": {
     "dev": "vercel dev",
     "deploy": "vercel --prod"

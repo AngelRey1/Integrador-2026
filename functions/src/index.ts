@@ -113,9 +113,9 @@ async function sendPaymentConfirmationEmail(
     : `${APP_BASE_URL}/auth/login`;
 
   const mailOptions = {
-    from: `"SportConnect" <${functions.config().email?.user}>`,
+    from: `"Sportconnecta" <${functions.config().email?.user}>`,
     to: customerEmail,
-    subject: '✅ Pago Confirmado - SportConnect',
+    subject: '✅ Pago Confirmado - Sportconnecta',
     html: `
       <!DOCTYPE html>
       <html>
@@ -140,7 +140,7 @@ async function sendPaymentConfirmationEmail(
       <body>
         <div class="container">
           <div class="header">
-            <h1>⚽ SportConnect</h1>
+            <h1>⚽ Sportconnecta</h1>
           </div>
           <div class="content">
             <div class="success-icon">✅</div>
@@ -195,8 +195,8 @@ async function sendPaymentConfirmationEmail(
             </p>
           </div>
           <div class="footer">
-            <p>© ${new Date().getFullYear()} SportConnect. Todos los derechos reservados.</p>
-            <p>Si tienes alguna pregunta, contáctanos en soporte@sportconnect.com</p>
+            <p>© ${new Date().getFullYear()} Sportconnecta. Todos los derechos reservados.</p>
+            <p>Si tienes alguna pregunta, contáctanos en sportconnecta@gmail.com</p>
           </div>
         </div>
       </body>
@@ -254,9 +254,9 @@ async function sendOxxoVoucherEmail(
     : `${APP_BASE_URL}/auth/login`;
 
   const mailOptions = {
-    from: '"SportConnect" <noreply@sportconnect.com>',
+    from: '"Sportconnecta" <sportconnecta@gmail.com>',
     to: customerEmail,
-    subject: '🏪 Instrucciones para pagar en OXXO - SportConnect',
+    subject: '🏪 Instrucciones para pagar en OXXO - Sportconnecta',
     html: `
       <!DOCTYPE html>
       <html>
@@ -287,7 +287,7 @@ async function sendOxxoVoucherEmail(
       <body>
         <div class="container">
           <div class="header">
-            <h1>🏋️ SportConnect</h1>
+            <h1>🏋️ Sportconnecta</h1>
           </div>
           <div class="content">
             <h2 style="text-align: center; color: #222;">¡Hola ${customerName}!</h2>
@@ -360,8 +360,8 @@ async function sendOxxoVoucherEmail(
             
           </div>
           <div class="footer">
-            <p>© ${new Date().getFullYear()} SportConnect. Todos los derechos reservados.</p>
-            <p>Si tienes alguna pregunta, contáctanos en soporte@sportconnect.com</p>
+            <p>© ${new Date().getFullYear()} Sportconnecta. Todos los derechos reservados.</p>
+            <p>Si tienes alguna pregunta, contáctanos en sportconnecta@gmail.com</p>
           </div>
         </div>
       </body>
@@ -421,7 +421,7 @@ export const createOxxoPaymentIntent = functions.https.onRequest((req, res) => {
           customerName,
           createdAt: new Date().toISOString(),
         },
-        description: description || `Reserva SportConnect - ${customerName}`,
+        description: description || `Reserva Sportconnecta - ${customerName}`,
       });
 
       // Guardar en Firestore para tracking
@@ -480,7 +480,7 @@ export const createCardPaymentIntent = functions.https.onRequest((req, res) => {
           customerName,
           createdAt: new Date().toISOString(),
         },
-        description: description || `Reserva SportConnect - ${customerName}`,
+        description: description || `Reserva Sportconnecta - ${customerName}`,
       });
 
       // Guardar en Firestore

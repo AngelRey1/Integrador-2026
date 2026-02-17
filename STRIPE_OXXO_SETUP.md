@@ -1,4 +1,4 @@
-# 💳 Integración de Stripe con OXXO - SportConnect
+# 💳 Integración de Stripe con OXXO - Sportconnecta
 
 Esta guía explica cómo configurar y desplegar la integración de pagos con Stripe y OXXO.
 

@@ -36,7 +36,7 @@ module.exports = async function handler(req, res) {
       amount: Math.round(amount), // Ya viene en centavos desde el frontend
       currency: 'mxn',
       payment_method_types: ['oxxo'],
-      description: description || 'Reserva SportConnect',
+      description: description || 'Reserva Sportconnecta',
       metadata: {
         customerName,
         customerEmail,

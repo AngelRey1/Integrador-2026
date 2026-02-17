@@ -83,9 +83,9 @@ module.exports = async function handler(req, res) {
     ` : '';
 
     const mailOptions = {
-      from: `"SportConnect" <${process.env.EMAIL_USER}>`,
+      from: `"Sportconnecta" <${process.env.EMAIL_USER}>`,
       to: customerEmail,
-      subject: '🏪 Instrucciones para pagar en OXXO - SportConnect',
+      subject: '🏪 Instrucciones para pagar en OXXO - Sportconnecta',
       html: `
         <!DOCTYPE html>
         <html>
@@ -111,7 +111,7 @@ module.exports = async function handler(req, res) {
         <body>
           <div class="container">
             <div class="header">
-              <h1>🏋️ SportConnect</h1>
+              <h1>🏋️ Sportconnecta</h1>
             </div>
             <div class="content">
               <h2 style="text-align: center;">¡Hola ${customerName}!</h2>
@@ -143,7 +143,7 @@ module.exports = async function handler(req, res) {
               </p>
             </div>
             <div class="footer">
-              <p>© ${new Date().getFullYear()} SportConnect. Todos los derechos reservados.</p>
+              <p>© ${new Date().getFullYear()} Sportconnecta. Todos los derechos reservados.</p>
             </div>
           </div>
         </body>

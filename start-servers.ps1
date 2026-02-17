@@ -1,6 +1,6 @@
 # Iniciar ambos servidores en paralelo
 Write-Host "=========================================" -ForegroundColor Cyan
-Write-Host "  SportConnect - Iniciando Servidores   " -ForegroundColor Cyan
+Write-Host "  Sportconnecta - Iniciando Servidores   " -ForegroundColor Cyan
 Write-Host "=========================================" -ForegroundColor Cyan
 Write-Host ""
 
@@ -26,5 +26,5 @@ Write-Host "  - Panel Admin:     http://localhost:4300" -ForegroundColor Magenta
 Write-Host ""
 Write-Host "Credenciales de Demo:" -ForegroundColor White
 Write-Host "  Cliente/Entrenador: cualquier email + password 123456" -ForegroundColor Gray
-Write-Host "  Admin:              admin@sportconnect.com / admin123" -ForegroundColor Gray
+Write-Host "  Admin:              admin@sportconnecta.com / admin123" -ForegroundColor Gray
 Write-Host ""

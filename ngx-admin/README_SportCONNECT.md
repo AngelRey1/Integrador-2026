@@ -1,4 +1,4 @@
-# 🏋️ SportConnect - Plataforma de Agendamiento de Entrenamientos
+# 🏋️ Sportconnecta - Plataforma de Agendamiento de Entrenamientos
 
 Aplicación web basada en **ngx-admin** para conectar clientes con entrenadores personales, inspirada en el modelo de Uber para servicios de entrenamiento.
 

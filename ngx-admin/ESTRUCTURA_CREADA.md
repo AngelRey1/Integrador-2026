@@ -1,4 +1,4 @@
-# ✅ Estructura de Módulos SportConnect Creada
+# ✅ Estructura de Módulos Sportconnecta Creada
 
 ## 🎉 Componentes Generados Exitosamente
 

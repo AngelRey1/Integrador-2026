@@ -4,7 +4,7 @@ export const SPORTCONNECT_THEME = {
   name: 'sportconnect',
   base: 'default',
   variables: {
-    // Colores SportConnect
+    // Colores Sportconnecta
     primary: '#00D09C',
     success: '#00D09C',
     info: '#0A7B8A',

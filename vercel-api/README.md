@@ -1,4 +1,4 @@
-# SportConnect Stripe API (Vercel)
+# Sportconnecta Stripe API (Vercel)
 
 API serverless para procesar pagos con Stripe (OXXO y tarjetas).
 
@@ -74,7 +74,7 @@ Endpoint para webhooks de Stripe.
 
 Después del despliegue, tu URL será algo como:
 ```
-https://sportconnect-stripe-api.vercel.app
+https://sportconnecta-stripe-api.vercel.app
 ```
 
 Actualiza `environment.ts` en tu app Angular con esta URL.

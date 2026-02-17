@@ -13,7 +13,7 @@ const routes: Routes = [{
   path: '',
   component: PagesComponent,
   children: [
-    // SportConnect - Módulos personalizados
+    // Sportconnecta - Módulos personalizados
     {
       path: 'cliente',
       canActivate: [AuthGuard, ClienteGuard],

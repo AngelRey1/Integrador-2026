@@ -1,4 +1,4 @@
-# 🚀 Guía Rápida de Uso - SportConnect Frontend
+# 🚀 Guía Rápida de Uso - Sportconnecta Frontend
 
 ## 📋 Índice Rápido
 1. [Iniciar Proyecto](#iniciar-proyecto)

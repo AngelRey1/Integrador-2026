@@ -13,8 +13,8 @@ export interface CloudinaryUploadResult {
 @Injectable({ providedIn: 'root' })
 export class CloudinaryService {
   // Configuración de Cloudinary (usar variables de entorno en producción)
-  private cloudName = 'sportconnect'; // Cambiar por tu cloud name
-  private uploadPreset = 'sportconnect_upload'; // Crear un upload preset sin firma
+  private cloudName = 'sportconnecta'; // Cambiar por tu cloud name
+  private uploadPreset = 'sportconnecta_upload'; // Crear un upload preset sin firma
 
   constructor(private http: HttpClient) {}
 

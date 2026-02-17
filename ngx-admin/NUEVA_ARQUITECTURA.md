@@ -1,4 +1,4 @@
-# 🔄 NUEVA ARQUITECTURA SportConnect - Feedback Profesor
+# 🔄 NUEVA ARQUITECTURA Sportconnecta - Feedback Profesor
 
 ## ❌ Flujo Anterior (INCORRECTO)
 ```
@@ -62,7 +62,7 @@ Opción C: Integrar en ngx-admin como página pública
 6. Bot: "Total: 25€. Link de pago: [Stripe/PayPal]"
 7. Usuario: → Paga
 8. Bot: "✅ Reserva confirmada. Tu código de acceso: ABC123XYZ"
-9. Bot: "Accede a tu panel: https://sportconnect.com/app?code=ABC123XYZ"
+9. Bot: "Accede a tu panel: https://sportconnecta.com/app?code=ABC123XYZ"
 ```
 
 #### N8N Workflow:
@@ -183,7 +183,7 @@ ORDER BY distancia ASC;
 ## 🏗️ Nueva Estructura del Proyecto
 
 ```
-SportConnect/
+Sportconnecta/
 ├── landing/                    # Landing page pública
 │   ├── index.html
 │   ├── deportes.html
@@ -229,7 +229,7 @@ SportConnect/
 
 ### **FASE 1: Rebranding y Landing** (2-3 horas)
 - [ ] Eliminar referencias a "ngx-admin"
-- [ ] Cambiar logo, colores, nombre a "SportConnect"
+- [ ] Cambiar logo, colores, nombre a "Sportconnecta"
 - [ ] Crear landing page:
   - Hero section
   - Galería de deportes
@@ -289,7 +289,7 @@ Diseñar esquema PostgreSQL con:
 
 ## ❓ ¿Qué Hacemos AHORA?
 
-**Opción A**: Empezar con Rebranding (cambiar ngx-admin a SportConnect)
+**Opción A**: Empezar con Rebranding (cambiar ngx-admin a Sportconnecta)
 **Opción B**: Diseñar Landing Page primero
 **Opción C**: Implementar sistema de códigos de acceso
 **Opción D**: Todo el plan completo paso a paso

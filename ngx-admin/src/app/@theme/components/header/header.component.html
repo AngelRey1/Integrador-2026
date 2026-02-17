@@ -3,18 +3,18 @@
     <a (click)="toggleSidebar()" href="#" class="sidebar-toggle">
       <nb-icon icon="menu-2-outline"></nb-icon>
     </a>
-    <a class="logo" href="#" (click)="navigateHome()">Sport<span>Connect</span></a>
-    <!-- Botón para volver a SportConnect (solo clientes) -->
+    <a class="logo" href="#" (click)="navigateHome()">Sportconnecta</a>
+    <!-- Botón para volver a Sportconnecta (solo clientes) -->
     <button 
       *ngIf="userRole && userRole.toLowerCase() === 'cliente'" 
       class="btn-volver-home"
-      (click)="volverASportConnect()"
+      (click)="volverASportconnecta()"
       nbButton
       status="primary"
       size="small"
       outline>
       <nb-icon icon="home-outline"></nb-icon>
-      <span class="btn-text">Volver a SportConnect</span>
+      <span class="btn-text">Volver a Sportconnecta</span>
     </button>
   </div>
 </div>

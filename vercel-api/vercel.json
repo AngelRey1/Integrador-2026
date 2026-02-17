@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "name": "sportconnect-stripe-api",
+  "name": "sportconnecta-stripe-api",
   "headers": [
     {
       "source": "/api/(.*)",

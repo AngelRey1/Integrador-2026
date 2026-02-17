@@ -1,8 +1,8 @@
-# 🏋️ SportConnect - Frontend Completo
+# 🏋️ Sportconnecta - Frontend Completo
 
 ## 📋 Resumen Ejecutivo
 
-**Frontend Angular 15 completo** para la plataforma SportConnect, implementado con **Nebular UI 11** y diseño responsive. 
+**Frontend Angular 15 completo** para la plataforma Sportconnecta, implementado con **Nebular UI 11** y diseño responsive. 
 
 ### ✅ Estado del Proyecto: **COMPLETADO 100%**
 

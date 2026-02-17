@@ -248,7 +248,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
   }
 
-  volverASportConnect() {
+  volverASportconnecta() {
     // Navega a la landing page principal
     this.router.navigate(['/']);
   }

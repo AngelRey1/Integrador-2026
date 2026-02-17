@@ -108,7 +108,7 @@
               Horarios
             </button>
             <button class="tab-btn" [class.active]="tabActiva === 'resenas'" (click)="cambiarTab('resenas')">
-              Reseñas ({{ entrenador.totalResenas }})
+              Reseñas ({{ entrenador?.totalResenas || resenas?.length || 0 }})
             </button>
           </div>
 
@@ -117,18 +117,18 @@
             <div class="sobre-mi-grid">
               <div class="columna-izquierda">
                 <h2>Sobre mí</h2>
-                <p class="bio-text">{{ entrenador.bio }}</p>
+                <p class="bio-text">{{ entrenador?.bio }}</p>
 
                 <h3>🎓 Certificaciones</h3>
                 <ul class="certificaciones-list">
-                  <li *ngFor="let cert of entrenador.certificaciones">
+                  <li *ngFor="let cert of entrenador?.certificaciones">
                     <span class="check-icon">✓</span> {{ cert }}
                   </li>
                 </ul>
 
                 <h3>🏆 Logros</h3>
                 <ul class="logros-list">
-                  <li *ngFor="let logro of entrenador.logros">
+                  <li *ngFor="let logro of entrenador?.logros">
                     <span class="trophy-icon">🏆</span> {{ logro }}
                   </li>
                 </ul>
@@ -149,7 +149,7 @@
                 <div class="contacto-box">
                   <h3>📞 Contacto</h3>
                   <p class="contacto-item">
-                    <span class="icon">📧</span> {{ entrenador.email }}
+                    <span class="icon">📧</span> {{ entrenador?.email }}
                   </p>
                 </div>
               </div>

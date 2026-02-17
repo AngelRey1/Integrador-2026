@@ -440,7 +440,7 @@ export class EntrenadorPerfilComponent implements OnInit, OnDestroy {
       bio: e.bio || e.descripcion || 'Entrenador profesional dedicado a ayudarte a alcanzar tus metas.',
       logros: e.especialidades?.map(esp => `Especialista en ${esp}`) || ['Entrenador certificado'],
       whatsapp: '',
-      email: e.email || `${prefijo}@sportconnect.com`,
+      email: e.email || `${prefijo}@sportconnecta.com`,
       idiomas: ['Español'],
       fotos: fotosFinales
     };
@@ -516,7 +516,7 @@ export class EntrenadorPerfilComponent implements OnInit, OnDestroy {
         'Mentor de atletas y entusiastas de alto rendimiento'
       ],
       whatsapp: `+521999${(parseInt(encontrado.id, 10) * 7311).toString().padStart(7, '0')}`,
-      email: `${prefijo}@sportconnect.com`,
+      email: `${prefijo}@sportconnecta.com`,
       idiomas: ['Español', 'Inglés'],
       fotos: [
         encontrado.foto.replace('w=400&h=400', 'w=800'),
@@ -599,7 +599,7 @@ export class EntrenadorPerfilComponent implements OnInit, OnDestroy {
     if (navigator.share) {
       navigator.share({
         title: `${this.entrenador.nombre} - ${this.entrenador.especialidad}`,
-        text: `Mira el perfil de este entrenador en SportConnect`,
+        text: `Mira el perfil de este entrenador en Sportconnecta`,
         url: url
       });
     } else {

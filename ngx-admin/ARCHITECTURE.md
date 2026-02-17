@@ -1,4 +1,4 @@
-# SportConnect - Arquitectura Modular
+# Sportconnecta - Arquitectura Modular
 
 ## 📁 Estructura del Proyecto
 

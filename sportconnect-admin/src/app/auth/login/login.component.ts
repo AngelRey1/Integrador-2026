@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
         <div class="login-header">
           <div class="logo">
             <span class="logo-icon">🏋️</span>
-            <span class="logo-text">SportConnect</span>
+            <span class="logo-text">Sportconnecta</span>
             <span class="logo-badge">Admin</span>
           </div>
           <h1>Panel de Administración</h1>
@@ -23,7 +23,7 @@ import { Router } from '@angular/router';
             <input 
               type="email" 
               formControlName="email" 
-              placeholder="admin@sportconnect.com"
+              placeholder="admin@sportconnecta.com"
               class="form-input"
             />
             <small class="error" *ngIf="form.get('email')?.invalid && form.get('email')?.touched">
@@ -60,11 +60,11 @@ import { Router } from '@angular/router';
 
         <div class="demo-credentials">
           <p><strong>Credenciales de Demo:</strong></p>
-          <code>admin@sportconnect.com / admin123</code>
+          <code>admin@sportconnecta.com / admin123</code>
         </div>
 
         <div class="back-link">
-          <a href="http://localhost:4200">← Volver a SportConnect</a>
+          <a href="http://localhost:4200">← Volver a Sportconnecta</a>
         </div>
       </div>
     </div>
@@ -249,7 +249,7 @@ export class LoginComponent {
 
   // Credenciales de demo para admin
   private demoCredentials = {
-    email: 'admin@sportconnect.com',
+    email: 'admin@sportconnecta.com',
     password: 'admin123'
   };
 

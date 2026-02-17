@@ -1,6 +1,6 @@
 rules_version = '2';
 
-// Reglas de seguridad para SportConnect
+// Reglas de seguridad para Sportconnecta
 // Estas reglas protegen las colecciones de Firestore
 
 service cloud.firestore {

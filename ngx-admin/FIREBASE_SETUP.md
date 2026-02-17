@@ -6,7 +6,7 @@
 
 1. Ve a [Firebase Console](https://console.firebase.google.com/)
 2. Haz clic en "Agregar proyecto" o "Add project"
-3. Ingresa el nombre del proyecto (ej: "sportconnect")
+3. Ingresa el nombre del proyecto (ej: "sportconnecta")
 4. Sigue los pasos del asistente
 5. **NO** habilites Google Analytics por ahora (opcional)
 
@@ -15,7 +15,7 @@
 1. En la consola de Firebase, ve a **Configuración del proyecto** (ícono de engranaje)
 2. Desplázate hacia abajo hasta "Tus aplicaciones"
 3. Haz clic en el ícono de **Web** (`</>`)
-4. Registra tu app con un nombre (ej: "SportConnect Web")
+4. Registra tu app con un nombre (ej: "Sportconnecta Web")
 5. **Copia las credenciales** que aparecen
 
 ### 3. Configurar las Credenciales en el Proyecto
