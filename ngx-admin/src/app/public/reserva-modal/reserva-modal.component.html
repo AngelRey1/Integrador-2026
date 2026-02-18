@@ -333,14 +333,9 @@
               </div>
             </div>
 
-            <div class="form-group">
-              <label>Email para recibir el voucher *</label>
-              <input type="email" formControlName="emailOxxo" placeholder="tu@email.com" class="form-input" />
-              <small class="hint-text">Te enviaremos el voucher a este correo</small>
-              <small class="error-text"
-                *ngIf="paso4Form.get('emailOxxo')?.invalid && paso4Form.get('emailOxxo')?.touched">
-                Ingresa un email válido
-              </small>
+            <div class="oxxo-email-info">
+              <nb-icon icon="email-outline"></nb-icon>
+              <span>El voucher se enviará a: <strong>{{ paso3Form.get('email')?.value }}</strong></span>
             </div>
 
             <div class="oxxo-nota">
@@ -369,135 +364,6 @@
           <span *ngIf="!procesandoPago && paso4Form.get('metodoPago')?.value === 'oxxo'" class="oxxo-btn-text">OXXO</span>
           {{ procesandoPago ? 'Procesando...' : (paso4Form.get('metodoPago')?.value === 'oxxo' ? 'Generar voucher OXXO' : 'Pagar $' + calcularPrecioTotal() + ' MXN') }}
         </button>
-      </div>
-
-      <!-- VOUCHER OXXO - Estilo Sportconnecta -->
-      <div class="paso-container voucher-sportconnect" *ngIf="pasoActual === 4 && mostrarVoucherOxxo && voucherOxxo">
-        
-        <!-- Header degradado -->
-        <div class="voucher-sc-header">
-          <div class="sc-logo">
-            <span class="logo-sport">Sport</span><span class="logo-connect">Connect</span>
-          </div>
-          <div class="sc-badge-oxxo">PAGO EN OXXO</div>
-        </div>
-
-        <!-- Monto destacado -->
-        <div class="voucher-sc-monto">
-          <span class="monto-label">Total a pagar</span>
-          <div class="monto-display">
-            <span class="monto-simbolo">$</span>
-            <span class="monto-cantidad">{{ voucherOxxo.monto | number:'1.0-0' }}</span>
-            <span class="monto-moneda">MXN</span>
-          </div>
-        </div>
-
-        <!-- Tarjeta de referencia -->
-        <div class="voucher-sc-card">
-          <div class="card-title">
-            <nb-icon icon="credit-card-outline"></nb-icon>
-            <span>Datos para tu pago</span>
-          </div>
-
-          <!-- Código de barras minimalista -->
-          <div class="sc-barcode">
-            <div class="barcode-lines"></div>
-            <span class="barcode-ref">{{ voucherOxxo.referencia }}</span>
-          </div>
-
-          <!-- Referencia grande -->
-          <div class="sc-referencia-box">
-            <span class="ref-label">REFERENCIA DE PAGO</span>
-            <div class="ref-numero-container">
-              <span class="ref-numero">{{ formatearReferencia(voucherOxxo.referencia) }}</span>
-              <button class="btn-copy" (click)="copiarReferencia()" title="Copiar">
-                <nb-icon icon="copy-outline"></nb-icon>
-              </button>
-            </div>
-          </div>
-
-          <!-- Info de la reserva -->
-          <div class="sc-info-grid">
-            <div class="info-item">
-              <nb-icon icon="person-outline"></nb-icon>
-              <div class="info-text">
-                <span class="info-label">Entrenador</span>
-                <span class="info-value">{{ entrenador?.nombre }}</span>
-              </div>
-            </div>
-            <div class="info-item">
-              <nb-icon icon="pricetag-outline"></nb-icon>
-              <div class="info-text">
-                <span class="info-label">Servicio</span>
-                <span class="info-value">Reserva deportiva</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Pasos de instrucciones -->
-        <div class="voucher-sc-steps">
-          <h4>¿Cómo pagar?</h4>
-          <div class="steps-list">
-            <div class="step-item">
-              <div class="step-number">1</div>
-              <span>Ve a cualquier <strong>tienda OXXO</strong></span>
-            </div>
-            <div class="step-item">
-              <div class="step-number">2</div>
-              <span>Solicita un <strong>pago de servicio</strong></span>
-            </div>
-            <div class="step-item">
-              <div class="step-number">3</div>
-              <span>Proporciona la <strong>referencia</strong></span>
-            </div>
-            <div class="step-item">
-              <div class="step-number">4</div>
-              <span>Paga <strong>${{ voucherOxxo.monto | number:'1.0-0' }} MXN</strong> en efectivo</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Alerta de tiempo -->
-        <div class="voucher-sc-alerta">
-          <nb-icon icon="clock-outline"></nb-icon>
-          <div class="alerta-content">
-            <span class="alerta-titulo">Fecha límite de pago</span>
-            <span class="alerta-fecha">{{ formatearFechaExpiracionVoucher(voucherOxxo.fechaExpiracion) }}</span>
-          </div>
-        </div>
-
-        <!-- Nota de confirmación -->
-        <div class="voucher-sc-nota">
-          <nb-icon icon="checkmark-circle-outline"></nb-icon>
-          <span>Tu reserva se confirmará <strong>al instante</strong> cuando acredites el pago</span>
-        </div>
-
-        <!-- Acciones -->
-        <div class="voucher-sc-actions">
-          <button class="btn-sc-primary" (click)="confirmarPagoOxxo()">
-            <nb-icon icon="arrow-forward-outline"></nb-icon>
-            Continuar con mi reserva
-          </button>
-          
-          <button class="btn-sc-secondary" (click)="descargarVoucher()">
-            <nb-icon icon="download-outline"></nb-icon>
-            Descargar voucher
-          </button>
-          
-          <a *ngIf="voucherOxxo?.hostedVoucherUrl" 
-             [href]="voucherOxxo.hostedVoucherUrl" 
-             target="_blank" 
-             class="btn-sc-link">
-            <nb-icon icon="pin-outline"></nb-icon>
-            Ver tiendas cercanas
-          </a>
-        </div>
-
-        <!-- Email nota -->
-        <p class="voucher-sc-email">
-          También enviamos estos datos a: <strong>{{ paso4Form.get('emailOxxo')?.value || paso3Form.get('email')?.value }}</strong>
-        </p>
       </div>
 
       <!-- PASO 5: Confirmación / Resumen -->

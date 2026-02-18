@@ -188,6 +188,7 @@ export class StripeService {
     entrenadorNombre?: string;
     fecha?: string;
     hora?: string;
+    hostedVoucherUrl?: string;
   }): Observable<any> {
     return this.http.post(`${this.apiUrl}/api/send-oxxo-email`, data);
   }

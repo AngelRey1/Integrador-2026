@@ -141,8 +141,7 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
       nombreTitular: [''],
       fechaExpiracion: [''],
       cvv: [''],
-      // Campos para OXXO
-      emailOxxo: [''],
+      // OXXO usa el email del paso 3
       aceptaPoliticas: [false, Validators.requiredTrue]
     });
 
@@ -557,7 +556,6 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
    */
   actualizarValidacionesPago(metodo: string) {
     const tarjetaControls = ['numeroTarjeta', 'nombreTitular', 'fechaExpiracion', 'cvv'];
-    const oxxoControls = ['emailOxxo'];
 
     if (metodo === 'tarjeta') {
       // Activar validaciones de tarjeta
@@ -565,20 +563,16 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
       this.paso4Form.get('nombreTitular')?.setValidators([Validators.required]);
       this.paso4Form.get('fechaExpiracion')?.setValidators([Validators.required, Validators.pattern(/^(0[1-9]|1[0-2])\/\d{2}$/)]);
       this.paso4Form.get('cvv')?.setValidators([Validators.required, Validators.pattern(/^\d{3,4}$/)]);
-      // Desactivar validaciones de OXXO
-      this.paso4Form.get('emailOxxo')?.clearValidators();
     } else if (metodo === 'oxxo') {
-      // Desactivar validaciones de tarjeta
+      // Desactivar validaciones de tarjeta (OXXO usa email del paso 3)
       tarjetaControls.forEach(control => {
         this.paso4Form.get(control)?.clearValidators();
         this.paso4Form.get(control)?.setValue('');
       });
-      // Activar validaciones de OXXO
-      this.paso4Form.get('emailOxxo')?.setValidators([Validators.required, Validators.email]);
     }
 
     // Actualizar validez de todos los controles
-    [...tarjetaControls, ...oxxoControls].forEach(control => {
+    tarjetaControls.forEach(control => {
       this.paso4Form.get(control)?.updateValueAndValidity();
     });
   }
@@ -615,7 +609,7 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
    */
   procesarPagoOxxo() {
     const precioFinal = this.calcularPrecioTotal() || this.entrenador?.precio || 350;
-    const email = this.paso4Form.get('emailOxxo')?.value || this.paso3Form.get('email')?.value;
+    const email = this.paso3Form.get('email')?.value; // Usar email del paso 3
     const nombre = this.paso3Form.get('nombre')?.value;
 
     // Validar límite de OXXO ($10,000 MXN máximo)
@@ -648,7 +642,8 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
         };
         
         this.paymentIntentId = 'pi_simulated_' + Date.now();
-        this.mostrarVoucherOxxo = true;
+        // Ir directo a confirmación (el popup de Stripe ya se mostró)
+        this.confirmarPagoOxxo();
         console.log('Voucher OXXO simulado generado:', this.voucherOxxo);
       }, 1500);
       
@@ -701,7 +696,8 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
             codigoBarras: result.oxxoVoucher.number || this.generarReferenciaSimulada(),
             hostedVoucherUrl: result.oxxoVoucher.hostedVoucherUrl
           };
-          this.mostrarVoucherOxxo = true;
+          // Ir directo a confirmación (el popup de Stripe ya se mostró)
+          this.confirmarPagoOxxo();
           console.log('Voucher OXXO generado:', this.voucherOxxo);
 
           // Enviar email con instrucciones de OXXO
@@ -713,7 +709,8 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
             expiresAt: Math.floor(this.voucherOxxo.fechaExpiracion.getTime() / 1000),
             entrenadorNombre: this.entrenador?.nombre || '',
             fecha: this.paso1Form.get('fecha')?.value,
-            hora: `${this.paso1Form.get('horaInicio')?.value} - ${this.paso1Form.get('horaFin')?.value}`
+            hora: `${this.paso1Form.get('horaInicio')?.value} - ${this.paso1Form.get('horaFin')?.value}`,
+            hostedVoucherUrl: result.oxxoVoucher.hostedVoucherUrl || ''
           }).subscribe({
             next: () => console.log('✅ Email de OXXO enviado exitosamente'),
             error: (err) => console.warn('⚠️ No se pudo enviar email de OXXO:', err)
