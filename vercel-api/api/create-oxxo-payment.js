@@ -23,6 +23,13 @@ module.exports = async function handler(req, res) {
   try {
     const { amount, customerEmail, customerName, description, metadata } = req.body;
 
+    // DEBUG: Log del monto recibido
+    console.log('=== DEBUG CREATE OXXO ===');
+    console.log('Monto recibido (amount):', amount);
+    console.log('Tipo de amount:', typeof amount);
+    console.log('customerEmail:', customerEmail);
+    console.log('customerName:', customerName);
+
     // Validar datos requeridos
     if (!amount || !customerEmail || !customerName) {
       return res.status(400).json({
@@ -30,10 +37,15 @@ module.exports = async function handler(req, res) {
       });
     }
 
+    // Asegurar que el monto sea un número entero en centavos
+    // El frontend envía centavos (ej: 35000 para $350 MXN)
+    const amountInCents = Math.round(Number(amount));
+    
+    console.log('amountInCents final:', amountInCents);
+
     // Crear el PaymentIntent para OXXO
-    // NOTA: El frontend ya envía el monto en centavos
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(amount), // Ya viene en centavos desde el frontend
+      amount: amountInCents,
       currency: 'mxn',
       payment_method_types: ['oxxo'],
       description: description || 'Reserva Sportconnecta',

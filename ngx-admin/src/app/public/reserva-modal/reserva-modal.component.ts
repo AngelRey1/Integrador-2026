@@ -618,6 +618,14 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
     const email = this.paso4Form.get('emailOxxo')?.value || this.paso3Form.get('email')?.value;
     const nombre = this.paso3Form.get('nombre')?.value;
 
+    // Validar límite de OXXO ($10,000 MXN máximo)
+    if (precioFinal > 10000) {
+      this.procesandoPago = false;
+      this.stripeError = `El monto de $${precioFinal.toLocaleString('es-MX')} MXN excede el límite de OXXO ($10,000 MXN). Por favor usa tarjeta o reduce la duración/personas.`;
+      alert(this.stripeError);
+      return;
+    }
+
     // Modo simulado: genera voucher fake sin llamar a Stripe
     if (environment.stripe?.simulatedMode) {
       console.log('Modo simulado: generando voucher OXXO fake');
@@ -649,6 +657,13 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
 
     // Modo real: usar Stripe
     const montoEnCentavos = Math.round(precioFinal * 100);
+    
+    console.log('=== DEBUG PAGO OXXO ===');
+    console.log('precioFinal (pesos):', precioFinal);
+    console.log('montoEnCentavos:', montoEnCentavos);
+    console.log('Entrenador precio:', this.entrenador?.precio);
+    console.log('Duración minutos:', this.getDuracionSesion());
+    console.log('Personas:', this.paso1Form.get('cantidadPersonas')?.value);
 
     // 1. Crear PaymentIntent en el backend
     this.stripeService.createOxxoPaymentIntent({

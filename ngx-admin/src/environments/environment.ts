@@ -27,11 +27,11 @@ export const environment = {
   // Obtén tus claves en: https://dashboard.stripe.com/apikeys
   stripe: {
     // Clave pública (publishable key) - segura para el frontend
-    publishableKey: 'pk_test_51SxfDODedWVOZwp7giJrXakkl5NUMPjOP9uZ6dFJxgm0CJevBt8vgQYLWNsaflSn3VOCj6PBhT0RLyjJYnFQqZuP00HRvBn0Yx',
+    publishableKey: 'pk_test_51SxfDODedWVOZwp7FU6XIDKSjPGjljLbTEaQ5boco047STVlMpFabHAd8F3XB9EBiOiJL6i0xq8qQshZKu9Hyak400DyIM9ufC',
     // URL del backend para Stripe (Vercel)
     functionsUrl: 'https://integrador-2026-rho.vercel.app',
     // Modo simulado: true = genera vouchers fake sin llamar a Stripe, false = usa Stripe real
     // Cambiar a false cuando Vercel esté configurado con STRIPE_SECRET_KEY
-    simulatedMode: true
+    simulatedMode: false
   }
 };

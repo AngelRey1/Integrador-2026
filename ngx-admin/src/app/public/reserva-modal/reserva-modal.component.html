@@ -1,11 +1,13 @@
-<div class="reserva-page-container">
-  <!-- Estado de carga -->
-  <div class="reserva-card" *ngIf="cargandoEntrenador">
-    <div class="loading-state">
-      <nb-spinner status="primary" size="large"></nb-spinner>
-      <p>Cargando información del entrenador...</p>
-    </div>
-  </div>
+<nb-layout>
+  <nb-layout-column class="no-layout-padding">
+    <div class="reserva-page-container">
+      <!-- Estado de carga -->
+      <div class="reserva-card" *ngIf="cargandoEntrenador">
+        <div class="loading-state">
+          <nb-spinner status="primary" size="large"></nb-spinner>
+          <p>Cargando información del entrenador...</p>
+        </div>
+      </div>
 
   <!-- Entrenador no encontrado -->
   <div class="reserva-card" *ngIf="!cargandoEntrenador && !entrenador">
@@ -597,17 +599,19 @@
 
     </div>
 
-    <!-- Botones de navegación -->
-    <div class="navigation-buttons" *ngIf="pasoActual < 5 && !reservaConfirmada && pasoActual !== 4">
-      <button class="btn-anterior" (click)="anterior()" [disabled]="pasoActual === 1">
-        <nb-icon icon="arrow-back-outline"></nb-icon>
-        Anterior
-      </button>
+      <!-- Botones de navegación -->
+      <div class="navigation-buttons" *ngIf="pasoActual < 5 && !reservaConfirmada && pasoActual !== 4">
+        <button class="btn-anterior" (click)="anterior()" [disabled]="pasoActual === 1">
+          <nb-icon icon="arrow-back-outline"></nb-icon>
+          Anterior
+        </button>
 
-      <button class="btn-siguiente" (click)="siguiente()" [disabled]="!validarPasoActual()">
-        Siguiente
-        <nb-icon icon="arrow-forward-outline"></nb-icon>
-      </button>
+        <button class="btn-siguiente" (click)="siguiente()" [disabled]="!validarPasoActual()">
+          Siguiente
+          <nb-icon icon="arrow-forward-outline"></nb-icon>
+        </button>
+      </div>
     </div>
   </div>
-</div>
+  </nb-layout-column>
+</nb-layout>

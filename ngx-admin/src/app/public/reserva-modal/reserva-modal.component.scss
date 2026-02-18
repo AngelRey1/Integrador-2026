@@ -1,4 +1,11 @@
 // ============================================
+// Layout sin padding
+// ============================================
+::ng-deep .no-layout-padding {
+  padding: 0 !important;
+}
+
+// ============================================
 // ESTILOS CRÍTICOS - Cargar primero para evitar flash de iconos
 // ============================================
 :host {
