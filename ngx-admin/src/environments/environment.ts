@@ -29,7 +29,7 @@ export const environment = {
     // Clave pública (publishable key) - segura para el frontend
     publishableKey: 'pk_test_51SxfDODedWVOZwp7FU6XIDKSjPGjljLbTEaQ5boco047STVlMpFabHAd8F3XB9EBiOiJL6i0xq8qQshZKu9Hyak400DyIM9ufC',
     // URL del backend para Stripe (Vercel)
-    functionsUrl: 'https://integrador-2026-rho.vercel.app',
+    functionsUrl: 'https://sportconnecta-stripe-api.vercel.app',
     // Modo simulado: true = genera vouchers fake sin llamar a Stripe, false = usa Stripe real
     // Cambiar a false cuando Vercel esté configurado con STRIPE_SECRET_KEY
     simulatedMode: false
