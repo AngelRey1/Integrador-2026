@@ -40,8 +40,12 @@ export class SharedHeaderComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    console.log('=== SharedHeader ngOnInit ===');
+    console.log('isLoggedIn inicial:', this.isLoggedIn);
+    
     // Detectar estado de autenticación
     this.authSubscription = this.afAuth.authState.subscribe(async (user) => {
+      console.log('=== authState cambió ===', user ? 'Usuario logueado' : 'Sin usuario');
       if (user) {
         this.isLoggedIn = true;
         const userData = this.authFirebase.getCurrentUserValue();
@@ -54,6 +58,7 @@ export class SharedHeaderComponent implements OnInit, OnDestroy {
         this.userName = '';
         this.userRole = '';
       }
+      console.log('isLoggedIn después:', this.isLoggedIn);
     });
   }
 
@@ -101,6 +106,7 @@ export class SharedHeaderComponent implements OnInit, OnDestroy {
   }
 
   irALogin(rol: 'CLIENTE' | 'ENTRENADOR') {
+    console.log('=== irALogin llamado ===', rol);
     this.router.navigate(['/auth/login'], {
       queryParams: { rol }
     });
