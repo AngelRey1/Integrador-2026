@@ -55,8 +55,10 @@ export class BuscarEntrenadoresComponent implements OnInit, OnDestroy {
 
   // Opciones para selects
   deportesDisponibles = [
-    'Yoga', 'CrossFit', 'Running', 'Pilates', 'Natación',
-    'Ciclismo', 'Boxeo', 'Funcional', 'Spinning', 'Zumba'
+    'Fútbol', 'Básquetbol', 'Basketball', 'Tenis', 'Natación', 'Running', 
+    'Ciclismo', 'Yoga', 'Pilates', 'CrossFit', 'Boxeo', 'Béisbol', 'Softball',
+    'Artes Marciales', 'Volleyball', 'Golf', 'Gimnasia',
+    'Entrenamiento Funcional', 'Pesas', 'Cardio', 'Fitness General'
   ];
 
   modalidadesDisponibles = [

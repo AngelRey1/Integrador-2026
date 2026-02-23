@@ -43,8 +43,8 @@ export class PerfilEntrenadorComponent implements OnInit, OnDestroy {
 
   // Opciones disponibles
   deportesDisponibles = [
-    'Fútbol', 'Básquetbol', 'Tenis', 'Natación', 'Running', 
-    'Ciclismo', 'Yoga', 'Pilates', 'CrossFit', 'Boxeo',
+    'Fútbol', 'Básquetbol', 'Basketball', 'Tenis', 'Natación', 'Running', 
+    'Ciclismo', 'Yoga', 'Pilates', 'CrossFit', 'Boxeo', 'Béisbol', 'Softball',
     'Artes Marciales', 'Volleyball', 'Golf', 'Gimnasia',
     'Entrenamiento Funcional', 'Pesas', 'Cardio', 'Fitness General'
   ];

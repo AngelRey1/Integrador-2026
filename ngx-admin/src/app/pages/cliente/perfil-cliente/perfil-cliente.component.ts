@@ -79,14 +79,27 @@ export class PerfilClienteComponent implements OnInit, OnDestroy {
   ];
 
   deportesDisponibles = [
-    { value: 'yoga', label: 'Yoga', icon: '🧘' },
-    { value: 'crossfit', label: 'CrossFit', icon: '🏋️' },
-    { value: 'running', label: 'Running', icon: '🏃' },
+    { value: 'futbol', label: 'Fútbol', icon: '⚽' },
+    { value: 'basquetbol', label: 'Básquetbol', icon: '🏀' },
+    { value: 'basketball', label: 'Basketball', icon: '🏀' },
+    { value: 'tenis', label: 'Tenis', icon: '🎾' },
     { value: 'natacion', label: 'Natación', icon: '🏊' },
+    { value: 'running', label: 'Running', icon: '🏃' },
     { value: 'ciclismo', label: 'Ciclismo', icon: '🚴' },
-    { value: 'boxeo', label: 'Boxeo', icon: '🥊' },
+    { value: 'yoga', label: 'Yoga', icon: '🧘' },
     { value: 'pilates', label: 'Pilates', icon: '🤸' },
-    { value: 'tenis', label: 'Tenis', icon: '🎾' }
+    { value: 'crossfit', label: 'CrossFit', icon: '🏋️' },
+    { value: 'boxeo', label: 'Boxeo', icon: '🥊' },
+    { value: 'beisbol', label: 'Béisbol', icon: '⚾' },
+    { value: 'softball', label: 'Softball', icon: '🥎' },
+    { value: 'artes-marciales', label: 'Artes Marciales', icon: '🥋' },
+    { value: 'volleyball', label: 'Volleyball', icon: '🏐' },
+    { value: 'golf', label: 'Golf', icon: '⛳' },
+    { value: 'gimnasia', label: 'Gimnasia', icon: '🤸‍♀️' },
+    { value: 'funcional', label: 'Entrenamiento Funcional', icon: '💪' },
+    { value: 'pesas', label: 'Pesas', icon: '🏋️‍♂️' },
+    { value: 'cardio', label: 'Cardio', icon: '❤️' },
+    { value: 'fitness', label: 'Fitness General', icon: '🏃‍♂️' }
   ];
 
   nivelesExperiencia = [

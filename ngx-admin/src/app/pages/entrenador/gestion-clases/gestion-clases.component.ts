@@ -31,7 +31,12 @@ export class GestionClasesComponent implements OnInit, OnDestroy {
   loading = true;
   guardando = false;
 
-  deportesDisponibles = ['Yoga', 'Pilates', 'CrossFit', 'Running', 'Natación', 'Boxeo', 'Ciclismo'];
+  deportesDisponibles = [
+    'Fútbol', 'Básquetbol', 'Basketball', 'Tenis', 'Natación', 'Running', 
+    'Ciclismo', 'Yoga', 'Pilates', 'CrossFit', 'Boxeo', 'Béisbol', 'Softball',
+    'Artes Marciales', 'Volleyball', 'Golf', 'Gimnasia',
+    'Entrenamiento Funcional', 'Pesas', 'Cardio', 'Fitness General'
+  ];
   nivelesDisponibles = ['Principiante', 'Intermedio', 'Avanzado', 'Todos los niveles'];
 
   private subscription: Subscription | null = null;
