@@ -2,27 +2,227 @@
 .text-hint { color: #8f9bb3; font-size: 0.875rem; }
 .mt-3 { margin-top: 1rem; }
 .mb-0 { margin-bottom: 0; }
+.mb-3 { margin-bottom: 1rem; }
 .mb-4 { margin-bottom: 1.5rem; }
+.py-5 { padding: 3rem 0; }
+
+// Tarjetas de estadísticas
+.stat-card {
+  nb-card-body {
+    padding: 1rem;
+  }
+  
+  .stat-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .stat-icon {
+    font-size: 2rem;
+    color: #3366ff;
+  }
+  
+  .stat-info {
+    display: flex;
+    flex-direction: column;
+    
+    .stat-number {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #222b45;
+      line-height: 1.2;
+    }
+    
+    .stat-label {
+      font-size: 0.75rem;
+      color: #8f9bb3;
+    }
+  }
+}
+
+// Tarjeta de cliente
+.cliente-card {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  &.frecuente {
+    border-left: 4px solid #00d68f;
+  }
+  
+  &.selected {
+    box-shadow: 0 0 0 2px #3366ff;
+  }
+}
 
 .cliente-header {
   display: flex;
   gap: 1rem;
   align-items: center;
   margin-bottom: 1rem;
-  .avatar { width: 60px; height: 60px; border-radius: 50%; }
-  h6 { margin: 0; color: #222b45; }
+  position: relative;
 }
 
-.cliente-stats {
+.cliente-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: linear-gradient(135deg, #3366ff, #00d68f);
   display: flex;
-  gap: 2rem;
-  margin-bottom: 1rem;
-  .stat {
-    display: flex;
-    flex-direction: column;
-    .value { font-size: 1.5rem; font-weight: 600; color: #3366ff; }
-    .label { font-size: 0.75rem; color: #8f9bb3; }
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .avatar-iniciales {
+    color: white;
+    font-size: 1.25rem;
+    font-weight: 600;
   }
 }
 
-.notas { color: #8f9bb3; font-size: 0.875rem; font-style: italic; }
+.cliente-info {
+  flex: 1;
+  min-width: 0;
+  
+  .cliente-nombre {
+    margin: 0 0 0.25rem 0;
+    color: #222b45;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    
+    .star-icon {
+      color: #ffaa00;
+      font-size: 1rem;
+    }
+  }
+  
+  .cliente-tiempo {
+    font-size: 0.8125rem;
+    color: #8f9bb3;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    
+    nb-icon {
+      font-size: 14px;
+    }
+  }
+}
+
+.badge-frecuente {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+}
+
+// Estadísticas del cliente
+.cliente-stats {
+  display: flex;
+  justify-content: space-around;
+  padding: 0.75rem 0;
+  background: #f7f9fc;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+    .stat-value {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #222b45;
+    }
+    
+    .stat-label {
+      font-size: 0.6875rem;
+      color: #8f9bb3;
+      text-transform: uppercase;
+    }
+  }
+}
+
+// Detalles expandidos
+.cliente-detalles {
+  padding-top: 0.5rem;
+  
+  hr {
+    border: none;
+    border-top: 1px solid #edf1f7;
+    margin: 0.75rem 0;
+  }
+  
+  .detalle-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    
+    &:not(:last-child) {
+      border-bottom: 1px dashed #edf1f7;
+    }
+    
+    .detalle-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #8f9bb3;
+      font-size: 0.875rem;
+      
+      nb-icon {
+        font-size: 16px;
+      }
+    }
+    
+    .detalle-value {
+      font-weight: 600;
+      color: #222b45;
+      font-size: 0.875rem;
+    }
+  }
+}
+
+// Footer del cliente
+.cliente-footer {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+// Colores de texto
+.text-success { color: #00d68f !important; }
+.text-warning { color: #ffaa00 !important; }
+.text-danger { color: #ff3d71 !important; }
+.text-info { color: #0095ff !important; }
+
+// Empty state
+.empty-icon {
+  font-size: 4rem;
+  color: #c5cee0;
+}
+
+// Responsive
+@media (max-width: 576px) {
+  .stat-card .stat-info .stat-number {
+    font-size: 1.25rem;
+  }
+  
+  .cliente-stats .stat-item .stat-value {
+    font-size: 1rem;
+  }
+}

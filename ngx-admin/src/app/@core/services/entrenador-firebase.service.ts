@@ -24,7 +24,10 @@ export interface ClienteResumen {
     nombre: string;
     foto?: string;
     sesiones: number;
+    sesionesCompletadas?: number;
     ultimaSesion?: Date;
+    primeraSesion?: Date;
+    gastoTotal?: number;
 }
 
 export interface EstadisticasMensuales {
@@ -325,40 +328,74 @@ export class EntrenadorFirebaseService {
     // ==================== CLIENTES ====================
 
     /**
-     * Obtener mis clientes (usuarios que han tomado sesiones conmigo)
+     * Obtener mis clientes con información detallada (usuarios que han reservado conmigo)
      */
     getMisClientes(): Observable<ClienteResumen[]> {
         return this.afAuth.authState.pipe(
             switchMap(user => {
                 if (!user) return of([]);
+                // Obtener TODAS las reservas (no solo completadas) para tener el historial completo
                 return this.firestore.collection<Reserva>('reservas', ref =>
                     ref.where('entrenadorId', '==', user.uid)
-                        .where('estado', '==', 'COMPLETADA')
-                ).valueChanges().pipe(
+                ).valueChanges({ idField: 'id' }).pipe(
                     map(reservas => {
                         const clientesMap = new Map<string, ClienteResumen>();
 
                         reservas.forEach(r => {
+                            const fechaReserva = r.fecha instanceof Date 
+                                ? r.fecha 
+                                : r.fecha 
+                                    ? new Date((r.fecha as any)?.seconds * 1000) 
+                                    : new Date();
+
                             if (clientesMap.has(r.clienteId)) {
                                 const cliente = clientesMap.get(r.clienteId)!;
                                 cliente.sesiones++;
-                                if (!cliente.ultimaSesion || new Date(r.fecha) > cliente.ultimaSesion) {
-                                    cliente.ultimaSesion = new Date(r.fecha);
+                                
+                                // Actualizar última sesión si es más reciente
+                                if (!cliente.ultimaSesion || fechaReserva > cliente.ultimaSesion) {
+                                    cliente.ultimaSesion = fechaReserva;
+                                }
+                                
+                                // Actualizar primera sesión si es más antigua
+                                if (!cliente.primeraSesion || fechaReserva < cliente.primeraSesion) {
+                                    cliente.primeraSesion = fechaReserva;
+                                }
+
+                                // Contar sesiones completadas
+                                if (r.estado === 'COMPLETADA') {
+                                    cliente.sesionesCompletadas = (cliente.sesionesCompletadas || 0) + 1;
+                                }
+
+                                // Acumular gasto total
+                                if (r.estado === 'COMPLETADA' || r.estado === 'CONFIRMADA') {
+                                    cliente.gastoTotal = (cliente.gastoTotal || 0) + (r.precio || 0);
                                 }
                             } else {
                                 clientesMap.set(r.clienteId, {
                                     clienteId: r.clienteId,
                                     nombre: r.clienteNombre,
                                     sesiones: 1,
-                                    ultimaSesion: new Date(r.fecha)
+                                    sesionesCompletadas: r.estado === 'COMPLETADA' ? 1 : 0,
+                                    ultimaSesion: fechaReserva,
+                                    primeraSesion: fechaReserva,
+                                    gastoTotal: (r.estado === 'COMPLETADA' || r.estado === 'CONFIRMADA') ? (r.precio || 0) : 0
                                 });
                             }
                         });
 
                         return Array.from(clientesMap.values())
                             .sort((a, b) => b.sesiones - a.sesiones);
+                    }),
+                    catchError(error => {
+                        console.error('Error al obtener clientes:', error);
+                        return of([]);
                     })
                 );
+            }),
+            catchError(error => {
+                console.error('Error de autenticación:', error);
+                return of([]);
             })
         );
     }

@@ -1,33 +1,186 @@
 <div class="container-fluid">
+  <!-- Header -->
   <div class="row mb-4">
     <div class="col-12">
       <h3 class="page-title">Mis Clientes</h3>
-      <input nbInput fullWidth placeholder="Buscar clientes..." [(ngModel)]="filtro" class="mt-3">
+      <p class="text-hint">Historial y estadísticas de tus clientes</p>
     </div>
   </div>
 
-  <div class="row">
-    <div class="col-md-6 col-lg-4 mb-4" *ngFor="let cliente of clientesFiltrados">
-      <nb-card>
+  <!-- Estadísticas generales -->
+  <div class="row mb-4">
+    <div class="col-6 col-md-3 mb-3">
+      <nb-card class="stat-card" accent="primary">
         <nb-card-body>
-          <div class="cliente-header">
-            <img [src]="cliente.avatar" [alt]="cliente.nombre" class="avatar">
-            <div>
-              <h6>{{ cliente.nombre }}</h6>
-              <p class="text-hint mb-0">{{ cliente.email }}</p>
+          <div class="stat-content">
+            <nb-icon icon="people-outline" class="stat-icon"></nb-icon>
+            <div class="stat-info">
+              <span class="stat-number">{{ stats.totalClientes }}</span>
+              <span class="stat-label">Total Clientes</span>
             </div>
           </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+    <div class="col-6 col-md-3 mb-3">
+      <nb-card class="stat-card" accent="success">
+        <nb-card-body>
+          <div class="stat-content">
+            <nb-icon icon="star-outline" class="stat-icon text-success"></nb-icon>
+            <div class="stat-info">
+              <span class="stat-number">{{ stats.clientesFrecuentes }}</span>
+              <span class="stat-label">Frecuentes</span>
+            </div>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+    <div class="col-6 col-md-3 mb-3">
+      <nb-card class="stat-card" accent="info">
+        <nb-card-body>
+          <div class="stat-content">
+            <nb-icon icon="person-add-outline" class="stat-icon text-info"></nb-icon>
+            <div class="stat-info">
+              <span class="stat-number">{{ stats.clientesNuevos }}</span>
+              <span class="stat-label">Nuevos (30d)</span>
+            </div>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+    <div class="col-6 col-md-3 mb-3">
+      <nb-card class="stat-card" accent="warning">
+        <nb-card-body>
+          <div class="stat-content">
+            <nb-icon icon="credit-card-outline" class="stat-icon text-warning"></nb-icon>
+            <div class="stat-info">
+              <span class="stat-number">{{ formatearMoneda(stats.ingresosTotales) }}</span>
+              <span class="stat-label">Ingresos</span>
+            </div>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="row mb-4">
+    <div class="col-md-6 mb-3">
+      <input nbInput fullWidth placeholder="Buscar clientes por nombre..." [(ngModel)]="filtro">
+    </div>
+    <div class="col-md-6 mb-3">
+      <nb-button-group>
+        <button nbButton [status]="filtroTipo === 'todos' ? 'primary' : 'basic'" (click)="filtroTipo = 'todos'">
+          Todos
+        </button>
+        <button nbButton [status]="filtroTipo === 'frecuentes' ? 'success' : 'basic'" (click)="filtroTipo = 'frecuentes'">
+          <nb-icon icon="star-outline"></nb-icon>
+          Frecuentes
+        </button>
+        <button nbButton [status]="filtroTipo === 'nuevos' ? 'info' : 'basic'" (click)="filtroTipo = 'nuevos'">
+          <nb-icon icon="person-add-outline"></nb-icon>
+          Nuevos
+        </button>
+      </nb-button-group>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="text-center py-5">
+    <nb-spinner status="primary"></nb-spinner>
+    <p class="mt-3">Cargando clientes...</p>
+  </div>
+
+  <!-- Sin clientes -->
+  <div *ngIf="!loading && clientesFiltrados.length === 0" class="text-center py-5">
+    <nb-icon icon="people-outline" class="empty-icon"></nb-icon>
+    <h4 class="mt-3">No tienes clientes aún</h4>
+    <p class="text-hint">Los clientes que reserven contigo aparecerán aquí</p>
+  </div>
+
+  <!-- Lista de clientes -->
+  <div class="row" *ngIf="!loading && clientesFiltrados.length > 0">
+    <div class="col-12 col-md-6 col-xl-4 mb-4" *ngFor="let cliente of clientesFiltrados">
+      <nb-card class="cliente-card" [class.frecuente]="cliente.esFrecuente" [class.selected]="clienteSeleccionado?.id === cliente.id">
+        <nb-card-body>
+          <!-- Header del cliente -->
+          <div class="cliente-header" (click)="verDetalles(cliente)">
+            <div class="cliente-avatar" [class.has-image]="cliente.avatar">
+              <img *ngIf="cliente.avatar" [src]="cliente.avatar" [alt]="cliente.nombre">
+              <span *ngIf="!cliente.avatar" class="avatar-iniciales">{{ getIniciales(cliente.nombre) }}</span>
+            </div>
+            <div class="cliente-info">
+              <h6 class="cliente-nombre">
+                {{ cliente.nombre }}
+                <nb-icon *ngIf="cliente.esFrecuente" icon="star" class="star-icon" nbTooltip="Cliente frecuente"></nb-icon>
+              </h6>
+              <span class="cliente-tiempo">
+                <nb-icon icon="clock-outline"></nb-icon>
+                Cliente desde hace {{ cliente.tiempoComoCliente }}
+              </span>
+            </div>
+            <nb-badge *ngIf="cliente.esFrecuente" text="Frecuente" status="success" class="badge-frecuente"></nb-badge>
+          </div>
+
+          <!-- Estadísticas rápidas -->
           <div class="cliente-stats">
-            <div class="stat">
-              <span class="value">{{ cliente.sesiones_totales }}</span>
-              <span class="label">Sesiones</span>
+            <div class="stat-item">
+              <span class="stat-value">{{ cliente.totalReservas }}</span>
+              <span class="stat-label">Reservas</span>
             </div>
-            <div class="stat">
-              <span class="value">{{ getTasaAsistencia(cliente) }}%</span>
-              <span class="label">Asistencia</span>
+            <div class="stat-item">
+              <span class="stat-value">{{ cliente.sesionesCompletadas }}</span>
+              <span class="stat-label">Completadas</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value" [class]="'text-' + getTasaColor(cliente.tasaAsistencia)">{{ cliente.tasaAsistencia }}%</span>
+              <span class="stat-label">Asistencia</span>
             </div>
           </div>
-          <p class="notas">{{ cliente.notas }}</p>
+
+          <!-- Detalles expandidos -->
+          <div class="cliente-detalles" *ngIf="clienteSeleccionado?.id === cliente.id">
+            <hr>
+            <div class="detalle-row">
+              <span class="detalle-label">
+                <nb-icon icon="calendar-outline"></nb-icon>
+                Primera sesión:
+              </span>
+              <span class="detalle-value">{{ formatearFecha(cliente.primeraSesion) }}</span>
+            </div>
+            <div class="detalle-row">
+              <span class="detalle-label">
+                <nb-icon icon="clock-outline"></nb-icon>
+                Última sesión:
+              </span>
+              <span class="detalle-value">{{ formatearFecha(cliente.ultimaSesion) }}</span>
+            </div>
+            <div class="detalle-row">
+              <span class="detalle-label">
+                <nb-icon icon="credit-card-outline"></nb-icon>
+                Gasto total:
+              </span>
+              <span class="detalle-value text-success">{{ formatearMoneda(cliente.gastoTotal) }}</span>
+            </div>
+            <div class="detalle-row">
+              <span class="detalle-label">
+                <nb-icon icon="trending-up-outline"></nb-icon>
+                Promedio por sesión:
+              </span>
+              <span class="detalle-value">
+                {{ cliente.sesionesCompletadas > 0 ? formatearMoneda(cliente.gastoTotal / cliente.sesionesCompletadas) : '$0' }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Footer con acción -->
+          <div class="cliente-footer">
+            <button nbButton size="small" [status]="clienteSeleccionado?.id === cliente.id ? 'primary' : 'basic'" 
+                    ghost (click)="verDetalles(cliente)">
+              <nb-icon [icon]="clienteSeleccionado?.id === cliente.id ? 'chevron-up-outline' : 'chevron-down-outline'"></nb-icon>
+              {{ clienteSeleccionado?.id === cliente.id ? 'Ocultar' : 'Ver más' }}
+            </button>
+          </div>
         </nb-card-body>
       </nb-card>
     </div>
