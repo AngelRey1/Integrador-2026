@@ -139,20 +139,32 @@ export class EntrenadorFirebaseService {
             switchMap(user => {
                 if (!user) return of([]);
 
-                let query = this.firestore.collection<Reserva>('reservas', ref => {
-                    let q = ref.where('entrenadorId', '==', user.uid)
-                        .orderBy('fecha', 'desc');
-                    return q;
-                });
-
-                return query.valueChanges({ idField: 'id' }).pipe(
+                // Consulta simple sin orderBy para evitar problemas de índices
+                return this.firestore.collection<Reserva>('reservas', ref => 
+                    ref.where('entrenadorId', '==', user.uid)
+                ).valueChanges({ idField: 'id' }).pipe(
                     map(reservas => {
+                        // Ordenar en cliente
+                        let resultado = reservas.sort((a, b) => {
+                            const fechaA = a.fecha instanceof Date ? a.fecha : new Date((a.fecha as any)?.seconds * 1000 || 0);
+                            const fechaB = b.fecha instanceof Date ? b.fecha : new Date((b.fecha as any)?.seconds * 1000 || 0);
+                            return fechaB.getTime() - fechaA.getTime();
+                        });
+                        
                         if (estado) {
-                            return reservas.filter(r => r.estado === estado);
+                            resultado = resultado.filter(r => r.estado === estado);
                         }
-                        return reservas;
+                        return resultado;
+                    }),
+                    catchError(error => {
+                        console.error('Error al obtener reservas:', error);
+                        return of([]);
                     })
                 );
+            }),
+            catchError(error => {
+                console.error('Error de autenticación:', error);
+                return of([]);
             })
         );
     }

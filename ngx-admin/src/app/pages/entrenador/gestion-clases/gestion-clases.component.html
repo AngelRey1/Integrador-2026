@@ -1,134 +1,427 @@
 <div class="container-fluid">
+  <!-- Header con tabs -->
   <div class="row mb-4">
     <div class="col-12">
-      <div class="d-flex justify-content-between align-items-center">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
         <div>
           <h3 class="page-title">Gestión de Clases</h3>
-          <p class="text-hint">Administra tus clases y servicios</p>
+          <p class="text-hint">Administra tus sesiones programadas y tipos de clases</p>
         </div>
-        <button nbButton status="primary" (click)="nuevaClase()">
-          <nb-icon icon="plus-outline"></nb-icon>
-          Nueva Clase
-        </button>
+        <nb-button-group>
+          <button nbButton [status]="vistaActiva === 'sesiones' ? 'primary' : 'basic'" 
+                  (click)="vistaActiva = 'sesiones'">
+            <nb-icon icon="calendar-outline"></nb-icon>
+            Mis Sesiones
+          </button>
+          <button nbButton [status]="vistaActiva === 'clases' ? 'primary' : 'basic'" 
+                  (click)="vistaActiva = 'clases'">
+            <nb-icon icon="list-outline"></nb-icon>
+            Tipos de Clases
+          </button>
+        </nb-button-group>
       </div>
     </div>
   </div>
 
-  <!-- Formulario -->
-  <div class="row mb-4" *ngIf="mostrarFormulario">
-    <div class="col-12">
-      <nb-card>
-        <nb-card-header>{{ claseEnEdicion ? 'Editar Clase' : 'Nueva Clase' }}</nb-card-header>
+  <!-- ==================== VISTA DE SESIONES ==================== -->
+  <div *ngIf="vistaActiva === 'sesiones'">
+    
+    <!-- Resumen rápido -->
+    <div class="row mb-4">
+      <div class="col-md-4 mb-3">
+        <nb-card accent="warning" class="summary-card">
+          <nb-card-body class="d-flex align-items-center">
+            <nb-icon icon="clock-outline" class="summary-icon text-warning"></nb-icon>
+            <div class="summary-text">
+              <span class="summary-number">{{ sesionesHoy.length }}</span>
+              <span class="summary-label">Sesiones Hoy</span>
+            </div>
+          </nb-card-body>
+        </nb-card>
+      </div>
+      <div class="col-md-4 mb-3">
+        <nb-card accent="info" class="summary-card">
+          <nb-card-body class="d-flex align-items-center">
+            <nb-icon icon="calendar-outline" class="summary-icon text-info"></nb-icon>
+            <div class="summary-text">
+              <span class="summary-number">{{ proximasSesiones.length }}</span>
+              <span class="summary-label">Próximas</span>
+            </div>
+          </nb-card-body>
+        </nb-card>
+      </div>
+      <div class="col-md-4 mb-3">
+        <nb-card accent="success" class="summary-card">
+          <nb-card-body class="d-flex align-items-center">
+            <nb-icon icon="checkmark-circle-outline" class="summary-icon text-success"></nb-icon>
+            <div class="summary-text">
+              <span class="summary-number">{{ todasLasSesiones.length }}</span>
+              <span class="summary-label">Total Reservas</span>
+            </div>
+          </nb-card-body>
+        </nb-card>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loadingSesiones" class="text-center py-5">
+      <nb-spinner status="primary"></nb-spinner>
+      <p class="mt-3">Cargando sesiones...</p>
+    </div>
+
+    <!-- Sesiones de Hoy -->
+    <div *ngIf="!loadingSesiones && sesionesHoy.length > 0" class="mb-4">
+      <nb-card accent="warning">
+        <nb-card-header>
+          <div class="d-flex align-items-center">
+            <nb-icon icon="sun-outline" class="me-2"></nb-icon>
+            <strong>Sesiones de Hoy</strong>
+            <nb-badge [text]="sesionesHoy.length.toString()" status="warning" class="ms-2"></nb-badge>
+          </div>
+        </nb-card-header>
         <nb-card-body>
-          <form [formGroup]="claseForm" (ngSubmit)="guardarClase()">
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label class="label">Nombre de la Clase *</label>
-                <input nbInput fullWidth formControlName="nombre" placeholder="Ej: Yoga Integral">
+          <div class="sesiones-list">
+            <div class="sesion-item sesion-hoy" *ngFor="let sesion of sesionesHoy">
+              <div class="sesion-tiempo">
+                <span class="hora">{{ sesion.hora }}</span>
+                <span class="tiempo-restante">{{ sesion.tiempoRestante }}</span>
               </div>
-              <div class="col-md-6 mb-3">
-                <label class="label">Deporte *</label>
-                <nb-select fullWidth formControlName="deporte">
-                  <nb-option *ngFor="let deporte of deportesDisponibles" [value]="deporte">{{ deporte }}</nb-option>
-                </nb-select>
+              <div class="sesion-info">
+                <div class="cliente-nombre">
+                  <nb-icon icon="person-outline"></nb-icon>
+                  {{ sesion.clienteNombre }}
+                </div>
+                <div class="sesion-detalles">
+                  <span class="detalle">
+                    <nb-icon icon="clock-outline"></nb-icon>
+                    {{ sesion.duracion }} min
+                  </span>
+                  <span class="detalle">
+                    <nb-icon icon="pricetags-outline"></nb-icon>
+                    ${{ sesion.precio }} MXN
+                  </span>
+                  <span class="detalle" *ngIf="sesion.modalidad">
+                    <nb-icon [icon]="sesion.modalidad === 'online' ? 'video-outline' : 'home-outline'"></nb-icon>
+                    {{ sesion.modalidad === 'online' ? 'Online' : 'Presencial' }}
+                  </span>
+                </div>
+                <div class="sesion-notas" *ngIf="sesion.notas">
+                  <small>📝 {{ sesion.notas }}</small>
+                </div>
               </div>
-              <div class="col-12 mb-3">
-                <label class="label">Descripción *</label>
-                <textarea nbInput fullWidth formControlName="descripcion" rows="3"></textarea>
-                <span class="char-counter">{{ descripcionLength }} / 300</span>
-              </div>
-              <div class="col-md-4 mb-3">
-                <label class="label">Modalidad *</label>
-                <nb-select fullWidth formControlName="modalidad">
-                  <nb-option value="presencial">Presencial</nb-option>
-                  <nb-option value="online">Online</nb-option>
-                  <nb-option value="ambas">Ambas</nb-option>
-                </nb-select>
-              </div>
-              <div class="col-md-4 mb-3">
-                <label class="label">Duración (min) *</label>
-                <input nbInput fullWidth type="number" formControlName="duracion">
-              </div>
-              <div class="col-md-4 mb-3">
-                <label class="label">Precio (MXN) *</label>
-                <input nbInput fullWidth type="number" formControlName="precio">
-              </div>
-              <div class="col-md-4 mb-3">
-                <label class="label">Cupo Máximo *</label>
-                <input nbInput fullWidth type="number" formControlName="cupo_maximo">
-              </div>
-              <div class="col-md-4 mb-3">
-                <label class="label">Ubicación</label>
-                <input nbInput fullWidth formControlName="ubicacion" placeholder="Ej: Estudio Central">
-              </div>
-              <div class="col-md-4 mb-3">
-                <label class="label">Nivel *</label>
-                <nb-select fullWidth formControlName="nivel">
-                  <nb-option *ngFor="let nivel of nivelesDisponibles" [value]="nivel">{{ nivel }}</nb-option>
-                </nb-select>
+              <div class="sesion-acciones">
+                <nb-badge [text]="getEstadoTexto(sesion.estado)" [status]="getEstadoClass(sesion.estado)"></nb-badge>
+                <div class="acciones-btns mt-2">
+                  <button nbButton size="tiny" status="success" 
+                          *ngIf="sesion.estado === 'PENDIENTE'"
+                          (click)="confirmarSesion(sesion)"
+                          nbTooltip="Confirmar sesión">
+                    <nb-icon icon="checkmark-outline"></nb-icon>
+                  </button>
+                  <button nbButton size="tiny" status="info" 
+                          *ngIf="sesion.estado === 'CONFIRMADA'"
+                          (click)="completarSesion(sesion)"
+                          nbTooltip="Marcar como completada">
+                    <nb-icon icon="checkmark-circle-outline"></nb-icon>
+                  </button>
+                  <button nbButton size="tiny" status="danger" ghost
+                          *ngIf="sesion.estado !== 'COMPLETADA' && sesion.estado !== 'CANCELADA'"
+                          (click)="cancelarSesion(sesion, dialogCancelar)"
+                          nbTooltip="Cancelar sesión">
+                    <nb-icon icon="close-outline"></nb-icon>
+                  </button>
+                </div>
               </div>
             </div>
-            <div class="d-flex justify-content-end gap-2">
-              <button nbButton type="button" status="basic" (click)="cancelarFormulario()">Cancelar</button>
-              <button nbButton type="submit" status="primary">Guardar Clase</button>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+
+    <!-- Próximas Sesiones -->
+    <div *ngIf="!loadingSesiones && proximasSesiones.length > 0" class="mb-4">
+      <nb-card>
+        <nb-card-header>
+          <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+              <nb-icon icon="calendar-outline" class="me-2"></nb-icon>
+              <strong>Próximas Sesiones</strong>
+              <nb-badge [text]="proximasSesiones.length.toString()" status="info" class="ms-2"></nb-badge>
             </div>
-          </form>
+          </div>
+        </nb-card-header>
+        <nb-card-body>
+          <div class="sesiones-list">
+            <div class="sesion-item" *ngFor="let sesion of proximasSesiones">
+              <div class="sesion-fecha">
+                <span class="dia">{{ formatearFechaCorta(sesion.fecha) }}</span>
+                <span class="hora">{{ sesion.hora }}</span>
+              </div>
+              <div class="sesion-info">
+                <div class="cliente-nombre">
+                  <nb-icon icon="person-outline"></nb-icon>
+                  {{ sesion.clienteNombre }}
+                </div>
+                <div class="sesion-detalles">
+                  <span class="detalle">
+                    <nb-icon icon="clock-outline"></nb-icon>
+                    {{ sesion.duracion }} min
+                  </span>
+                  <span class="detalle">
+                    <nb-icon icon="pricetags-outline"></nb-icon>
+                    ${{ sesion.precio }} MXN
+                  </span>
+                  <span class="detalle" *ngIf="sesion.modalidad">
+                    <nb-icon [icon]="sesion.modalidad === 'online' ? 'video-outline' : 'home-outline'"></nb-icon>
+                    {{ sesion.modalidad === 'online' ? 'Online' : 'Presencial' }}
+                  </span>
+                </div>
+                <div class="tiempo-restante-badge">
+                  {{ sesion.tiempoRestante }}
+                </div>
+              </div>
+              <div class="sesion-acciones">
+                <nb-badge [text]="getEstadoTexto(sesion.estado)" [status]="getEstadoClass(sesion.estado)"></nb-badge>
+                <div class="acciones-btns mt-2">
+                  <button nbButton size="tiny" status="success" 
+                          *ngIf="sesion.estado === 'PENDIENTE'"
+                          (click)="confirmarSesion(sesion)"
+                          nbTooltip="Confirmar sesión">
+                    <nb-icon icon="checkmark-outline"></nb-icon>
+                  </button>
+                  <button nbButton size="tiny" status="danger" ghost
+                          *ngIf="sesion.estado !== 'COMPLETADA' && sesion.estado !== 'CANCELADA'"
+                          (click)="cancelarSesion(sesion, dialogCancelar)"
+                          nbTooltip="Cancelar sesión">
+                    <nb-icon icon="close-outline"></nb-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </nb-card-body>
+      </nb-card>
+    </div>
+
+    <!-- Sin sesiones -->
+    <div *ngIf="!loadingSesiones && sesionesHoy.length === 0 && proximasSesiones.length === 0" class="text-center py-5">
+      <nb-icon icon="calendar-outline" class="empty-icon"></nb-icon>
+      <h4 class="mt-3">No tienes sesiones programadas</h4>
+      <p class="text-hint">Las reservas de tus clientes aparecerán aquí automáticamente</p>
+    </div>
+
+    <!-- Historial de todas las sesiones -->
+    <div *ngIf="!loadingSesiones && todasLasSesiones.length > 0" class="mb-4">
+      <nb-card>
+        <nb-card-header>
+          <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <div class="d-flex align-items-center">
+              <nb-icon icon="archive-outline" class="me-2"></nb-icon>
+              <strong>Historial de Sesiones</strong>
+            </div>
+            <nb-select [(selected)]="filtroEstado" size="small" (selectedChange)="filtrarSesiones()">
+              <nb-option value="todas">Todas</nb-option>
+              <nb-option value="PENDIENTE">Pendientes</nb-option>
+              <nb-option value="CONFIRMADA">Confirmadas</nb-option>
+              <nb-option value="COMPLETADA">Completadas</nb-option>
+              <nb-option value="CANCELADA">Canceladas</nb-option>
+            </nb-select>
+          </div>
+        </nb-card-header>
+        <nb-card-body>
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Cliente</th>
+                  <th>Hora</th>
+                  <th>Duración</th>
+                  <th>Precio</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let sesion of getSesionesFiltradas()">
+                  <td>{{ formatearFechaCorta(sesion.fecha) }}</td>
+                  <td>{{ sesion.clienteNombre }}</td>
+                  <td>{{ sesion.hora }}</td>
+                  <td>{{ sesion.duracion }} min</td>
+                  <td>${{ sesion.precio }}</td>
+                  <td>
+                    <nb-badge [text]="getEstadoTexto(sesion.estado)" [status]="getEstadoClass(sesion.estado)"></nb-badge>
+                  </td>
+                  <td>
+                    <button nbButton size="tiny" status="success" 
+                            *ngIf="sesion.estado === 'PENDIENTE'"
+                            (click)="confirmarSesion(sesion)">
+                      Confirmar
+                    </button>
+                    <button nbButton size="tiny" status="info" 
+                            *ngIf="sesion.estado === 'CONFIRMADA'"
+                            (click)="completarSesion(sesion)">
+                      Completar
+                    </button>
+                    <span *ngIf="sesion.estado === 'COMPLETADA'" class="text-success">✓</span>
+                    <span *ngIf="sesion.estado === 'CANCELADA'" class="text-danger">✗</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </nb-card-body>
       </nb-card>
     </div>
   </div>
 
-  <!-- Lista de clases -->
-  <div class="row">
-    <div class="col-12 col-md-6 col-lg-4 mb-4" *ngFor="let clase of clases">
-      <nb-card [class.inactive]="!clase.activa">
-        <nb-card-header>
-          <div class="d-flex justify-content-between align-items-center">
-            <strong>{{ clase.nombre }}</strong>
-            <nb-toggle [checked]="clase.activa" (checkedChange)="toggleActiva(clase)"></nb-toggle>
-          </div>
-        </nb-card-header>
-        <nb-card-body>
-          <div class="clase-info">
-            <p class="deporte-badge">{{ clase.deporte }}</p>
-            <p class="descripcion">{{ clase.descripcion }}</p>
-            <div class="clase-meta">
-              <div class="meta-item">
-                <nb-icon icon="clock-outline"></nb-icon>
-                <span>{{ clase.duracion }} min</span>
+  <!-- ==================== VISTA DE TIPOS DE CLASES ==================== -->
+  <div *ngIf="vistaActiva === 'clases'">
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="d-flex justify-content-end">
+          <button nbButton status="primary" (click)="nuevaClase()">
+            <nb-icon icon="plus-outline"></nb-icon>
+            Nueva Clase
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulario -->
+    <div class="row mb-4" *ngIf="mostrarFormulario">
+      <div class="col-12">
+        <nb-card>
+          <nb-card-header>{{ claseEnEdicion ? 'Editar Clase' : 'Nueva Clase' }}</nb-card-header>
+          <nb-card-body>
+            <form [formGroup]="claseForm" (ngSubmit)="guardarClase()">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="label">Nombre de la Clase *</label>
+                  <input nbInput fullWidth formControlName="nombre" placeholder="Ej: Yoga Integral">
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="label">Deporte *</label>
+                  <nb-select fullWidth formControlName="deporte">
+                    <nb-option *ngFor="let deporte of deportesDisponibles" [value]="deporte">{{ deporte }}</nb-option>
+                  </nb-select>
+                </div>
+                <div class="col-12 mb-3">
+                  <label class="label">Descripción *</label>
+                  <textarea nbInput fullWidth formControlName="descripcion" rows="3"></textarea>
+                  <span class="char-counter">{{ descripcionLength }} / 300</span>
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="label">Modalidad *</label>
+                  <nb-select fullWidth formControlName="modalidad">
+                    <nb-option value="presencial">Presencial</nb-option>
+                    <nb-option value="online">Online</nb-option>
+                    <nb-option value="ambas">Ambas</nb-option>
+                  </nb-select>
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="label">Duración (min) *</label>
+                  <input nbInput fullWidth type="number" formControlName="duracion">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="label">Precio (MXN) *</label>
+                  <input nbInput fullWidth type="number" formControlName="precio">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="label">Cupo Máximo *</label>
+                  <input nbInput fullWidth type="number" formControlName="capacidad">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="label">Ubicación</label>
+                  <input nbInput fullWidth formControlName="ubicacion" placeholder="Ej: Estudio Central">
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="label">Nivel *</label>
+                  <nb-select fullWidth formControlName="nivel">
+                    <nb-option *ngFor="let nivel of nivelesDisponibles" [value]="nivel">{{ nivel }}</nb-option>
+                  </nb-select>
+                </div>
               </div>
-              <div class="meta-item">
-                <nb-icon icon="people-outline"></nb-icon>
-                <span>{{ clase.cupo_maximo }} personas</span>
+              <div class="d-flex justify-content-end gap-2">
+                <button nbButton type="button" status="basic" (click)="cancelarFormulario()">Cancelar</button>
+                <button nbButton type="submit" status="primary" [nbSpinner]="guardando">Guardar Clase</button>
               </div>
-              <div class="meta-item">
-                <nb-icon icon="pricetags-outline"></nb-icon>
-                <span>${{ clase.precio }} MXN</span>
+            </form>
+          </nb-card-body>
+        </nb-card>
+      </div>
+    </div>
+
+    <!-- Lista de clases -->
+    <div class="row" *ngIf="!loading">
+      <div class="col-12 col-md-6 col-lg-4 mb-4" *ngFor="let clase of clases">
+        <nb-card [class.inactive]="!clase.activa">
+          <nb-card-header>
+            <div class="d-flex justify-content-between align-items-center">
+              <strong>{{ clase.nombre }}</strong>
+              <nb-toggle [checked]="clase.activa" (checkedChange)="toggleActiva(clase)"></nb-toggle>
+            </div>
+          </nb-card-header>
+          <nb-card-body>
+            <div class="clase-info">
+              <p class="deporte-badge">{{ clase.deporte }}</p>
+              <p class="descripcion">{{ clase.descripcion }}</p>
+              <div class="clase-meta">
+                <div class="meta-item">
+                  <nb-icon icon="clock-outline"></nb-icon>
+                  <span>{{ clase.duracion }} min</span>
+                </div>
+                <div class="meta-item">
+                  <nb-icon icon="people-outline"></nb-icon>
+                  <span>{{ clase.capacidad }} personas</span>
+                </div>
+                <div class="meta-item">
+                  <nb-icon icon="pricetags-outline"></nb-icon>
+                  <span>${{ clase.precio }} MXN</span>
+                </div>
+              </div>
+              <div class="clase-badges">
+                <nb-badge [text]="clase.modalidad" [status]="clase.modalidad === 'online' ? 'info' : 'success'"></nb-badge>
+                <nb-badge [text]="clase.nivel" status="basic"></nb-badge>
               </div>
             </div>
-            <div class="clase-badges">
-              <nb-badge [text]="clase.modalidad" [status]="clase.modalidad === 'online' ? 'info' : 'success'"></nb-badge>
-              <nb-badge [text]="clase.nivel" status="basic"></nb-badge>
+          </nb-card-body>
+          <nb-card-footer>
+            <div class="d-flex gap-2">
+              <button nbButton size="small" status="info" (click)="editarClase(clase)">
+                <nb-icon icon="edit-outline"></nb-icon>
+                Editar
+              </button>
+              <button nbButton size="small" status="danger" (click)="eliminarClase(clase, dialogEliminar)">
+                <nb-icon icon="trash-2-outline"></nb-icon>
+                Eliminar
+              </button>
             </div>
-          </div>
-        </nb-card-body>
-        <nb-card-footer>
-          <div class="d-flex gap-2">
-            <button nbButton size="small" status="info" (click)="editarClase(clase)">
-              <nb-icon icon="edit-outline"></nb-icon>
-              Editar
-            </button>
-            <button nbButton size="small" status="danger" (click)="eliminarClase(clase, dialogEliminar)">
-              <nb-icon icon="trash-2-outline"></nb-icon>
-              Eliminar
-            </button>
-          </div>
-        </nb-card-footer>
-      </nb-card>
+          </nb-card-footer>
+        </nb-card>
+      </div>
+    </div>
+
+    <!-- Sin clases -->
+    <div *ngIf="!loading && clases.length === 0" class="text-center py-5">
+      <nb-icon icon="briefcase-outline" class="empty-icon"></nb-icon>
+      <h4 class="mt-3">No tienes tipos de clases creados</h4>
+      <p class="text-hint">Crea tipos de clases para que los clientes puedan reservar</p>
+      <button nbButton status="primary" (click)="nuevaClase()">
+        <nb-icon icon="plus-outline"></nb-icon>
+        Crear mi primera clase
+      </button>
+    </div>
+
+    <!-- Loading clases -->
+    <div *ngIf="loading" class="text-center py-5">
+      <nb-spinner status="primary"></nb-spinner>
+      <p class="mt-3">Cargando clases...</p>
     </div>
   </div>
 </div>
 
+<!-- Dialog Eliminar Clase -->
 <ng-template #dialogEliminar let-data let-ref="dialogRef">
   <nb-card>
     <nb-card-header>Confirmar Eliminación</nb-card-header>
@@ -139,6 +432,29 @@
       <div class="d-flex justify-content-end gap-2">
         <button nbButton status="basic" (click)="ref.close()">Cancelar</button>
         <button nbButton status="danger" (click)="confirmarEliminar(ref)">Eliminar</button>
+      </div>
+    </nb-card-footer>
+  </nb-card>
+</ng-template>
+
+<!-- Dialog Cancelar Sesión -->
+<ng-template #dialogCancelar let-data let-ref="dialogRef">
+  <nb-card>
+    <nb-card-header>Cancelar Sesión</nb-card-header>
+    <nb-card-body>
+      <p>¿Estás seguro de que deseas cancelar la sesión con <strong>{{ data.clienteNombre }}</strong>?</p>
+      <p class="text-hint">Fecha: {{ formatearFecha(data.fecha) }} a las {{ data.hora }}</p>
+      <div class="mt-3">
+        <label class="label">Motivo de cancelación (opcional)</label>
+        <textarea nbInput fullWidth #motivoInput rows="2" placeholder="Ej: Emergencia personal"></textarea>
+      </div>
+    </nb-card-body>
+    <nb-card-footer>
+      <div class="d-flex justify-content-end gap-2">
+        <button nbButton status="basic" (click)="ref.close()">No cancelar</button>
+        <button nbButton status="danger" (click)="confirmarCancelacion(data, motivoInput.value, ref)">
+          Sí, cancelar sesión
+        </button>
       </div>
     </nb-card-footer>
   </nb-card>

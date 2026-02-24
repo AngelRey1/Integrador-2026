@@ -275,10 +275,15 @@
                   <div class="input-group">
                     <span class="input-prefix">$</span>
                     <input nbInput fullWidth type="number" formControlName="precio" 
-                           placeholder="500" min="0" step="50">
+                           placeholder="500" min="50" max="3000" step="50">
                     <span class="input-suffix">MXN</span>
                   </div>
-                  <small class="text-muted">Tarifa para sesiones presenciales</small>
+                  <small class="text-muted">Tarifa para sesiones presenciales (mín. $50 - máx. $3,000)</small>
+                  <div *ngIf="perfilForm.get('precio')?.invalid && perfilForm.get('precio')?.touched" class="text-danger small mt-1">
+                    <span *ngIf="perfilForm.get('precio')?.errors?.['min']">El precio mínimo es $50 MXN</span>
+                    <span *ngIf="perfilForm.get('precio')?.errors?.['max']">El precio máximo es $3,000 MXN</span>
+                    <span *ngIf="perfilForm.get('precio')?.errors?.['required']">El precio es requerido</span>
+                  </div>
                 </div>
               </div>
               

@@ -17,6 +17,7 @@ import { SportIconsModule } from '../../@theme/components/sport-icons/sport-icon
 import {
   NbCardModule,
   NbButtonModule,
+  NbButtonGroupModule,
   NbIconModule,
   NbInputModule,
   NbBadgeModule,
@@ -58,6 +59,7 @@ import { NbEvaIconsModule } from '@nebular/eva-icons';
     // Nebular Modules
     NbCardModule,
     NbButtonModule,
+    NbButtonGroupModule,
     NbIconModule,
     NbEvaIconsModule,
     NbInputModule,
