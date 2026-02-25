@@ -202,6 +202,19 @@ export class GestionClasesComponent implements OnInit, OnDestroy {
     return this.todasLasSesiones.filter(s => s.estado === this.filtroEstado);
   }
 
+  /**
+   * Verificar si una sesión ya pasó (fecha + duración < ahora)
+   */
+  sesionYaPaso(sesion: SesionProgramada): boolean {
+    const ahora = new Date();
+    const fechaSesion = sesion.fecha instanceof Date 
+      ? sesion.fecha 
+      : new Date((sesion.fecha as any)?.seconds * 1000 || 0);
+    const duracionMinutos = sesion.duracion || 60;
+    const fechaFinSesion = new Date(fechaSesion.getTime() + duracionMinutos * 60 * 1000);
+    return fechaFinSesion < ahora;
+  }
+
   async confirmarSesion(sesion: SesionProgramada): Promise<void> {
     const result = await this.entrenadorFirebase.confirmarReserva(sesion.id);
     if (result.success) {

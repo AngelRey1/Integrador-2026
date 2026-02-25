@@ -111,7 +111,8 @@
               </div>
               <div class="sesion-acciones">
                 <nb-badge *ngIf="sesion.estado === 'CONFIRMADA'" text="Confirmada" status="success"></nb-badge>
-                <div class="acciones-btns mt-2" *ngIf="sesion.estado === 'CONFIRMADA'">
+                <!-- Botón completar solo si ya pasó la sesión -->
+                <div class="acciones-btns mt-2" *ngIf="sesion.estado === 'CONFIRMADA' && sesionYaPaso(sesion)">
                   <button nbButton size="tiny" status="info" 
                           (click)="completarSesion(sesion)"
                           nbTooltip="Marcar como completada">
@@ -226,14 +227,18 @@
                               [status]="sesion.estado === 'PENDIENTE' ? 'warning' : getEstadoClass(sesion.estado)"></nb-badge>
                   </td>
                   <td>
+                    <!-- Botón completar solo si ya pasó la fecha y está confirmada -->
                     <button nbButton size="tiny" status="info" 
-                            *ngIf="sesion.estado === 'CONFIRMADA'"
+                            *ngIf="sesion.estado === 'CONFIRMADA' && sesionYaPaso(sesion)"
                             (click)="completarSesion(sesion)">
                       Completar
                     </button>
+                    <!-- Indicadores de estado -->
                     <span *ngIf="sesion.estado === 'COMPLETADA'" class="text-success">✓</span>
                     <span *ngIf="sesion.estado === 'CANCELADA'" class="text-danger">✗</span>
                     <span *ngIf="sesion.estado === 'PENDIENTE'" class="text-warning">⏳</span>
+                    <!-- Si está confirmada pero aún no pasa, mostrar reloj -->
+                    <span *ngIf="sesion.estado === 'CONFIRMADA' && !sesionYaPaso(sesion)" class="text-info">📅</span>
                   </td>
                 </tr>
               </tbody>
