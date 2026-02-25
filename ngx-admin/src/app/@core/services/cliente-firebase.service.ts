@@ -269,11 +269,20 @@ export class ClienteFirebaseService {
             const userDoc = await this.firestore.doc(`users/${user.uid}`).get().toPromise();
             const userData = userDoc?.data() as any;
 
+            // Determinar el nombre del cliente: usar el de la reserva, o buscarlo en userData
+            let nombreCliente = reserva.clienteNombre;
+            if (!nombreCliente || nombreCliente === 'Cliente') {
+                nombreCliente = userData 
+                    ? `${userData.nombre || ''} ${userData.apellido || ''}`.trim() || user.displayName || 'Cliente'
+                    : user.displayName || 'Cliente';
+            }
+
             const nuevaReserva: Omit<Reserva, 'id'> = {
                 ...reserva,
                 clienteId: user.uid,
-                clienteNombre: userData ? `${userData.nombre} ${userData.apellido}` : 'Cliente',
-                estado: 'PENDIENTE',
+                clienteNombre: nombreCliente,
+                // Respetar el estado que viene de la reserva (CONFIRMADA si pagó, PENDIENTE si no)
+                estado: reserva.estado || 'PENDIENTE',
                 fechaCreacion: new Date()
             };
 

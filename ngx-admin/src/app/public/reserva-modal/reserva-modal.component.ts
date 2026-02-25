@@ -820,7 +820,8 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
       duracion: this.getDuracionSesion(),
       precio: this.calcularPrecioTotal(),
       modalidad: this.paso2Form.get('modalidad')?.value,
-      estado: 'PENDIENTE',
+      // Si el pago fue completado, la reserva se confirma automáticamente
+      estado: this.pagoCompletado ? 'CONFIRMADA' : 'PENDIENTE',
       notas: this.paso2Form.get('notas')?.value || '',
       ubicacion: this.paso2Form.get('ubicacion')?.value || ''
     };

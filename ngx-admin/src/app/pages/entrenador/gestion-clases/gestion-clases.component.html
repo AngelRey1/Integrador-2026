@@ -110,25 +110,12 @@
                 </div>
               </div>
               <div class="sesion-acciones">
-                <nb-badge [text]="getEstadoTexto(sesion.estado)" [status]="getEstadoClass(sesion.estado)"></nb-badge>
-                <div class="acciones-btns mt-2">
-                  <button nbButton size="tiny" status="success" 
-                          *ngIf="sesion.estado === 'PENDIENTE'"
-                          (click)="confirmarSesion(sesion)"
-                          nbTooltip="Confirmar sesión">
-                    <nb-icon icon="checkmark-outline"></nb-icon>
-                  </button>
+                <nb-badge *ngIf="sesion.estado === 'CONFIRMADA'" text="Confirmada" status="success"></nb-badge>
+                <div class="acciones-btns mt-2" *ngIf="sesion.estado === 'CONFIRMADA'">
                   <button nbButton size="tiny" status="info" 
-                          *ngIf="sesion.estado === 'CONFIRMADA'"
                           (click)="completarSesion(sesion)"
                           nbTooltip="Marcar como completada">
                     <nb-icon icon="checkmark-circle-outline"></nb-icon>
-                  </button>
-                  <button nbButton size="tiny" status="danger" ghost
-                          *ngIf="sesion.estado !== 'COMPLETADA' && sesion.estado !== 'CANCELADA'"
-                          (click)="cancelarSesion(sesion, dialogCancelar)"
-                          nbTooltip="Cancelar sesión">
-                    <nb-icon icon="close-outline"></nb-icon>
                   </button>
                 </div>
               </div>
@@ -181,21 +168,7 @@
                 </div>
               </div>
               <div class="sesion-acciones">
-                <nb-badge [text]="getEstadoTexto(sesion.estado)" [status]="getEstadoClass(sesion.estado)"></nb-badge>
-                <div class="acciones-btns mt-2">
-                  <button nbButton size="tiny" status="success" 
-                          *ngIf="sesion.estado === 'PENDIENTE'"
-                          (click)="confirmarSesion(sesion)"
-                          nbTooltip="Confirmar sesión">
-                    <nb-icon icon="checkmark-outline"></nb-icon>
-                  </button>
-                  <button nbButton size="tiny" status="danger" ghost
-                          *ngIf="sesion.estado !== 'COMPLETADA' && sesion.estado !== 'CANCELADA'"
-                          (click)="cancelarSesion(sesion, dialogCancelar)"
-                          nbTooltip="Cancelar sesión">
-                    <nb-icon icon="close-outline"></nb-icon>
-                  </button>
-                </div>
+                <nb-badge *ngIf="sesion.estado === 'CONFIRMADA'" text="Confirmada" status="success"></nb-badge>
               </div>
             </div>
           </div>
@@ -221,7 +194,6 @@
             </div>
             <nb-select [(selected)]="filtroEstado" size="small" (selectedChange)="filtrarSesiones()">
               <nb-option value="todas">Todas</nb-option>
-              <nb-option value="PENDIENTE">Pendientes</nb-option>
               <nb-option value="CONFIRMADA">Confirmadas</nb-option>
               <nb-option value="COMPLETADA">Completadas</nb-option>
               <nb-option value="CANCELADA">Canceladas</nb-option>
@@ -250,14 +222,10 @@
                   <td>{{ sesion.duracion }} min</td>
                   <td>${{ sesion.precio }}</td>
                   <td>
-                    <nb-badge [text]="getEstadoTexto(sesion.estado)" [status]="getEstadoClass(sesion.estado)"></nb-badge>
+                    <nb-badge [text]="sesion.estado === 'PENDIENTE' ? 'Esperando pago' : getEstadoTexto(sesion.estado)" 
+                              [status]="sesion.estado === 'PENDIENTE' ? 'warning' : getEstadoClass(sesion.estado)"></nb-badge>
                   </td>
                   <td>
-                    <button nbButton size="tiny" status="success" 
-                            *ngIf="sesion.estado === 'PENDIENTE'"
-                            (click)="confirmarSesion(sesion)">
-                      Confirmar
-                    </button>
                     <button nbButton size="tiny" status="info" 
                             *ngIf="sesion.estado === 'CONFIRMADA'"
                             (click)="completarSesion(sesion)">
@@ -265,6 +233,7 @@
                     </button>
                     <span *ngIf="sesion.estado === 'COMPLETADA'" class="text-success">✓</span>
                     <span *ngIf="sesion.estado === 'CANCELADA'" class="text-danger">✗</span>
+                    <span *ngIf="sesion.estado === 'PENDIENTE'" class="text-warning">⏳</span>
                   </td>
                 </tr>
               </tbody>

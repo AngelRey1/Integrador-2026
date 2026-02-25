@@ -146,9 +146,57 @@ export class EntrenadorFirebaseService {
                 return this.firestore.collection<Reserva>('reservas', ref => 
                     ref.where('entrenadorId', '==', user.uid)
                 ).valueChanges({ idField: 'id' }).pipe(
-                    map(reservas => {
+                    switchMap(async (reservas) => {
+                        const ahora = new Date();
+                        
+                        // Procesar reservas: obtener nombres y auto-completar sesiones pasadas
+                        const reservasProcesadas = await Promise.all(
+                            reservas.map(async (r) => {
+                                // Si el nombre es "Cliente" o vacío, buscar el nombre real
+                                if (!r.clienteNombre || r.clienteNombre === 'Cliente') {
+                                    try {
+                                        const userDoc = await this.firestore.doc(`users/${r.clienteId}`).get().toPromise();
+                                        const userData = userDoc?.data() as any;
+                                        if (userData && (userData.nombre || userData.displayName)) {
+                                            r.clienteNombre = userData.nombre 
+                                                ? `${userData.nombre} ${userData.apellido || ''}`.trim()
+                                                : userData.displayName || 'Cliente';
+                                        }
+                                    } catch (e) {
+                                        console.log('No se pudo obtener nombre del cliente:', r.clienteId);
+                                    }
+                                }
+                                
+                                // AUTO-COMPLETAR: Si la sesión está CONFIRMADA y ya pasó, marcarla como COMPLETADA
+                                if (r.estado === 'CONFIRMADA' && r.id) {
+                                    const fechaSesion = r.fecha instanceof Date 
+                                        ? r.fecha 
+                                        : new Date((r.fecha as any)?.seconds * 1000 || 0);
+                                    
+                                    // Calcular fecha+hora de fin de la sesión
+                                    const duracionMinutos = r.duracion || 60;
+                                    const fechaFinSesion = new Date(fechaSesion.getTime() + duracionMinutos * 60 * 1000);
+                                    
+                                    // Si la sesión ya terminó, marcarla como completada
+                                    if (fechaFinSesion < ahora) {
+                                        try {
+                                            await this.firestore.doc(`reservas/${r.id}`).update({
+                                                estado: 'COMPLETADA'
+                                            });
+                                            r.estado = 'COMPLETADA';
+                                            console.log(`Sesión ${r.id} auto-completada`);
+                                        } catch (e) {
+                                            console.log('Error al auto-completar sesión:', r.id);
+                                        }
+                                    }
+                                }
+                                
+                                return r;
+                            })
+                        );
+
                         // Ordenar en cliente
-                        let resultado = reservas.sort((a, b) => {
+                        let resultado = reservasProcesadas.sort((a, b) => {
                             const fechaA = a.fecha instanceof Date ? a.fecha : new Date((a.fecha as any)?.seconds * 1000 || 0);
                             const fechaB = b.fecha instanceof Date ? b.fecha : new Date((b.fecha as any)?.seconds * 1000 || 0);
                             return fechaB.getTime() - fechaA.getTime();
