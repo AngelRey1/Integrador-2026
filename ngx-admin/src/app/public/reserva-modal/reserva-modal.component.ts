@@ -28,6 +28,24 @@ interface RangoDisponibilidad {
   tipoSesion: 'individual' | 'grupal' | 'ambos';
 }
 
+// Sesión individual seleccionada
+interface SesionSeleccionada {
+  fecha: string;
+  horaInicio: string;
+  horaFin: string;
+  duracionMinutos: number;
+}
+
+// Día del calendario
+interface DiaCalendario {
+  fecha: Date;
+  dia: number;
+  disponible: boolean;
+  seleccionado: boolean;
+  esMesActual: boolean;
+  esHoy: boolean;
+}
+
 @Component({
   selector: 'ngx-reserva-modal',
   templateUrl: './reserva-modal.component.html',
@@ -89,6 +107,46 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
   pagoCompletado = false;
   procesandoPago = false;
   cargandoHorarios = false;
+
+  // ========== NUEVO: Sistema de reservas múltiples/recurrentes ==========
+  tipoReserva: 'unica' | 'multiple' = 'unica';
+  modoMultiple: 'calendario' | 'plan' = 'calendario';
+  sesionesSeleccionadas: SesionSeleccionada[] = [];
+  
+  // Calendario visual para múltiples sesiones
+  calendarioMes: DiaCalendario[][] = [];
+  mesActual: Date = new Date();
+  diasConDisponibilidad: Set<string> = new Set(); // formato 'YYYY-MM-DD'
+  
+  // Calendario visual para sesión única
+  calendarioUnica: DiaCalendario[][] = [];
+  mesActualUnica: Date = new Date();
+  
+  // Plan semanal (unificado)
+  planRecurrente = {
+    duracionMeses: 1 as 1 | 2 | 3,
+    diaSemana: '' as string, // Legacy, ya no se usa
+    horaInicio: '',
+    horaFin: ''
+  };
+  diasSemanaPlan: string[] = []; // Array para múltiple selección de días
+  fechasRecurrentes: string[] = []; // Fechas calculadas del plan
+  
+  // Opciones de días de semana con disponibilidad del entrenador
+  diasSemanaOpciones: { key: string; label: string; disponible: boolean }[] = [];
+  
+  // Horas disponibles para modo múltiple (basadas en entrenador)
+  horasDisponiblesMultiple: string[] = [];
+  horasFinDisponiblesMultiple: string[] = [];
+  horasDisponiblesPlan: string[] = [];
+  horasFinDisponiblesPlan: string[] = [];
+  
+  // Horario para sesiones múltiples (se usa para todas las fechas seleccionadas)
+  horarioMultiple = {
+    horaInicio: '',
+    horaFin: ''
+  };
+  // =====================================================================
 
   // Variables para OXXO (Stripe real)
   voucherOxxo: {
@@ -240,6 +298,9 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
       next: (entrenador) => {
         if (entrenador) {
           this.entrenador = entrenador;
+          // Inicializar calendario para sesión única con disponibilidad del entrenador
+          this.cargarDiasConDisponibilidad();
+          this.generarCalendarioUnica();
         } else {
           // Entrenador no encontrado
           console.warn('Entrenador no encontrado con ID:', id);
@@ -530,7 +591,7 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
   validarPasoActual(): boolean {
     switch (this.pasoActual) {
       case 1:
-        return this.paso1Form.valid;
+        return this.validarPaso1Multiple();
       case 2:
         return this.paso2Form.valid;
       case 3:
@@ -608,7 +669,10 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
    * Si simulatedMode=true, genera voucher simulado sin llamar al backend
    */
   procesarPagoOxxo() {
-    const precioFinal = this.calcularPrecioTotal() || this.entrenador?.precio || 350;
+    // Calcular precio según tipo de reserva
+    const precioFinal = this.tipoReserva === 'unica' 
+      ? (this.calcularPrecioTotal() || this.entrenador?.precio || 350)
+      : this.calcularPrecioTotalMultiple();
     const email = this.paso3Form.get('email')?.value; // Usar email del paso 3
     const nombre = this.paso3Form.get('nombre')?.value;
 
@@ -744,7 +808,11 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
    * Procesar pago con tarjeta usando Stripe real
    */
   procesarPagoTarjeta() {
-    const montoEnCentavos = Math.round(this.calcularPrecioTotal() * 100);
+    // Calcular precio según tipo de reserva
+    const precioFinal = this.tipoReserva === 'unica' 
+      ? this.calcularPrecioTotal()
+      : this.calcularPrecioTotalMultiple();
+    const montoEnCentavos = Math.round(precioFinal * 100);
     const email = this.paso3Form.get('email')?.value;
     const nombre = this.paso3Form.get('nombre')?.value;
 
@@ -801,7 +869,18 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
 
     this.enviando = true;
 
-    // Crear la reserva en Firebase
+    // Manejar según tipo de reserva
+    if (this.tipoReserva === 'unica') {
+      this.crearReservaUnica();
+    } else {
+      this.crearReservasMultiples();
+    }
+  }
+
+  /**
+   * Crear una sola reserva (flujo original)
+   */
+  private crearReservaUnica() {
     const fechaReserva = new Date(this.paso1Form.get('fecha')?.value);
     const horaInicio = this.paso1Form.get('horaInicio')?.value;
     const horaFin = this.paso1Form.get('horaFin')?.value;
@@ -811,8 +890,8 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
     fechaReserva.setHours(horas, minutos, 0, 0);
 
     const reservaData: Omit<Reserva, 'id' | 'clienteId' | 'fechaCreacion'> = {
-      entrenadorId: this.entrenador.id!,
-      entrenadorNombre: this.entrenador.nombre + ' ' + (this.entrenador.apellidoPaterno || ''),
+      entrenadorId: this.entrenador!.id!,
+      entrenadorNombre: this.entrenador!.nombre + ' ' + (this.entrenador!.apellidoPaterno || ''),
       clienteNombre: this.paso3Form.get('nombre')?.value,
       fecha: fechaReserva,
       hora: horaInicio,
@@ -820,7 +899,6 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
       duracion: this.getDuracionSesion(),
       precio: this.calcularPrecioTotal(),
       modalidad: this.paso2Form.get('modalidad')?.value,
-      // Si el pago fue completado, la reserva se confirma automáticamente
       estado: this.pagoCompletado ? 'CONFIRMADA' : 'PENDIENTE',
       notas: this.paso2Form.get('notas')?.value || '',
       ubicacion: this.paso2Form.get('ubicacion')?.value || ''
@@ -843,6 +921,70 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Crear múltiples reservas (para modo multiple y recurrente)
+   */
+  private async crearReservasMultiples() {
+    const sesiones = this.tipoReserva === 'multiple' 
+      ? this.sesionesSeleccionadas 
+      : this.fechasRecurrentes.map(fecha => ({
+          fecha: fecha,
+          horaInicio: this.planRecurrente.horaInicio,
+          horaFin: this.planRecurrente.horaFin
+        }));
+
+    const precioUnitario = this.calcularPrecioTotalMultiple() / sesiones.length;
+    const reservasCreadas: string[] = [];
+    const errores: string[] = [];
+
+    for (const sesion of sesiones) {
+      const fechaReserva = new Date(sesion.fecha);
+      const [horas, minutos] = sesion.horaInicio.split(':').map(Number);
+      fechaReserva.setHours(horas, minutos, 0, 0);
+
+      const reservaData: Omit<Reserva, 'id' | 'clienteId' | 'fechaCreacion'> = {
+        entrenadorId: this.entrenador!.id!,
+        entrenadorNombre: this.entrenador!.nombre + ' ' + (this.entrenador!.apellidoPaterno || ''),
+        clienteNombre: this.paso3Form.get('nombre')?.value,
+        fecha: fechaReserva,
+        hora: sesion.horaInicio,
+        horaFin: sesion.horaFin,
+        duracion: this.getDuracionSesion(),
+        precio: precioUnitario,
+        modalidad: this.paso2Form.get('modalidad')?.value,
+        estado: this.pagoCompletado ? 'CONFIRMADA' : 'PENDIENTE',
+        notas: `${this.paso2Form.get('notas')?.value || ''} [${this.tipoReserva === 'multiple' ? 'Sesión múltiple' : 'Plan recurrente'} - ${reservasCreadas.length + 1}/${sesiones.length}]`.trim(),
+        ubicacion: this.paso2Form.get('ubicacion')?.value || ''
+      };
+
+      try {
+        const result = await this.clienteFirebase.crearReserva(reservaData);
+        if (result.success && result.id) {
+          reservasCreadas.push(result.id);
+        } else {
+          errores.push(`Error en sesión del ${sesion.fecha}: ${result.message}`);
+        }
+      } catch (error) {
+        console.error('Error al crear reserva:', error);
+        errores.push(`Error en sesión del ${sesion.fecha}`);
+      }
+    }
+
+    this.enviando = false;
+
+    if (reservasCreadas.length > 0) {
+      this.reservaConfirmada = true;
+      this.numeroReserva = 'RSV-' + reservasCreadas[0].substring(0, 8).toUpperCase() + ` (+${reservasCreadas.length - 1} más)`;
+      console.log(`${reservasCreadas.length} reservas creadas exitosamente`);
+      
+      if (errores.length > 0) {
+        console.warn('Algunas reservas fallaron:', errores);
+      }
+    } else {
+      alert('No se pudo crear ninguna reserva. Por favor intenta de nuevo.');
+    }
+  }
+
   calcularPrecioTotal(): number {
     const duracionMinutos = this.getDuracionSesion() || 60;
     const modalidad = this.paso2Form.get('modalidad')?.value;
@@ -853,6 +995,556 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
     const personas = this.paso1Form.get('cantidadPersonas')?.value || 1;
     return ((duracionMinutos / 60) * precioHora) * personas;
   }
+
+  // ==================== MÉTODOS PARA RESERVAS MÚLTIPLES/RECURRENTES ====================
+
+  /**
+   * Cambiar tipo de reserva y resetear selecciones
+   */
+  cambiarTipoReserva(tipo: 'unica' | 'multiple') {
+    this.tipoReserva = tipo;
+    this.sesionesSeleccionadas = [];
+    this.fechasRecurrentes = [];
+    this.horarioMultiple = { horaInicio: '', horaFin: '' };
+    this.planRecurrente = { duracionMeses: 1, diaSemana: '', horaInicio: '', horaFin: '' };
+    this.diasSemanaPlan = [];
+    this.modoMultiple = 'calendario';
+    
+    // Cargar disponibilidad del entrenador
+    this.cargarDiasConDisponibilidad();
+    
+    if (tipo === 'unica') {
+      this.paso1Form.patchValue({ fecha: '', horaInicio: '', horaFin: '' });
+      this.generarCalendarioUnica();
+    } else {
+      // Para múltiple, generar calendario y cargar opciones
+      this.cargarHorasDisponiblesMultiple();
+      this.cargarDiasSemanaOpciones();
+    }
+  }
+
+  // ==================== MÉTODOS PARA CALENDARIO SESIÓN ÚNICA ====================
+
+  /**
+   * Generar calendario para sesión única
+   */
+  generarCalendarioUnica() {
+    const año = this.mesActualUnica.getFullYear();
+    const mes = this.mesActualUnica.getMonth();
+    
+    const primerDia = new Date(año, mes, 1);
+    const ultimoDia = new Date(año, mes + 1, 0);
+    const primerDiaSemana = primerDia.getDay();
+    
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    
+    const fechaSeleccionada = this.paso1Form.get('fecha')?.value;
+    
+    const semanas: DiaCalendario[][] = [];
+    let semanaActual: DiaCalendario[] = [];
+    
+    // Días del mes anterior
+    const diasMesAnterior = new Date(año, mes, 0).getDate();
+    for (let i = primerDiaSemana - 1; i >= 0; i--) {
+      const fecha = new Date(año, mes - 1, diasMesAnterior - i);
+      semanaActual.push({
+        fecha,
+        dia: fecha.getDate(),
+        disponible: false,
+        seleccionado: false,
+        esMesActual: false,
+        esHoy: false
+      });
+    }
+    
+    // Días del mes actual
+    for (let d = 1; d <= ultimoDia.getDate(); d++) {
+      const fecha = new Date(año, mes, d);
+      const fechaStr = this.formatearFechaISO(fecha);
+      const esPasado = fecha < hoy;
+      const tieneDisponibilidad = this.diasConDisponibilidad.has(fechaStr);
+      
+      semanaActual.push({
+        fecha,
+        dia: d,
+        disponible: !esPasado && tieneDisponibilidad,
+        seleccionado: fechaSeleccionada === fechaStr,
+        esMesActual: true,
+        esHoy: fecha.getTime() === hoy.getTime()
+      });
+      
+      if (semanaActual.length === 7) {
+        semanas.push(semanaActual);
+        semanaActual = [];
+      }
+    }
+    
+    // Completar última semana
+    let diaNextMes = 1;
+    while (semanaActual.length < 7 && semanaActual.length > 0) {
+      const fecha = new Date(año, mes + 1, diaNextMes);
+      semanaActual.push({
+        fecha,
+        dia: diaNextMes,
+        disponible: false,
+        seleccionado: false,
+        esMesActual: false,
+        esHoy: false
+      });
+      diaNextMes++;
+    }
+    if (semanaActual.length > 0) {
+      semanas.push(semanaActual);
+    }
+    
+    this.calendarioUnica = semanas;
+  }
+
+  /**
+   * Seleccionar un día en sesión única
+   */
+  seleccionarDiaUnico(dia: DiaCalendario) {
+    if (!dia.disponible || !dia.esMesActual) return;
+    
+    const fechaStr = this.formatearFechaISO(dia.fecha);
+    
+    // Deseleccionar todos los días
+    this.calendarioUnica.forEach(semana => {
+      semana.forEach(d => d.seleccionado = false);
+    });
+    
+    // Seleccionar este día
+    dia.seleccionado = true;
+    
+    // Actualizar el form con la fecha
+    this.paso1Form.patchValue({ fecha: fechaStr, horaInicio: '', horaFin: '' });
+    
+    // Cargar horarios disponibles para este día
+    if (this.entrenador?.id) {
+      this.cargarHorariosOcupados(this.entrenador.id, dia.fecha);
+    }
+  }
+
+  /**
+   * Navegar mes en calendario de sesión única
+   */
+  cambiarMesUnica(delta: number) {
+    this.mesActualUnica = new Date(this.mesActualUnica.getFullYear(), this.mesActualUnica.getMonth() + delta, 1);
+    this.generarCalendarioUnica();
+  }
+
+  /**
+   * Obtener nombre del mes para sesión única
+   */
+  getNombreMesUnica(): string {
+    const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                   'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    return `${meses[this.mesActualUnica.getMonth()]} ${this.mesActualUnica.getFullYear()}`;
+  }
+
+  // ==================== MÉTODOS PARA MÚLTIPLES SESIONES ====================
+
+  /**
+   * Cambiar modo dentro de múltiples sesiones
+   */
+  cambiarModoMultiple(modo: 'calendario' | 'plan') {
+    this.modoMultiple = modo;
+    this.sesionesSeleccionadas = [];
+    this.fechasRecurrentes = [];
+    this.horarioMultiple = { horaInicio: '', horaFin: '' };
+    this.planRecurrente = { duracionMeses: 1, diaSemana: '', horaInicio: '', horaFin: '' };
+    this.diasSemanaPlan = [];
+    
+    if (modo === 'calendario') {
+      this.generarCalendario();
+    }
+  }
+
+  /**
+   * Cargar opciones de días de la semana con disponibilidad del entrenador
+   */
+  cargarDiasSemanaOpciones() {
+    const dias = [
+      { key: 'lunes', label: 'Lun' },
+      { key: 'martes', label: 'Mar' },
+      { key: 'miercoles', label: 'Mié' },
+      { key: 'jueves', label: 'Jue' },
+      { key: 'viernes', label: 'Vie' },
+      { key: 'sabado', label: 'Sáb' },
+      { key: 'domingo', label: 'Dom' }
+    ];
+    
+    this.diasSemanaOpciones = dias.map(dia => {
+      const disponibilidadDia = this.entrenador?.disponibilidad?.[dia.key];
+      const disponible = disponibilidadDia && Array.isArray(disponibilidadDia) && disponibilidadDia.length > 0;
+      return { ...dia, disponible };
+    });
+  }
+
+  /**
+   * Cargar horas disponibles del entrenador para modo múltiple
+   */
+  cargarHorasDisponiblesMultiple() {
+    const todasHoras = new Set<string>();
+    
+    if (this.entrenador?.disponibilidad) {
+      Object.values(this.entrenador.disponibilidad).forEach((rangos: any) => {
+        if (Array.isArray(rangos)) {
+          rangos.forEach((rango: any) => {
+            if (rango.inicio && rango.fin) {
+              // Agregar cada hora posible en el rango
+              const horaInicio = parseInt(rango.inicio.split(':')[0]);
+              const horaFin = parseInt(rango.fin.split(':')[0]);
+              for (let h = horaInicio; h <= horaFin; h++) {
+                todasHoras.add(`${h.toString().padStart(2, '0')}:00`);
+              }
+            }
+          });
+        }
+      });
+    }
+    
+    const horasArray = Array.from(todasHoras).sort();
+    this.horasDisponiblesMultiple = horasArray.slice(0, -1); // Quitar última (no puede ser inicio)
+    this.horasFinDisponiblesMultiple = horasArray.slice(1);   // Quitar primera (no puede ser fin)
+    
+    this.horasDisponiblesPlan = [...this.horasDisponiblesMultiple];
+    this.horasFinDisponiblesPlan = [...this.horasFinDisponiblesMultiple];
+  }
+
+  /**
+   * Toggle día de semana en plan semanal (múltiple selección)
+   */
+  toggleDiaSemana(dia: string) {
+    const index = this.diasSemanaPlan.indexOf(dia);
+    if (index >= 0) {
+      this.diasSemanaPlan.splice(index, 1);
+    } else {
+      this.diasSemanaPlan.push(dia);
+    }
+    this.calcularFechasRecurrentes();
+  }
+
+  /**
+   * Establecer duración del plan
+   */
+  setPlanDuracion(meses: 1 | 2 | 3) {
+    this.planRecurrente.duracionMeses = meses;
+    this.calcularFechasRecurrentes();
+  }
+
+  /**
+   * Generar calendario del mes actual
+   */
+  generarCalendario() {
+    const año = this.mesActual.getFullYear();
+    const mes = this.mesActual.getMonth();
+    
+    // Primer día del mes
+    const primerDia = new Date(año, mes, 1);
+    const ultimoDia = new Date(año, mes + 1, 0);
+    
+    // Día de la semana del primer día (0=Dom, 1=Lun, etc.)
+    const primerDiaSemana = primerDia.getDay();
+    
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    
+    const semanas: DiaCalendario[][] = [];
+    let semanaActual: DiaCalendario[] = [];
+    
+    // Días del mes anterior para completar primera semana
+    const diasMesAnterior = new Date(año, mes, 0).getDate();
+    for (let i = primerDiaSemana - 1; i >= 0; i--) {
+      const fecha = new Date(año, mes - 1, diasMesAnterior - i);
+      semanaActual.push({
+        fecha,
+        dia: fecha.getDate(),
+        disponible: false,
+        seleccionado: false,
+        esMesActual: false,
+        esHoy: false
+      });
+    }
+    
+    // Días del mes actual
+    for (let d = 1; d <= ultimoDia.getDate(); d++) {
+      const fecha = new Date(año, mes, d);
+      const fechaStr = this.formatearFechaISO(fecha);
+      const esPasado = fecha < hoy;
+      const tieneDisponibilidad = this.diasConDisponibilidad.has(fechaStr);
+      
+      semanaActual.push({
+        fecha,
+        dia: d,
+        disponible: !esPasado && tieneDisponibilidad,
+        seleccionado: this.sesionesSeleccionadas.some(s => s.fecha === fechaStr),
+        esMesActual: true,
+        esHoy: fecha.getTime() === hoy.getTime()
+      });
+      
+      if (semanaActual.length === 7) {
+        semanas.push(semanaActual);
+        semanaActual = [];
+      }
+    }
+    
+    // Completar última semana con días del siguiente mes
+    let diaNextMes = 1;
+    while (semanaActual.length < 7 && semanaActual.length > 0) {
+      const fecha = new Date(año, mes + 1, diaNextMes);
+      semanaActual.push({
+        fecha,
+        dia: diaNextMes,
+        disponible: false,
+        seleccionado: false,
+        esMesActual: false,
+        esHoy: false
+      });
+      diaNextMes++;
+    }
+    if (semanaActual.length > 0) {
+      semanas.push(semanaActual);
+    }
+    
+    this.calendarioMes = semanas;
+  }
+
+  /**
+   * Cargar días que tienen disponibilidad del entrenador
+   */
+  cargarDiasConDisponibilidad() {
+    this.diasConDisponibilidad.clear();
+    
+    console.log('=== DEBUG cargarDiasConDisponibilidad ===');
+    console.log('Entrenador:', this.entrenador?.nombre);
+    console.log('Disponibilidad objeto:', this.entrenador?.disponibilidad);
+    
+    if (!this.entrenador?.disponibilidad) {
+      console.warn('No hay disponibilidad configurada para este entrenador');
+      return;
+    }
+    
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    
+    // Verificar próximos 90 días
+    for (let i = 0; i < 90; i++) {
+      const fecha = new Date(hoy);
+      fecha.setDate(hoy.getDate() + i);
+      
+      const diaSemana = fecha.getDay();
+      const diaKey = this.diasSemana[diaSemana];
+      
+      const disponibilidadDia = this.entrenador.disponibilidad[diaKey];
+      
+      // Log solo para primeros 7 días para ver el patrón
+      if (i < 7) {
+        console.log(`Día ${i}: ${this.formatearFechaISO(fecha)} (${diaKey}) -> `, disponibilidadDia);
+      }
+      
+      if (disponibilidadDia && Array.isArray(disponibilidadDia) && disponibilidadDia.length > 0) {
+        this.diasConDisponibilidad.add(this.formatearFechaISO(fecha));
+      }
+    }
+    
+    console.log('Total días con disponibilidad:', this.diasConDisponibilidad.size);
+    console.log('Días disponibles:', Array.from(this.diasConDisponibilidad).slice(0, 10));
+    
+    // Regenerar calendario con los días actualizados
+    this.generarCalendario();
+  }
+
+  /**
+   * Navegar mes anterior/siguiente
+   */
+  cambiarMes(delta: number) {
+    this.mesActual = new Date(this.mesActual.getFullYear(), this.mesActual.getMonth() + delta, 1);
+    this.generarCalendario();
+  }
+
+  /**
+   * Toggle selección de día en modo múltiple
+   */
+  toggleDiaSeleccionado(dia: DiaCalendario) {
+    if (!dia.disponible || !dia.esMesActual) return;
+    
+    const fechaStr = this.formatearFechaISO(dia.fecha);
+    const index = this.sesionesSeleccionadas.findIndex(s => s.fecha === fechaStr);
+    
+    if (index >= 0) {
+      // Quitar selección
+      this.sesionesSeleccionadas.splice(index, 1);
+      dia.seleccionado = false;
+    } else {
+      // Agregar si tiene horario configurado
+      if (this.horarioMultiple.horaInicio && this.horarioMultiple.horaFin) {
+        this.sesionesSeleccionadas.push({
+          fecha: fechaStr,
+          horaInicio: this.horarioMultiple.horaInicio,
+          horaFin: this.horarioMultiple.horaFin,
+          duracionMinutos: this.parseHora(this.horarioMultiple.horaFin) - this.parseHora(this.horarioMultiple.horaInicio)
+        });
+        dia.seleccionado = true;
+      } else {
+        alert('Primero selecciona el horario que deseas para todas las sesiones');
+      }
+    }
+  }
+
+  /**
+   * Actualizar horario para todas las sesiones múltiples
+   */
+  actualizarHorarioMultiple() {
+    if (!this.horarioMultiple.horaInicio || !this.horarioMultiple.horaFin) return;
+    
+    const duracion = this.parseHora(this.horarioMultiple.horaFin) - this.parseHora(this.horarioMultiple.horaInicio);
+    
+    this.sesionesSeleccionadas.forEach(sesion => {
+      sesion.horaInicio = this.horarioMultiple.horaInicio;
+      sesion.horaFin = this.horarioMultiple.horaFin;
+      sesion.duracionMinutos = duracion;
+    });
+  }
+
+  /**
+   * Configurar plan recurrente y calcular fechas (soporta múltiples días)
+   */
+  calcularFechasRecurrentes() {
+    // Usar diasSemanaPlan (array) en lugar de planRecurrente.diaSemana
+    if (this.diasSemanaPlan.length === 0 || !this.planRecurrente.horaInicio || !this.planRecurrente.horaFin) {
+      this.fechasRecurrentes = [];
+      this.sesionesSeleccionadas = [];
+      return;
+    }
+    
+    const semanas = this.planRecurrente.duracionMeses * 4; // 4 semanas por mes aproximado
+    const diaMap: { [key: string]: number } = {
+      'domingo': 0, 'lunes': 1, 'martes': 2, 'miercoles': 3,
+      'jueves': 4, 'viernes': 5, 'sabado': 6
+    };
+    
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    
+    this.fechasRecurrentes = [];
+    this.sesionesSeleccionadas = [];
+    
+    const duracion = this.parseHora(this.planRecurrente.horaFin) - this.parseHora(this.planRecurrente.horaInicio);
+    
+    // Para cada día de la semana seleccionado
+    for (const diaSemana of this.diasSemanaPlan) {
+      const diaObjetivo = diaMap[diaSemana];
+      
+      // Encontrar el próximo día de este tipo
+      let fechaInicio = new Date(hoy);
+      while (fechaInicio.getDay() !== diaObjetivo) {
+        fechaInicio.setDate(fechaInicio.getDate() + 1);
+      }
+      
+      // Agregar todas las semanas
+      for (let i = 0; i < semanas; i++) {
+        const fecha = new Date(fechaInicio);
+        fecha.setDate(fechaInicio.getDate() + (i * 7));
+        
+        const fechaStr = this.formatearFechaISO(fecha);
+        this.fechasRecurrentes.push(fechaStr);
+        
+        this.sesionesSeleccionadas.push({
+          fecha: fechaStr,
+          horaInicio: this.planRecurrente.horaInicio,
+          horaFin: this.planRecurrente.horaFin,
+          duracionMinutos: duracion
+        });
+      }
+    }
+    
+    // Ordenar fechas cronológicamente
+    this.fechasRecurrentes.sort();
+    this.sesionesSeleccionadas.sort((a, b) => a.fecha.localeCompare(b.fecha));
+    
+    // Actualizar calendario para mostrar fechas seleccionadas
+    this.generarCalendario();
+  }
+
+  /**
+   * Obtener nombre del mes en español
+   */
+  getNombreMes(): string {
+    const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                   'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    return `${meses[this.mesActual.getMonth()]} ${this.mesActual.getFullYear()}`;
+  }
+
+  /**
+   * Formatear fecha a ISO (YYYY-MM-DD)
+   */
+  private formatearFechaISO(fecha: Date): string {
+    const año = fecha.getFullYear();
+    const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
+    const dia = fecha.getDate().toString().padStart(2, '0');
+    return `${año}-${mes}-${dia}`;
+  }
+
+  /**
+   * Calcular precio total (sesión única o múltiples)
+   */
+  calcularPrecioTotalMultiple(): number {
+    const precioHora = this.entrenador?.precio || 0;
+    const personas = this.paso1Form.get('cantidadPersonas')?.value || 1;
+    
+    if (this.tipoReserva === 'unica') {
+      return this.calcularPrecioTotal();
+    }
+    
+    // Para múltiples sesiones
+    let duracionTotalMinutos = 0;
+    this.sesionesSeleccionadas.forEach(sesion => {
+      duracionTotalMinutos += sesion.duracionMinutos;
+    });
+    
+    return ((duracionTotalMinutos / 60) * precioHora) * personas;
+  }
+
+  /**
+   * Obtener total de sesiones seleccionadas
+   */
+  getTotalSesiones(): number {
+    if (this.tipoReserva === 'unica') return 1;
+    return this.sesionesSeleccionadas.length;
+  }
+
+  /**
+   * Quitar una sesión seleccionada
+   */
+  quitarSesion(index: number) {
+    const sesion = this.sesionesSeleccionadas[index];
+    this.sesionesSeleccionadas.splice(index, 1);
+    
+    // Actualizar el calendario
+    this.calendarioMes.forEach(semana => {
+      semana.forEach(dia => {
+        if (this.formatearFechaISO(dia.fecha) === sesion.fecha) {
+          dia.seleccionado = false;
+        }
+      });
+    });
+  }
+
+  /**
+   * Validar paso 1 considerando tipo de reserva
+   */
+  validarPaso1Multiple(): boolean {
+    if (this.tipoReserva === 'unica') {
+      return this.paso1Form.valid;
+    }
+    
+    // Para múltiple/recurrente, debe haber al menos una sesión
+    return this.sesionesSeleccionadas.length > 0 && this.paso1Form.get('cantidadPersonas')?.valid === true;
+  }
+
+  // ===================================================================================
 
   cerrar() {
     if (this.reservaConfirmada) {
