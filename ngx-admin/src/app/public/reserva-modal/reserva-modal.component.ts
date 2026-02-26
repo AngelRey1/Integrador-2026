@@ -146,6 +146,17 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
     horaInicio: '',
     horaFin: ''
   };
+  
+  // Modal de selección de horario por día
+  diaSeleccionandoHorario: DiaCalendario | null = null;
+  horarioTemporal = { horaInicio: '', horaFin: '' };
+  horasDisponiblesDia: string[] = [];
+  horasFinDisponiblesDia: string[] = [];
+  rangosDisponiblesDia: { inicio: string; fin: string }[] = [];
+  
+  // Sistema de mensajes de feedback
+  mensajeFeedback: { texto: string; tipo: 'success' | 'warning' | 'error' | 'info' } | null = null;
+  private feedbackTimeout: any = null;
   // =====================================================================
 
   // Variables para OXXO (Stripe real)
@@ -287,6 +298,9 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.subscriptions.forEach(sub => sub.unsubscribe());
+    if (this.feedbackTimeout) {
+      clearTimeout(this.feedbackTimeout);
+    }
   }
 
   /**
@@ -1102,10 +1116,32 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Mostrar mensaje de feedback temporal
+   */
+  mostrarFeedback(texto: string, tipo: 'success' | 'warning' | 'error' | 'info', duracion: number = 3000) {
+    if (this.feedbackTimeout) {
+      clearTimeout(this.feedbackTimeout);
+    }
+    
+    this.mensajeFeedback = { texto, tipo };
+    
+    this.feedbackTimeout = setTimeout(() => {
+      this.mensajeFeedback = null;
+    }, duracion);
+  }
+
+  /**
    * Seleccionar un día en sesión única
    */
   seleccionarDiaUnico(dia: DiaCalendario) {
-    if (!dia.disponible || !dia.esMesActual) return;
+    if (!dia.esMesActual) {
+      return;
+    }
+    
+    if (!dia.disponible) {
+      this.mostrarFeedback('Este día no tiene disponibilidad. El entrenador no trabaja este día.', 'warning');
+      return;
+    }
     
     const fechaStr = this.formatearFechaISO(dia.fecha);
     
@@ -1116,6 +1152,11 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
     
     // Seleccionar este día
     dia.seleccionado = true;
+    
+    // Mostrar confirmación
+    const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+    const nombreDia = diasSemana[dia.fecha.getDay()];
+    this.mostrarFeedback(`${nombreDia} ${dia.fecha.getDate()} seleccionado. Ahora elige el horario.`, 'success');
     
     // Actualizar el form con la fecha
     this.paso1Form.patchValue({ fecha: fechaStr, horaInicio: '', horaFin: '' });
@@ -1365,7 +1406,7 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Toggle selección de día en modo múltiple
+   * Toggle selección de día en modo múltiple (legacy - ya no se usa directamente)
    */
   toggleDiaSeleccionado(dia: DiaCalendario) {
     if (!dia.disponible || !dia.esMesActual) return;
@@ -1391,6 +1432,135 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
         alert('Primero selecciona el horario que deseas para todas las sesiones');
       }
     }
+  }
+
+  /**
+   * Abrir modal para seleccionar horario de un día específico
+   */
+  abrirSelectorHorario(dia: DiaCalendario) {
+    if (!dia.esMesActual) {
+      return;
+    }
+    
+    if (!dia.disponible) {
+      const diasSemana = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+      const nombreDia = diasSemana[dia.fecha.getDay()];
+      this.mostrarFeedback(`El entrenador no tiene disponibilidad los ${nombreDia}. Selecciona otro día.`, 'warning');
+      return;
+    }
+    
+    const fechaStr = this.formatearFechaISO(dia.fecha);
+    
+    // Si ya está seleccionado, quitarlo
+    const index = this.sesionesSeleccionadas.findIndex(s => s.fecha === fechaStr);
+    if (index >= 0) {
+      this.sesionesSeleccionadas.splice(index, 1);
+      dia.seleccionado = false;
+      this.mostrarFeedback(`Sesión del ${dia.fecha.getDate()}/${dia.fecha.getMonth() + 1} eliminada`, 'info');
+      return;
+    }
+    
+    // Cargar horarios disponibles para este día
+    this.diaSeleccionandoHorario = dia;
+    this.horarioTemporal = { horaInicio: '', horaFin: '' };
+    this.cargarHorariosParaDia(dia.fecha);
+  }
+
+  /**
+   * Cargar horarios disponibles del entrenador para un día específico
+   */
+  cargarHorariosParaDia(fecha: Date) {
+    const diaSemana = fecha.getDay();
+    const diaKey = this.diasSemana[diaSemana];
+    
+    const disponibilidadDia = this.entrenador?.disponibilidad?.[diaKey];
+    this.rangosDisponiblesDia = [];
+    this.horasDisponiblesDia = [];
+    this.horasFinDisponiblesDia = [];
+    
+    if (disponibilidadDia && Array.isArray(disponibilidadDia)) {
+      // Guardar rangos para mostrar
+      this.rangosDisponiblesDia = disponibilidadDia.map((r: any) => ({
+        inicio: r.inicio,
+        fin: r.fin
+      }));
+      
+      // Generar todas las horas posibles
+      const todasHoras = new Set<string>();
+      disponibilidadDia.forEach((rango: any) => {
+        if (rango.inicio && rango.fin) {
+          const horaInicio = parseInt(rango.inicio.split(':')[0]);
+          const horaFin = parseInt(rango.fin.split(':')[0]);
+          for (let h = horaInicio; h <= horaFin; h++) {
+            todasHoras.add(`${h.toString().padStart(2, '0')}:00`);
+          }
+        }
+      });
+      
+      const horasArray = Array.from(todasHoras).sort();
+      this.horasDisponiblesDia = horasArray.slice(0, -1);
+      this.horasFinDisponiblesDia = horasArray.slice(1);
+    }
+  }
+
+  /**
+   * Cerrar modal de selección de horario
+   */
+  cerrarSelectorHorario() {
+    this.diaSeleccionandoHorario = null;
+    this.horarioTemporal = { horaInicio: '', horaFin: '' };
+  }
+
+  /**
+   * Confirmar y agregar sesión con horario seleccionado
+   */
+  confirmarSesionMultiple() {
+    if (!this.diaSeleccionandoHorario || !this.horarioTemporal.horaInicio || !this.horarioTemporal.horaFin) {
+      this.mostrarFeedback('Debes seleccionar hora de inicio y fin', 'warning');
+      return;
+    }
+    
+    const fechaStr = this.formatearFechaISO(this.diaSeleccionandoHorario.fecha);
+    const duracion = this.parseHora(this.horarioTemporal.horaFin) - this.parseHora(this.horarioTemporal.horaInicio);
+    
+    this.sesionesSeleccionadas.push({
+      fecha: fechaStr,
+      horaInicio: this.horarioTemporal.horaInicio,
+      horaFin: this.horarioTemporal.horaFin,
+      duracionMinutos: duracion
+    });
+    
+    this.diaSeleccionandoHorario.seleccionado = true;
+    
+    const dia = this.diaSeleccionandoHorario.fecha.getDate();
+    const mes = this.diaSeleccionandoHorario.fecha.getMonth() + 1;
+    this.mostrarFeedback(`¡Sesión del ${dia}/${mes} agregada! (${this.horarioTemporal.horaInicio} - ${this.horarioTemporal.horaFin})`, 'success');
+    
+    this.cerrarSelectorHorario();
+    
+    // Actualizar el calendario
+    this.generarCalendario();
+  }
+
+  /**
+   * Quitar una sesión de la lista
+   */
+  quitarSesion(index: number) {
+    const sesion = this.sesionesSeleccionadas[index];
+    this.sesionesSeleccionadas.splice(index, 1);
+    
+    // Mostrar mensaje de confirmación
+    const fechaParts = sesion.fecha.split('-');
+    this.mostrarFeedback(`Sesión del ${fechaParts[2]}/${fechaParts[1]} eliminada`, 'info');
+    
+    // Actualizar el calendario para deseleccionar el día
+    this.calendarioMes.forEach(semana => {
+      semana.forEach(dia => {
+        if (this.formatearFechaISO(dia.fecha) === sesion.fecha) {
+          dia.seleccionado = false;
+        }
+      });
+    });
   }
 
   /**
@@ -1513,23 +1683,6 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
   getTotalSesiones(): number {
     if (this.tipoReserva === 'unica') return 1;
     return this.sesionesSeleccionadas.length;
-  }
-
-  /**
-   * Quitar una sesión seleccionada
-   */
-  quitarSesion(index: number) {
-    const sesion = this.sesionesSeleccionadas[index];
-    this.sesionesSeleccionadas.splice(index, 1);
-    
-    // Actualizar el calendario
-    this.calendarioMes.forEach(semana => {
-      semana.forEach(dia => {
-        if (this.formatearFechaISO(dia.fecha) === sesion.fecha) {
-          dia.seleccionado = false;
-        }
-      });
-    });
   }
 
   /**

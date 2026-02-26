@@ -1,6 +1,21 @@
 <nb-layout>
   <nb-layout-column class="no-layout-padding">
     <div class="reserva-page-container">
+      
+      <!-- Mensaje de feedback flotante -->
+      <div class="feedback-toast" 
+           *ngIf="mensajeFeedback" 
+           [class.feedback-success]="mensajeFeedback.tipo === 'success'"
+           [class.feedback-warning]="mensajeFeedback.tipo === 'warning'"
+           [class.feedback-error]="mensajeFeedback.tipo === 'error'"
+           [class.feedback-info]="mensajeFeedback.tipo === 'info'">
+        <nb-icon [icon]="mensajeFeedback.tipo === 'success' ? 'checkmark-circle-outline' : 
+                         mensajeFeedback.tipo === 'warning' ? 'alert-triangle-outline' : 
+                         mensajeFeedback.tipo === 'error' ? 'close-circle-outline' : 
+                         'info-outline'"></nb-icon>
+        <span>{{ mensajeFeedback.texto }}</span>
+      </div>
+
       <!-- Estado de carga -->
       <div class="reserva-card" *ngIf="cargandoEntrenador">
         <div class="loading-state">
@@ -72,20 +87,23 @@
           <div class="form-group">
             <label>Fecha de la sesión *</label>
             
-            <!-- Calendario visual para sesión única -->
-            <div class="calendario-container calendario-unica">
+            <!-- Calendario visual premium para sesión única -->
+            <div class="calendario-container calendario-premium">
               <div class="calendario-header">
                 <button type="button" class="btn-nav-mes" (click)="cambiarMesUnica(-1)">
                   <nb-icon icon="chevron-left-outline"></nb-icon>
                 </button>
-                <span class="mes-actual">{{ getNombreMesUnica() }}</span>
+                <div class="mes-info">
+                  <span class="mes-actual">{{ getNombreMesUnica() }}</span>
+                  <small class="mes-hint">Selecciona una fecha disponible</small>
+                </div>
                 <button type="button" class="btn-nav-mes" (click)="cambiarMesUnica(1)">
                   <nb-icon icon="chevron-right-outline"></nb-icon>
                 </button>
               </div>
               
               <div class="calendario-dias-semana">
-                <span>Dom</span><span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span>
+                <span>D</span><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span>
               </div>
               
               <div class="calendario-grid">
@@ -98,15 +116,18 @@
                        [class.seleccionado]="dia.seleccionado"
                        [class.hoy]="dia.esHoy"
                        (click)="seleccionarDiaUnico(dia)"
-                       [title]="!dia.disponible ? 'El entrenador no trabaja este día' : ''">
-                    {{ dia.dia }}
+                       [title]="!dia.disponible ? 'El entrenador no trabaja este día' : 'Clic para seleccionar'">
+                    <span class="dia-numero">{{ dia.dia }}</span>
+                    <span class="dia-indicador" *ngIf="dia.seleccionado">
+                      <nb-icon icon="checkmark-outline"></nb-icon>
+                    </span>
                   </div>
                 </div>
               </div>
 
               <div class="calendario-leyenda">
                 <span class="leyenda-item"><span class="dot disponible"></span> Disponible</span>
-                <span class="leyenda-item"><span class="dot no-disponible"></span> No disponible</span>
+                <span class="leyenda-item"><span class="dot no-disponible"></span> No trabaja</span>
               </div>
             </div>
 
@@ -242,49 +263,26 @@
           <div class="modo-calendario-content" *ngIf="modoMultiple === 'calendario'">
             <div class="instrucciones-multiple">
               <nb-icon icon="bulb-outline"></nb-icon>
-              <span>Selecciona el horario y luego haz clic en los días verdes</span>
+              <span>Haz clic en un día disponible para agregar una sesión con su horario</span>
             </div>
 
-            <!-- Selector de horario común -->
-            <div class="horario-comun-section">
-              <label>Horario para todas las sesiones *</label>
-              <div class="horario-rango-container">
-                <div class="hora-selector">
-                  <label class="hora-label">Desde</label>
-                  <select [(ngModel)]="horarioMultiple.horaInicio" class="form-select hora-select" 
-                          (change)="actualizarHorarioMultiple()">
-                    <option value="">Hora inicio</option>
-                    <option *ngFor="let h of horasDisponiblesMultiple" [value]="h">{{ h }}</option>
-                  </select>
-                </div>
-                <div class="hora-flecha">
-                  <nb-icon icon="arrow-forward-outline"></nb-icon>
-                </div>
-                <div class="hora-selector">
-                  <label class="hora-label">Hasta</label>
-                  <select [(ngModel)]="horarioMultiple.horaFin" class="form-select hora-select"
-                          (change)="actualizarHorarioMultiple()">
-                    <option value="">Hora fin</option>
-                    <option *ngFor="let h of horasFinDisponiblesMultiple" [value]="h">{{ h }}</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <!-- Calendario visual -->
-            <div class="calendario-container">
+            <!-- Calendario visual mejorado -->
+            <div class="calendario-container calendario-premium">
               <div class="calendario-header">
                 <button class="btn-nav-mes" (click)="cambiarMes(-1)">
                   <nb-icon icon="chevron-left-outline"></nb-icon>
                 </button>
-                <span class="mes-actual">{{ getNombreMes() }}</span>
+                <div class="mes-info">
+                  <span class="mes-actual">{{ getNombreMes() }}</span>
+                  <small class="mes-hint">Selecciona las fechas de tus sesiones</small>
+                </div>
                 <button class="btn-nav-mes" (click)="cambiarMes(1)">
                   <nb-icon icon="chevron-right-outline"></nb-icon>
                 </button>
               </div>
               
               <div class="calendario-dias-semana">
-                <span>Dom</span><span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span>
+                <span>D</span><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span>
               </div>
               
               <div class="calendario-grid">
@@ -296,17 +294,74 @@
                        [class.disponible]="dia.disponible"
                        [class.seleccionado]="dia.seleccionado"
                        [class.hoy]="dia.esHoy"
-                       (click)="toggleDiaSeleccionado(dia)"
-                       [title]="!dia.disponible ? 'No disponible' : ''">
-                    {{ dia.dia }}
+                       (click)="abrirSelectorHorario(dia)"
+                       [title]="!dia.disponible ? 'El entrenador no trabaja este día' : 'Clic para agregar sesión'">
+                    <span class="dia-numero">{{ dia.dia }}</span>
+                    <span class="dia-indicador" *ngIf="dia.seleccionado">
+                      <nb-icon icon="checkmark-outline"></nb-icon>
+                    </span>
                   </div>
                 </div>
               </div>
 
               <div class="calendario-leyenda">
                 <span class="leyenda-item"><span class="dot disponible"></span> Disponible</span>
-                <span class="leyenda-item"><span class="dot no-disponible"></span> No disponible</span>
+                <span class="leyenda-item"><span class="dot no-disponible"></span> No trabaja</span>
                 <span class="leyenda-item"><span class="dot seleccionado"></span> Seleccionado</span>
+              </div>
+            </div>
+
+            <!-- Modal para seleccionar horario del día -->
+            <div class="horario-modal-overlay" *ngIf="diaSeleccionandoHorario" (click)="cerrarSelectorHorario()">
+              <div class="horario-modal" (click)="$event.stopPropagation()">
+                <div class="horario-modal-header">
+                  <h4>
+                    <nb-icon icon="calendar-outline"></nb-icon>
+                    {{ diaSeleccionandoHorario?.fecha | date:'EEEE d \'de\' MMMM':'':'es' }}
+                  </h4>
+                  <button class="btn-cerrar-modal" (click)="cerrarSelectorHorario()">
+                    <nb-icon icon="close-outline"></nb-icon>
+                  </button>
+                </div>
+                <div class="horario-modal-body">
+                  <label>Selecciona el horario para esta sesión:</label>
+                  <div class="horario-modal-selects">
+                    <div class="hora-selector">
+                      <label class="hora-label">Desde</label>
+                      <select [(ngModel)]="horarioTemporal.horaInicio" class="form-select hora-select">
+                        <option value="">Hora inicio</option>
+                        <option *ngFor="let h of horasDisponiblesDia" [value]="h">{{ h }}</option>
+                      </select>
+                    </div>
+                    <div class="hora-flecha">
+                      <nb-icon icon="arrow-forward-outline"></nb-icon>
+                    </div>
+                    <div class="hora-selector">
+                      <label class="hora-label">Hasta</label>
+                      <select [(ngModel)]="horarioTemporal.horaFin" class="form-select hora-select">
+                        <option value="">Hora fin</option>
+                        <option *ngFor="let h of horasFinDisponiblesDia" [value]="h">{{ h }}</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="rangos-disponibles-modal" *ngIf="rangosDisponiblesDia.length > 0">
+                    <small>Horarios del entrenador este día:</small>
+                    <div class="rangos-chips">
+                      <span class="rango-chip" *ngFor="let rango of rangosDisponiblesDia">
+                        {{ rango.inicio }} - {{ rango.fin }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="horario-modal-footer">
+                  <button class="btn-cancelar" (click)="cerrarSelectorHorario()">Cancelar</button>
+                  <button class="btn-agregar" 
+                          [disabled]="!horarioTemporal.horaInicio || !horarioTemporal.horaFin"
+                          (click)="confirmarSesionMultiple()">
+                    <nb-icon icon="plus-outline"></nb-icon>
+                    Agregar sesión
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -394,12 +449,25 @@
           </div>
 
           <!-- Lista de sesiones seleccionadas (común) -->
-          <div class="sesiones-seleccionadas" *ngIf="sesionesSeleccionadas.length > 0">
-            <h4>Sesiones seleccionadas ({{ sesionesSeleccionadas.length }})</h4>
-            <div class="sesion-chip" *ngFor="let sesion of sesionesSeleccionadas; let i = index">
-              <span>{{ sesion.fecha | date:'EEE d MMM':'':'es' }} · {{ sesion.horaInicio }} - {{ sesion.horaFin }}</span>
-              <button class="btn-quitar" (click)="quitarSesion(i)" *ngIf="modoMultiple === 'calendario'">
-                <nb-icon icon="close-outline"></nb-icon>
+          <div class="sesiones-seleccionadas sesiones-mejorada" *ngIf="sesionesSeleccionadas.length > 0">
+            <div class="sesiones-header">
+              <h4>
+                <nb-icon icon="calendar-outline"></nb-icon>
+                Sesiones seleccionadas
+              </h4>
+              <span class="sesiones-count">{{ sesionesSeleccionadas.length }}</span>
+            </div>
+            <div class="sesion-chip-mejorado" *ngFor="let sesion of sesionesSeleccionadas; let i = index">
+              <div class="sesion-info">
+                <span class="sesion-fecha">{{ sesion.fecha | date:'EEEE d':'':'es' }}</span>
+                <span class="sesion-mes">{{ sesion.fecha | date:'MMMM':'':'es' }}</span>
+              </div>
+              <div class="sesion-horario">
+                <nb-icon icon="clock-outline"></nb-icon>
+                {{ sesion.horaInicio }} - {{ sesion.horaFin }}
+              </div>
+              <button class="btn-quitar-mejorado" (click)="quitarSesion(i)" title="Quitar sesión">
+                <nb-icon icon="trash-2-outline"></nb-icon>
               </button>
             </div>
           </div>

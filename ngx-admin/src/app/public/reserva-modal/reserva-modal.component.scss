@@ -6,6 +6,79 @@
 }
 
 // ============================================
+// FEEDBACK TOAST - Mensajes flotantes
+// ============================================
+.feedback-toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 24px;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.1);
+  animation: slideDown 0.4s ease-out, fadeIn 0.3s ease-out;
+  backdrop-filter: blur(10px);
+  max-width: 90vw;
+  
+  nb-icon {
+    width: 24px !important;
+    height: 24px !important;
+    font-size: 24px !important;
+    flex-shrink: 0;
+  }
+  
+  span {
+    font-size: 0.95rem;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+  
+  &.feedback-success {
+    background: linear-gradient(135deg, #00d68f 0%, #00b887 100%);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  &.feedback-warning {
+    background: linear-gradient(135deg, #ffaa00 0%, #ff9500 100%);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  &.feedback-error {
+    background: linear-gradient(135deg, #ff3d71 0%, #db2c66 100%);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  &.feedback-info {
+    background: linear-gradient(135deg, #0095ff 0%, #0077cc 100%);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateX(-50%) translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+// ============================================
 // ESTILOS CRÍTICOS - Cargar primero para evitar flash de iconos
 // ============================================
 :host {
@@ -2933,5 +3006,572 @@
     margin-top: 0.5rem;
     color: #6366f1;
     font-weight: 500;
+  }
+}
+
+// ==========================================
+// CALENDARIO PREMIUM
+// ==========================================
+.calendario-premium {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  border: none;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.04);
+  border-radius: 20px;
+  padding: 1.25rem;
+  overflow: hidden;
+
+  .calendario-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e2e8f0;
+
+    .mes-info {
+      text-align: center;
+
+      .mes-actual {
+        display: block;
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: #0f172a;
+        letter-spacing: -0.02em;
+      }
+
+      .mes-hint {
+        display: block;
+        font-size: 0.7rem;
+        color: #94a3b8;
+        margin-top: 0.25rem;
+      }
+    }
+
+    .btn-nav-mes {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border: none;
+      background: white;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: #64748b;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+      &:hover {
+        background: #3366ff;
+        color: white;
+        transform: scale(1.05);
+      }
+
+      nb-icon {
+        font-size: 1.25rem !important;
+        width: 1.25rem !important;
+        height: 1.25rem !important;
+      }
+    }
+  }
+
+  .calendario-dias-semana {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    margin-bottom: 0.75rem;
+
+    span {
+      text-align: center;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+      padding: 0.5rem 0;
+      letter-spacing: 0.05em;
+    }
+  }
+
+  .calendario-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .calendario-semana {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+
+  .calendario-dia {
+    position: relative;
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: white;
+    color: #0f172a;
+    border: 2px solid transparent;
+
+    .dia-numero {
+      z-index: 1;
+    }
+
+    .dia-indicador {
+      position: absolute;
+      bottom: 3px;
+      font-size: 0.6rem !important;
+      
+      nb-icon {
+        font-size: 0.7rem !important;
+        width: 0.7rem !important;
+        height: 0.7rem !important;
+      }
+    }
+
+    &.otro-mes {
+      color: #cbd5e1;
+      cursor: default;
+      background: transparent;
+    }
+
+    &.no-disponible {
+      background: linear-gradient(135deg, #fef2f2, #fee2e2);
+      color: #dc2626;
+      cursor: not-allowed;
+      border-color: #fecaca;
+
+      &::after {
+        content: '';
+        position: absolute;
+        width: 60%;
+        height: 2px;
+        background: #f87171;
+        transform: rotate(-45deg);
+        opacity: 0.5;
+      }
+
+      &:hover {
+        background: linear-gradient(135deg, #fef2f2, #fee2e2);
+        transform: none;
+      }
+    }
+
+    &.disponible {
+      background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+      color: #15803d;
+      border-color: #bbf7d0;
+
+      &:hover {
+        background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+        transform: scale(1.08);
+        box-shadow: 0 4px 12px rgba(34, 197, 94, 0.25);
+        border-color: #22c55e;
+      }
+    }
+
+    &.seleccionado {
+      background: linear-gradient(135deg, #3366ff, #6366f1);
+      color: white;
+      border-color: transparent;
+      box-shadow: 0 4px 16px rgba(51, 102, 255, 0.4);
+
+      .dia-indicador {
+        color: rgba(255, 255, 255, 0.9);
+      }
+
+      &:hover {
+        background: linear-gradient(135deg, #2952cc, #4f46e5);
+        transform: scale(1.08);
+      }
+    }
+
+    &.hoy {
+      &::before {
+        content: '';
+        position: absolute;
+        inset: -3px;
+        border: 2px solid #3366ff;
+        border-radius: 14px;
+        animation: pulse 2s infinite;
+      }
+    }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  .calendario-leyenda {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e2e8f0;
+
+    .leyenda-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+      color: #64748b;
+      font-weight: 500;
+
+      .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 4px;
+
+        &.disponible {
+          background: linear-gradient(135deg, #22c55e, #16a34a);
+        }
+
+        &.no-disponible {
+          background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+
+        &.seleccionado {
+          background: linear-gradient(135deg, #3366ff, #6366f1);
+        }
+      }
+    }
+  }
+}
+
+// ==========================================
+// MODAL DE HORARIO
+// ==========================================
+.horario-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+.horario-modal {
+  background: white;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 420px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  animation: slideUp 0.3s ease;
+
+  @keyframes slideUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .horario-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem;
+    background: linear-gradient(135deg, #3366ff, #6366f1);
+    color: white;
+
+    h4 {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 600;
+      text-transform: capitalize;
+
+      nb-icon {
+        font-size: 1.25rem !important;
+        width: 1.25rem !important;
+        height: 1.25rem !important;
+      }
+    }
+
+    .btn-cerrar-modal {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      cursor: pointer;
+      color: white;
+      transition: all 0.2s;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      nb-icon {
+        font-size: 1.1rem !important;
+        width: 1.1rem !important;
+        height: 1.1rem !important;
+      }
+    }
+  }
+
+  .horario-modal-body {
+    padding: 1.5rem;
+
+    > label {
+      display: block;
+      font-weight: 600;
+      color: #0f172a;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .horario-modal-selects {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+
+      .hora-selector {
+        flex: 1;
+      }
+
+      .hora-flecha {
+        color: #94a3b8;
+      }
+    }
+
+    .rangos-disponibles-modal {
+      margin-top: 1.25rem;
+      padding: 1rem;
+      background: #f8fafc;
+      border-radius: 12px;
+      border: 1px dashed #e2e8f0;
+
+      > small {
+        display: block;
+        font-size: 0.75rem;
+        color: #64748b;
+        margin-bottom: 0.5rem;
+      }
+
+      .rangos-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.375rem;
+      }
+
+      .rango-chip {
+        display: inline-block;
+        padding: 0.375rem 0.75rem;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        color: #475569;
+        font-weight: 500;
+      }
+    }
+  }
+
+  .horario-modal-footer {
+    display: flex;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem 1.5rem;
+    border-top: 1px solid #f1f5f9;
+
+    .btn-cancelar {
+      flex: 1;
+      padding: 0.875rem 1.25rem;
+      border: 2px solid #e2e8f0;
+      background: white;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #64748b;
+      transition: all 0.2s;
+
+      &:hover {
+        border-color: #cbd5e1;
+        background: #f8fafc;
+      }
+    }
+
+    .btn-agregar {
+      flex: 1.5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.875rem 1.25rem;
+      border: none;
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: white;
+      transition: all 0.2s;
+
+      &:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(34, 197, 94, 0.35);
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      nb-icon {
+        font-size: 1rem !important;
+        width: 1rem !important;
+        height: 1rem !important;
+      }
+    }
+  }
+}
+
+// ==========================================
+// SESIONES SELECCIONADAS MEJORADAS
+// ==========================================
+.sesiones-mejorada {
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 16px;
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+  border: 1px solid #e2e8f0;
+
+  .sesiones-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e2e8f0;
+
+    h4 {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 0;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #0f172a;
+
+      nb-icon {
+        font-size: 1.1rem !important;
+        width: 1.1rem !important;
+        height: 1.1rem !important;
+        color: #3366ff;
+      }
+    }
+
+    .sesiones-count {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 28px;
+      height: 28px;
+      background: linear-gradient(135deg, #3366ff, #6366f1);
+      color: white;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+  }
+
+  .sesion-chip-mejorado {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.875rem 1rem;
+    background: white;
+    border-radius: 12px;
+    margin-bottom: 0.5rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s;
+
+    &:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      border-color: #cbd5e1;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .sesion-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+
+      .sesion-fecha {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #0f172a;
+        text-transform: capitalize;
+      }
+
+      .sesion-mes {
+        font-size: 0.75rem;
+        color: #64748b;
+        text-transform: capitalize;
+      }
+    }
+
+    .sesion-horario {
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.375rem 0.75rem;
+      background: linear-gradient(135deg, #f0f4ff, #eff6ff);
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #3366ff;
+
+      nb-icon {
+        font-size: 0.9rem !important;
+        width: 0.9rem !important;
+        height: 0.9rem !important;
+      }
+    }
+
+    .btn-quitar-mejorado {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: #fef2f2;
+      border-radius: 8px;
+      cursor: pointer;
+      color: #dc2626;
+      transition: all 0.2s;
+
+      &:hover {
+        background: #fee2e2;
+        transform: scale(1.05);
+      }
+
+      nb-icon {
+        font-size: 1rem !important;
+        width: 1rem !important;
+        height: 1rem !important;
+      }
+    }
   }
 }
