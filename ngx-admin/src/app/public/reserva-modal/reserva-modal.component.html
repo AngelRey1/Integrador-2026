@@ -3,17 +3,9 @@
     <div class="reserva-page-container">
       
       <!-- Mensaje de feedback flotante -->
-      <div class="feedback-toast" 
-           *ngIf="mensajeFeedback" 
-           [class.feedback-success]="mensajeFeedback.tipo === 'success'"
-           [class.feedback-warning]="mensajeFeedback.tipo === 'warning'"
-           [class.feedback-error]="mensajeFeedback.tipo === 'error'"
-           [class.feedback-info]="mensajeFeedback.tipo === 'info'">
-        <nb-icon [icon]="mensajeFeedback.tipo === 'success' ? 'checkmark-circle-outline' : 
-                         mensajeFeedback.tipo === 'warning' ? 'alert-triangle-outline' : 
-                         mensajeFeedback.tipo === 'error' ? 'close-circle-outline' : 
-                         'info-outline'"></nb-icon>
-        <span>{{ mensajeFeedback.texto }}</span>
+      <div class="feedback-message" *ngIf="mostrarFeedback">
+        <nb-icon icon="alert-circle-outline"></nb-icon>
+        <span>{{ mensajeFeedback }}</span>
       </div>
 
       <!-- Estado de carga -->
@@ -60,8 +52,11 @@
       </div>
     </div>
 
-    <!-- Contenedor de pasos -->
-    <div class="wizard-content">
+    <!-- Contenedor principal -->
+    <div class="wizard-layout">
+      
+      <!-- Contenedor de pasos -->
+      <div class="wizard-content">
 
       <!-- PASO 1: Fecha y Hora -->
       <div class="paso-container" *ngIf="pasoActual === 1">
@@ -88,22 +83,21 @@
             <label>Fecha de la sesión *</label>
             
             <!-- Calendario visual premium para sesión única -->
-            <div class="calendario-container calendario-premium">
+            <div class="calendario-container calendario-premium calendario-profesional">
               <div class="calendario-header">
                 <button type="button" class="btn-nav-mes" (click)="cambiarMesUnica(-1)">
-                  <nb-icon icon="chevron-left-outline"></nb-icon>
+                  <nb-icon icon="arrow-ios-back-outline"></nb-icon>
                 </button>
                 <div class="mes-info">
                   <span class="mes-actual">{{ getNombreMesUnica() }}</span>
-                  <small class="mes-hint">Selecciona una fecha disponible</small>
                 </div>
                 <button type="button" class="btn-nav-mes" (click)="cambiarMesUnica(1)">
-                  <nb-icon icon="chevron-right-outline"></nb-icon>
+                  <nb-icon icon="arrow-ios-forward-outline"></nb-icon>
                 </button>
               </div>
               
               <div class="calendario-dias-semana">
-                <span>D</span><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span>
+                <span>Dom</span><span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span>
               </div>
               
               <div class="calendario-grid">
@@ -111,23 +105,38 @@
                   <div *ngFor="let dia of semana" 
                        class="calendario-dia"
                        [class.otro-mes]="!dia.esMesActual"
-                       [class.no-disponible]="!dia.disponible"
-                       [class.disponible]="dia.disponible"
+                       [class.no-disponible]="!dia.disponible && dia.esMesActual"
+                       [class.disponible]="dia.disponible && dia.esMesActual"
                        [class.seleccionado]="dia.seleccionado"
                        [class.hoy]="dia.esHoy"
                        (click)="seleccionarDiaUnico(dia)"
-                       [title]="!dia.disponible ? 'El entrenador no trabaja este día' : 'Clic para seleccionar'">
+                       [attr.data-tooltip]="!dia.disponible && dia.esMesActual ? 'No disponible' : null">
                     <span class="dia-numero">{{ dia.dia }}</span>
-                    <span class="dia-indicador" *ngIf="dia.seleccionado">
+                    <span class="dia-estado" *ngIf="dia.disponible && dia.esMesActual && !dia.seleccionado">
+                      <span class="estado-dot"></span>
+                    </span>
+                    <span class="dia-check" *ngIf="dia.seleccionado">
                       <nb-icon icon="checkmark-outline"></nb-icon>
                     </span>
                   </div>
                 </div>
               </div>
 
-              <div class="calendario-leyenda">
-                <span class="leyenda-item"><span class="dot disponible"></span> Disponible</span>
-                <span class="leyenda-item"><span class="dot no-disponible"></span> No trabaja</span>
+              <div class="calendario-footer">
+                <div class="leyenda-profesional">
+                  <span class="leyenda-item">
+                    <span class="indicador disponible"></span>
+                    Disponible
+                  </span>
+                  <span class="leyenda-item">
+                    <span class="indicador no-disponible"></span>
+                    No disponible
+                  </span>
+                  <span class="leyenda-item">
+                    <span class="indicador seleccionado"></span>
+                    Seleccionado
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -140,8 +149,15 @@
           </div>
 
           <!-- Selector de Horarios - Hora Inicio y Hora Fin -->
-          <div class="form-group" *ngIf="paso1Form.get('fecha')?.value">
-            <label>Horario de la sesión *</label>
+          <div class="form-group horario-profesional" *ngIf="paso1Form.get('fecha')?.value">
+            <div class="horario-header">
+              <div class="horario-titulo">
+                <nb-icon icon="clock-outline"></nb-icon>
+                <span>Horario de la sesión</span>
+              </div>
+              <span class="horario-badge">Requerido</span>
+            </div>
+            
             <div *ngIf="cargandoHorarios" class="loading-horarios">
               <nb-spinner status="primary" size="small"></nb-spinner>
               <span>Cargando disponibilidad...</span>
@@ -154,45 +170,63 @@
             </div>
             
             <!-- Selectores de hora inicio y fin -->
-            <div class="horario-rango-container" *ngIf="!cargandoHorarios && rangosDelDia.length > 0">
-              <div class="hora-selector">
-                <label class="hora-label">Desde</label>
-                <select formControlName="horaInicio" class="form-select hora-select">
-                  <option value="">Selecciona hora inicio</option>
-                  <option *ngFor="let hora of horasInicio" [value]="hora">{{ hora }}</option>
-                </select>
+            <div class="horario-rango-profesional" *ngIf="!cargandoHorarios && rangosDelDia.length > 0">
+              <div class="tiempo-selector">
+                <div class="tiempo-icono inicio">
+                  <span class="icono-texto">IN</span>
+                  <span class="icono-punto"></span>
+                </div>
+                <div class="tiempo-campo">
+                  <label class="tiempo-label">Hora de inicio</label>
+                  <select formControlName="horaInicio" class="tiempo-select">
+                    <option value="">Selecciona hora</option>
+                    <option *ngFor="let hora of horasInicio" [value]="hora">{{ hora }}</option>
+                  </select>
+                </div>
               </div>
               
-              <div class="hora-flecha">
-                <nb-icon icon="arrow-forward-outline"></nb-icon>
+              <div class="tiempo-conexion">
+                <div class="linea-tiempo"></div>
+                <div class="duracion-pill" *ngIf="getDuracionSesion() > 0">
+                  <nb-icon icon="time-outline"></nb-icon>
+                  {{ getDuracionFormateada() }}
+                </div>
+                <div class="linea-tiempo"></div>
               </div>
               
-              <div class="hora-selector">
-                <label class="hora-label">Hasta</label>
-                <select formControlName="horaFin" class="form-select hora-select" 
-                        [disabled]="!paso1Form.get('horaInicio')?.value">
-                  <option value="">Selecciona hora fin</option>
-                  <option *ngFor="let hora of horasFin" [value]="hora">{{ hora }}</option>
-                </select>
+              <div class="tiempo-selector">
+                <div class="tiempo-icono fin">
+                  <span class="icono-texto">FIN</span>
+                  <span class="icono-punto"></span>
+                </div>
+                <div class="tiempo-campo">
+                  <label class="tiempo-label">Hora de fin</label>
+                  <select formControlName="horaFin" class="tiempo-select" 
+                          [disabled]="!paso1Form.get('horaInicio')?.value">
+                    <option value="">Selecciona hora</option>
+                    <option *ngFor="let hora of horasFin" [value]="hora">{{ hora }}</option>
+                  </select>
+                </div>
               </div>
-            </div>
-
-            <!-- Mostrar duración calculada -->
-            <div class="duracion-info" *ngIf="getDuracionSesion() > 0">
-              <nb-icon icon="clock-outline"></nb-icon>
-              <span>Duración: <strong>{{ getDuracionFormateada() }}</strong></span>
             </div>
 
             <!-- Mostrar rangos disponibles del entrenador -->
-            <div class="rangos-disponibles" *ngIf="!cargandoHorarios && rangosDelDia.length > 0">
-              <small class="rangos-label">Horarios disponibles del entrenador:</small>
-              <div class="rangos-chips">
-                <span *ngFor="let rango of rangosDelDia" class="rango-chip">
-                  {{ rango.inicio }} - {{ rango.fin }}
-                  <span class="capacidad-badge" *ngIf="rango.capacidad > 1">máx {{ rango.capacidad }} pers.</span>
-                </span>
+            <div class="rangos-disponibles-pro" *ngIf="!cargandoHorarios && rangosDelDia.length > 0">
+              <div class="rangos-header">
+                <nb-icon icon="calendar-outline"></nb-icon>
+                <span>Horarios disponibles del entrenador</span>
+              </div>
+              <div class="rangos-grid">
+                <div *ngFor="let rango of rangosDelDia" class="rango-card">
+                  <span class="rango-tiempo">{{ rango.inicio }} - {{ rango.fin }}</span>
+                  <span class="rango-capacidad" *ngIf="rango.capacidad > 1">
+                    <nb-icon icon="people-outline"></nb-icon>
+                    máx {{ rango.capacidad }}
+                  </span>
+                </div>
               </div>
             </div>
+          </div>
 
             <small class="error-text" *ngIf="paso1Form.get('horaInicio')?.invalid && paso1Form.get('horaInicio')?.touched">
               Selecciona una hora de inicio
@@ -200,7 +234,6 @@
             <small class="error-text" *ngIf="paso1Form.get('horaFin')?.invalid && paso1Form.get('horaFin')?.touched">
               Selecciona una hora de fin
             </small>
-          </div>
 
           <!-- Mensaje cuando no hay fecha seleccionada -->
           <div class="form-group" *ngIf="!paso1Form.get('fecha')?.value">
@@ -210,13 +243,41 @@
             </div>
           </div>
 
-          <div class="form-group">
-            <label>Nº Personas *</label>
-            <input type="number" formControlName="cantidadPersonas" class="form-input" 
-                   min="1" [max]="capacidadMaxima" />
-            <small class="hint-text" *ngIf="capacidadMaxima > 1">
-              Capacidad máxima: {{ capacidadMaxima }} personas
-            </small>
+          <div class="form-group personas-selector">
+            <div class="personas-header">
+              <label>
+                <nb-icon icon="people-outline"></nb-icon>
+                Nº Personas
+              </label>
+              <span class="personas-badge">Requerido</span>
+            </div>
+            
+            <div class="personas-control">
+              <button type="button" class="personas-btn menos" 
+                      [disabled]="paso1Form.get('cantidadPersonas')?.value <= 1"
+                      (click)="decrementarPersonas()">
+                <nb-icon icon="minus-outline"></nb-icon>
+              </button>
+              <div class="personas-display">
+                <span class="personas-numero">{{ paso1Form.get('cantidadPersonas')?.value || 1 }}</span>
+              </div>
+              <button type="button" class="personas-btn mas" 
+                      [disabled]="paso1Form.get('cantidadPersonas')?.value >= capacidadMaxima"
+                      (click)="incrementarPersonas()">
+                <nb-icon icon="plus-outline"></nb-icon>
+              </button>
+            </div>
+            
+            <div class="personas-visual">
+              <div class="personas-icons">
+                <span class="persona-icon" *ngFor="let i of getPersonasArray()" 
+                      [class.activo]="i < (paso1Form.get('cantidadPersonas')?.value || 1)">
+                  <nb-icon icon="person"></nb-icon>
+                </span>
+              </div>
+              <span class="personas-label">{{ paso1Form.get('cantidadPersonas')?.value || 1 }} de {{ capacidadMaxima }} disponibles</span>
+            </div>
+            
             <small class="error-text" *ngIf="paso1Form.get('cantidadPersonas')?.hasError('excedeCupos')">
               ¡Capacidad máxima del entrenador: {{ capacidadMaxima }} personas!
             </small>
@@ -266,23 +327,22 @@
               <span>Haz clic en un día disponible para agregar una sesión con su horario</span>
             </div>
 
-            <!-- Calendario visual mejorado -->
-            <div class="calendario-container calendario-premium">
+            <!-- Calendario visual mejorado (igual que sesión única) -->
+            <div class="calendario-container calendario-premium calendario-profesional">
               <div class="calendario-header">
                 <button class="btn-nav-mes" (click)="cambiarMes(-1)">
-                  <nb-icon icon="chevron-left-outline"></nb-icon>
+                  <nb-icon icon="arrow-ios-back-outline"></nb-icon>
                 </button>
                 <div class="mes-info">
                   <span class="mes-actual">{{ getNombreMes() }}</span>
-                  <small class="mes-hint">Selecciona las fechas de tus sesiones</small>
                 </div>
                 <button class="btn-nav-mes" (click)="cambiarMes(1)">
-                  <nb-icon icon="chevron-right-outline"></nb-icon>
+                  <nb-icon icon="arrow-ios-forward-outline"></nb-icon>
                 </button>
               </div>
               
               <div class="calendario-dias-semana">
-                <span>D</span><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span>
+                <span>Dom</span><span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span>
               </div>
               
               <div class="calendario-grid">
@@ -291,74 +351,119 @@
                        class="calendario-dia"
                        [class.otro-mes]="!dia.esMesActual"
                        [class.no-disponible]="!dia.disponible"
-                       [class.disponible]="dia.disponible"
+                       [class.disponible]="dia.disponible && dia.esMesActual"
                        [class.seleccionado]="dia.seleccionado"
                        [class.hoy]="dia.esHoy"
                        (click)="abrirSelectorHorario(dia)"
                        [title]="!dia.disponible ? 'El entrenador no trabaja este día' : 'Clic para agregar sesión'">
                     <span class="dia-numero">{{ dia.dia }}</span>
-                    <span class="dia-indicador" *ngIf="dia.seleccionado">
+                    <span class="dia-estado" *ngIf="dia.disponible && dia.esMesActual && !dia.seleccionado">
+                      <span class="estado-dot"></span>
+                    </span>
+                    <span class="dia-check" *ngIf="dia.seleccionado">
                       <nb-icon icon="checkmark-outline"></nb-icon>
                     </span>
                   </div>
                 </div>
               </div>
 
-              <div class="calendario-leyenda">
-                <span class="leyenda-item"><span class="dot disponible"></span> Disponible</span>
-                <span class="leyenda-item"><span class="dot no-disponible"></span> No trabaja</span>
-                <span class="leyenda-item"><span class="dot seleccionado"></span> Seleccionado</span>
+              <div class="calendario-footer">
+                <div class="leyenda-profesional">
+                  <span class="leyenda-item"><span class="indicador disponible"></span> Disponible</span>
+                  <span class="leyenda-item"><span class="indicador no-disponible"></span> No trabaja</span>
+                  <span class="leyenda-item"><span class="indicador seleccionado"></span> Seleccionado</span>
+                </div>
               </div>
             </div>
 
-            <!-- Modal para seleccionar horario del día -->
+            <!-- Modal para seleccionar horario del día (Profesional) -->
             <div class="horario-modal-overlay" *ngIf="diaSeleccionandoHorario" (click)="cerrarSelectorHorario()">
-              <div class="horario-modal" (click)="$event.stopPropagation()">
-                <div class="horario-modal-header">
-                  <h4>
+              <div class="horario-modal horario-modal-pro" (click)="$event.stopPropagation()">
+                <div class="horario-modal-header-pro">
+                  <div class="modal-fecha-badge">
                     <nb-icon icon="calendar-outline"></nb-icon>
-                    {{ diaSeleccionandoHorario?.fecha | date:'EEEE d \'de\' MMMM':'':'es' }}
+                    <span>{{ diaSeleccionandoHorario?.fecha | date:'EEEE':'':'es' }}</span>
+                  </div>
+                  <h4 class="modal-fecha-titulo">
+                    {{ diaSeleccionandoHorario?.fecha | date:'d \' de \' MMMM, yyyy':'':'es' }}
                   </h4>
-                  <button class="btn-cerrar-modal" (click)="cerrarSelectorHorario()">
+                  <button class="btn-cerrar-modal-pro" (click)="cerrarSelectorHorario()">
                     <nb-icon icon="close-outline"></nb-icon>
                   </button>
                 </div>
-                <div class="horario-modal-body">
-                  <label>Selecciona el horario para esta sesión:</label>
-                  <div class="horario-modal-selects">
-                    <div class="hora-selector">
-                      <label class="hora-label">Desde</label>
-                      <select [(ngModel)]="horarioTemporal.horaInicio" class="form-select hora-select">
-                        <option value="">Hora inicio</option>
-                        <option *ngFor="let h of horasDisponiblesDia" [value]="h">{{ h }}</option>
-                      </select>
+                
+                <div class="horario-modal-body-pro">
+                  <div class="selector-titulo">
+                    <nb-icon icon="clock-outline"></nb-icon>
+                    <span>Selecciona el horario</span>
+                  </div>
+                  
+                  <div class="horario-rango-profesional modal-version">
+                    <div class="tiempo-selector">
+                      <div class="tiempo-icono inicio">
+                        <span class="icono-texto">IN</span>
+                        <span class="icono-punto"></span>
+                      </div>
+                      <div class="tiempo-campo">
+                        <label class="tiempo-label">Hora de inicio</label>
+                        <select [(ngModel)]="horarioTemporal.horaInicio" class="tiempo-select"
+                                (ngModelChange)="onHoraInicioTemporalChange()">
+                          <option value="">Selecciona hora</option>
+                          <option *ngFor="let h of horasDisponiblesDia" [value]="h">{{ h }}</option>
+                        </select>
+                      </div>
                     </div>
-                    <div class="hora-flecha">
-                      <nb-icon icon="arrow-forward-outline"></nb-icon>
+                    
+                    <div class="tiempo-conexion">
+                      <div class="linea-tiempo"></div>
+                      <div class="duracion-pill" *ngIf="getDuracionTemporalFormateada()">
+                        <nb-icon icon="time-outline"></nb-icon>
+                        {{ getDuracionTemporalFormateada() }}
+                      </div>
+                      <div class="linea-tiempo"></div>
                     </div>
-                    <div class="hora-selector">
-                      <label class="hora-label">Hasta</label>
-                      <select [(ngModel)]="horarioTemporal.horaFin" class="form-select hora-select">
-                        <option value="">Hora fin</option>
-                        <option *ngFor="let h of horasFinDisponiblesDia" [value]="h">{{ h }}</option>
-                      </select>
+                    
+                    <div class="tiempo-selector">
+                      <div class="tiempo-icono fin">
+                        <span class="icono-texto">FIN</span>
+                        <span class="icono-punto"></span>
+                      </div>
+                      <div class="tiempo-campo">
+                        <label class="tiempo-label">Hora de fin</label>
+                        <select [(ngModel)]="horarioTemporal.horaFin" class="tiempo-select">
+                          <option value="">Selecciona hora</option>
+                          <option *ngFor="let h of horasFinDisponiblesDia" [value]="h">{{ h }}</option>
+                        </select>
+                      </div>
                     </div>
                   </div>
-                  <div class="rangos-disponibles-modal" *ngIf="rangosDisponiblesDia.length > 0">
-                    <small>Horarios del entrenador este día:</small>
-                    <div class="rangos-chips">
-                      <span class="rango-chip" *ngFor="let rango of rangosDisponiblesDia">
-                        {{ rango.inicio }} - {{ rango.fin }}
-                      </span>
+                  
+                  <!-- Siempre mostrar esta sección para mantener tamaño constante -->
+                  <div class="rangos-disponibles-pro modal-version">
+                    <div class="rangos-header">
+                      <nb-icon icon="flash-outline"></nb-icon>
+                      <span>Horarios disponibles</span>
+                    </div>
+                    <div class="rangos-grid" *ngIf="rangosDisponiblesDia.length > 0">
+                      <div class="rango-card" *ngFor="let rango of rangosDisponiblesDia">
+                        <span class="rango-tiempo">{{ rango.inicio }} - {{ rango.fin }}</span>
+                      </div>
+                    </div>
+                    <div class="rangos-placeholder" *ngIf="rangosDisponiblesDia.length === 0">
+                      <span>Cargando horarios...</span>
                     </div>
                   </div>
                 </div>
-                <div class="horario-modal-footer">
-                  <button class="btn-cancelar" (click)="cerrarSelectorHorario()">Cancelar</button>
-                  <button class="btn-agregar" 
+                
+                <div class="horario-modal-footer-pro">
+                  <button class="btn-cancelar-pro" (click)="cerrarSelectorHorario()">
+                    <nb-icon icon="close-outline"></nb-icon>
+                    Cancelar
+                  </button>
+                  <button class="btn-agregar-pro" 
                           [disabled]="!horarioTemporal.horaInicio || !horarioTemporal.horaFin"
                           (click)="confirmarSesionMultiple()">
-                    <nb-icon icon="plus-outline"></nb-icon>
+                    <nb-icon icon="checkmark-circle-outline"></nb-icon>
                     Agregar sesión
                   </button>
                 </div>
@@ -411,30 +516,68 @@
               </small>
             </div>
 
-            <!-- Horario -->
-            <div class="form-group">
-              <label>Horario semanal *</label>
-              <div class="horario-rango-container">
-                <div class="hora-selector">
-                  <label class="hora-label">Desde</label>
-                  <select [(ngModel)]="planRecurrente.horaInicio" class="form-select hora-select"
-                          (change)="calcularFechasRecurrentes()">
-                    <option value="">Hora inicio</option>
-                    <option *ngFor="let h of horasDisponiblesPlan" [value]="h">{{ h }}</option>
-                  </select>
+            <!-- Horario (Profesional) -->
+            <div class="form-group horario-profesional">
+              <div class="horario-header">
+                <div class="horario-titulo">
+                  <nb-icon icon="clock-outline"></nb-icon>
+                  <span>Horario semanal</span>
                 </div>
-                <div class="hora-flecha">
-                  <nb-icon icon="arrow-forward-outline"></nb-icon>
+                <span class="horario-badge">Requerido</span>
+              </div>
+              
+              <!-- Mensaje si no hay horarios disponibles -->
+              <div class="no-horarios-msg warning" *ngIf="horasDisponiblesPlan.length === 0">
+                <nb-icon icon="alert-triangle-outline"></nb-icon>
+                <span>El entrenador no tiene horarios configurados. Contacta directamente para coordinar.</span>
+              </div>
+              
+              <div class="horario-rango-profesional" *ngIf="horasDisponiblesPlan.length > 0">
+                <div class="tiempo-selector">
+                  <div class="tiempo-icono inicio">
+                    <span class="icono-texto">IN</span>
+                    <span class="icono-punto"></span>
+                  </div>
+                  <div class="tiempo-campo">
+                    <label class="tiempo-label">Hora de inicio</label>
+                    <select [(ngModel)]="planRecurrente.horaInicio" class="tiempo-select"
+                            (change)="calcularFechasRecurrentes()">
+                      <option value="">Selecciona hora</option>
+                      <option *ngFor="let h of horasDisponiblesPlan" [value]="h">{{ h }}</option>
+                    </select>
+                  </div>
                 </div>
-                <div class="hora-selector">
-                  <label class="hora-label">Hasta</label>
-                  <select [(ngModel)]="planRecurrente.horaFin" class="form-select hora-select"
-                          (change)="calcularFechasRecurrentes()">
-                    <option value="">Hora fin</option>
-                    <option *ngFor="let h of horasFinDisponiblesPlan" [value]="h">{{ h }}</option>
-                  </select>
+                
+                <div class="tiempo-conexion">
+                  <div class="linea-tiempo"></div>
+                  <div class="duracion-pill" *ngIf="planRecurrente.horaInicio && planRecurrente.horaFin">
+                    <nb-icon icon="time-outline"></nb-icon>
+                    Plan
+                  </div>
+                  <div class="linea-tiempo"></div>
+                </div>
+                
+                <div class="tiempo-selector">
+                  <div class="tiempo-icono fin">
+                    <span class="icono-texto">FIN</span>
+                    <span class="icono-punto"></span>
+                  </div>
+                  <div class="tiempo-campo">
+                    <label class="tiempo-label">Hora de fin</label>
+                    <select [(ngModel)]="planRecurrente.horaFin" class="tiempo-select"
+                            (change)="calcularFechasRecurrentes()">
+                      <option value="">Selecciona hora</option>
+                      <option *ngFor="let h of horasFinDisponiblesPlan" [value]="h">{{ h }}</option>
+                    </select>
+                  </div>
                 </div>
               </div>
+            </div>
+
+            <!-- Mensaje de ayuda para seleccionar horario -->
+            <div class="info-box tip" *ngIf="diasSemanaPlan.length > 0 && (!planRecurrente.horaInicio || !planRecurrente.horaFin) && horasDisponiblesPlan.length > 0">
+              <nb-icon icon="bulb-outline"></nb-icon>
+              <span>Selecciona hora de inicio y fin para ver las fechas de tu plan.</span>
             </div>
 
             <!-- Vista previa de fechas -->
@@ -446,6 +589,17 @@
                 </span>
               </div>
             </div>
+          </div>
+
+          <!-- Mensaje si no hay sesiones seleccionadas -->
+          <div class="no-horarios-msg" *ngIf="sesionesSeleccionadas.length === 0 && modoMultiple === 'calendario'">
+            <nb-icon icon="calendar-outline"></nb-icon>
+            <span>Haz clic en los días verdes del calendario para agregar sesiones.</span>
+          </div>
+
+          <div class="no-horarios-msg" *ngIf="sesionesSeleccionadas.length === 0 && modoMultiple === 'plan'">
+            <nb-icon icon="sync-outline"></nb-icon>
+            <span>Selecciona los días de la semana, duración y horario para generar tu plan.</span>
           </div>
 
           <!-- Lista de sesiones seleccionadas (común) -->
@@ -472,10 +626,44 @@
             </div>
           </div>
 
-          <!-- Personas -->
-          <div class="form-group">
-            <label>Nº Personas por sesión *</label>
-            <input type="number" [formControl]="paso1Form.get('cantidadPersonas')" class="form-input" min="1" max="10" />
+          <!-- Personas (con visual mejorado) -->
+          <div class="form-group personas-selector compact">
+            <div class="personas-header">
+              <label>
+                <nb-icon icon="people-outline"></nb-icon>
+                Nº Personas por sesión
+              </label>
+              <span class="personas-badge">Máx. {{ capacidadMaximaMultiple }}</span>
+            </div>
+            
+            <div class="personas-control">
+              <button type="button" class="personas-btn menos" 
+                      [disabled]="paso1Form.get('cantidadPersonas')?.value <= 1"
+                      (click)="decrementarPersonas()">
+                <nb-icon icon="minus-outline"></nb-icon>
+              </button>
+              <div class="personas-display">
+                <span class="personas-numero">{{ paso1Form.get('cantidadPersonas')?.value || 1 }}</span>
+              </div>
+              <button type="button" class="personas-btn mas" 
+                      [disabled]="paso1Form.get('cantidadPersonas')?.value >= capacidadMaximaMultiple"
+                      (click)="incrementarPersonas()">
+                <nb-icon icon="plus-outline"></nb-icon>
+              </button>
+            </div>
+            
+            <div class="personas-visual">
+              <div class="personas-icons">
+                <span class="persona-icon" *ngFor="let i of getPersonasArrayMultiple()" 
+                      [class.activo]="i < (paso1Form.get('cantidadPersonas')?.value || 1)">
+                  <nb-icon icon="person"></nb-icon>
+                </span>
+              </div>
+            </div>
+            
+            <small class="error-text" *ngIf="paso1Form.get('cantidadPersonas')?.hasError('excedeCupos')">
+              ¡Capacidad máxima: {{ capacidadMaximaMultiple }} personas!
+            </small>
           </div>
 
           <!-- Total -->
@@ -684,6 +872,51 @@
           </div>
         </form>
 
+        <!-- Resumen de confirmación antes de pagar -->
+        <div class="confirmacion-pago-resumen">
+          <h4>
+            <nb-icon icon="checkmark-circle-outline"></nb-icon>
+            Confirma los datos de tu reserva
+          </h4>
+          
+          <div class="confirmacion-grid">
+            <div class="confirmacion-item">
+              <span class="conf-label">Entrenador</span>
+              <span class="conf-value">{{ entrenador?.nombre }} {{ entrenador?.apellidoPaterno }}</span>
+            </div>
+            
+            <div class="confirmacion-item" *ngIf="tipoReserva === 'unica'">
+              <span class="conf-label">Fecha</span>
+              <span class="conf-value">{{ paso1Form.get('fecha')?.value | date:'fullDate':'':'es' }}</span>
+            </div>
+            
+            <div class="confirmacion-item" *ngIf="tipoReserva === 'unica'">
+              <span class="conf-label">Horario</span>
+              <span class="conf-value">{{ paso1Form.get('horaInicio')?.value }} - {{ paso1Form.get('horaFin')?.value }}</span>
+            </div>
+            
+            <div class="confirmacion-item" *ngIf="tipoReserva !== 'unica'">
+              <span class="conf-label">Sesiones</span>
+              <span class="conf-value">{{ sesionesSeleccionadas.length }} sesiones programadas</span>
+            </div>
+            
+            <div class="confirmacion-item">
+              <span class="conf-label">Personas</span>
+              <span class="conf-value">{{ paso1Form.get('cantidadPersonas')?.value }}</span>
+            </div>
+            
+            <div class="confirmacion-item">
+              <span class="conf-label">Contacto</span>
+              <span class="conf-value">{{ paso3Form.get('email')?.value }}</span>
+            </div>
+          </div>
+          
+          <div class="confirmacion-total">
+            <span>Total a pagar:</span>
+            <strong>${{ tipoReserva === 'unica' ? calcularPrecioTotal() : (calcularPrecioTotalMultiple() | number:'1.0-0') }} MXN</strong>
+          </div>
+        </div>
+
         <button class="btn-pagar" (click)="procesarPago()" [disabled]="procesandoPago || !paso4Form.valid">
           <nb-spinner *ngIf="procesandoPago" size="small" status="control"></nb-spinner>
           <nb-icon icon="card-outline" *ngIf="!procesandoPago && paso4Form.get('metodoPago')?.value === 'tarjeta'"></nb-icon>
@@ -808,6 +1041,143 @@
 
     </div>
 
+      <!-- Botón flotante para mostrar resumen -->
+      <button class="btn-resumen-flotante" 
+              *ngIf="pasoActual < 5 && !reservaConfirmada"
+              (click)="resumenExpandido = !resumenExpandido"
+              [class.activo]="resumenExpandido">
+        <nb-icon [icon]="resumenExpandido ? 'close-outline' : 'clipboard-outline'"></nb-icon>
+        <span class="btn-resumen-precio">${{ tipoReserva === 'unica' ? calcularPrecioTotal() : (calcularPrecioTotalMultiple() | number:'1.0-0') }}</span>
+        <span class="btn-resumen-label">{{ resumenExpandido ? 'Cerrar' : 'Ver resumen' }}</span>
+      </button>
+
+      <!-- Panel de Resumen Lateral (Colapsable) -->
+      <div class="resumen-overlay" 
+           *ngIf="pasoActual < 5 && !reservaConfirmada && resumenExpandido"
+           (click)="resumenExpandido = false">
+      </div>
+      <div class="resumen-lateral colapsable" 
+           *ngIf="pasoActual < 5 && !reservaConfirmada"
+           [class.expandido]="resumenExpandido">
+        <div class="resumen-sticky">
+          <div class="resumen-header-colapsable">
+            <h4 class="resumen-titulo">
+              <nb-icon icon="clipboard-outline"></nb-icon>
+              Tu Reserva
+            </h4>
+            <button class="btn-cerrar-resumen" (click)="resumenExpandido = false">
+              <nb-icon icon="close-outline"></nb-icon>
+            </button>
+          </div>
+
+          <!-- Entrenador -->
+          <div class="resumen-item">
+            <div class="resumen-avatar" *ngIf="entrenador?.fotoURL">
+              <img [src]="entrenador?.fotoURL" [alt]="entrenador?.nombre" />
+            </div>
+            <div class="resumen-avatar placeholder" *ngIf="!entrenador?.fotoURL">
+              <nb-icon icon="person-outline"></nb-icon>
+            </div>
+            <div class="resumen-info">
+              <span class="resumen-label">Entrenador</span>
+              <span class="resumen-value">{{ entrenador?.nombre }} {{ entrenador?.apellidoPaterno }}</span>
+            </div>
+          </div>
+
+          <!-- Tipo de reserva -->
+          <div class="resumen-item">
+            <nb-icon [icon]="tipoReserva === 'unica' ? 'calendar-outline' : 'layers-outline'"></nb-icon>
+            <div class="resumen-info">
+              <span class="resumen-label">Tipo</span>
+              <span class="resumen-value">{{ tipoReserva === 'unica' ? 'Sesión única' : 'Múltiples sesiones' }}</span>
+            </div>
+          </div>
+
+          <!-- Fecha(s) seleccionada(s) -->
+          <div class="resumen-item" *ngIf="tipoReserva === 'unica' && paso1Form.get('fecha')?.value">
+            <nb-icon icon="calendar-outline"></nb-icon>
+            <div class="resumen-info">
+              <span class="resumen-label">Fecha</span>
+              <span class="resumen-value">{{ paso1Form.get('fecha')?.value | date:'EEEE d MMMM':'':'es' }}</span>
+            </div>
+          </div>
+
+          <!-- Horario sesión única -->
+          <div class="resumen-item" *ngIf="tipoReserva === 'unica' && paso1Form.get('horaInicio')?.value">
+            <nb-icon icon="clock-outline"></nb-icon>
+            <div class="resumen-info">
+              <span class="resumen-label">Horario</span>
+              <span class="resumen-value">{{ paso1Form.get('horaInicio')?.value }} - {{ paso1Form.get('horaFin')?.value || '...' }}</span>
+            </div>
+          </div>
+
+          <!-- Sesiones múltiples -->
+          <div class="resumen-item sesiones" *ngIf="tipoReserva !== 'unica' && sesionesSeleccionadas.length > 0">
+            <nb-icon icon="layers-outline"></nb-icon>
+            <div class="resumen-info">
+              <span class="resumen-label">Sesiones</span>
+              <span class="resumen-value">{{ sesionesSeleccionadas.length }} sesiones</span>
+              <div class="mini-sesiones">
+                <span class="mini-sesion" *ngFor="let s of sesionesSeleccionadas | slice:0:3">
+                  {{ s.fecha | date:'d/M':'':'es' }}
+                </span>
+                <span class="mini-sesion more" *ngIf="sesionesSeleccionadas.length > 3">
+                  +{{ sesionesSeleccionadas.length - 3 }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Personas -->
+          <div class="resumen-item">
+            <nb-icon icon="people-outline"></nb-icon>
+            <div class="resumen-info">
+              <span class="resumen-label">Personas</span>
+              <span class="resumen-value">{{ paso1Form.get('cantidadPersonas')?.value || 1 }}</span>
+            </div>
+          </div>
+
+          <!-- Ubicación (paso 2) -->
+          <div class="resumen-item" *ngIf="pasoActual >= 2">
+            <nb-icon icon="pin-outline"></nb-icon>
+            <div class="resumen-info">
+              <span class="resumen-label">Ubicación</span>
+              <span class="resumen-value">{{ entrenador?.direccionEntrenamiento || 'Por confirmar' }}</span>
+            </div>
+          </div>
+
+          <!-- Separador -->
+          <div class="resumen-divider"></div>
+
+          <!-- Total -->
+          <div class="resumen-total">
+            <span class="total-label">Total</span>
+            <span class="total-value">${{ tipoReserva === 'unica' ? calcularPrecioTotal() : (calcularPrecioTotalMultiple() | number:'1.0-0') }} MXN</span>
+          </div>
+
+          <!-- Desglose -->
+          <div class="resumen-desglose">
+            <small *ngIf="tipoReserva === 'unica'">
+              ${{ entrenador?.precio || 0 }}/hr × {{ getDuracionFormateada() }} × {{ paso1Form.get('cantidadPersonas')?.value || 1 }} persona(s)
+            </small>
+            <small *ngIf="tipoReserva !== 'unica'">
+              {{ sesionesSeleccionadas.length }} sesiones × ${{ entrenador?.precio || 0 }}/hr
+            </small>
+          </div>
+
+          <!-- Políticas -->
+          <div class="resumen-politicas">
+            <nb-icon icon="shield-outline"></nb-icon>
+            <div>
+              <strong>Política de cancelación</strong>
+              <p>Cancelación gratuita hasta 24 horas antes. Después se cobra el 50%.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div> <!-- Cierre wizard-layout -->
+
       <!-- Botones de navegación -->
       <div class="navigation-buttons" *ngIf="pasoActual < 5 && !reservaConfirmada && pasoActual !== 4">
         <button class="btn-anterior" (click)="anterior()" [disabled]="pasoActual === 1">
@@ -815,10 +1185,16 @@
           Anterior
         </button>
 
-        <button class="btn-siguiente" (click)="siguiente()" [disabled]="!validarPasoActual()">
-          Siguiente
-          <nb-icon icon="arrow-forward-outline"></nb-icon>
-        </button>
+        <div class="btn-siguiente-wrapper">
+          <button class="btn-siguiente" (click)="siguiente()" [disabled]="!validarPasoActual()">
+            Siguiente
+            <nb-icon icon="arrow-forward-outline"></nb-icon>
+          </button>
+          <span class="mensaje-faltante" *ngIf="!validarPasoActual() && getMensajeFaltante()">
+            <nb-icon icon="alert-circle-outline"></nb-icon>
+            {{ getMensajeFaltante() }}
+          </span>
+        </div>
       </div>
     </div>
   </div>

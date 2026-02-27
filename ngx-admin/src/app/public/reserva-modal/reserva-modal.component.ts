@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ClienteFirebaseService, Entrenador, Reserva } from '../../@core/services/cliente-firebase.service';
@@ -82,7 +82,12 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
   rangosDelDia: RangoDisponibilidad[] = [];
   horasInicio: string[] = [];  // Horas de inicio disponibles
   horasFin: string[] = [];     // Horas de fin disponibles (filtradas según hora inicio)
-  capacidadMaxima = 1;         // Capacidad máxima para el rango seleccionado
+  capacidadMaxima = 10;        // Capacidad máxima para el rango seleccionado (sesión única)
+  capacidadMaximaMultiple = 10; // Capacidad máxima para sesiones múltiples
+  horarioSeleccionado = false; // Indica si ya se seleccionó un horario válido
+  mensajeFeedback: string = ''; // Mensaje de feedback para el usuario
+  mostrarFeedback = false; // Controla visibilidad del mensaje
+  private feedbackTimeout: any = null; // Timeout para ocultar el mensaje
   tipoSesionPermitida: 'individual' | 'grupal' | 'ambos' = 'ambos';
 
   modalidades = [
@@ -154,9 +159,8 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
   horasFinDisponiblesDia: string[] = [];
   rangosDisponiblesDia: { inicio: string; fin: string }[] = [];
   
-  // Sistema de mensajes de feedback
-  mensajeFeedback: { texto: string; tipo: 'success' | 'warning' | 'error' | 'info' } | null = null;
-  private feedbackTimeout: any = null;
+  // Resumen lateral colapsable
+  resumenExpandido = false;
   // =====================================================================
 
   // Variables para OXXO (Stripe real)
@@ -180,7 +184,8 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
     private clienteFirebase: ClienteFirebaseService,
     private stripeService: StripeService,
     private authFirebase: AuthFirebaseService,
-    private afAuth: AngularFireAuth
+    private afAuth: AngularFireAuth,
+    private cdr: ChangeDetectorRef
   ) {
     this.fechaMinima = new Date().toISOString().split('T')[0];
 
@@ -257,6 +262,8 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
       } else {
         this.rangosDelDia = [];
         this.horasInicio = [];
+        this.capacidadMaxima = 10;
+        this.horarioSeleccionado = false;
       }
       this.validarCupos();
     });
@@ -269,7 +276,13 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
         this.actualizarHorasFin(horaInicio);
       } else {
         this.horasFin = [];
-        this.capacidadMaxima = 1;
+        this.horarioSeleccionado = false;
+        // Restaurar capacidad máxima del día si hay rangos
+        if (this.rangosDelDia.length > 0) {
+          this.capacidadMaxima = Math.max(...this.rangosDelDia.map(r => r.capacidad));
+        } else {
+          this.capacidadMaxima = 10;
+        }
       }
     });
 
@@ -379,11 +392,20 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
   }
 
   validarCupos() {
-    const cantidad = this.paso1Form.get('cantidadPersonas')?.value || 1;
-    if (cantidad > this.capacidadMaxima) {
-      this.paso1Form.get('cantidadPersonas')?.setErrors({ excedeCupos: true });
-    } else {
-      this.paso1Form.get('cantidadPersonas')?.setErrors(null);
+    const cantidadControl = this.paso1Form.get('cantidadPersonas');
+    const cantidad = cantidadControl?.value || 1;
+    
+    // En modo múltiple, usar capacidad más flexible
+    const capacidadAUsar = this.tipoReserva === 'multiple' ? this.capacidadMaximaMultiple : this.capacidadMaxima;
+    
+    if (cantidad > capacidadAUsar) {
+      // Agregar error sin eliminar los existentes
+      const erroresActuales = cantidadControl?.errors || {};
+      cantidadControl?.setErrors({ ...erroresActuales, excedeCupos: true });
+    } else if (cantidadControl?.hasError('excedeCupos')) {
+      // Quitar solo el error de cupos, mantener los demás
+      const { excedeCupos, ...otrosErrores } = cantidadControl.errors || {};
+      cantidadControl?.setErrors(Object.keys(otrosErrores).length > 0 ? otrosErrores : null);
     }
   }
 
@@ -413,6 +435,7 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
       // No hay disponibilidad para este día
       this.rangosDelDia = [];
       this.horasInicio = [];
+      this.horarioSeleccionado = false;
       return;
     }
 
@@ -423,6 +446,21 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
       capacidad: r.capacidad || 1,
       tipoSesion: r.tipoSesion || 'ambos'
     }));
+
+    // Establecer capacidad máxima basada en el rango con mayor capacidad del día
+    // Esto previene que el usuario aumente personas antes de seleccionar horario
+    if (this.rangosDelDia.length > 0) {
+      const maxCapacidadDelDia = Math.max(...this.rangosDelDia.map(r => r.capacidad));
+      this.capacidadMaxima = maxCapacidadDelDia;
+      // Ajustar si la cantidad actual excede el máximo
+      const cantidadActual = this.paso1Form.get('cantidadPersonas')?.value || 1;
+      if (cantidadActual > this.capacidadMaxima) {
+        this.paso1Form.patchValue({ cantidadPersonas: this.capacidadMaxima });
+      }
+    } else {
+      this.capacidadMaxima = 10;
+    }
+    this.horarioSeleccionado = false;
 
     // Generar lista de horas de inicio disponibles (cada 30 min dentro de los rangos)
     this.generarHorasInicio();
@@ -469,6 +507,7 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
 
     if (!rangoActivo) {
       this.horasFin = [];
+      this.horarioSeleccionado = false;
       return;
     }
 
@@ -482,9 +521,10 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
 
     this.horasFin = horas;
     
-    // Actualizar capacidad y tipo basándose en el rango
+    // Actualizar capacidad y tipo basándose en el rango ESPECÍFICO seleccionado
     this.capacidadMaxima = rangoActivo.capacidad;
     this.tipoSesionPermitida = rangoActivo.tipoSesion;
+    this.horarioSeleccionado = true;
     
     // Validar cantidad de personas
     const cantidadActual = this.paso1Form.get('cantidadPersonas')?.value || 1;
@@ -510,6 +550,13 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
     if (rangoActivo) {
       this.capacidadMaxima = rangoActivo.capacidad;
       this.tipoSesionPermitida = rangoActivo.tipoSesion;
+      this.horarioSeleccionado = true;
+      
+      // Ajustar cantidad de personas si excede la capacidad del rango específico
+      const cantidadActual = this.paso1Form.get('cantidadPersonas')?.value || 1;
+      if (cantidadActual > this.capacidadMaxima) {
+        this.paso1Form.patchValue({ cantidadPersonas: this.capacidadMaxima });
+      }
     }
     
     this.validarCupos();
@@ -526,6 +573,14 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
       capacidad: 5,
       tipoSesion: 'ambos'
     }];
+    // Establecer capacidad máxima del rango por defecto
+    this.capacidadMaxima = 5;
+    this.horarioSeleccionado = false;
+    // Ajustar cantidad si excede
+    const cantidadActual = this.paso1Form.get('cantidadPersonas')?.value || 1;
+    if (cantidadActual > this.capacidadMaxima) {
+      this.paso1Form.patchValue({ cantidadPersonas: this.capacidadMaxima });
+    }
     this.generarHorasInicio();
   }
 
@@ -583,6 +638,95 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
     return `${horas}h ${mins}min`;
   }
 
+  /**
+   * Calcula la duración del horario temporal (modal múltiples sesiones)
+   */
+  getDuracionTemporalFormateada(): string {
+    if (!this.horarioTemporal.horaInicio || !this.horarioTemporal.horaFin) return '';
+    
+    const minutos = this.parseHora(this.horarioTemporal.horaFin) - this.parseHora(this.horarioTemporal.horaInicio);
+    if (minutos <= 0) return '';
+    
+    const horas = Math.floor(minutos / 60);
+    const mins = minutos % 60;
+    
+    if (horas === 0) return `${mins} min`;
+    if (mins === 0) return horas === 1 ? '1 hora' : `${horas} hrs`;
+    return `${horas}h ${mins}m`;
+  }
+
+  /**
+   * Genera array para mostrar iconos de personas
+   */
+  getPersonasArray(): number[] {
+    return Array.from({ length: this.capacidadMaxima }, (_, i) => i);
+  }
+
+  /**
+   * Genera array para mostrar iconos de personas (múltiples sesiones)
+   */
+  getPersonasArrayMultiple(): number[] {
+    return Array.from({ length: this.capacidadMaximaMultiple }, (_, i) => i);
+  }
+
+  /**
+   * Incrementar cantidad de personas
+   */
+  incrementarPersonas(): void {
+    const current = this.paso1Form.get('cantidadPersonas')?.value || 1;
+    const max = this.tipoReserva === 'multiple' ? this.capacidadMaximaMultiple : this.capacidadMaxima;
+    
+    // Verificar si puede incrementar
+    if (current >= max) {
+      // Si no hay fecha seleccionada y el máximo es 1, mostrar mensaje de seleccionar fecha
+      if (this.tipoReserva === 'unica' && !this.paso1Form.get('fecha')?.value) {
+        this.mostrarMensajeFeedback('Selecciona primero una fecha para ver la capacidad disponible');
+      } else {
+        this.mostrarMensajeFeedback(`La capacidad máxima es de ${max} persona${max > 1 ? 's' : ''}`);
+      }
+      return;
+    }
+    
+    this.paso1Form.patchValue({ cantidadPersonas: current + 1 });
+    this.ocultarMensajeFeedback();
+  }
+
+  /**
+   * Muestra un mensaje de feedback temporal
+   */
+  mostrarMensajeFeedback(mensaje: string): void {
+    // Limpiar timeout anterior si existe
+    if (this.feedbackTimeout) {
+      clearTimeout(this.feedbackTimeout);
+    }
+    
+    this.mensajeFeedback = mensaje;
+    this.mostrarFeedback = true;
+    
+    // Ocultar después de 3 segundos
+    this.feedbackTimeout = setTimeout(() => {
+      this.ocultarMensajeFeedback();
+    }, 3000);
+  }
+
+  /**
+   * Oculta el mensaje de feedback
+   */
+  ocultarMensajeFeedback(): void {
+    this.mostrarFeedback = false;
+    this.mensajeFeedback = '';
+  }
+
+  /**
+   * Decrementar cantidad de personas
+   */
+  decrementarPersonas(): void {
+    const current = this.paso1Form.get('cantidadPersonas')?.value || 1;
+    if (current > 1) {
+      this.paso1Form.patchValue({ cantidadPersonas: current - 1 });
+    }
+  }
+
   siguiente() {
     if (this.validarPasoActual()) {
       this.pasos[this.pasoActual - 1].completado = true;
@@ -614,6 +758,37 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
         return this.paso4Form.valid;
       default:
         return true;
+    }
+  }
+
+  /**
+   * Obtener mensaje de lo que falta para completar el paso actual
+   */
+  getMensajeFaltante(): string {
+    switch (this.pasoActual) {
+      case 1:
+        if (this.tipoReserva === 'unica') {
+          if (!this.paso1Form.get('fecha')?.value) return 'Selecciona una fecha';
+          if (!this.paso1Form.get('horaInicio')?.value) return 'Selecciona hora de inicio';
+          if (!this.paso1Form.get('horaFin')?.value) return 'Selecciona hora de fin';
+          if (this.paso1Form.get('cantidadPersonas')?.hasError('excedeCupos')) return 'Reduce el número de personas';
+        } else {
+          if (this.sesionesSeleccionadas.length === 0) return 'Agrega al menos una sesión';
+          if (this.paso1Form.get('cantidadPersonas')?.hasError('excedeCupos')) return 'Reduce el número de personas';
+        }
+        return '';
+      case 2:
+        return 'Completa los datos de ubicación';
+      case 3:
+        if (!this.isLoggedIn) return 'Inicia sesión para continuar';
+        if (!this.paso3Form.get('aceptaTerminos')?.value) return 'Acepta los términos y condiciones';
+        return 'Completa tus datos de contacto';
+      case 4:
+        if (!this.paso4Form.get('metodoPago')?.value) return 'Selecciona un método de pago';
+        if (!this.paso4Form.get('aceptaPoliticas')?.value) return 'Acepta las políticas de pago';
+        return 'Completa el formulario de pago';
+      default:
+        return '';
     }
   }
 
@@ -1034,6 +1209,7 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
       // Para múltiple, generar calendario y cargar opciones
       this.cargarHorasDisponiblesMultiple();
       this.cargarDiasSemanaOpciones();
+      this.cargarCapacidadMaximaMultiple();
     }
   }
 
@@ -1116,21 +1292,6 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Mostrar mensaje de feedback temporal
-   */
-  mostrarFeedback(texto: string, tipo: 'success' | 'warning' | 'error' | 'info', duracion: number = 3000) {
-    if (this.feedbackTimeout) {
-      clearTimeout(this.feedbackTimeout);
-    }
-    
-    this.mensajeFeedback = { texto, tipo };
-    
-    this.feedbackTimeout = setTimeout(() => {
-      this.mensajeFeedback = null;
-    }, duracion);
-  }
-
-  /**
    * Seleccionar un día en sesión única
    */
   seleccionarDiaUnico(dia: DiaCalendario) {
@@ -1139,7 +1300,7 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
     }
     
     if (!dia.disponible) {
-      this.mostrarFeedback('Este día no tiene disponibilidad. El entrenador no trabaja este día.', 'warning');
+      this.mostrarMensajeFeedback('Este día no tiene disponibilidad. El entrenador no trabaja este día.');
       return;
     }
     
@@ -1156,7 +1317,7 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
     // Mostrar confirmación
     const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
     const nombreDia = diasSemana[dia.fecha.getDay()];
-    this.mostrarFeedback(`${nombreDia} ${dia.fecha.getDate()} seleccionado. Ahora elige el horario.`, 'success');
+    this.mostrarMensajeFeedback(`${nombreDia} ${dia.fecha.getDate()} seleccionado. Ahora elige el horario.`);
     
     // Actualizar el form con la fecha
     this.paso1Form.patchValue({ fecha: fechaStr, horaInicio: '', horaFin: '' });
@@ -1252,6 +1413,30 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
     
     this.horasDisponiblesPlan = [...this.horasDisponiblesMultiple];
     this.horasFinDisponiblesPlan = [...this.horasFinDisponiblesMultiple];
+  }
+
+  /**
+   * Cargar capacidad máxima para sesiones múltiples (toma el máximo de todos los rangos)
+   */
+  cargarCapacidadMaximaMultiple() {
+    let maxCapacidad = 10; // Valor por defecto
+    
+    if (this.entrenador?.disponibilidad) {
+      let encontrado = false;
+      Object.values(this.entrenador.disponibilidad).forEach((rangos: any) => {
+        if (Array.isArray(rangos)) {
+          rangos.forEach((rango: any) => {
+            const cap = rango.capacidad || 10;
+            if (!encontrado || cap > maxCapacidad) {
+              maxCapacidad = cap;
+              encontrado = true;
+            }
+          });
+        }
+      });
+    }
+    
+    this.capacidadMaximaMultiple = maxCapacidad;
   }
 
   /**
@@ -1445,7 +1630,7 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
     if (!dia.disponible) {
       const diasSemana = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
       const nombreDia = diasSemana[dia.fecha.getDay()];
-      this.mostrarFeedback(`El entrenador no tiene disponibilidad los ${nombreDia}. Selecciona otro día.`, 'warning');
+      this.mostrarMensajeFeedback(`El entrenador no tiene disponibilidad los ${nombreDia}. Selecciona otro día.`);
       return;
     }
     
@@ -1456,7 +1641,7 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
     if (index >= 0) {
       this.sesionesSeleccionadas.splice(index, 1);
       dia.seleccionado = false;
-      this.mostrarFeedback(`Sesión del ${dia.fecha.getDate()}/${dia.fecha.getMonth() + 1} eliminada`, 'info');
+      this.mostrarMensajeFeedback(`Sesión del ${dia.fecha.getDate()}/${dia.fecha.getMonth() + 1} eliminada`);
       return;
     }
     
@@ -1500,6 +1685,9 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
       const horasArray = Array.from(todasHoras).sort();
       this.horasDisponiblesDia = horasArray.slice(0, -1);
       this.horasFinDisponiblesDia = horasArray.slice(1);
+      
+      // Forzar detección de cambios
+      this.cdr.detectChanges();
     }
   }
 
@@ -1512,11 +1700,52 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Actualiza las horas de fin disponibles cuando se cambia hora de inicio
+   */
+  onHoraInicioTemporalChange() {
+    if (!this.horarioTemporal.horaInicio || !this.diaSeleccionandoHorario) {
+      return;
+    }
+    
+    const horaInicioSeleccionada = this.parseHora(this.horarioTemporal.horaInicio);
+    const fecha = this.diaSeleccionandoHorario.fecha;
+    const diaSemana = fecha.getDay();
+    const diaKey = this.diasSemana[diaSemana];
+    
+    const disponibilidadDia = this.entrenador?.disponibilidad?.[diaKey];
+    
+    if (disponibilidadDia && Array.isArray(disponibilidadDia)) {
+      const horasFin = new Set<string>();
+      disponibilidadDia.forEach((rango: any) => {
+        if (rango.inicio && rango.fin) {
+          const horaInicio = parseInt(rango.inicio.split(':')[0]);
+          const horaFin = parseInt(rango.fin.split(':')[0]);
+          for (let h = horaInicio; h <= horaFin; h++) {
+            const horaMin = h * 60;
+            if (horaMin > horaInicioSeleccionada) {
+              horasFin.add(`${h.toString().padStart(2, '0')}:00`);
+            }
+          }
+        }
+      });
+      
+      this.horasFinDisponiblesDia = Array.from(horasFin).sort();
+      
+      // Si la hora fin seleccionada ya no es válida, resetearla
+      if (this.horarioTemporal.horaFin && !this.horasFinDisponiblesDia.includes(this.horarioTemporal.horaFin)) {
+        this.horarioTemporal.horaFin = '';
+      }
+      
+      this.cdr.detectChanges();
+    }
+  }
+
+  /**
    * Confirmar y agregar sesión con horario seleccionado
    */
   confirmarSesionMultiple() {
     if (!this.diaSeleccionandoHorario || !this.horarioTemporal.horaInicio || !this.horarioTemporal.horaFin) {
-      this.mostrarFeedback('Debes seleccionar hora de inicio y fin', 'warning');
+      this.mostrarMensajeFeedback('Debes seleccionar hora de inicio y fin');
       return;
     }
     
@@ -1534,7 +1763,7 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
     
     const dia = this.diaSeleccionandoHorario.fecha.getDate();
     const mes = this.diaSeleccionandoHorario.fecha.getMonth() + 1;
-    this.mostrarFeedback(`¡Sesión del ${dia}/${mes} agregada! (${this.horarioTemporal.horaInicio} - ${this.horarioTemporal.horaFin})`, 'success');
+    this.mostrarMensajeFeedback(`¡Sesión del ${dia}/${mes} agregada! (${this.horarioTemporal.horaInicio} - ${this.horarioTemporal.horaFin})`);
     
     this.cerrarSelectorHorario();
     
@@ -1551,7 +1780,7 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
     
     // Mostrar mensaje de confirmación
     const fechaParts = sesion.fecha.split('-');
-    this.mostrarFeedback(`Sesión del ${fechaParts[2]}/${fechaParts[1]} eliminada`, 'info');
+    this.mostrarMensajeFeedback(`Sesión del ${fechaParts[2]}/${fechaParts[1]} eliminada`);
     
     // Actualizar el calendario para deseleccionar el día
     this.calendarioMes.forEach(semana => {
