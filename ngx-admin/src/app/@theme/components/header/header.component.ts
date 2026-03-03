@@ -236,8 +236,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
     await this.afAuth.signOut();
     // Cerrar sesión local (eliminar token)
     this.authService.logout();
-    // Redirigir al login
-    this.router.navigate(['/auth/login']);
+    // Redirigir a la landing page
+    this.router.navigate(['/']);
   }
 
   goToProfile() {

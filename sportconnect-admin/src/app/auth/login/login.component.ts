@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { AngularFirestore } from '@angular/fire/compat/firestore';
 
 @Component({
   selector: 'sc-admin-login',
@@ -59,8 +61,8 @@ import { Router } from '@angular/router';
         </form>
 
         <div class="demo-credentials">
-          <p><strong>Credenciales de Demo:</strong></p>
-          <code>admin@sportconnecta.com / admin123</code>
+          <p><strong>ℹ️ Acceso de Administrador</strong></p>
+          <small>El primer usuario que inicie sesión será registrado como administrador principal.</small>
         </div>
 
         <div class="back-link">
@@ -247,15 +249,20 @@ export class LoginComponent {
   loading = false;
   errorMessage = '';
 
-  // Credenciales de demo para admin
-  private demoCredentials = {
-    email: 'admin@sportconnecta.com',
-    password: 'admin123'
-  };
+  // Emails pre-autorizados como administradores
+  private readonly ADMIN_EMAILS = [
+    'admin@sportconnecta.com',
+    'admin2@sportconnecta.com',
+    'soporte@sportconnecta.com',
+    'moderador@sportconnecta.com',
+    'finanzas@sportconnecta.com'
+  ];
 
   constructor(
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private afAuth: AngularFireAuth,
+    private firestore: AngularFirestore
   ) {
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -263,7 +270,11 @@ export class LoginComponent {
     });
   }
 
-  submit(): void {
+  private isPreauthorizedAdmin(email: string): boolean {
+    return this.ADMIN_EMAILS.includes(email.toLowerCase());
+  }
+
+  async submit(): Promise<void> {
     if (this.form.invalid) {
       Object.keys(this.form.controls).forEach(key => {
         this.form.get(key)?.markAsTouched();
@@ -276,23 +287,98 @@ export class LoginComponent {
 
     const { email, password } = this.form.value;
 
-    // Simular verificación de credenciales
-    setTimeout(() => {
-      if (email === this.demoCredentials.email && password === this.demoCredentials.password) {
-        // Guardar token simulado
-        localStorage.setItem('admin_token', 'demo_admin_token_' + Date.now());
+    try {
+      // Autenticar con Firebase
+      const userCredential = await this.afAuth.signInWithEmailAndPassword(email, password);
+      const user = userCredential.user;
+      
+      if (!user) {
+        throw new Error('No se pudo autenticar');
+      }
+
+      // Verificar si es admin
+      const adminDoc = await this.firestore.collection('admins').doc(user.uid).get().toPromise();
+      
+      if (adminDoc?.exists) {
+        // Es admin, proceder al dashboard
         localStorage.setItem('admin_user', JSON.stringify({
-          id: 1,
-          name: 'Administrador',
-          email: email,
-          role: 'ADMIN'
+          id: user.uid,
+          name: adminDoc.get('nombre') || 'Administrador',
+          email: user.email,
+          role: adminDoc.get('role') || 'ADMIN'
+        }));
+        this.router.navigate(['/admin/dashboard']);
+      } else if (this.isPreauthorizedAdmin(email)) {
+        // Email pre-autorizado - registrar automáticamente como admin
+        const adminRole = email === 'admin@sportconnecta.com' ? 'SUPER_ADMIN' : 'ADMIN';
+        await this.firestore.collection('admins').doc(user.uid).set({
+          email: user.email,
+          nombre: user.displayName || this.getAdminName(email),
+          createdAt: new Date(),
+          role: adminRole,
+          active: true
+        });
+        
+        localStorage.setItem('admin_user', JSON.stringify({
+          id: user.uid,
+          name: this.getAdminName(email),
+          email: user.email,
+          role: adminRole
         }));
         
         this.router.navigate(['/admin/dashboard']);
       } else {
-        this.errorMessage = 'Credenciales incorrectas. Usa las credenciales de demo.';
+        // Verificar si hay algún admin registrado (bootstrap para otros usuarios)
+        const adminsSnapshot = await this.firestore.collection('admins').get().toPromise();
+        
+        if (adminsSnapshot?.empty) {
+          // Primera vez - registrar como admin (bootstrap)
+          await this.firestore.collection('admins').doc(user.uid).set({
+            email: user.email,
+            nombre: user.displayName || 'Administrador Principal',
+            createdAt: new Date(),
+            role: 'ADMIN',
+            active: true
+          });
+          
+          localStorage.setItem('admin_user', JSON.stringify({
+            id: user.uid,
+            name: 'Administrador Principal',
+            email: user.email,
+            role: 'ADMIN'
+          }));
+          
+          this.router.navigate(['/admin/dashboard']);
+        } else {
+          // No es admin pre-autorizado y ya hay admins - denegar acceso
+          await this.afAuth.signOut();
+          this.errorMessage = 'Esta cuenta no tiene permisos de administrador.';
+        }
       }
+    } catch (error: any) {
+      console.error('Error de login:', error);
+      if (error.code === 'auth/user-not-found') {
+        this.errorMessage = 'Usuario no encontrado.';
+      } else if (error.code === 'auth/wrong-password') {
+        this.errorMessage = 'Contraseña incorrecta.';
+      } else if (error.code === 'auth/invalid-email') {
+        this.errorMessage = 'Email inválido.';
+      } else {
+        this.errorMessage = error.message || 'Error al iniciar sesión.';
+      }
+    } finally {
       this.loading = false;
-    }, 1000);
+    }
+  }
+
+  private getAdminName(email: string): string {
+    const names: { [key: string]: string } = {
+      'admin@sportconnecta.com': 'Administrador Principal',
+      'admin2@sportconnecta.com': 'Administrador Secundario',
+      'soporte@sportconnecta.com': 'Soporte Técnico',
+      'moderador@sportconnecta.com': 'Moderador de Contenido',
+      'finanzas@sportconnecta.com': 'Administrador Finanzas'
+    };
+    return names[email.toLowerCase()] || 'Administrador';
   }
 }
