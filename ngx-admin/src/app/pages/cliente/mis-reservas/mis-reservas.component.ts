@@ -83,7 +83,7 @@ export class MisReservasComponent implements OnInit, OnDestroy {
       entrenador: {
         id: r.entrenadorId,
         nombre: r.entrenadorNombre,
-        foto_url: 'assets/images/avatar-default.png',
+        foto_url: 'https://ui-avatars.com/api/?name=E&background=ff6b35&color=fff&size=100',
         especialidad: (r as any).deporte || 'General'
       },
       fecha: fecha,

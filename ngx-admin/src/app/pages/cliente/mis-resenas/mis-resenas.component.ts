@@ -130,7 +130,7 @@ export class MisResenasComponent implements OnInit, OnDestroy {
       reservaId: r.reservaId,
       entrenador: {
         nombre: 'Entrenador', // Se podría enriquecer con datos del entrenador
-        avatar: 'assets/images/avatar-default.png',
+        avatar: 'https://ui-avatars.com/api/?name=E&background=ff6b35&color=fff&size=100',
         especialidad: 'Deportes'
       },
       sesion: {

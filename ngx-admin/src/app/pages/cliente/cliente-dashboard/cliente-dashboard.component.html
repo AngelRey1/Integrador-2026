@@ -11,8 +11,8 @@
     <div class="welcome-section">
       <div class="welcome-avatar">
         <div class="avatar-ring">
-          <img [src]="cliente?.foto_url || 'assets/images/default-avatar.png'" [alt]="cliente?.nombre"
-            class="avatar-img" (error)="$event.target.src='assets/images/default-avatar.png'">
+          <img [src]="cliente?.foto_url || 'https://ui-avatars.com/api/?name=Usuario&background=ff6b35&color=fff&size=200'" [alt]="cliente?.nombre"
+            class="avatar-img" (error)="$event.target.src='https://ui-avatars.com/api/?name=U&background=ff6b35&color=fff&size=200'">
         </div>
         <div class="status-indicator online"></div>
       </div>
@@ -322,58 +322,6 @@
   <!-- COLUMNA LATERAL (30%) -->
   <!-- ═══════════════════════════════════════════════════ -->
   <div class="side-column">
-
-    <!-- FAVORITOS - Acceso Rápido -->
-    <section class="favorites-panel">
-      <div class="panel-header-glass">
-        <h3 class="panel-title">
-          <ngx-sport-icon name="heart" [size]="18" color="#ff6b35" [filled]="true"></ngx-sport-icon>
-          Mis Favoritos
-        </h3>
-        <span class="count-badge">{{ entrenadoresFavoritos?.length || 0 }}</span>
-      </div>
-
-      <div class="favorites-scroll">
-        <!-- Estado vacío -->
-        <div class="empty-favorites" *ngIf="!entrenadoresFavoritos || entrenadoresFavoritos.length === 0">
-          <div class="empty-heart-icon">
-            <ngx-sport-icon name="heart" [size]="36" color="rgba(255,107,53,0.3)"></ngx-sport-icon>
-          </div>
-          <p>Guarda tus entrenadores favoritos para acceso rápido</p>
-          <button class="btn-outline-small" (click)="buscarEntrenadores()">
-            <ngx-sport-icon name="search" [size]="14"></ngx-sport-icon>
-            Explorar
-          </button>
-        </div>
-
-        <!-- Lista de favoritos -->
-        <div class="favorite-coach-card" *ngFor="let coach of entrenadoresFavoritos">
-          <div class="coach-visual">
-            <img [src]="coach.foto_url" [alt]="coach.nombre_completo" class="coach-photo">
-            <div class="online-dot" *ngIf="coach.disponible"></div>
-          </div>
-
-          <div class="coach-details">
-            <h4 class="coach-name">{{ coach.nombre_completo }}</h4>
-            <div class="coach-specialty">
-              <ngx-sport-icon [name]="getDeporteIcon(coach.especialidad)" [size]="12"></ngx-sport-icon>
-              {{ coach.especialidad }}
-            </div>
-            <div class="coach-rating-price">
-              <span class="rating">
-                <ngx-sport-icon name="star-filled" [size]="12" color="#ffd700"></ngx-sport-icon>
-                {{ coach.calificacion }}
-              </span>
-              <span class="price">${{ coach.tarifa_por_hora }} MXN</span>
-            </div>
-          </div>
-
-          <button class="btn-quick-book" (click)="agendarConEntrenador(coach)" title="Agendar rápido">
-            <ngx-sport-icon name="calendar" [size]="16"></ngx-sport-icon>
-          </button>
-        </div>
-      </div>
-    </section>
 
     <!-- ACCIONES RÁPIDAS -->
     <section class="quick-actions-panel">

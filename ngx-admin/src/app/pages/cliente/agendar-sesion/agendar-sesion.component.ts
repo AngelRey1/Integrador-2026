@@ -149,7 +149,62 @@ export class AgendarSesionComponent implements OnInit, OnDestroy {
 
   private cargarEntrenadores(): void {
     this.loadingEntrenadores = true;
-    const sub = this.clienteFirebase.getEntrenadores().subscribe(
+    
+    // Primero obtener las reservas para filtrar entrenadores con reservas previas
+    const reservasSub = this.clienteFirebase.getMisReservasSinOrden().subscribe(
+      (reservas) => {
+        // Extraer IDs de entrenadores con cualquier reserva previa
+        const entrenadoresConReservas = new Set<string>();
+        reservas.forEach(r => {
+          if (r.entrenadorId) {
+            entrenadoresConReservas.add(r.entrenadorId);
+          }
+        });
+
+        // Cargar entrenadores y filtrar por los que tienen reservas previas
+        const entrenadorSub = this.clienteFirebase.getEntrenadores().subscribe(
+          (entrenadores) => {
+            // Filtrar solo entrenadores con reservas previas
+            const entrenadoresFiltrados = entrenadores.filter(e => 
+              e.id && entrenadoresConReservas.has(e.id)
+            );
+            
+            this.entrenadores = entrenadoresFiltrados.map(e => ({
+              id: e.id || '',
+              nombre_completo: `${e.nombre} ${e.apellidoPaterno || ''}`.trim(),
+              foto_url: e.foto || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face',
+              especialidad: e.deportes?.join(', ') || 'Entrenamiento',
+              tarifa_por_hora: e.precio || 300,
+              calificacion: e.calificacionPromedio || 5.0,
+              total_resenas: e.totalReviews || 0
+            }));
+            this.loadingEntrenadores = false;
+            
+            // Si venía con ID, seleccionar ahora
+            if (this.entrenadorId) {
+              this.seleccionarEntrenador(this.entrenadorId);
+            }
+          },
+          (error) => {
+            console.error('Error cargando entrenadores:', error);
+            this.loadingEntrenadores = false;
+            this.toastr.danger('Error al cargar entrenadores', 'Error');
+          }
+        );
+        this.subscriptions.push(entrenadorSub);
+      },
+      (error) => {
+        console.error('Error cargando reservas:', error);
+        this.loadingEntrenadores = false;
+        // En caso de error, cargar todos los entrenadores como fallback
+        this.cargarTodosEntrenadores();
+      }
+    );
+    this.subscriptions.push(reservasSub);
+  }
+
+  private cargarTodosEntrenadores(): void {
+    const entrenadorSub = this.clienteFirebase.getEntrenadores().subscribe(
       (entrenadores) => {
         this.entrenadores = entrenadores.map(e => ({
           id: e.id || '',
@@ -161,11 +216,6 @@ export class AgendarSesionComponent implements OnInit, OnDestroy {
           total_resenas: e.totalReviews || 0
         }));
         this.loadingEntrenadores = false;
-        
-        // Si venía con ID, seleccionar ahora
-        if (this.entrenadorId) {
-          this.seleccionarEntrenador(this.entrenadorId);
-        }
       },
       (error) => {
         console.error('Error cargando entrenadores:', error);
@@ -173,7 +223,7 @@ export class AgendarSesionComponent implements OnInit, OnDestroy {
         this.toastr.danger('Error al cargar entrenadores', 'Error');
       }
     );
-    this.subscriptions.push(sub);
+    this.subscriptions.push(entrenadorSub);
   }
 
   // Paso 1: Selección de entrenador

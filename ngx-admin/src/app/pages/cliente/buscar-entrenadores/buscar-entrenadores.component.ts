@@ -124,7 +124,7 @@ export class BuscarEntrenadoresComponent implements OnInit, OnDestroy {
     return {
       id: e.id || '',
       nombre_completo: `${e.nombre} ${e.apellidoPaterno}`,
-      foto_url: e.foto || 'assets/images/avatar-default.png',
+      foto_url: e.foto || 'https://ui-avatars.com/api/?name=E&background=ff6b35&color=fff&size=200',
       especialidad: e.especialidades?.join(' & ') || e.deportes?.join(' & ') || 'General',
       deportes: e.deportes || [],
       calificacion: e.calificacionPromedio || 0,

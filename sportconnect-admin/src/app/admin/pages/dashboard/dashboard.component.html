@@ -152,7 +152,7 @@
       <div *ngIf="pendingTrainers.length > 0" class="admin-items-grid">
         <div class="admin-item-card" *ngFor="let trainer of pendingTrainers">
           <div class="item-avatar">
-            <img [src]="trainer.avatar || 'assets/images/default-avatar.png'" [alt]="trainer.name">
+            <img [src]="trainer.avatar || 'https://ui-avatars.com/api/?name=E&background=ff6b35&color=fff&size=100'" [alt]="trainer.name">
           </div>
           <div class="item-details">
             <h5 class="item-name">{{ trainer.name }}</h5>

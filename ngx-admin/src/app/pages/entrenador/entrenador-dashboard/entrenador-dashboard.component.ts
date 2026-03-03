@@ -135,7 +135,7 @@ export class EntrenadorDashboardComponent implements OnInit, OnDestroy {
       cliente: {
         id: r.clienteId,
         nombre: r.clienteNombre,
-        avatar: 'assets/images/avatar-default.png'
+        avatar: 'https://ui-avatars.com/api/?name=C&background=ff6b35&color=fff&size=100'
       },
       deporte: (r as any).deporte || 'General',
       fecha: fecha,

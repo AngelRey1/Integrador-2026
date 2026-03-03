@@ -15,7 +15,7 @@
           <div class="perfil-header">
             <div class="avatar-section">
               <div class="avatar-wrapper">
-                <img [src]="avatarPreview || usuario.avatar || 'https://i.pravatar.cc/300?img=1'" [alt]="usuario.nombreUsuario || usuario.email" class="avatar-image">
+                <img [src]="avatarPreview || usuario.avatar || 'https://ui-avatars.com/api/?name=' + (usuario.nombre || 'U') + '&background=ff6b35&color=fff&size=200'" [alt]="usuario.nombre || usuario.nombreUsuario || 'Usuario'" class="avatar-image">
                 <label class="avatar-upload" [class.editing]="editandoPerfil">
                   <input type="file" accept="image/*" (change)="onFileSelected($event)" [disabled]="!editandoPerfil">
                   <nb-icon icon="camera-outline"></nb-icon>
@@ -23,7 +23,7 @@
               </div>
             </div>
             <div class="perfil-info">
-              <h4 class="nombre">{{ usuario.nombreUsuario || usuario.email }}</h4>
+              <h4 class="nombre">{{ usuario.nombre || usuario.nombreUsuario || 'Usuario' }}</h4>
               <p class="email">
                 <strong>Email:</strong> {{ usuario.email }}
               </p>

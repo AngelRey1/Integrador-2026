@@ -270,6 +270,20 @@ export class ClienteFirebaseService {
     }
 
     /**
+     * Obtener mis reservas sin ordenar (para filtros simples)
+     */
+    getMisReservasSinOrden(): Observable<Reserva[]> {
+        return this.afAuth.authState.pipe(
+            switchMap(user => {
+                if (!user) return of([]);
+                return this.firestore.collection<Reserva>('reservas', ref =>
+                    ref.where('clienteId', '==', user.uid)
+                ).valueChanges({ idField: 'id' });
+            })
+        );
+    }
+
+    /**
      * Obtener reservas próximas
      */
     getReservasProximas(): Observable<Reserva[]> {

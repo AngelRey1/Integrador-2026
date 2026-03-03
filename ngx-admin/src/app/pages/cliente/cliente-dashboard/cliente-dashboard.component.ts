@@ -51,9 +51,6 @@ export class ClienteDashboardComponent implements OnInit, OnDestroy {
   // Próximas sesiones
   proximasSesiones: any[] = [];
 
-  // Entrenadores favoritos
-  entrenadoresFavoritos: any[] = [];
-
   // Filtros de búsqueda
   busquedaRapida = {
     deporte: '',
@@ -157,13 +154,17 @@ export class ClienteDashboardComponent implements OnInit, OnDestroy {
   cargarDatosFirebase(): void {
     this.loading = true;
 
-    // Obtener datos del usuario actual
-    const userSub = this.authFirebase.getCurrentUser().subscribe(user => {
-      if (user) {
-        this.cliente = user;
+    // Obtener datos del perfil del cliente (foto, nombre actualizado, etc.)
+    const perfilSub = this.clienteFirebase.getMiPerfil().subscribe(perfil => {
+      if (perfil) {
+        this.cliente = {
+          ...perfil,
+          nombre: perfil.nombre || perfil.email?.split('@')[0] || 'Atleta',
+          foto_url: perfil.foto || perfil.foto_url || perfil.fotoURL || null
+        };
       }
     });
-    this.dataSubscriptions.push(userSub);
+    this.dataSubscriptions.push(perfilSub);
 
     // Cargar estadísticas del dashboard (tiempo real)
     const statsSub = this.clienteFirebase.getDashboardStats().subscribe(stats => {
@@ -207,20 +208,6 @@ export class ClienteDashboardComponent implements OnInit, OnDestroy {
       this.deportesPracticados = deportes.size;
     });
     this.dataSubscriptions.push(historialSub);
-
-    // Cargar entrenadores (para favoritos)
-    const entrenadorsSub = this.clienteFirebase.getEntrenadores().subscribe(entrenadores => {
-      this.entrenadoresFavoritos = entrenadores.slice(0, 3).map(e => ({
-        id: e.id,
-        nombre_completo: `${e.nombre} ${e.apellidoPaterno}`,
-        especialidad: e.deportes?.join(', ') || 'General',
-        calificacion: e.calificacionPromedio || 0,
-        total_resenas: e.totalReviews || 0,
-        tarifa_por_hora: e.precio || 0,
-        foto_url: e.foto || 'assets/images/avatar-default.png'
-      }));
-    });
-    this.dataSubscriptions.push(entrenadorsSub);
   }
 
   private formatearReserva(reserva: Reserva): any {
@@ -230,7 +217,7 @@ export class ClienteDashboardComponent implements OnInit, OnDestroy {
       entrenador: {
         id: reserva.entrenadorId,
         nombre: reserva.entrenadorNombre,
-        foto: 'assets/images/avatar-default.png'
+        foto: 'https://ui-avatars.com/api/?name=E&background=ff6b35&color=fff&size=100'
       },
       deporte: (reserva as any).deporte || 'General',
       duracion: reserva.duracion || 60,
