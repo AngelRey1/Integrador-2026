@@ -138,7 +138,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
         if (this.currentRole === 'entrenador') {
           return this.firestore.doc(`entrenadores/${user.uid}`).valueChanges();
         } else {
-          return this.firestore.doc(`users/${user.uid}`).valueChanges();
+          return this.firestore.doc(`clientes/${user.uid}`).valueChanges();
         }
       }),
       takeUntil(this.destroy$)
@@ -231,8 +231,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
     return false;
   }
 
-  logout() {
+  async logout() {
+    // Cerrar sesión de Firebase
+    await this.afAuth.signOut();
+    // Cerrar sesión local (eliminar token)
     this.authService.logout();
+    // Redirigir al login
     this.router.navigate(['/auth/login']);
   }
 

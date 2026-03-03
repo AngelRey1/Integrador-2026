@@ -9,13 +9,6 @@
   <div class="hero-backdrop"></div>
   <div class="hero-content">
     <div class="welcome-section">
-      <div class="welcome-avatar">
-        <div class="avatar-ring">
-          <img [src]="cliente?.foto_url || 'https://ui-avatars.com/api/?name=Usuario&background=ff6b35&color=fff&size=200'" [alt]="cliente?.nombre"
-            class="avatar-img" (error)="$event.target.src='https://ui-avatars.com/api/?name=U&background=ff6b35&color=fff&size=200'">
-        </div>
-        <div class="status-indicator online"></div>
-      </div>
       <div class="welcome-text">
         <span class="greeting-small">{{ getGreeting() }} 👋</span>
         <h1 class="welcome-name">{{ cliente?.nombre || 'Atleta' }}</h1>

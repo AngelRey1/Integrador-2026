@@ -58,8 +58,8 @@
     </div>
 
     <nb-action class="user-action" *nbIsGranted="['view', 'user']">
-      <nb-user [nbContextMenu]="userMenu" [nbContextMenuTag]="'user-context-menu'" [onlyPicture]="userPictureOnly"
-        [name]="user?.name" [picture]="user?.picture">
+      <nb-user [nbContextMenu]="userMenu" [nbContextMenuTag]="'user-context-menu'" [onlyPicture]="true"
+        [name]="user?.name" [picture]="user?.picture" size="medium">
       </nb-user>
     </nb-action>
   </nb-actions>

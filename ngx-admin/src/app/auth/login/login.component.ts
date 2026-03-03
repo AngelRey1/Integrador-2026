@@ -47,8 +47,9 @@ export class LoginComponent implements OnInit {
       }
     });
 
-    // Verificar si ya está autenticado
-    if (this.authFirebase.isAuthenticated()) {
+    // Solo redirigir si está autenticado Y tiene un rol válido
+    const role = this.authFirebase.getRole();
+    if (this.authFirebase.isAuthenticated() && role) {
       this.redirectByRole();
     }
   }
@@ -65,21 +66,27 @@ export class LoginComponent implements OnInit {
     this.errorMessage = '';
     this.successMessage = '';
 
-    const { email, password } = this.form.value;
-    const rol = this.requestedRole || 'CLIENTE'; // Por defecto cliente
+    try {
+      const { email, password } = this.form.value;
+      const rol = this.requestedRole || 'CLIENTE'; // Por defecto cliente
 
-    const result = await this.authFirebase.login(email, password, rol);
+      const result = await this.authFirebase.login(email, password, rol);
 
-    this.loading = false;
+      this.loading = false;
 
-    if (result.success) {
-      if (this.returnUrl) {
-        this.router.navigateByUrl(this.returnUrl);
-        return;
+      if (result.success) {
+        if (this.returnUrl) {
+          this.router.navigateByUrl(this.returnUrl);
+          return;
+        }
+        this.redirectByRole();
+      } else {
+        this.errorMessage = result.message;
       }
-      this.redirectByRole();
-    } else {
-      this.errorMessage = result.message;
+    } catch (error: any) {
+      console.error('Error en login:', error);
+      this.loading = false;
+      this.errorMessage = 'Error al iniciar sesión. Intenta de nuevo.';
     }
   }
 
@@ -92,14 +99,19 @@ export class LoginComponent implements OnInit {
     }
 
     this.loading = true;
-    const result = await this.authFirebase.resetPassword(email);
-    this.loading = false;
+    try {
+      const result = await this.authFirebase.resetPassword(email);
+      this.loading = false;
 
-    if (result.success) {
-      this.successMessage = result.message;
-      this.errorMessage = '';
-    } else {
-      this.errorMessage = result.message;
+      if (result.success) {
+        this.successMessage = result.message;
+        this.errorMessage = '';
+      } else {
+        this.errorMessage = result.message;
+      }
+    } catch (error) {
+      this.loading = false;
+      this.errorMessage = 'Error al enviar el correo de recuperación';
     }
   }
 

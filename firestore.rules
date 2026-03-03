@@ -38,9 +38,19 @@ service cloud.firestore {
     }
     
     // ===========================================
-    // USUARIOS
+    // USUARIOS (colección 'users')
     // ===========================================
     match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId) || isAdmin();
+      allow delete: if isAdmin();
+    }
+    
+    // ===========================================
+    // USUARIOS (colección 'usuarios')
+    // ===========================================
+    match /usuarios/{userId} {
       allow read: if isAuthenticated();
       allow create: if isOwner(userId);
       allow update: if isOwner(userId) || isAdmin();

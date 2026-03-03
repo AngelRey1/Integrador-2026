@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { map, switchMap, catchError } from 'rxjs/operators';
 
 export interface AuthResult {
   success: boolean;
@@ -37,9 +37,67 @@ export class AuthFirebaseService {
     // Escuchar cambios de autenticación
     this.afAuth.authState.pipe(
       switchMap(user => {
-        if (user) {
-          return this.firestore.collection('usuarios').doc(user.uid).valueChanges() as Observable<UserData>;
+        if (!user) {
+          // Si no hay usuario, limpiar sesión
+          this.clearSession();
+          return of(null);
         }
+        // Buscar en múltiples colecciones
+        return this.firestore.collection('usuarios').doc(user.uid).valueChanges().pipe(
+          switchMap(userData => {
+            if (userData) return of(userData as UserData);
+            // Si no está en usuarios, buscar en clientes
+            return this.firestore.collection('clientes').doc(user.uid).valueChanges().pipe(
+              switchMap(clienteData => {
+                if (clienteData) {
+                  const data = clienteData as any;
+                  return of({
+                    uid: user.uid,
+                    email: data.email || user.email || '',
+                    nombre: data.nombre || '',
+                    apellido: data.apellidos || '',
+                    rol: 'CLIENTE' as const,
+                    estado: 'ACTIVO' as const,
+                    fechaRegistro: data.fechaRegistro || new Date()
+                  } as UserData);
+                }
+                // Si no está en clientes, buscar en entrenadores
+                return this.firestore.collection('entrenadores').doc(user.uid).valueChanges().pipe(
+                  map(entrenadorData => {
+                    if (entrenadorData) {
+                      const data = entrenadorData as any;
+                      return {
+                        uid: user.uid,
+                        email: data.email || user.email || '',
+                        nombre: data.nombre || '',
+                        apellido: data.apellidoPaterno || '',
+                        rol: 'ENTRENADOR' as const,
+                        estado: data.activo ? 'ACTIVO' as const : 'PENDIENTE' as const,
+                        fechaRegistro: data.fechaRegistro || new Date()
+                      } as UserData;
+                    }
+                    return null;
+                  }),
+                  catchError(err => {
+                    console.warn('Error buscando en entrenadores:', err);
+                    return of(null);
+                  })
+                );
+              }),
+              catchError(err => {
+                console.warn('Error buscando en clientes:', err);
+                return of(null);
+              })
+            );
+          }),
+          catchError(err => {
+            console.warn('Error buscando en usuarios:', err);
+            return of(null);
+          })
+        );
+      }),
+      catchError(err => {
+        console.warn('Error en authState:', err);
         return of(null);
       })
     ).subscribe(userData => {
@@ -287,9 +345,13 @@ export class AuthFirebaseService {
       } else if (error.code === 'auth/invalid-email') {
         message = 'El correo electrónico no es válido.';
       } else if (error.code === 'auth/too-many-requests') {
-        message = 'Demasiados intentos. Intenta más tarde.';
-      } else if (error.code === 'auth/invalid-credential') {
-        message = 'Credenciales inválidas. Verifica tu correo y contraseña.';
+        message = 'Demasiados intentos fallidos. Por seguridad, espera 5-10 minutos antes de intentar de nuevo.';
+      } else if (error.code === 'auth/invalid-credential' || error.code === 'auth/invalid-login-credentials') {
+        message = 'Email o contraseña incorrectos. Verifica tus datos e intenta de nuevo.';
+      } else if (error.code === 'auth/network-request-failed') {
+        message = 'Error de conexión. Verifica tu internet e intenta de nuevo.';
+      } else if (error.message?.includes('permission') || error.code?.includes('permission')) {
+        message = 'Error de permisos. Contacta al administrador.';
       }
       
       return { success: false, message };
