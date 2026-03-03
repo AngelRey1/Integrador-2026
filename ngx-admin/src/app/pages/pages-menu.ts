@@ -105,9 +105,18 @@ const ENTRENADOR_MENU: NbMenuItem[] = [
     link: '/pages/entrenador/mis-ingresos',
   },
   {
-    title: 'Mensajes',
+    title: 'COMUNICACIÓN',
+    group: true,
+  },
+  {
+    title: 'Mensajes Clientes',
     icon: 'message-circle-outline',
     link: '/pages/entrenador/chat',
+  },
+  {
+    title: 'Chat con Admin',
+    icon: 'shield-outline',
+    link: '/pages/entrenador/chat-admin',
   },
   {
     title: 'NAVEGACIÓN',

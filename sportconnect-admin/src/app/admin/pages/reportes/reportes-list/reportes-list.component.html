@@ -1,4 +1,149 @@
-<div class="reportes-container">
-  <h1>Reportes</h1>
-  <p>Visualiza reportes y analytics de la plataforma</p>
+<!-- HERO SECTION - Reportes -->
+<section class="hero-section">
+  <div class="hero-content">
+    <h1 class="hero-title">Reportes y Estadísticas</h1>
+    <p class="hero-subtitle">Visualiza el rendimiento de la plataforma</p>
+  </div>
+</section>
+
+<!-- PERIOD SELECTOR -->
+<div class="period-selector">
+  <div class="selector-group">
+    <label>Mes</label>
+    <select [(ngModel)]="selectedMonth" (change)="onPeriodChange()">
+      <option *ngFor="let month of months" [value]="month.value">{{ month.label }}</option>
+    </select>
+  </div>
+  <div class="selector-group">
+    <label>Año</label>
+    <select [(ngModel)]="selectedYear" (change)="onPeriodChange()">
+      <option *ngFor="let year of years" [value]="year">{{ year }}</option>
+    </select>
+  </div>
+  <div class="period-display">
+    <span class="period-text">{{ getSelectedMonthName() }} {{ selectedYear }}</span>
+  </div>
+</div>
+
+<!-- LOADING STATE -->
+<div *ngIf="loading" class="loading-container">
+  <div class="spinner"></div>
+  <p>Generando reporte...</p>
+</div>
+
+<!-- REPORTE CONTENT -->
+<div *ngIf="!loading && reporte" class="reporte-content">
+  <!-- KPI CARDS -->
+  <div class="kpi-grid">
+    <div class="kpi-card primary">
+      <div class="kpi-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="1" x2="12" y2="23"></line>
+          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+        </svg>
+      </div>
+      <div class="kpi-content">
+        <span class="kpi-value">{{ formatearMoneda(reporte.ingresosTotales) }}</span>
+        <span class="kpi-label">Ingresos Totales</span>
+      </div>
+    </div>
+
+    <div class="kpi-card success">
+      <div class="kpi-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path>
+          <path d="M12 18V6"></path>
+        </svg>
+      </div>
+      <div class="kpi-content">
+        <span class="kpi-value">{{ formatearMoneda(reporte.comisionesPlatforma) }}</span>
+        <span class="kpi-label">Comisiones (10%)</span>
+      </div>
+    </div>
+
+    <div class="kpi-card info">
+      <div class="kpi-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+      </div>
+      <div class="kpi-content">
+        <span class="kpi-value">{{ reporte.totalReservas }}</span>
+        <span class="kpi-label">Total Reservas</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS SECTION -->
+  <div class="stats-section">
+    <div class="stats-card">
+      <h3>Resumen de Reservas</h3>
+      <div class="stats-bars">
+        <div class="stat-bar-item">
+          <div class="stat-bar-header">
+            <span class="stat-bar-label">Completadas</span>
+            <span class="stat-bar-value success">{{ reporte.reservasCompletadas }}</span>
+          </div>
+          <div class="stat-bar-track">
+            <div class="stat-bar-fill success" [style.width.%]="tasaCompletadas"></div>
+          </div>
+          <span class="stat-bar-percent">{{ tasaCompletadas }}%</span>
+        </div>
+
+        <div class="stat-bar-item">
+          <div class="stat-bar-header">
+            <span class="stat-bar-label">Canceladas</span>
+            <span class="stat-bar-value danger">{{ reporte.reservasCanceladas }}</span>
+          </div>
+          <div class="stat-bar-track">
+            <div class="stat-bar-fill danger" [style.width.%]="tasaCanceladas"></div>
+          </div>
+          <span class="stat-bar-percent">{{ tasaCanceladas }}%</span>
+        </div>
+
+        <div class="stat-bar-item">
+          <div class="stat-bar-header">
+            <span class="stat-bar-label">Tasa de Éxito</span>
+            <span class="stat-bar-value primary">{{ tasaCompletadas }}%</span>
+          </div>
+          <div class="stat-bar-track">
+            <div class="stat-bar-fill primary" [style.width.%]="tasaCompletadas"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-card">
+      <h3>Resumen Financiero</h3>
+      <div class="financial-summary">
+        <div class="financial-row">
+          <span class="financial-label">Ingresos Brutos</span>
+          <span class="financial-value">{{ formatearMoneda(reporte.ingresosTotales) }}</span>
+        </div>
+        <div class="financial-row">
+          <span class="financial-label">Comisión SportConnect (10%)</span>
+          <span class="financial-value highlight">{{ formatearMoneda(reporte.comisionesPlatforma) }}</span>
+        </div>
+        <div class="financial-row total">
+          <span class="financial-label">Pagos a Entrenadores</span>
+          <span class="financial-value">{{ formatearMoneda(reporte.ingresosTotales - reporte.comisionesPlatforma) }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EMPTY STATE -->
+<div *ngIf="!loading && !reporte" class="empty-state">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <line x1="18" y1="20" x2="18" y2="10"></line>
+    <line x1="12" y1="20" x2="12" y2="4"></line>
+    <line x1="6" y1="20" x2="6" y2="14"></line>
+  </svg>
+  <h3>No hay datos</h3>
+  <p>No se encontraron datos para el período seleccionado</p>
 </div>

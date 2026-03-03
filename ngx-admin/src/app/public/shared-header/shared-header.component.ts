@@ -1,6 +1,7 @@
 import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthFirebaseService } from '../../@core/services/auth-firebase.service';
+import { ClienteFirebaseService } from '../../@core/services/cliente-firebase.service';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { Subscription } from 'rxjs';
 
@@ -17,31 +18,26 @@ export class SharedHeaderComponent implements OnInit, OnDestroy {
   userName = '';
   userRole = '';
   private authSubscription: Subscription;
+  private deportesSub: Subscription;
 
-  deportes = [
-    'Todos',
-    'Fútbol',
-    'CrossFit',
-    'Yoga',
-    'Natación',
-    'Running',
-    'Boxeo',
-    'Ciclismo',
-    'Tenis',
-    'Pilates',
-    'Basketball',
-    'Artes Marciales'
-  ];
+  // Deportes cargados desde Firebase
+  deportes: string[] = ['Todos'];
 
   constructor(
     private router: Router,
     private authFirebase: AuthFirebaseService,
+    private clienteFirebase: ClienteFirebaseService,
     private afAuth: AngularFireAuth
   ) {}
 
   ngOnInit() {
     console.log('=== SharedHeader ngOnInit ===');
     console.log('isLoggedIn inicial:', this.isLoggedIn);
+    
+    // Cargar deportes desde Firebase
+    this.deportesSub = this.clienteFirebase.getDeportesNombres().subscribe(nombres => {
+      this.deportes = ['Todos', ...nombres];
+    });
     
     // Detectar estado de autenticación
     this.authSubscription = this.afAuth.authState.subscribe(async (user) => {
@@ -65,6 +61,9 @@ export class SharedHeaderComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     if (this.authSubscription) {
       this.authSubscription.unsubscribe();
+    }
+    if (this.deportesSub) {
+      this.deportesSub.unsubscribe();
     }
   }
 

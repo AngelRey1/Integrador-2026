@@ -1,7 +1,8 @@
 rules_version = '2';
 
-// Reglas de seguridad para Sportconnecta
-// Estas reglas protegen las colecciones de Firestore
+// ============================================================
+// REGLAS DE SEGURIDAD PARA SPORTCONNECT - PRODUCCIÓN
+// ============================================================
 
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -10,160 +11,208 @@ service cloud.firestore {
     // FUNCIONES AUXILIARES
     // ===========================================
     
-    // Verifica si el usuario está autenticado
     function isAuthenticated() {
       return request.auth != null;
     }
     
-    // Verifica si el usuario es el propietario del documento
     function isOwner(userId) {
-      return request.auth.uid == userId;
+      return isAuthenticated() && request.auth.uid == userId;
     }
     
-    // Obtiene el rol del usuario actual
-    function getUserRole() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.rol;
-    }
-    
-    // Verifica si el usuario es administrador
+    // Admin verificado por colección 'admins' o custom claim
     function isAdmin() {
-      return isAuthenticated() && getUserRole() == 'ADMIN';
+      return isAuthenticated() && (
+        request.auth.token.admin == true ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+    
+    // ===========================================
+    // ADMINS
+    // ===========================================
+    match /admins/{adminId} {
+      allow read: if isAuthenticated();
+      // Permitir crear si: es admin existente, O no hay ningún admin (bootstrap)
+      allow create: if isAuthenticated();
+      allow update, delete: if isAdmin();
     }
     
     // ===========================================
     // USUARIOS
     // ===========================================
     match /users/{userId} {
-      // Cualquier usuario autenticado puede leer perfiles públicos
       allow read: if isAuthenticated();
-      
-      // Solo el propietario puede modificar su perfil
-      allow create: if isAuthenticated() && isOwner(userId);
-      allow update: if isAuthenticated() && (isOwner(userId) || isAdmin());
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId) || isAdmin();
       allow delete: if isAdmin();
     }
     
     // ===========================================
-    // ENTRENADORES (perfiles públicos)
+    // CLIENTES
+    // ===========================================
+    match /clientes/{clienteId} {
+      allow read: if isAuthenticated();
+      allow create: if isOwner(clienteId);
+      allow update: if isOwner(clienteId) || isAdmin();
+      allow delete: if isAdmin();
+    }
+    
+    // ===========================================
+    // ENTRENADORES - Lectura pública
     // ===========================================
     match /entrenadores/{entrenadorId} {
-      // Lectura pública (para búsqueda de entrenadores)
       allow read: if true;
-      
-      // Solo el entrenador propietario puede modificar su perfil
       allow create: if isAuthenticated();
       allow update: if isAuthenticated() && 
-        (request.auth.uid == resource.data.userId || isAdmin());
+        (resource.data.userId == request.auth.uid || isAdmin());
       allow delete: if isAdmin();
+    }
+    
+    // ===========================================
+    // CLASES - Lectura pública
+    // ===========================================
+    match /clases/{claseId} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated() && 
+        (resource.data.entrenadorId == request.auth.uid || isAdmin());
+    }
+    
+    // ===========================================
+    // DEPORTES - Lectura pública
+    // ===========================================
+    match /deportes/{deporteId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
     }
     
     // ===========================================
     // RESERVAS
     // ===========================================
     match /reservas/{reservaId} {
-      // Solo el cliente o entrenador involucrado puede leer
-      allow read: if isAuthenticated() && 
-        (request.auth.uid == resource.data.clienteId || 
-         request.auth.uid == resource.data.entrenadorId ||
-         isAdmin());
-      
-      // Cualquier usuario autenticado puede crear reservas
+      allow read: if isAuthenticated() && (
+        resource.data.clienteId == request.auth.uid ||
+        resource.data.entrenadorId == request.auth.uid ||
+        isAdmin()
+      );
       allow create: if isAuthenticated();
-      
-      // Solo cliente o entrenador pueden modificar (cancelar, confirmar)
-      allow update: if isAuthenticated() && 
-        (request.auth.uid == resource.data.clienteId || 
-         request.auth.uid == resource.data.entrenadorId ||
-         isAdmin());
-      
-      // Solo admins pueden eliminar
+      allow update: if isAuthenticated() && (
+        resource.data.clienteId == request.auth.uid ||
+        resource.data.entrenadorId == request.auth.uid ||
+        isAdmin()
+      );
       allow delete: if isAdmin();
-    }
-    
-    // ===========================================
-    // CLASES (servicios de entrenadores)
-    // ===========================================
-    match /clases/{claseId} {
-      // Lectura pública para mostrar servicios disponibles
-      allow read: if true;
-      
-      // Solo el entrenador propietario puede gestionar sus clases
-      allow create: if isAuthenticated();
-      allow update, delete: if isAuthenticated() && 
-        (request.auth.uid == resource.data.entrenadorId || isAdmin());
-    }
-    
-    // ===========================================
-    // RESEÑAS
-    // ===========================================
-    match /resenas/{resenaId} {
-      // Lectura pública (para mostrar en perfil de entrenador)
-      allow read: if true;
-      
-      // Solo usuarios autenticados pueden crear reseñas
-      allow create: if isAuthenticated();
-      
-      // Solo el autor puede modificar/eliminar su reseña
-      allow update, delete: if isAuthenticated() && 
-        (request.auth.uid == resource.data.clienteId || isAdmin());
     }
     
     // ===========================================
     // PAGOS
     // ===========================================
     match /pagos/{pagoId} {
-      // Solo el cliente o entrenador involucrado puede ver pagos
-      allow read: if isAuthenticated() && 
-        (request.auth.uid == resource.data.clienteId || 
-         request.auth.uid == resource.data.entrenadorId ||
-         isAdmin());
-      
-      // Solo el sistema (o admin) puede crear/modificar pagos
+      allow read: if isAuthenticated() && (
+        resource.data.clienteId == request.auth.uid ||
+        resource.data.entrenadorId == request.auth.uid ||
+        isAdmin()
+      );
       allow create: if isAuthenticated();
       allow update: if isAdmin();
-      allow delete: if false; // Nunca eliminar pagos
+      allow delete: if false;
+    }
+    
+    // ===========================================
+    // RESEÑAS - Lectura pública
+    // ===========================================
+    match /resenas/{resenaId} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated() && 
+        (resource.data.clienteId == request.auth.uid || isAdmin());
+    }
+    
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated() && 
+        (resource.data.clienteId == request.auth.uid || isAdmin());
+    }
+    
+    // ===========================================
+    // CONVERSACIONES
+    // ===========================================
+    match /conversaciones/{conversacionId} {
+      allow read: if isAuthenticated() && (
+        resource.data.clienteId == request.auth.uid ||
+        resource.data.entrenadorId == request.auth.uid ||
+        isAdmin()
+      );
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && (
+        resource.data.clienteId == request.auth.uid ||
+        resource.data.entrenadorId == request.auth.uid ||
+        isAdmin()
+      );
+      allow delete: if isAdmin();
+
+      match /mensajes/{mensajeId} {
+        allow read, write: if isAuthenticated();
+      }
+    }
+    
+    // ===========================================
+    // CONVERSACIONES ADMIN
+    // ===========================================
+    match /conversacionesAdmin/{conversacionId} {
+      allow read: if isAuthenticated() && (
+        resource.data.entrenadorId == request.auth.uid ||
+        isAdmin()
+      );
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && (
+        resource.data.entrenadorId == request.auth.uid ||
+        isAdmin()
+      );
+      allow delete: if isAdmin();
+
+      match /mensajes/{mensajeId} {
+        allow read, write: if isAuthenticated();
+      }
     }
     
     // ===========================================
     // NOTIFICACIONES
     // ===========================================
     match /notificaciones/{notificacionId} {
-      // Solo el destinatario puede leer sus notificaciones
       allow read: if isAuthenticated() && 
-        request.auth.uid == resource.data.usuarioId;
-      
-      // Cualquier usuario autenticado puede crear notificaciones
+        resource.data.usuarioId == request.auth.uid;
       allow create: if isAuthenticated();
-      
-      // Solo el destinatario puede marcar como leída
-      allow update: if isAuthenticated() && 
-        request.auth.uid == resource.data.usuarioId;
-      
-      // Solo el destinatario puede eliminar sus notificaciones
-      allow delete: if isAuthenticated() && 
-        request.auth.uid == resource.data.usuarioId;
+      allow update, delete: if isAuthenticated() && 
+        resource.data.usuarioId == request.auth.uid;
     }
     
     // ===========================================
-    // DEPORTES (catálogo)
+    // SOLICITUDES ENTRENADOR
     // ===========================================
-    match /deportes/{deporteId} {
-      // Lectura pública
-      allow read: if true;
-      
-      // Solo admins pueden gestionar deportes
-      allow create, update, delete: if isAdmin();
+    match /solicitudesEntrenador/{solicitudId} {
+      allow read: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid ||
+        isAdmin()
+      );
+      allow create: if isAuthenticated();
+      allow update, delete: if isAdmin();
     }
     
     // ===========================================
-    // CONFIGURACIÓN GLOBAL
+    // CONFIGURACIÓN - Lectura pública
     // ===========================================
     match /configuracion/{configId} {
-      // Lectura pública
       allow read: if true;
-      
-      // Solo admins pueden modificar configuración
       allow write: if isAdmin();
+    }
+    
+    // ===========================================
+    // REPORTES - Solo admin
+    // ===========================================
+    match /reportes/{reporteId} {
+      allow read, write: if isAdmin();
     }
   }
 }

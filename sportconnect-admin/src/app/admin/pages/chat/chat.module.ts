@@ -2,25 +2,25 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { NbIconModule } from '@nebular/theme';
-import { DeportesListComponent } from './deportes-list/deportes-list.component';
+import { NbToastrModule } from '@nebular/theme';
+import { ChatListComponent } from './chat-list/chat-list.component';
 
 const routes: Routes = [
   {
     path: '',
-    component: DeportesListComponent,
+    component: ChatListComponent,
   },
 ];
 
 @NgModule({
   declarations: [
-    DeportesListComponent,
+    ChatListComponent,
   ],
   imports: [
     CommonModule,
     FormsModule,
-    NbIconModule,
+    NbToastrModule,
     RouterModule.forChild(routes),
   ],
 })
-export class DeportesModule { }
+export class ChatModule { }

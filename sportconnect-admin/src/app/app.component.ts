@@ -69,6 +69,11 @@ export class AppComponent implements OnInit, OnDestroy {
       link: '/admin/pagos'
     },
     {
+      title: 'Chat',
+      icon: 'message-circle-outline',
+      link: '/admin/chat'
+    },
+    {
       title: 'CONFIGURACIÓN',
       group: true
     },

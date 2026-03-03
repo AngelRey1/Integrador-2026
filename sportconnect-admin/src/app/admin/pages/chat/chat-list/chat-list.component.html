@@ -1,0 +1,157 @@
+<!-- HERO SECTION -->
+<section class="hero-section">
+  <div class="hero-content">
+    <h1 class="hero-title">Chat con Entrenadores</h1>
+    <p class="hero-subtitle">Comunícate directamente con los entrenadores de la plataforma</p>
+  </div>
+  <button class="btn-new-chat" (click)="toggleNuevaConversacion()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+      <line x1="12" y1="8" x2="12" y2="14"></line>
+      <line x1="9" y1="11" x2="15" y2="11"></line>
+    </svg>
+    <span>Nueva Conversación</span>
+  </button>
+</section>
+
+<!-- NUEVA CONVERSACIÓN MODAL -->
+<div class="modal-overlay" *ngIf="mostrarNuevaConversacion" (click)="toggleNuevaConversacion()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Iniciar Nueva Conversación</h3>
+      <button class="btn-close" (click)="toggleNuevaConversacion()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+        <input type="text" placeholder="Buscar entrenador..." [(ngModel)]="busquedaEntrenador" />
+      </div>
+      <div class="entrenadores-list">
+        <div class="entrenador-item" *ngFor="let entrenador of entrenadoresFiltrados" 
+             (click)="iniciarConversacion(entrenador)">
+          <div class="entrenador-avatar">
+            <img *ngIf="entrenador.fotoPerfil" [src]="entrenador.fotoPerfil" [alt]="entrenador.nombre">
+            <span *ngIf="!entrenador.fotoPerfil">{{ getIniciales(entrenador.nombre) }}</span>
+          </div>
+          <div class="entrenador-info">
+            <span class="entrenador-nombre">{{ entrenador.nombre }}</span>
+            <span class="entrenador-email">{{ entrenador.email }}</span>
+          </div>
+        </div>
+        <div class="empty-entrenadores" *ngIf="entrenadoresFiltrados.length === 0">
+          <p>No se encontraron entrenadores</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHAT CONTAINER -->
+<div class="chat-container">
+  <!-- CONVERSACIONES LIST -->
+  <div class="conversaciones-panel">
+    <div class="panel-header">
+      <h3>Conversaciones</h3>
+      <span class="badge">{{ conversaciones.length }}</span>
+    </div>
+
+    <div *ngIf="loading" class="loading-state">
+      <div class="spinner"></div>
+    </div>
+
+    <div *ngIf="!loading && conversaciones.length === 0" class="empty-conversations">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+      </svg>
+      <p>No hay conversaciones</p>
+      <button class="btn-start" (click)="toggleNuevaConversacion()">Iniciar chat</button>
+    </div>
+
+    <div class="conversaciones-list" *ngIf="!loading && conversaciones.length > 0">
+      <div class="conversacion-item" 
+           *ngFor="let conv of conversaciones"
+           [class.active]="conversacionActiva?.id === conv.id"
+           (click)="seleccionarConversacion(conv)">
+        <div class="conv-avatar">
+          {{ getIniciales(conv.entrenadorNombre) }}
+        </div>
+        <div class="conv-content">
+          <div class="conv-header">
+            <span class="conv-nombre">{{ conv.entrenadorNombre }}</span>
+            <span class="conv-fecha">{{ formatearFecha(conv.ultimoMensajeTimestamp) }}</span>
+          </div>
+          <p class="conv-preview">{{ conv.ultimoMensaje || 'Sin mensajes' }}</p>
+        </div>
+        <div class="conv-badge" *ngIf="conv.noLeidosAdmin && conv.noLeidosAdmin > 0">
+          {{ conv.noLeidosAdmin }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MENSAJES PANEL -->
+  <div class="mensajes-panel">
+    <div *ngIf="!conversacionActiva" class="no-conversation">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+      </svg>
+      <h3>Selecciona una conversación</h3>
+      <p>Elige un entrenador de la lista para chatear</p>
+    </div>
+
+    <ng-container *ngIf="conversacionActiva">
+      <!-- Header del chat -->
+      <div class="chat-header">
+        <div class="chat-header-avatar">
+          {{ getIniciales(conversacionActiva!.entrenadorNombre) }}
+        </div>
+        <div class="chat-header-info">
+          <h4>{{ conversacionActiva!.entrenadorNombre }}</h4>
+          <span class="status-online">Entrenador</span>
+        </div>
+      </div>
+
+      <!-- Mensajes -->
+      <div class="mensajes-container" #mensajesContainer>
+        <div class="mensaje" 
+             *ngFor="let mensaje of mensajes"
+             [class.enviado]="mensaje.senderTipo === 'admin'"
+             [class.recibido]="mensaje.senderTipo === 'entrenador'">
+          <div class="mensaje-bubble">
+            <p class="mensaje-texto">{{ mensaje.texto }}</p>
+            <span class="mensaje-hora">{{ formatearFecha(mensaje.timestamp) }}</span>
+          </div>
+        </div>
+
+        <div *ngIf="mensajes.length === 0" class="no-messages">
+          <p>No hay mensajes aún. ¡Inicia la conversación!</p>
+        </div>
+      </div>
+
+      <!-- Input de mensaje -->
+      <div class="mensaje-input-container">
+        <input 
+          type="text" 
+          [(ngModel)]="nuevoMensaje" 
+          placeholder="Escribe un mensaje..."
+          (keypress)="onKeyPress($event)"
+          [disabled]="enviando"
+        />
+        <button class="btn-send" (click)="enviarMensaje()" [disabled]="!nuevoMensaje.trim() || enviando">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+      </div>
+    </ng-container>
+  </div>
+</div>

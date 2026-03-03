@@ -9,6 +9,7 @@ import { MisClientesComponent } from './mis-clientes/mis-clientes.component';
 import { MisIngresosComponent } from './mis-ingresos/mis-ingresos.component';
 import { PerfilEntrenadorComponent } from './perfil-entrenador/perfil-entrenador.component';
 import { ChatEntrenadorComponent } from './chat/chat.component';
+import { ChatAdminComponent } from './chat-admin/chat-admin.component';
 
 // Custom Icons
 import { SportIconsModule } from '../../@theme/components/sport-icons/sport-icons.module';
@@ -49,7 +50,8 @@ import { NbEvaIconsModule } from '@nebular/eva-icons';
     MisClientesComponent,
     MisIngresosComponent,
     PerfilEntrenadorComponent,
-    ChatEntrenadorComponent
+    ChatEntrenadorComponent,
+    ChatAdminComponent
   ],
   imports: [
     CommonModule,

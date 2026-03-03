@@ -143,39 +143,38 @@ export class PerfilClienteComponent implements OnInit, OnDestroy {
   ) {
     // Obtener email y nombre de usuario del token JWT
     const tokenPayload = this.authService.decodeToken(this.authService.token || '');
-    const email = tokenPayload?.email || 'usuario@example.com';
-    const nombreUsuario = tokenPayload?.nombreUsuario || tokenPayload?.sub || 'usuario';
+    const email = tokenPayload?.email || '';
+    const nombreUsuario = tokenPayload?.nombreUsuario || tokenPayload?.sub || '';
     
-    // Generar una foto consistente de HOMBRE basada en el nombre de usuario o email
-    // La misma función que se usa en el header para que sea la misma foto
+    // Generar una foto consistente basada en el nombre de usuario o email
     const fotoId = this.generarFotoIdHombre(nombreUsuario || email || 'usuario');
     
-    // Inicializar datos mock
+    // Inicializar datos desde token - se actualizarán desde Firebase
     this.usuario = {
       id: 1,
-      nombre: 'Juan',
-      apellidos: 'García López',
-      email: email, // Email del token
-      nombreUsuario: nombreUsuario, // Nombre de usuario del token
-      telefono: '+34 612 345 678',
-      fecha_nacimiento: new Date(1990, 5, 15),
-      genero: 'masculino',
+      nombre: '',
+      apellidos: '',
+      email: email,
+      nombreUsuario: nombreUsuario,
+      telefono: '',
+      fecha_nacimiento: null,
+      genero: '',
       direccion: {
-        calle: 'Calle Mayor 123, 3º B',
-        ciudad: 'Madrid',
-        codigo_postal: '28013',
-        pais: 'ES'
+        calle: '',
+        ciudad: '',
+        codigo_postal: '',
+        pais: 'MX'
       },
-      avatar: `https://randomuser.me/api/portraits/men/${fotoId}.jpg` // Misma foto de HOMBRE que en el header (fotos reales)
+      avatar: `https://randomuser.me/api/portraits/men/${fotoId}.jpg`
     };
 
     this.preferencias = {
-      deportes_favoritos: ['yoga', 'running', 'natacion'],
-      nivel_experiencia: 'intermedio',
-      objetivos: ['perder_peso', 'mejorar_resistencia'],
-      dias_preferidos: ['lunes', 'miercoles', 'viernes'],
-      horario_preferido: 'tarde',
-      presupuesto_mensual: 150
+      deportes_favoritos: [],
+      nivel_experiencia: '',
+      objetivos: [],
+      dias_preferidos: [],
+      horario_preferido: '',
+      presupuesto_mensual: 0
     };
 
     this.notificaciones = {

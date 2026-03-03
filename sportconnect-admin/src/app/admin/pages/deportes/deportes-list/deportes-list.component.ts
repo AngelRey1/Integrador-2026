@@ -21,6 +21,22 @@ export class DeportesListComponent implements OnInit, OnDestroy {
   nuevoDeporte = { nombre: '', icono: 'activity-outline' };
   mostrarFormulario = false;
 
+  // Opciones de iconos disponibles
+  iconOptions = [
+    'activity-outline',
+    'award-outline',
+    'flash-outline',
+    'heart-outline',
+    'navigation-2-outline',
+    'trending-up-outline',
+    'compass-outline',
+    'flag-outline',
+    'star-outline',
+    'thermometer-outline',
+    'droplet-outline',
+    'sun-outline'
+  ];
+
   stats = {
     total: 0,
     activos: 0

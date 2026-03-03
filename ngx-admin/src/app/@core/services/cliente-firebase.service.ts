@@ -86,6 +86,13 @@ export interface Pago {
     fecha: Date;
 }
 
+export interface Deporte {
+    id?: string;
+    nombre: string;
+    icono?: string;
+    activo: boolean;
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -218,6 +225,31 @@ export class ClienteFirebaseService {
             ref.where('entrenadorId', '==', entrenadorId)
                 .orderBy('fecha', 'desc')
         ).valueChanges({ idField: 'id' });
+    }
+
+    // ==================== DEPORTES ====================
+
+    /**
+     * Obtener todos los deportes activos desde Firebase
+     */
+    getDeportes(): Observable<Deporte[]> {
+        return this.firestore.collection<Deporte>('deportes', ref =>
+            ref.where('activo', '==', true)
+        ).valueChanges({ idField: 'id' }).pipe(
+            catchError(err => {
+                console.error('Error cargando deportes:', err);
+                return of([]);
+            })
+        );
+    }
+
+    /**
+     * Obtener lista simple de nombres de deportes
+     */
+    getDeportesNombres(): Observable<string[]> {
+        return this.getDeportes().pipe(
+            map(deportes => deportes.map(d => d.nombre))
+        );
     }
 
     // ==================== RESERVAS ====================

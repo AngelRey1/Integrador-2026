@@ -1,4 +1,169 @@
-<div class="pagos-container">
-  <h1>Gestión de Pagos</h1>
-  <p>Administra los pagos y transacciones del sistema</p>
+<!-- HERO SECTION - Pagos -->
+<section class="hero-section">
+  <div class="hero-content">
+    <h1 class="hero-title">Gestión de Pagos</h1>
+    <p class="hero-subtitle">Administra los pagos, comisiones y transacciones</p>
+  </div>
+</section>
+
+<!-- STATS GRID -->
+<div class="stats-grid">
+  <div class="stat-card highlight">
+    <div class="stat-icon ingresos">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="12" y1="1" x2="12" y2="23"></line>
+        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+      </svg>
+    </div>
+    <div class="stat-content">
+      <span class="stat-value">{{ formatearMoneda(stats.ingresosMes) }}</span>
+      <span class="stat-label">Ingresos del Mes</span>
+    </div>
+  </div>
+
+  <div class="stat-card highlight">
+    <div class="stat-icon comisiones">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path>
+        <path d="M12 18V6"></path>
+      </svg>
+    </div>
+    <div class="stat-content">
+      <span class="stat-value">{{ formatearMoneda(stats.comisionesMes) }}</span>
+      <span class="stat-label">Comisiones del Mes</span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon total">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+        <line x1="1" y1="10" x2="23" y2="10"></line>
+      </svg>
+    </div>
+    <div class="stat-content">
+      <span class="stat-value">{{ stats.total }}</span>
+      <span class="stat-label">Total Pagos</span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon completado">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+      </svg>
+    </div>
+    <div class="stat-content">
+      <span class="stat-value">{{ stats.completados }}</span>
+      <span class="stat-label">Completados</span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon pendiente">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <polyline points="12 6 12 12 16 14"></polyline>
+      </svg>
+    </div>
+    <div class="stat-content">
+      <span class="stat-value">{{ stats.pendientes }}</span>
+      <span class="stat-label">Pendientes</span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon reembolsado">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="1 4 1 10 7 10"></polyline>
+        <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+      </svg>
+    </div>
+    <div class="stat-content">
+      <span class="stat-value">{{ stats.reembolsados }}</span>
+      <span class="stat-label">Reembolsados</span>
+    </div>
+  </div>
+</div>
+
+<!-- FILTERS -->
+<div class="filters-section">
+  <div class="filter-tabs">
+    <button class="filter-tab" [class.active]="filterEstado === 'todos'" (click)="onFilterChange('todos')">
+      Todos
+    </button>
+    <button class="filter-tab" [class.active]="filterEstado === 'COMPLETADO'" (click)="onFilterChange('COMPLETADO')">
+      Completados
+    </button>
+    <button class="filter-tab" [class.active]="filterEstado === 'PENDIENTE'" (click)="onFilterChange('PENDIENTE')">
+      Pendientes
+    </button>
+    <button class="filter-tab" [class.active]="filterEstado === 'REEMBOLSADO'" (click)="onFilterChange('REEMBOLSADO')">
+      Reembolsados
+    </button>
+  </div>
+</div>
+
+<!-- PAGOS TABLE -->
+<div class="table-container">
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Cargando pagos...</p>
+  </div>
+
+  <div *ngIf="!loading && filteredPagos.length === 0" class="empty-state">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+      <line x1="1" y1="10" x2="23" y2="10"></line>
+    </svg>
+    <h3>No hay pagos</h3>
+    <p>No se encontraron pagos con el filtro seleccionado</p>
+  </div>
+
+  <table *ngIf="!loading && filteredPagos.length > 0" class="data-table">
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Monto Total</th>
+        <th>Comisión (10%)</th>
+        <th>Monto Entrenador</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let pago of filteredPagos">
+        <td>{{ formatearFecha(pago.fecha) }}</td>
+        <td class="price-cell">{{ formatearMoneda(pago.monto) }}</td>
+        <td class="commission-cell">{{ formatearMoneda(pago.comision) }}</td>
+        <td class="trainer-amount">{{ formatearMoneda(pago.montoEntrenador) }}</td>
+        <td>
+          <span class="status-badge" [ngClass]="pago.estado.toLowerCase()">
+            {{ pago.estado }}
+          </span>
+        </td>
+        <td>
+          <div class="actions-cell">
+            <button class="btn-action view" title="Ver detalles">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
+            <button *ngIf="pago.estado === 'COMPLETADO'" 
+                    class="btn-action refund" 
+                    title="Reembolsar"
+                    (click)="reembolsarPago(pago)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="1 4 1 10 7 10"></polyline>
+                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+              </svg>
+            </button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </div>

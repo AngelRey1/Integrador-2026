@@ -1,0 +1,110 @@
+<div class="chat-admin-container">
+  <!-- HEADER -->
+  <div class="chat-header-section">
+    <div class="header-content">
+      <div class="header-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        </svg>
+      </div>
+      <div class="header-text">
+        <h1>Chat con Administración</h1>
+        <p>Comunícate con el equipo de SportConnect</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHAT AREA -->
+  <div class="chat-main">
+    <!-- Sin conversaciones -->
+    <div *ngIf="!loading && conversaciones.length === 0" class="no-conversations">
+      <div class="empty-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+      </div>
+      <h3>Sin mensajes del administrador</h3>
+      <p>Cuando el administrador te envíe un mensaje, aparecerá aquí</p>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando...</p>
+    </div>
+
+    <!-- Chat activo -->
+    <div *ngIf="!loading && conversaciones.length > 0" class="chat-active">
+      <!-- Lista lateral de conversaciones (si hay más de una) -->
+      <div class="conversations-sidebar" *ngIf="conversaciones.length > 1">
+        <div class="conv-item" 
+             *ngFor="let conv of conversaciones"
+             [class.active]="conversacionActiva?.id === conv.id"
+             (click)="seleccionarConversacion(conv)">
+          <div class="conv-avatar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+          </div>
+          <div class="conv-info">
+            <span class="conv-name">{{ conv.adminNombre }}</span>
+            <span class="conv-preview">{{ conv.ultimoMensaje || 'Sin mensajes' }}</span>
+          </div>
+          <div class="conv-badge" *ngIf="conv.noLeidosEntrenador && conv.noLeidosEntrenador > 0">
+            {{ conv.noLeidosEntrenador }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Área de mensajes -->
+      <div class="messages-area">
+        <!-- Header del chat -->
+        <div class="chat-header" *ngIf="conversacionActiva">
+          <div class="chat-avatar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+          </div>
+          <div class="chat-info">
+            <h4>{{ conversacionActiva.adminNombre }}</h4>
+            <span class="chat-status">Administración SportConnect</span>
+          </div>
+        </div>
+
+        <!-- Mensajes -->
+        <div class="messages-container" #mensajesContainer>
+          <div class="mensaje" 
+               *ngFor="let mensaje of mensajes"
+               [class.enviado]="mensaje.senderTipo === 'entrenador'"
+               [class.recibido]="mensaje.senderTipo === 'admin'">
+            <div class="mensaje-bubble">
+              <p class="mensaje-texto">{{ mensaje.texto }}</p>
+              <span class="mensaje-hora">{{ formatearFecha(mensaje.timestamp) }}</span>
+            </div>
+          </div>
+
+          <div *ngIf="mensajes.length === 0 && conversacionActiva" class="no-messages">
+            <p>No hay mensajes aún</p>
+          </div>
+        </div>
+
+        <!-- Input de mensaje -->
+        <div class="input-container" *ngIf="conversacionActiva">
+          <input 
+            type="text" 
+            [(ngModel)]="nuevoMensaje" 
+            placeholder="Escribe tu mensaje..."
+            (keypress)="onKeyPress($event)"
+            [disabled]="enviando"
+          />
+          <button class="btn-send" (click)="enviarMensaje()" [disabled]="!nuevoMensaje.trim() || enviando">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -7,6 +7,7 @@ import { MisClientesComponent } from './mis-clientes/mis-clientes.component';
 import { MisIngresosComponent } from './mis-ingresos/mis-ingresos.component';
 import { PerfilEntrenadorComponent } from './perfil-entrenador/perfil-entrenador.component';
 import { ChatEntrenadorComponent } from './chat/chat.component';
+import { ChatAdminComponent } from './chat-admin/chat-admin.component';
 
 const routes: Routes = [
   {
@@ -37,6 +38,10 @@ const routes: Routes = [
   {
     path: 'chat',
     component: ChatEntrenadorComponent
+  },
+  {
+    path: 'chat-admin',
+    component: ChatAdminComponent
   },
   {
     path: 'perfil',

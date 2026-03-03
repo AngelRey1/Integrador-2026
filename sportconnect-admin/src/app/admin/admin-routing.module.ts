@@ -35,6 +35,10 @@ const routes: Routes = [
         loadChildren: () => import('./pages/reportes/reportes.module').then(m => m.ReportesModule),
       },
       {
+        path: 'chat',
+        loadChildren: () => import('./pages/chat/chat.module').then(m => m.ChatModule),
+      },
+      {
         path: '',
         redirectTo: 'dashboard',
         pathMatch: 'full',

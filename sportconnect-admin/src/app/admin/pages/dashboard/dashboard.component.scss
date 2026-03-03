@@ -46,6 +46,139 @@ $font-primary: 'Space Grotesk', 'Inter', sans-serif;
   padding: 1.5rem;
 }
 
+// ========== ADMIN CHECK SECTION ==========
+.admin-check-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  padding: 2rem;
+}
+
+.admin-check-card {
+  background: $color-surface;
+  border-radius: 24px;
+  padding: 4rem;
+  text-align: center;
+  box-shadow: $shadow-lg;
+  max-width: 500px;
+
+  nb-spinner {
+    margin-bottom: 2rem;
+  }
+
+  h2 {
+    font-family: $font-primary;
+    font-size: 1.5rem;
+    color: $color-text-primary;
+    margin: 0;
+  }
+}
+
+.admin-register-card,
+.admin-denied-card {
+  background: $color-surface;
+  border-radius: 24px;
+  padding: 4rem;
+  text-align: center;
+  box-shadow: $shadow-lg;
+  max-width: 500px;
+
+  h2 {
+    font-family: $font-primary;
+    font-size: 1.75rem;
+    color: $color-text-primary;
+    margin: 1.5rem 0 1rem;
+  }
+
+  p {
+    color: $color-text-secondary;
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+  }
+}
+
+.admin-icon-large {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, $color-primary, $color-secondary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  
+  svg {
+    width: 40px;
+    height: 40px;
+    stroke: white;
+  }
+}
+
+.admin-icon-denied {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #EF4444, #DC2626);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  
+  svg {
+    width: 40px;
+    height: 40px;
+    stroke: white;
+  }
+}
+
+.btn-register-admin {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, $color-primary, $color-secondary);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-family: $font-primary;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: $shadow-md;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-lg;
+  }
+}
+
+.btn-logout {
+  padding: 0.875rem 2rem;
+  background: transparent;
+  color: $color-text-secondary;
+  border: 2px solid $color-accent;
+  border-radius: 12px;
+  font-family: $font-primary;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+
+  &:hover {
+    background: $color-accent;
+    color: $color-text-primary;
+  }
+}
+
 // ========== HERO SECTION ==========
 .hero-dashboard {
   background: linear-gradient(135deg, $color-primary 0%, $color-secondary 100%);

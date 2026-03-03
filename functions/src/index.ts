@@ -729,3 +729,106 @@ export const cancelPaymentIntent = functions.https.onRequest((req, res) => {
     }
   });
 });
+
+/**
+ * Crear documento de admin en Firestore
+ * Solo funciona si no hay admins existentes (bootstrap inicial)
+ * O se proporciona el token secreto correcto
+ */
+export const createAdmin = functions.https.onRequest((req, res) => {
+  corsHandler(req, res, async () => {
+    if (req.method !== 'POST') {
+      res.status(405).json({ error: 'Method not allowed' });
+      return;
+    }
+
+    try {
+      const { uid, email, secretToken } = req.body;
+
+      if (!uid || !email) {
+        res.status(400).json({ error: 'uid and email are required' });
+        return;
+      }
+
+      // Token secreto para crear admins (cambiar en producción)
+      const ADMIN_SECRET_TOKEN = 'sportconnect-admin-2026-secret';
+
+      // Verificar si hay admins existentes
+      const adminsSnapshot = await db.collection('admins').limit(1).get();
+      const noAdmins = adminsSnapshot.empty;
+
+      // Permitir creación solo si:
+      // 1. No hay admins (primer admin)
+      // 2. O se proporciona el token secreto correcto
+      if (!noAdmins && secretToken !== ADMIN_SECRET_TOKEN) {
+        res.status(403).json({ 
+          error: 'No autorizado. Se requiere token secreto para agregar más admins.' 
+        });
+        return;
+      }
+
+      // Crear documento de admin
+      await db.collection('admins').doc(uid).set({
+        email: email,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        role: 'ADMIN',
+        active: true
+      });
+
+      // También agregar custom claim de admin al usuario
+      try {
+        await admin.auth().setCustomUserClaims(uid, { admin: true });
+      } catch (claimError) {
+        console.warn('No se pudo establecer custom claim:', claimError);
+      }
+
+      res.status(200).json({
+        success: true,
+        message: 'Admin creado exitosamente',
+        uid: uid
+      });
+
+    } catch (error: any) {
+      console.error('Error creating admin:', error);
+      res.status(500).json({ 
+        error: 'Error al crear admin',
+        message: error.message 
+      });
+    }
+  });
+});
+
+/**
+ * Verificar si un usuario es admin
+ */
+export const isAdmin = functions.https.onRequest((req, res) => {
+  corsHandler(req, res, async () => {
+    if (req.method !== 'GET') {
+      res.status(405).json({ error: 'Method not allowed' });
+      return;
+    }
+
+    try {
+      const uid = req.query.uid as string;
+
+      if (!uid) {
+        res.status(400).json({ error: 'uid is required' });
+        return;
+      }
+
+      const adminDoc = await db.collection('admins').doc(uid).get();
+
+      res.status(200).json({
+        isAdmin: adminDoc.exists,
+        active: adminDoc.exists ? adminDoc.data()?.active : false
+      });
+
+    } catch (error: any) {
+      console.error('Error checking admin:', error);
+      res.status(500).json({ 
+        error: 'Error al verificar admin',
+        message: error.message 
+      });
+    }
+  });
+});

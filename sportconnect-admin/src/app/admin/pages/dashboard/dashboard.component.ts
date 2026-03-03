@@ -30,6 +30,9 @@ interface Transaction {
 export class DashboardComponent implements OnInit, OnDestroy {
   today = new Date();
   loading = true;
+  isAdmin = false;
+  noAdminExists = false;
+  checkingAdmin = true;
 
   stats = {
     totalUsers: 0,
@@ -55,12 +58,47 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private adminFirebase: AdminFirebaseService
   ) { }
 
-  ngOnInit(): void {
-    this.cargarDatos();
+  async ngOnInit(): Promise<void> {
+    await this.verificarAdmin();
   }
 
   ngOnDestroy(): void {
     this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
+
+  async verificarAdmin(): Promise<void> {
+    this.checkingAdmin = true;
+    try {
+      // Verificar si el usuario actual es admin
+      this.isAdmin = await this.adminFirebase.isCurrentUserAdmin();
+      
+      if (!this.isAdmin) {
+        // Verificar si hay algún admin
+        const hayAdmin = await this.adminFirebase.hasAnyAdmin();
+        this.noAdminExists = !hayAdmin;
+      }
+
+      if (this.isAdmin) {
+        this.cargarDatos();
+      }
+    } catch (error) {
+      console.error('Error verificando admin:', error);
+      this.noAdminExists = true;
+    }
+    this.checkingAdmin = false;
+  }
+
+  async registrarseComoAdmin(): Promise<void> {
+    try {
+      await this.adminFirebase.registerAsAdmin();
+      this.toastr.success('Te has registrado como administrador', 'Éxito');
+      this.isAdmin = true;
+      this.noAdminExists = false;
+      this.cargarDatos();
+    } catch (error: any) {
+      console.error('Error registrándose como admin:', error);
+      this.toastr.danger('Error al registrarse como admin: ' + error.message, 'Error');
+    }
   }
 
   cargarDatos(): void {

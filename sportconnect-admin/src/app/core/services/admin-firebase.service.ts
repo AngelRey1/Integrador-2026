@@ -98,6 +98,44 @@ export class AdminFirebaseService {
         private afAuth: AngularFireAuth
     ) { }
 
+    // ==================== ADMIN VERIFICATION ====================
+
+    /**
+     * Verificar si el usuario actual es admin
+     */
+    async isCurrentUserAdmin(): Promise<boolean> {
+        const user = await this.afAuth.currentUser;
+        if (!user) return false;
+
+        const adminDoc = await this.firestore.collection('admins').doc(user.uid).get().toPromise();
+        return adminDoc?.exists || false;
+    }
+
+    /**
+     * Verificar si hay algún admin registrado
+     */
+    async hasAnyAdmin(): Promise<boolean> {
+        const adminsSnapshot = await this.firestore.collection('admins').get().toPromise();
+        return !adminsSnapshot?.empty;
+    }
+
+    /**
+     * Registrar al usuario actual como admin
+     * Solo funciona si no hay ningún admin (bootstrap) 
+     */
+    async registerAsAdmin(): Promise<void> {
+        const user = await this.afAuth.currentUser;
+        if (!user) throw new Error('Usuario no autenticado');
+
+        await this.firestore.collection('admins').doc(user.uid).set({
+            email: user.email,
+            createdAt: new Date(),
+            role: 'ADMIN',
+            active: true,
+            nombre: user.displayName || 'Administrador'
+        });
+    }
+
     // ==================== DASHBOARD ====================
 
     getDashboardStats(): Observable<DashboardStats> {

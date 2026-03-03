@@ -1,4 +1,93 @@
-<div class="deportes-container">
-  <h1>Gestión de Deportes</h1>
-  <p>Administra los deportes disponibles en la plataforma</p>
+<!-- HERO SECTION - Deportes -->
+<section class="hero-section">
+  <div class="hero-content">
+    <h1 class="hero-title">Gestión de Deportes</h1>
+    <p class="hero-subtitle">Administra los deportes disponibles en la plataforma</p>
+  </div>
+  <button class="btn-add" (click)="toggleFormulario()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <line x1="12" y1="5" x2="12" y2="19"></line>
+      <line x1="5" y1="12" x2="19" y2="12"></line>
+    </svg>
+    <span>Nuevo Deporte</span>
+  </button>
+</section>
+
+<!-- STATS -->
+<div class="stats-row">
+  <div class="stat-pill">
+    <span class="stat-number">{{ stats.total }}</span>
+    <span class="stat-label">Total</span>
+  </div>
+  <div class="stat-pill active">
+    <span class="stat-number">{{ stats.activos }}</span>
+    <span class="stat-label">Activos</span>
+  </div>
+</div>
+
+<!-- FORMULARIO NUEVO DEPORTE -->
+<div class="form-card" *ngIf="mostrarFormulario">
+  <h3>Crear Nuevo Deporte</h3>
+  <div class="form-group">
+    <label>Nombre del Deporte</label>
+    <input type="text" [(ngModel)]="nuevoDeporte.nombre" placeholder="Ej: Natación" />
+  </div>
+  <div class="form-group">
+    <label>Icono (Nebular Icon)</label>
+    <div class="icons-grid">
+      <button *ngFor="let icon of iconOptions" 
+              class="icon-option" 
+              [class.selected]="nuevoDeporte.icono === icon"
+              (click)="nuevoDeporte.icono = icon">
+        <nb-icon [icon]="icon"></nb-icon>
+      </button>
+    </div>
+  </div>
+  <div class="form-actions">
+    <button class="btn-cancel" (click)="toggleFormulario()">Cancelar</button>
+    <button class="btn-save" (click)="crearDeporte()">Guardar Deporte</button>
+  </div>
+</div>
+
+<!-- DEPORTES GRID -->
+<div class="deportes-grid">
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Cargando deportes...</p>
+  </div>
+
+  <div *ngIf="!loading && deportes.length === 0" class="empty-state">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="12" y1="8" x2="12" y2="12"></line>
+      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+    </svg>
+    <h3>No hay deportes</h3>
+    <p>Crea tu primer deporte para comenzar</p>
+  </div>
+
+  <div *ngFor="let deporte of deportes" class="deporte-card" [class.inactive]="!deporte.activo">
+    <div class="deporte-icon">
+      <nb-icon [icon]="deporte.icono" pack="eva"></nb-icon>
+    </div>
+    <div class="deporte-info">
+      <h4>{{ deporte.nombre }}</h4>
+      <span class="status-badge" [class.active]="deporte.activo">
+        {{ deporte.activo ? 'Activo' : 'Inactivo' }}
+      </span>
+    </div>
+    <div class="deporte-actions">
+      <button class="btn-toggle" [class.off]="!deporte.activo" (click)="toggleActivo(deporte)" title="{{ deporte.activo ? 'Desactivar' : 'Activar' }}">
+        <div class="toggle-track">
+          <div class="toggle-thumb"></div>
+        </div>
+      </button>
+      <button class="btn-delete" (click)="eliminarDeporte(deporte)" title="Eliminar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="3 6 5 6 21 6"></polyline>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
 </div>
