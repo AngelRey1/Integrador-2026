@@ -19,8 +19,8 @@ interface DiaDisponibilidad {
 
 @Component({
   selector: 'ngx-calendario-disponibilidad',
-  templateUrl: './calendario-disponibilidad.component.html',
-  styleUrls: ['./calendario-disponibilidad.component.scss']
+  templateUrl: './calendario-disponibilidad-pro.component.html',
+  styleUrls: ['./calendario-disponibilidad-pro.scss']
 })
 export class CalendarioDisponibilidadComponent implements OnInit, OnDestroy {
   loading = true;

@@ -1,0 +1,175 @@
+<div class="calendario-container">
+  <!-- Loading State -->
+  <div *ngIf="loading" class="calendario-loading">
+    <nb-spinner status="primary" size="large"></nb-spinner>
+    <p>Cargando disponibilidad...</p>
+  </div>
+
+  <div *ngIf="!loading">
+    <!-- Hero Header -->
+    <div class="calendario-hero">
+      <div class="hero-content">
+        <div class="hero-text">
+          <h1>
+            <span class="hero-icon">
+              <nb-icon icon="calendar-outline"></nb-icon>
+            </span>
+            Mi Disponibilidad Semanal
+          </h1>
+          <p>Configura los días y horarios en los que estás disponible para sesiones</p>
+        </div>
+        
+        <div class="hero-actions">
+          <button class="btn-hero btn-primary-hero" 
+                  [disabled]="guardando"
+                  (click)="guardarDisponibilidad()">
+            <nb-icon icon="save-outline"></nb-icon>
+            {{ guardando ? 'Guardando...' : 'Guardar Cambios' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Days Grid -->
+    <div class="days-grid">
+      <div class="day-card" 
+           *ngFor="let dia of diasSemana"
+           [class.enabled]="dia.habilitado"
+           [class.disabled]="!dia.habilitado">
+        
+        <!-- Day Header -->
+        <div class="day-header">
+          <span class="day-name">{{ dia.nombre }}</span>
+          <div class="toggle-wrapper">
+            <nb-toggle [checked]="dia.habilitado" 
+                       (checkedChange)="toggleDia(dia)"
+                       status="success">
+            </nb-toggle>
+          </div>
+        </div>
+
+        <!-- Day Body -->
+        <div class="day-body">
+          <div *ngIf="dia.habilitado; else dayDisabled">
+            <!-- Time Ranges -->
+            <div class="ranges-container">
+              <div class="range-item" *ngFor="let rango of dia.rangos; let i = index">
+                <!-- Time Inputs -->
+                <div class="range-inputs">
+                  <div class="time-group">
+                    <label class="time-label">Desde</label>
+                    <nb-select [(selected)]="rango.inicio" size="small">
+                      <nb-option *ngFor="let hora of horasDisponibles" [value]="hora">
+                        {{ hora }}
+                      </nb-option>
+                    </nb-select>
+                  </div>
+                  
+                  <span class="range-separator">–</span>
+                  
+                  <div class="time-group">
+                    <label class="time-label">Hasta</label>
+                    <nb-select [(selected)]="rango.fin" size="small">
+                      <nb-option *ngFor="let hora of getHorasFinDisponibles(rango)" [value]="hora">
+                        {{ hora }}
+                      </nb-option>
+                    </nb-select>
+                  </div>
+                  
+                  <button class="btn-delete-range" 
+                          (click)="eliminarRango(dia, i)"
+                          nbTooltip="Eliminar este horario">
+                    <nb-icon icon="trash-2-outline"></nb-icon>
+                  </button>
+                </div>
+
+                <!-- Config Options -->
+                <div class="range-config">
+                  <div class="config-group">
+                    <label class="config-label">
+                      <nb-icon icon="people-outline"></nb-icon>
+                      Capacidad máx.
+                    </label>
+                    <nb-select [(selected)]="rango.capacidad" size="small">
+                      <nb-option *ngFor="let cap of opcionesCapacidad" [value]="cap">
+                        {{ cap }} {{ cap === 1 ? 'persona' : 'personas' }}
+                      </nb-option>
+                    </nb-select>
+                  </div>
+                  
+                  <div class="config-group">
+                    <label class="config-label">
+                      <nb-icon [icon]="getTipoSesionIcon(rango.tipoSesion)"></nb-icon>
+                      Tipo sesión
+                    </label>
+                    <nb-select [(selected)]="rango.tipoSesion" size="small">
+                      <nb-option *ngFor="let tipo of tiposSesion" [value]="tipo.value">
+                        {{ tipo.label }}
+                      </nb-option>
+                    </nb-select>
+                  </div>
+                </div>
+                
+                <!-- Error Message -->
+                <div class="range-error" *ngIf="!validarRango(rango)">
+                  <nb-icon icon="alert-circle-outline"></nb-icon>
+                  La hora de fin debe ser mayor que la de inicio
+                </div>
+              </div>
+            </div>
+
+            <!-- Add Range Button -->
+            <button class="btn-add-range" (click)="agregarRango(dia)">
+              <nb-icon icon="plus-outline"></nb-icon>
+              Agregar otro horario
+            </button>
+          </div>
+
+          <!-- Day Disabled Template -->
+          <ng-template #dayDisabled>
+            <div class="day-disabled-state">
+              <div class="disabled-icon">
+                <nb-icon icon="moon-outline"></nb-icon>
+              </div>
+              <span class="disabled-title">No disponible</span>
+              <span class="disabled-hint">Activa el día para configurar horarios</span>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary Section -->
+    <div class="summary-section">
+      <div class="summary-header">
+        <div class="summary-icon">
+          <nb-icon icon="clock-outline"></nb-icon>
+        </div>
+        <h3>Resumen de tu disponibilidad</h3>
+      </div>
+      <div class="summary-body">
+        <div class="summary-grid">
+          <div class="summary-item" 
+               *ngFor="let dia of diasSemana"
+               [class.available]="dia.habilitado"
+               [class.unavailable]="!dia.habilitado">
+            <span class="summary-day">{{ dia.nombre }}</span>
+            <span class="summary-hours" [class.no-disponible]="!dia.habilitado">
+              {{ getResumenDia(dia) }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info Alert -->
+    <div class="info-alert">
+      <nb-icon icon="info-outline"></nb-icon>
+      <div class="alert-content">
+        <strong>Nota:</strong> Esta es tu disponibilidad base semanal. Los clientes podrán reservar 
+        sesiones dentro de estos horarios. Para bloquear fechas específicas, usa la sección de 
+        "Gestión de Clases".
+      </div>
+    </div>
+  </div>
+</div>

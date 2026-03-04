@@ -1,250 +1,394 @@
-<!-- HERO SECTION - Bienvenida -->
-<section class="hero-dashboard trainer">
-  <div class="hero-content">
-    <h1 class="hero-title">Tu Panel de Control</h1>
-    <p class="hero-subtitle">Gestiona tus clientes, sesiones e ingresos desde aquí</p>
-  </div>
-  <div class="hero-actions">
-    <button class="btn-action-hero" (click)="irACalendario()">
-      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-        <line x1="16" y1="2" x2="16" y2="6"></line>
-        <line x1="8" y1="2" x2="8" y2="6"></line>
-        <line x1="3" y1="10" x2="21" y2="10"></line>
-      </svg>
-      <span>Ver Calendario</span>
-    </button>
-  </div>
-</section>
-
-<!-- METRICS GRID - KPIs Premium -->
-<div class="metrics-premium-grid">
-  <div class="metric-card-large" (click)="irAClases()">
-    <div class="metric-icon">
-      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-        <circle cx="9" cy="7" r="4"></circle>
-        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-      </svg>
+<!-- DASHBOARD PROFESIONAL - BENTO GRID LAYOUT -->
+<div class="dashboard-pro">
+  
+  <!-- HERO SECTION - Bienvenida Personalizada -->
+  <section class="hero-pro">
+    <!-- Elementos decorativos de fondo -->
+    <div class="hero-bg-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+      <div class="shape shape-3"></div>
     </div>
-    <div class="metric-content">
-      <span class="metric-label">Clientes Activos</span>
-      <span class="metric-value">{{ clientesActivos }}</span>
-      <span class="metric-trend" [ngClass]="getTendenciaClientes().tipo">{{ getTendenciaClientes().valor }}</span>
-    </div>
-  </div>
-
-  <div class="metric-card-large">
-    <div class="metric-icon">
-      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-      </svg>
-    </div>
-    <div class="metric-content">
-      <span class="metric-label">Sesiones Este Mes</span>
-      <span class="metric-value">{{ sesionesMes }}</span>
-      <span class="metric-trend" [ngClass]="getTendenciaSesiones().tipo">{{ getTendenciaSesiones().valor }}</span>
-    </div>
-  </div>
-
-  <div class="metric-card-large" (click)="irAIngresos()">
-    <div class="metric-icon">
-      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="12" y1="1" x2="12" y2="23"></line>
-        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-      </svg>
-    </div>
-    <div class="metric-content">
-      <span class="metric-label">Ingresos Este Mes</span>
-      <span class="metric-value">{{ formatearMoneda(ingresosMes) }}</span>
-      <span class="metric-trend" [ngClass]="getTendenciaIngresos().tipo">{{ getTendenciaIngresos().valor }}</span>
-    </div>
-  </div>
-
-  <div class="metric-card-large">
-    <div class="metric-icon">
-      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-      </svg>
-    </div>
-    <div class="metric-content">
-      <span class="metric-label">Calificación</span>
-      <span class="metric-value">{{ calificacionPromedio }}
-        <svg class="icon-inline star-filled" viewBox="0 0 24 24" fill="currentColor" stroke="none">
-          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-        </svg>
-      </span>
-      <span class="metric-trend positive">{{ tasaAsistencia }}% asistencia</span>
-    </div>
-  </div>
-</div>
-
-<!-- MAIN CONTENT -->
-<div class="trainer-dashboard-container">
-  <!-- LEFT COLUMN: SESSIONS -->
-  <div class="trainer-main">
-    <!-- SESIONES DE HOY -->
-    <div class="section-card">
-      <div class="section-header">
-        <div>
-          <h3 class="section-title">Sesiones de Hoy</h3>
-          <span class="badge-count">{{ sesionesHoy.length }} sesiones</span>
+    
+    <div class="hero-main-content">
+      <div class="hero-greeting">
+        <span class="greeting-badge">
+          <span class="pulse-dot"></span>
+          Activo ahora
+        </span>
+        <h1 class="greeting-title">{{ getSaludo() }}</h1>
+        <p class="greeting-date">{{ getFechaFormateada() }}</p>
+      </div>
+      
+      <div class="hero-quick-stats">
+        <div class="quick-stat">
+          <span class="quick-stat-value">{{ sesionesHoy.length }}</span>
+          <span class="quick-stat-label">Hoy</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="quick-stat">
+          <span class="quick-stat-value">{{ proximasSesiones.length }}</span>
+          <span class="quick-stat-label">Próximas</span>
         </div>
       </div>
-
-      <div *ngIf="sesionesHoy.length === 0" class="empty-state">
-        <svg class="icon-large" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    </div>
+    
+    <div class="hero-action-area">
+      <button class="btn-hero-primary" (click)="irACalendario()">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
           <line x1="16" y1="2" x2="16" y2="6"></line>
           <line x1="8" y1="2" x2="8" y2="6"></line>
           <line x1="3" y1="10" x2="21" y2="10"></line>
         </svg>
-        <p>Sin sesiones hoy</p>
-      </div>
-
-      <div *ngIf="sesionesHoy.length > 0" class="trainer-sessions-grid">
-        <div class="trainer-session-card" *ngFor="let sesion of sesionesHoy">
-          <div class="session-badge-time">
-            <div class="time-box">{{ sesion.hora }}</div>
-            <span class="duration">{{ sesion.duracion }}min</span>
-          </div>
-          <div class="session-details">
-            <h5 class="session-name">{{ sesion.cliente.nombre }}</h5>
-            <p class="session-type">{{ sesion.deporte }}</p>
-            <div class="session-status" [ngClass]="'status-' + sesion.estado.toLowerCase()">
-              {{ sesion.estado }}
-            </div>
-          </div>
-          <div class="session-actions-trainer">
-            <button class="btn-small" (click)="verSesion(sesion)">
-              <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                <circle cx="12" cy="12" r="3"></circle>
-              </svg>
-            </button>
-            <button class="btn-small" (click)="completarSesion(sesion)" *ngIf="sesion.estado === 'CONFIRMADA'">
-              <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- PRÓXIMAS SESIONES -->
-    <div class="section-card">
-      <div class="section-header">
-        <h3 class="section-title">Próximas Sesiones</h3>
-        <span class="badge-count">{{ proximasSesiones.length }}</span>
-      </div>
-
-      <div *ngIf="proximasSesiones.length === 0" class="empty-state">
-        <svg class="icon-large" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-          <line x1="16" y1="2" x2="16" y2="6"></line>
-          <line x1="8" y1="2" x2="8" y2="6"></line>
-          <line x1="3" y1="10" x2="21" y2="10"></line>
-        </svg>
-        <p>No hay sesiones programadas</p>
-      </div>
-
-      <div *ngIf="proximasSesiones.length > 0" class="upcoming-list">
-        <div class="upcoming-item" *ngFor="let sesion of proximasSesiones">
-          <div class="upcoming-date">
-            <span class="date-label">{{ sesion.fecha | date:'MMM dd' }}</span>
-          </div>
-          <div class="upcoming-info">
-            <h6>{{ sesion.cliente.nombre }}</h6>
-            <p>{{ sesion.deporte }}</p>
-          </div>
-          <div class="upcoming-time">
-            {{ sesion.hora }}
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- RIGHT COLUMN: STATS -->
-  <div class="trainer-sidebar">
-    <!-- CLIENTES ACTIVOS RECIENTES -->
-    <div class="sidebar-card">
-      <div class="section-header">
-        <h3 class="section-title">
-          <svg class="icon-title" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-            <circle cx="9" cy="7" r="4"></circle>
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-          </svg>
-          Clientes
-        </h3>
-      </div>
-
-      <div *ngIf="clientesActivos === 0" class="empty-small">
-        <p>Sin clientes aún</p>
-      </div>
-
-      <div *ngIf="clientesActivos > 0" class="clients-mini-list">
-        <div class="client-mini-item" *ngFor="let cliente of ultimosClientes | slice:0:5">
-          <img [src]="cliente.foto" alt="Cliente" class="client-avatar">
-          <div class="client-mini-info">
-            <span class="client-name">{{ cliente.nombre }}</span>
-            <span class="client-sessions">{{ cliente.sesiones }} sesiones</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- INGRESOS RESUMEN -->
-    <div class="sidebar-card income-card">
-      <div class="section-header">
-        <h3 class="section-title">
-          <svg class="icon-title" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="12" y1="1" x2="12" y2="23"></line>
-            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-          </svg>
-          Ingresos
-        </h3>
-      </div>
-
-      <div class="income-display">
-        <div class="income-item">
-          <span class="income-label">Esta Semana</span>
-          <span class="income-value">{{ formatearMoneda(ingresosSemanales) }}</span>
-        </div>
-        <div class="income-divider"></div>
-        <div class="income-item">
-          <span class="income-label">Este Mes</span>
-          <span class="income-value">{{ formatearMoneda(ingresosMes) }}</span>
-        </div>
-      </div>
-
-      <button class="btn-view-all" (click)="irAIngresos()">
-        Ver Detalles
-        <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <span>Ver Calendario</span>
+        <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="5" y1="12" x2="19" y2="12"></line>
           <polyline points="12 5 19 12 12 19"></polyline>
         </svg>
       </button>
     </div>
+  </section>
 
-    <!-- RATING -->
-    <div class="sidebar-card rating-card">
-      <div class="rating-display">
-        <div class="rating-stars">
-          {{ calificacionPromedio }}
-          <svg class="icon-inline star-filled" viewBox="0 0 24 24" fill="currentColor" stroke="none">
-            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+  <!-- BENTO GRID - Métricas Premium -->
+  <div class="bento-grid">
+    <!-- Card Grande: Clientes -->
+    <div class="bento-card bento-large clients-bento" (click)="irAClases()">
+      <div class="bento-card-inner">
+        <div class="bento-icon-wrap">
+          <div class="bento-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+          </div>
+          <div class="bento-icon-ring"></div>
+        </div>
+        <div class="bento-data">
+          <span class="bento-value">{{ clientesActivos }}</span>
+          <span class="bento-label">Clientes Activos</span>
+        </div>
+        <div class="bento-footer">
+          <span class="bento-trend" [ngClass]="getTendenciaClientes().tipo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+              <polyline points="17 6 23 6 23 12"></polyline>
+            </svg>
+            {{ getTendenciaClientes().valor }}
+          </span>
+        </div>
+        <!-- Decoración visual -->
+        <div class="bento-decoration">
+          <svg viewBox="0 0 120 60" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:currentColor;stop-opacity:0.1" />
+                <stop offset="100%" style="stop-color:currentColor;stop-opacity:0.3" />
+              </linearGradient>
+            </defs>
+            <path d="M0 60 Q30 40, 60 45 T120 30 L120 60 Z" fill="url(#grad1)"/>
           </svg>
         </div>
-        <div class="rating-stats">
-          <span class="rating-count">{{ totalResenas }} reseñas</span>
-          <span class="rating-trend">{{ tasaAsistencia }}% asistencia</span>
+      </div>
+    </div>
+
+    <!-- Card: Sesiones -->
+    <div class="bento-card sessions-bento">
+      <div class="bento-card-inner">
+        <div class="bento-header-row">
+          <div class="bento-icon-small sessions">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+            </svg>
+          </div>
+          <span class="bento-trend" [ngClass]="getTendenciaSesiones().tipo">{{ getTendenciaSesiones().valor }}</span>
+        </div>
+        <div class="bento-data-compact">
+          <span class="bento-value">{{ sesionesMes }}</span>
+          <span class="bento-label">Sesiones del Mes</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card: Ingresos -->
+    <div class="bento-card income-bento" (click)="irAIngresos()">
+      <div class="bento-card-inner">
+        <div class="bento-header-row">
+          <div class="bento-icon-small income">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="1" x2="12" y2="23"></line>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+          </div>
+          <span class="bento-trend" [ngClass]="getTendenciaIngresos().tipo">{{ getTendenciaIngresos().valor }}</span>
+        </div>
+        <div class="bento-data-compact">
+          <span class="bento-value currency">{{ formatearMoneda(ingresosMes) }}</span>
+          <span class="bento-label">Ingresos del Mes</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card: Rating -->
+    <div class="bento-card rating-bento">
+      <div class="bento-card-inner rating-glass">
+        <div class="rating-display-pro">
+          <span class="rating-number">{{ calificacionPromedio }}</span>
+          <div class="rating-stars-pro">
+            <svg class="star-pro" *ngFor="let star of [1,2,3,4,5]" 
+                 [class.filled]="star <= calificacionPromedio" 
+                 viewBox="0 0 24 24">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+          </div>
+        </div>
+        <div class="rating-meta">
+          <span class="rating-reviews">{{ totalResenas }} reseñas</span>
+          <span class="rating-assist">{{ tasaAsistencia }}% asistencia</span>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- CONTENIDO PRINCIPAL - 2 Columnas -->
+  <div class="main-content-pro">
+    
+    <!-- COLUMNA IZQUIERDA: Sesiones -->
+    <div class="content-column main-column">
+      
+      <!-- SESIONES DE HOY -->
+      <div class="card-pro sessions-today-card">
+        <div class="card-header-pro">
+          <div class="header-left">
+            <div class="header-icon-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+            </div>
+            <div class="header-text">
+              <h3>Sesiones de Hoy</h3>
+              <span class="header-count">{{ sesionesHoy.length }} programadas</span>
+            </div>
+          </div>
+          <div class="header-badge live" *ngIf="sesionesHoy.length > 0">
+            <span class="live-dot"></span> En vivo
+          </div>
+        </div>
+
+        <div *ngIf="sesionesHoy.length === 0" class="empty-state-pro">
+          <div class="empty-illustration">
+            <svg viewBox="0 0 120 100" fill="none">
+              <rect x="30" y="20" width="60" height="60" rx="8" stroke="currentColor" stroke-width="2" opacity="0.3"/>
+              <line x1="45" y1="35" x2="75" y2="35" stroke="currentColor" stroke-width="2" opacity="0.3"/>
+              <line x1="45" y1="50" x2="70" y2="50" stroke="currentColor" stroke-width="2" opacity="0.3"/>
+              <line x1="45" y1="65" x2="60" y2="65" stroke="currentColor" stroke-width="2" opacity="0.3"/>
+              <circle cx="90" cy="70" r="18" stroke="currentColor" stroke-width="2" opacity="0.2"/>
+              <path d="M85 70 L90 75 L98 65" stroke="currentColor" stroke-width="2" opacity="0.4"/>
+            </svg>
+          </div>
+          <p class="empty-title">Día libre</p>
+          <p class="empty-subtitle">No tienes sesiones programadas para hoy</p>
+        </div>
+
+        <div *ngIf="sesionesHoy.length > 0" class="sessions-list-pro">
+          <div class="session-item-pro" *ngFor="let sesion of sesionesHoy; let i = index"
+               [style.animation-delay]="i * 0.1 + 's'">
+            <div class="session-time-block">
+              <span class="session-hour">{{ sesion.hora }}</span>
+              <span class="session-duration">{{ sesion.duracion }}min</span>
+            </div>
+            <div class="session-connector">
+              <div class="connector-line"></div>
+              <div class="connector-dot"></div>
+            </div>
+            <div class="session-content">
+              <div class="session-main-info">
+                <h4 class="client-name-pro">{{ sesion.cliente.nombre }}</h4>
+                <div class="session-tags">
+                  <span class="tag-sport">{{ sesion.deporte }}</span>
+                  <span class="tag-status" [ngClass]="'status-' + sesion.estado.toLowerCase()">{{ sesion.estado }}</span>
+                </div>
+              </div>
+              <div class="session-actions-pro">
+                <button class="action-btn view" (click)="verSesion(sesion)" title="Ver detalles">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                </button>
+                <button class="action-btn complete" *ngIf="sesion.estado === 'CONFIRMADA'" 
+                        (click)="completarSesion(sesion)" title="Completar">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRÓXIMAS SESIONES -->
+      <div class="card-pro upcoming-card">
+        <div class="card-header-pro">
+          <div class="header-left">
+            <div class="header-icon-badge upcoming">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+            </div>
+            <div class="header-text">
+              <h3>Próximas Sesiones</h3>
+              <span class="header-count">{{ proximasSesiones.length }} en agenda</span>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="proximasSesiones.length === 0" class="empty-state-pro small">
+          <div class="empty-illustration small">
+            <svg viewBox="0 0 80 60" fill="none">
+              <rect x="15" y="10" width="50" height="40" rx="6" stroke="currentColor" stroke-width="1.5" opacity="0.3"/>
+              <circle cx="40" cy="30" r="10" stroke="currentColor" stroke-width="1.5" opacity="0.2"/>
+            </svg>
+          </div>
+          <p class="empty-subtitle">No hay sesiones próximas</p>
+        </div>
+
+        <div *ngIf="proximasSesiones.length > 0" class="upcoming-list-pro">
+          <div class="upcoming-item-pro" *ngFor="let sesion of proximasSesiones; let i = index"
+               [style.animation-delay]="i * 0.08 + 's'">
+            <div class="upcoming-date-box">
+              <span class="date-day">{{ sesion.fecha | date:'dd' }}</span>
+              <span class="date-month">{{ sesion.fecha | date:'MMM' }}</span>
+            </div>
+            <div class="upcoming-details">
+              <span class="upcoming-client">{{ sesion.cliente.nombre }}</span>
+              <span class="upcoming-sport">{{ sesion.deporte }}</span>
+            </div>
+            <div class="upcoming-time-badge">
+              {{ sesion.hora }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COLUMNA DERECHA: Sidebar -->
+    <div class="content-column side-column">
+      
+      <!-- CLIENTES RECIENTES -->
+      <div class="card-pro clients-card">
+        <div class="card-header-pro compact">
+          <div class="header-left">
+            <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            <h3>Mis Clientes</h3>
+          </div>
+          <button class="btn-see-all" (click)="irAClientes()">Ver todos</button>
+        </div>
+
+        <div *ngIf="clientesActivos === 0" class="empty-state-pro mini">
+          <p>Sin clientes aún</p>
+        </div>
+
+        <div *ngIf="clientesActivos > 0" class="clients-list-pro">
+          <div class="client-item-pro" *ngFor="let cliente of ultimosClientes | slice:0:4; let i = index"
+               [style.animation-delay]="i * 0.1 + 's'">
+            <div class="client-avatar-wrap">
+              <img [src]="cliente.foto" [alt]="cliente.nombre" class="client-avatar-pro">
+              <span class="client-status-dot active"></span>
+            </div>
+            <div class="client-info-pro">
+              <span class="client-name-pro">{{ cliente.nombre }}</span>
+              <span class="client-stats">{{ cliente.sesiones }} sesiones</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESUMEN DE INGRESOS -->
+      <div class="card-pro income-summary-card">
+        <div class="card-header-pro compact">
+          <div class="header-left">
+            <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="1" x2="12" y2="23"></line>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+            <h3>Ingresos</h3>
+          </div>
+        </div>
+
+        <div class="income-breakdown">
+          <div class="income-row">
+            <span class="income-period">Esta Semana</span>
+            <span class="income-amount">{{ formatearMoneda(ingresosSemanales) }}</span>
+          </div>
+          <div class="income-progress">
+            <div class="progress-bar" [style.width]="getIngresosPorcentaje() + '%'"></div>
+          </div>
+          <div class="income-row highlight">
+            <span class="income-period">Este Mes</span>
+            <span class="income-amount">{{ formatearMoneda(ingresosMes) }}</span>
+          </div>
+        </div>
+
+        <button class="btn-details-pro" (click)="irAIngresos()">
+          <span>Ver Detalles</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </button>
+      </div>
+
+      <!-- QUICK ACTIONS -->
+      <div class="card-pro quick-actions-card">
+        <h4 class="quick-title">Acciones Rápidas</h4>
+        <div class="quick-actions-grid">
+          <button class="quick-action" (click)="irACalendario()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            <span>Calendario</span>
+          </button>
+          <button class="quick-action" (click)="irAClases()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+            </svg>
+            <span>Clases</span>
+          </button>
+          <button class="quick-action" (click)="irAPerfil()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span>Perfil</span>
+          </button>
+          <button class="quick-action" (click)="irAIngresos()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+            <span>Estadísticas</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>

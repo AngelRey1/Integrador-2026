@@ -20,8 +20,8 @@ interface Cliente {
 
 @Component({
   selector: 'ngx-mis-clientes',
-  templateUrl: './mis-clientes.component.html',
-  styleUrls: ['./mis-clientes.component.scss']
+  templateUrl: './mis-clientes-pro.component.html',
+  styleUrls: ['./mis-clientes-pro.scss']
 })
 export class MisClientesComponent implements OnInit, OnDestroy {
   clientes: Cliente[] = [];

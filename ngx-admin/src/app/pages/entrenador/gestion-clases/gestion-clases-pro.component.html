@@ -1,0 +1,459 @@
+<div class="gestion-clases-container">
+  <!-- Hero Header -->
+  <div class="page-hero">
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1>
+          <span class="hero-icon">
+            <nb-icon icon="calendar-outline"></nb-icon>
+          </span>
+          Gestión de Clases
+        </h1>
+        <p>Administra tus sesiones programadas y tipos de clases</p>
+      </div>
+      
+      <div class="hero-tabs">
+        <button class="tab-btn" 
+                [class.active]="vistaActiva === 'sesiones'"
+                (click)="vistaActiva = 'sesiones'">
+          <nb-icon icon="calendar-outline"></nb-icon>
+          Mis Sesiones
+        </button>
+        <button class="tab-btn" 
+                [class.active]="vistaActiva === 'clases'"
+                (click)="vistaActiva = 'clases'">
+          <nb-icon icon="list-outline"></nb-icon>
+          Tipos de Clases
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== VISTA DE SESIONES ==================== -->
+  <div *ngIf="vistaActiva === 'sesiones'">
+    
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card warning">
+        <div class="stat-icon warning">
+          <nb-icon icon="clock-outline"></nb-icon>
+        </div>
+        <div class="stat-content">
+          <span class="stat-number">{{ sesionesHoy.length }}</span>
+          <span class="stat-label">Sesiones Hoy</span>
+        </div>
+      </div>
+      
+      <div class="stat-card info">
+        <div class="stat-icon info">
+          <nb-icon icon="calendar-outline"></nb-icon>
+        </div>
+        <div class="stat-content">
+          <span class="stat-number">{{ proximasSesiones.length }}</span>
+          <span class="stat-label">Próximas</span>
+        </div>
+      </div>
+      
+      <div class="stat-card success">
+        <div class="stat-icon success">
+          <nb-icon icon="checkmark-circle-outline"></nb-icon>
+        </div>
+        <div class="stat-content">
+          <span class="stat-number">{{ todasLasSesiones.length }}</span>
+          <span class="stat-label">Total Reservas</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loadingSesiones" class="loading-state">
+      <nb-spinner status="primary" size="large" class="loading-spinner"></nb-spinner>
+      <p>Cargando sesiones...</p>
+    </div>
+
+    <!-- Sesiones de Hoy -->
+    <div *ngIf="!loadingSesiones && sesionesHoy.length > 0" class="section-card">
+      <div class="section-header">
+        <div class="section-title">
+          <div class="title-icon">
+            <nb-icon icon="sun-outline"></nb-icon>
+          </div>
+          <h3>Sesiones de Hoy</h3>
+        </div>
+        <span class="section-badge">{{ sesionesHoy.length }}</span>
+      </div>
+      <div class="section-body">
+        <div class="sessions-list">
+          <div class="session-card session-today" *ngFor="let sesion of sesionesHoy">
+            <div class="session-date">
+              <span class="date-day">Hoy</span>
+              <span class="date-time">{{ sesion.hora }}</span>
+            </div>
+            <div class="session-info">
+              <div class="client-name">
+                <nb-icon icon="person-outline"></nb-icon>
+                {{ sesion.clienteNombre }}
+              </div>
+              <div class="session-details">
+                <span class="detail-item">
+                  <nb-icon icon="clock-outline"></nb-icon>
+                  {{ sesion.duracion }} min
+                </span>
+                <span class="detail-item">
+                  <nb-icon icon="pricetags-outline"></nb-icon>
+                  ${{ sesion.precio }} MXN
+                </span>
+                <span class="detail-item" *ngIf="sesion.modalidad">
+                  <nb-icon [icon]="sesion.modalidad === 'online' ? 'video-outline' : 'home-outline'"></nb-icon>
+                  {{ sesion.modalidad === 'online' ? 'Online' : 'Presencial' }}
+                </span>
+              </div>
+              <span class="time-badge" *ngIf="sesion.tiempoRestante">{{ sesion.tiempoRestante }}</span>
+            </div>
+            <div class="session-status">
+              <span class="status-badge confirmed" *ngIf="sesion.estado === 'CONFIRMADA'">
+                <nb-icon icon="checkmark-circle-outline"></nb-icon>
+                Confirmada
+              </span>
+              <button class="action-btn" 
+                      *ngIf="sesion.estado === 'CONFIRMADA' && sesionYaPaso(sesion)"
+                      (click)="completarSesion(sesion)">
+                <nb-icon icon="checkmark-circle-outline"></nb-icon>
+                Completar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Próximas Sesiones -->
+    <div *ngIf="!loadingSesiones && proximasSesiones.length > 0" class="section-card">
+      <div class="section-header">
+        <div class="section-title">
+          <div class="title-icon">
+            <nb-icon icon="calendar-outline"></nb-icon>
+          </div>
+          <h3>Próximas Sesiones</h3>
+        </div>
+        <span class="section-badge">{{ proximasSesiones.length }}</span>
+      </div>
+      <div class="section-body">
+        <div class="sessions-list">
+          <div class="session-card" *ngFor="let sesion of proximasSesiones">
+            <div class="session-date">
+              <span class="date-day">{{ formatearFechaCorta(sesion.fecha) }}</span>
+              <span class="date-time">{{ sesion.hora }}</span>
+            </div>
+            <div class="session-info">
+              <div class="client-name">
+                <nb-icon icon="person-outline"></nb-icon>
+                {{ sesion.clienteNombre }}
+              </div>
+              <div class="session-details">
+                <span class="detail-item">
+                  <nb-icon icon="clock-outline"></nb-icon>
+                  {{ sesion.duracion }} min
+                </span>
+                <span class="detail-item">
+                  <nb-icon icon="pricetags-outline"></nb-icon>
+                  ${{ sesion.precio }} MXN
+                </span>
+                <span class="detail-item" *ngIf="sesion.modalidad">
+                  <nb-icon [icon]="sesion.modalidad === 'online' ? 'video-outline' : 'home-outline'"></nb-icon>
+                  {{ sesion.modalidad === 'online' ? 'Online' : 'Presencial' }}
+                </span>
+              </div>
+              <span class="time-badge">{{ sesion.tiempoRestante }}</span>
+            </div>
+            <div class="session-status">
+              <span class="status-badge confirmed" *ngIf="sesion.estado === 'CONFIRMADA'">
+                <nb-icon icon="checkmark-circle-outline"></nb-icon>
+                Confirmada
+              </span>
+              <span class="status-badge pending" *ngIf="sesion.estado === 'PENDIENTE'">
+                <nb-icon icon="clock-outline"></nb-icon>
+                Pendiente
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State (Sin sesiones) -->
+    <div *ngIf="!loadingSesiones && sesionesHoy.length === 0 && proximasSesiones.length === 0" class="empty-state">
+      <div class="empty-icon">
+        <nb-icon icon="calendar-outline"></nb-icon>
+      </div>
+      <h4>No tienes sesiones programadas</h4>
+      <p>Las reservas de tus clientes aparecerán aquí automáticamente</p>
+    </div>
+
+    <!-- Historial de Sesiones -->
+    <div *ngIf="!loadingSesiones && todasLasSesiones.length > 0" class="section-card">
+      <div class="section-header">
+        <div class="section-title">
+          <div class="title-icon">
+            <nb-icon icon="archive-outline"></nb-icon>
+          </div>
+          <h3>Historial de Sesiones</h3>
+        </div>
+        <div class="section-filter">
+          <span class="filter-label">Filtrar:</span>
+          <nb-select [(selected)]="filtroEstado" size="small" (selectedChange)="filtrarSesiones()">
+            <nb-option value="todas">Todas</nb-option>
+            <nb-option value="CONFIRMADA">Confirmadas</nb-option>
+            <nb-option value="COMPLETADA">Completadas</nb-option>
+            <nb-option value="CANCELADA">Canceladas</nb-option>
+          </nb-select>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="table-pro-container">
+          <table class="table-pro">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Cliente</th>
+                <th>Hora</th>
+                <th>Duración</th>
+                <th>Precio</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let sesion of getSesionesFiltradas()">
+                <td class="col-date">{{ formatearFechaCorta(sesion.fecha) }}</td>
+                <td class="col-client">{{ sesion.clienteNombre }}</td>
+                <td>{{ sesion.hora }}</td>
+                <td>{{ sesion.duracion }} min</td>
+                <td>${{ sesion.precio }}</td>
+                <td class="col-status">
+                  <span class="status-badge" 
+                        [class.confirmed]="sesion.estado === 'CONFIRMADA'"
+                        [class.completed]="sesion.estado === 'COMPLETADA'"
+                        [class.cancelled]="sesion.estado === 'CANCELADA'"
+                        [class.pending]="sesion.estado === 'PENDIENTE'">
+                    {{ sesion.estado === 'PENDIENTE' ? 'Esperando pago' : getEstadoTexto(sesion.estado) }}
+                  </span>
+                </td>
+                <td class="col-actions">
+                  <button class="btn-action" 
+                          *ngIf="sesion.estado === 'CONFIRMADA' && sesionYaPaso(sesion)"
+                          (click)="completarSesion(sesion)">
+                    Completar
+                  </button>
+                  <nb-icon icon="checkmark-circle-2-outline" class="action-icon success" 
+                           *ngIf="sesion.estado === 'COMPLETADA'"></nb-icon>
+                  <nb-icon icon="close-circle-outline" class="action-icon danger"
+                           *ngIf="sesion.estado === 'CANCELADA'"></nb-icon>
+                  <nb-icon icon="clock-outline" class="action-icon warning"
+                           *ngIf="sesion.estado === 'PENDIENTE'"></nb-icon>
+                  <nb-icon icon="calendar-outline" class="action-icon info"
+                           *ngIf="sesion.estado === 'CONFIRMADA' && !sesionYaPaso(sesion)"></nb-icon>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== VISTA DE TIPOS DE CLASES ==================== -->
+  <div *ngIf="vistaActiva === 'clases'">
+    
+    <!-- Header con botón -->
+    <div class="classes-header">
+      <button class="btn-new-class" (click)="nuevaClase()">
+        <nb-icon icon="plus-outline"></nb-icon>
+        Nueva Clase
+      </button>
+    </div>
+
+    <!-- Formulario de Clase -->
+    <div class="class-form-card" *ngIf="mostrarFormulario">
+      <div class="form-header">
+        <h3>{{ claseEnEdicion ? 'Editar Clase' : 'Nueva Clase' }}</h3>
+      </div>
+      <div class="form-body">
+        <form [formGroup]="claseForm" (ngSubmit)="guardarClase()">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Nombre de la Clase</label>
+              <input nbInput fullWidth formControlName="nombre" placeholder="Ej: Yoga Integral">
+            </div>
+            <div class="form-group">
+              <label>Deporte</label>
+              <nb-select fullWidth formControlName="deporte">
+                <nb-option *ngFor="let deporte of deportesDisponibles" [value]="deporte">{{ deporte }}</nb-option>
+              </nb-select>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group" style="grid-column: 1 / -1;">
+              <label>Descripción</label>
+              <textarea nbInput fullWidth formControlName="descripcion" rows="3"></textarea>
+              <span class="char-counter">{{ descripcionLength }} / 300</span>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>Modalidad</label>
+              <nb-select fullWidth formControlName="modalidad">
+                <nb-option value="presencial">Presencial</nb-option>
+                <nb-option value="online">Online</nb-option>
+                <nb-option value="ambas">Ambas</nb-option>
+              </nb-select>
+            </div>
+            <div class="form-group">
+              <label>Duración (min)</label>
+              <input nbInput fullWidth type="number" formControlName="duracion">
+            </div>
+            <div class="form-group">
+              <label>Precio (MXN)</label>
+              <input nbInput fullWidth type="number" formControlName="precio">
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>Cupo Máximo</label>
+              <input nbInput fullWidth type="number" formControlName="capacidad">
+            </div>
+            <div class="form-group">
+              <label class="optional">Ubicación</label>
+              <input nbInput fullWidth formControlName="ubicacion" placeholder="Ej: Estudio Central">
+            </div>
+            <div class="form-group">
+              <label>Nivel</label>
+              <nb-select fullWidth formControlName="nivel">
+                <nb-option *ngFor="let nivel of nivelesDisponibles" [value]="nivel">{{ nivel }}</nb-option>
+              </nb-select>
+            </div>
+          </div>
+          
+          <div class="form-actions">
+            <button type="button" class="btn-cancel" (click)="cancelarFormulario()">Cancelar</button>
+            <button type="submit" class="btn-save" [disabled]="guardando">
+              <nb-spinner *ngIf="guardando" size="tiny" status="control"></nb-spinner>
+              {{ guardando ? 'Guardando...' : 'Guardar Clase' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Grid de Clases -->
+    <div class="classes-grid" *ngIf="!loading && clases.length > 0">
+      <div class="class-card" *ngFor="let clase of clases" [class.inactive]="!clase.activa">
+        <div class="class-header">
+          <h4>{{ clase.nombre }}</h4>
+          <div class="toggle-wrapper">
+            <nb-toggle [checked]="clase.activa" (checkedChange)="toggleActiva(clase)"></nb-toggle>
+          </div>
+        </div>
+        <div class="class-body">
+          <span class="sport-badge">{{ clase.deporte }}</span>
+          <p class="class-description">{{ clase.descripcion }}</p>
+          <div class="class-meta">
+            <div class="meta-item">
+              <nb-icon icon="clock-outline"></nb-icon>
+              <span>{{ clase.duracion }} minutos</span>
+            </div>
+            <div class="meta-item">
+              <nb-icon icon="people-outline"></nb-icon>
+              <span>{{ clase.capacidad }} personas</span>
+            </div>
+            <div class="meta-item">
+              <nb-icon icon="pricetags-outline"></nb-icon>
+              <span>${{ clase.precio }} MXN</span>
+            </div>
+          </div>
+          <div class="class-badges">
+            <span class="badge" 
+                  [class.badge-online]="clase.modalidad === 'online'"
+                  [class.badge-presencial]="clase.modalidad === 'presencial'"
+                  [class.badge-ambas]="clase.modalidad === 'ambos' || clase.modalidad === 'ambas'">
+              {{ clase.modalidad === 'online' ? 'Online' : clase.modalidad === 'presencial' ? 'Presencial' : 'Ambas' }}
+            </span>
+            <span class="badge badge-nivel">{{ clase.nivel }}</span>
+          </div>
+        </div>
+        <div class="class-footer">
+          <button class="btn-edit" (click)="editarClase(clase)">
+            <nb-icon icon="edit-outline"></nb-icon>
+            Editar
+          </button>
+          <button class="btn-delete" (click)="eliminarClase(clase, dialogEliminar)">
+            <nb-icon icon="trash-2-outline"></nb-icon>
+            Eliminar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State (Sin clases) -->
+    <div *ngIf="!loading && clases.length === 0" class="empty-state">
+      <div class="empty-icon">
+        <nb-icon icon="briefcase-outline"></nb-icon>
+      </div>
+      <h4>No tienes tipos de clases creados</h4>
+      <p>Crea tipos de clases para que los clientes puedan reservar</p>
+      <button class="btn-empty" (click)="nuevaClase()">
+        <nb-icon icon="plus-outline"></nb-icon>
+        Crear mi primera clase
+      </button>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-state">
+      <nb-spinner status="primary" size="large" class="loading-spinner"></nb-spinner>
+      <p>Cargando clases...</p>
+    </div>
+  </div>
+</div>
+
+<!-- Dialog Eliminar Clase -->
+<ng-template #dialogEliminar let-data let-ref="dialogRef">
+  <div class="dialog-pro">
+    <div class="dialog-header">
+      <h4>Confirmar Eliminación</h4>
+    </div>
+    <div class="dialog-body">
+      <p>¿Estás seguro de que deseas eliminar la clase "<strong>{{ data.nombre }}</strong>"?</p>
+      <p class="dialog-hint">Esta acción no se puede deshacer.</p>
+    </div>
+    <div class="dialog-footer">
+      <button class="btn-cancel" (click)="ref.close()">Cancelar</button>
+      <button class="btn-confirm" (click)="confirmarEliminar(ref)">Eliminar</button>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Dialog Cancelar Sesión -->
+<ng-template #dialogCancelar let-data let-ref="dialogRef">
+  <div class="dialog-pro">
+    <div class="dialog-header">
+      <h4>Cancelar Sesión</h4>
+    </div>
+    <div class="dialog-body">
+      <p>¿Estás seguro de que deseas cancelar la sesión con <strong>{{ data.clienteNombre }}</strong>?</p>
+      <p class="dialog-hint">Fecha: {{ formatearFecha(data.fecha) }} a las {{ data.hora }}</p>
+      <div class="dialog-field">
+        <label>Motivo de cancelación (opcional)</label>
+        <textarea #motivoInput rows="2" placeholder="Ej: Emergencia personal"></textarea>
+      </div>
+    </div>
+    <div class="dialog-footer">
+      <button class="btn-cancel" (click)="ref.close()">No cancelar</button>
+      <button class="btn-confirm" (click)="confirmarCancelacion(data, motivoInput.value, ref)">
+        Sí, cancelar sesión
+      </button>
+    </div>
+  </div>
+</ng-template>

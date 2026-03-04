@@ -23,7 +23,7 @@ interface Sesion {
 @Component({
   selector: 'ngx-entrenador-dashboard',
   templateUrl: './entrenador-dashboard.component.html',
-  styleUrls: ['./entrenador-dashboard.component.scss']
+  styleUrls: ['./entrenador-dashboard-pro.scss']
 })
 export class EntrenadorDashboardComponent implements OnInit, OnDestroy {
   loading = true;
@@ -253,6 +253,42 @@ export class EntrenadorDashboardComponent implements OnInit, OnDestroy {
       style: 'currency',
       currency: 'MXN'
     }).format(monto);
+  }
+
+  // Nuevo: Saludo contextual basado en la hora
+  getSaludo(): string {
+    const hora = new Date().getHours();
+    if (hora < 12) return '¡Buenos días!';
+    if (hora < 18) return '¡Buenas tardes!';
+    return '¡Buenas noches!';
+  }
+
+  // Nuevo: Fecha formateada elegante
+  getFechaFormateada(): string {
+    const opciones: Intl.DateTimeFormatOptions = { 
+      weekday: 'long', 
+      day: 'numeric', 
+      month: 'long',
+      year: 'numeric'
+    };
+    const fecha = new Date().toLocaleDateString('es-ES', opciones);
+    return fecha.charAt(0).toUpperCase() + fecha.slice(1);
+  }
+
+  // Nuevo: Porcentaje de ingresos semanales vs mensuales
+  getIngresosPorcentaje(): number {
+    if (this.ingresosMes === 0) return 0;
+    return Math.min((this.ingresosSemanales / this.ingresosMes) * 100, 100);
+  }
+
+  // Nuevo: Navegación a clientes
+  irAClientes(): void {
+    this.router.navigate(['/pages/entrenador/clientes']);
+  }
+
+  // Nuevo: Navegación a perfil
+  irAPerfil(): void {
+    this.router.navigate(['/pages/entrenador/perfil']);
   }
 }
 

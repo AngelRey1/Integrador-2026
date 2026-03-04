@@ -7,8 +7,8 @@ import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'ngx-perfil-entrenador',
-  templateUrl: './perfil-entrenador.component.html',
-  styleUrls: ['./perfil-entrenador.component.scss']
+  templateUrl: './perfil-entrenador-pro.component.html',
+  styleUrls: ['./perfil-entrenador-pro.scss']
 })
 export class PerfilEntrenadorComponent implements OnInit, OnDestroy {
   perfilForm: FormGroup;

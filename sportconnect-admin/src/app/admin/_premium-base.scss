@@ -1,0 +1,718 @@
+// ============================================================
+// PREMIUM BASE STYLES - SPORTCONNECT ADMIN PANEL
+// Sistema de diseño premium unificado
+// ============================================================
+
+// ============================================================
+// VARIABLES DE DISEÑO
+// ============================================================
+
+// Paleta primaria - Admin (Verde Esmeralda)
+$color-primary: #047857;
+$color-primary-light: #10B981;
+$color-primary-dark: #065F46;
+$color-secondary: #0F766E;
+$color-accent: #14B8A6;
+
+// Colores semánticos
+$color-success: #22C55E;
+$color-success-light: #D1FAE5;
+$color-warning: #F59E0B;
+$color-warning-light: #FEF3C7;
+$color-danger: #EF4444;
+$color-danger-light: #FEE2E2;
+$color-info: #0EA5E9;
+$color-info-light: #E0F2FE;
+
+// Neutrales
+$color-bg: #F8FAFC;
+$color-bg-card: #FFFFFF;
+$color-text: #1E293B;
+$color-text-secondary: #64748B;
+$color-text-muted: #94A3B8;
+$color-border: #E2E8F0;
+
+// Radios
+$radius-2xl: 28px;
+$radius-xl: 24px;
+$radius-lg: 20px;
+$radius-md: 16px;
+$radius-sm: 12px;
+$radius-xs: 8px;
+$radius-full: 50px;
+
+// Sombras Premium
+$shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+$shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.03);
+$shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.04);
+$shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.08), 0 4px 10px rgba(0, 0, 0, 0.04);
+$shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.05);
+$shadow-primary: 0 10px 30px rgba(4, 120, 87, 0.25);
+$shadow-primary-lg: 0 15px 40px rgba(4, 120, 87, 0.3);
+$shadow-glow: 0 0 40px rgba(16, 185, 129, 0.15);
+
+// Tipografía
+$font-primary: 'Space Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+// ============================================================
+// KEYFRAMES ANIMATIONS
+// ============================================================
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes gradientMove {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes countUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ringPulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+}
+
+@keyframes livePulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba($color-success, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba($color-success, 0);
+  }
+}
+
+@keyframes borderGlow {
+  0%, 100% {
+    border-color: rgba($color-primary, 0.3);
+  }
+  50% {
+    border-color: rgba($color-primary, 0.6);
+  }
+}
+
+@keyframes iconBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes rotateIn {
+  from {
+    opacity: 0;
+    transform: rotate(-10deg) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(0) scale(1);
+  }
+}
+
+// ============================================================
+// MIXINS
+// ============================================================
+
+// Contenedor de página
+@mixin page-container {
+  padding: 2rem 2.5rem;
+  background: $color-bg;
+  min-height: 100vh;
+  animation: fadeInUp 0.5s ease-out;
+}
+
+// Hero Section
+@mixin hero-section {
+  background: linear-gradient(135deg, $color-primary 0%, $color-secondary 100%);
+  background-size: 200% 200%;
+  animation: gradientMove 8s ease infinite;
+  border-radius: $radius-xl;
+  padding: 2.5rem 3rem;
+  margin-bottom: 2rem;
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 400px;
+    height: 400px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 50%;
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -5%;
+    width: 250px;
+    height: 250px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    animation: float 8s ease-in-out infinite reverse;
+  }
+}
+
+// Card base premium
+@mixin premium-card {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  border: 1px solid $color-border;
+  box-shadow: $shadow-md;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, $color-primary, $color-accent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  &:hover {
+    transform: translateY(-6px);
+    box-shadow: $shadow-xl;
+    border-color: rgba($color-primary, 0.2);
+    
+    &::before {
+      opacity: 1;
+    }
+  }
+}
+
+// Stat Card Premium
+@mixin stat-card-premium {
+  @include premium-card;
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  cursor: pointer;
+  animation: fadeInUp 0.5s ease-out backwards;
+  
+  .stat-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: $radius-md;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: all 0.3s ease;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.2) 50%, transparent 70%);
+      background-size: 200% 200%;
+      animation: shimmer 2s ease-in-out infinite;
+      border-radius: inherit;
+    }
+    
+    svg, nb-icon {
+      width: 32px;
+      height: 32px;
+      color: white;
+      position: relative;
+      z-index: 1;
+    }
+  }
+  
+  .stat-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    
+    .stat-label {
+      font-size: 0.9375rem;
+      color: $color-text-secondary;
+      font-weight: 500;
+    }
+    
+    .stat-value {
+      font-family: $font-primary;
+      font-size: 2.25rem;
+      font-weight: 800;
+      color: $color-text;
+      line-height: 1;
+      animation: countUp 0.6s ease-out 0.3s both;
+    }
+    
+    .stat-trend {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      padding: 0.25rem 0.625rem;
+      border-radius: $radius-full;
+      width: fit-content;
+      
+      &.positive {
+        background: $color-success-light;
+        color: $color-success;
+      }
+      
+      &.negative {
+        background: $color-danger-light;
+        color: $color-danger;
+      }
+    }
+  }
+  
+  &:hover {
+    .stat-icon {
+      transform: scale(1.1) rotate(5deg);
+    }
+  }
+}
+
+// Section Card
+@mixin section-card {
+  @include premium-card;
+  padding: 0;
+  
+  .section-header {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid $color-border;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, rgba($color-primary, 0.03) 0%, rgba($color-secondary, 0.02) 100%);
+    
+    .section-title {
+      font-family: $font-primary;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: $color-text;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      
+      .title-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: $radius-sm;
+        background: linear-gradient(135deg, $color-primary, $color-secondary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: $shadow-primary;
+        
+        svg, nb-icon {
+          width: 20px;
+          height: 20px;
+          color: white;
+        }
+      }
+    }
+    
+    .section-badge {
+      background: rgba($color-primary, 0.1);
+      color: $color-primary;
+      padding: 0.375rem 0.875rem;
+      border-radius: $radius-full;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      
+      &.warning {
+        background: rgba($color-warning, 0.1);
+        color: $color-warning;
+      }
+      
+      &.danger {
+        background: rgba($color-danger, 0.1);
+        color: $color-danger;
+      }
+    }
+    
+    .section-action {
+      color: $color-primary;
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        color: $color-primary-dark;
+        transform: translateX(4px);
+      }
+    }
+  }
+  
+  .section-body {
+    padding: 2rem;
+  }
+}
+
+// Button Primary Premium
+@mixin btn-primary-premium {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-dark 100%);
+  color: white;
+  border: none;
+  border-radius: $radius-full;
+  padding: 0.875rem 1.75rem;
+  font-family: $font-primary;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: $shadow-primary;
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+  }
+  
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: $shadow-primary-lg;
+    
+    &::before {
+      left: 100%;
+    }
+  }
+  
+  &:active {
+    transform: translateY(-1px);
+  }
+}
+
+// Input Premium
+@mixin input-premium {
+  width: 100%;
+  padding: 0.875rem 1.25rem;
+  border: 2px solid $color-border;
+  border-radius: $radius-sm;
+  font-size: 0.9375rem;
+  color: $color-text;
+  background: $color-bg-card;
+  transition: all 0.3s ease;
+  
+  &:focus {
+    outline: none;
+    border-color: $color-primary;
+    box-shadow: 0 0 0 4px rgba($color-primary, 0.1);
+  }
+  
+  &::placeholder {
+    color: $color-text-muted;
+  }
+}
+
+// Empty State
+@mixin empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  
+  .empty-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    background: linear-gradient(135deg, rgba($color-primary, 0.1), rgba($color-secondary, 0.1));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: pulse 2s ease-in-out infinite;
+    
+    svg, nb-icon {
+      width: 40px;
+      height: 40px;
+      color: $color-primary;
+    }
+  }
+  
+  h4 {
+    font-family: $font-primary;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: $color-text;
+    margin: 0 0 0.5rem;
+  }
+  
+  p {
+    color: $color-text-secondary;
+    font-size: 1rem;
+    margin: 0;
+  }
+}
+
+// List Item Premium
+@mixin list-item-premium {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: $color-bg;
+  border-radius: $radius-md;
+  transition: all 0.3s ease;
+  animation: fadeInUp 0.4s ease-out backwards;
+  
+  &:hover {
+    background: rgba($color-primary, 0.05);
+    transform: translateX(4px);
+  }
+  
+  .item-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: $radius-sm;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 2px solid rgba($color-primary, 0.2);
+    
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+  
+  .item-info {
+    flex: 1;
+    
+    .item-name {
+      font-weight: 600;
+      color: $color-text;
+      font-size: 0.9375rem;
+      margin: 0 0 0.25rem;
+    }
+    
+    .item-subtitle {
+      color: $color-text-secondary;
+      font-size: 0.8125rem;
+      margin: 0;
+    }
+  }
+  
+  .item-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+}
+
+// Action Button Small
+@mixin action-btn-small($color) {
+  width: 38px;
+  height: 38px;
+  border-radius: $radius-xs;
+  border: none;
+  background: rgba($color, 0.1);
+  color: $color;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  
+  svg, nb-icon {
+    width: 18px;
+    height: 18px;
+  }
+  
+  &:hover {
+    background: $color;
+    color: white;
+    transform: scale(1.1);
+  }
+}
+
+// Table Premium
+@mixin table-premium {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  
+  thead {
+    th {
+      padding: 1rem 1.25rem;
+      background: linear-gradient(135deg, rgba($color-primary, 0.05), rgba($color-secondary, 0.03));
+      font-family: $font-primary;
+      font-size: 0.8125rem;
+      font-weight: 700;
+      color: $color-text-secondary;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      text-align: left;
+      border-bottom: 2px solid $color-border;
+      
+      &:first-child {
+        border-radius: $radius-sm 0 0 0;
+      }
+      
+      &:last-child {
+        border-radius: 0 $radius-sm 0 0;
+      }
+    }
+  }
+  
+  tbody {
+    tr {
+      transition: all 0.3s ease;
+      
+      &:hover {
+        background: rgba($color-primary, 0.03);
+      }
+      
+      &:not(:last-child) td {
+        border-bottom: 1px solid $color-border;
+      }
+    }
+    
+    td {
+      padding: 1.25rem;
+      font-size: 0.9375rem;
+      color: $color-text;
+      vertical-align: middle;
+    }
+  }
+}
+
+// Badge Premium
+@mixin badge-premium($bg, $color) {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  background: $bg;
+  color: $color;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: $radius-full;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}

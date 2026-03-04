@@ -1,0 +1,429 @@
+// ============================================
+// PAGOS LIST - PREMIUM STYLES
+// Fresh Wellness Admin Panel
+// ============================================
+@import '../../_sections-premium.scss';
+
+// HOST
+:host {
+  display: block;
+  background: linear-gradient(135deg, #F8FAFC 0%, #F0FDF4 100%);
+  min-height: 100vh;
+  padding: 2rem;
+  
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+  }
+}
+
+// HERO SECTION
+.hero-section {
+  @include hero-section;
+  
+  .hero-title {
+    color: white;
+    font-family: $font-primary;
+    font-size: 2rem;
+    font-weight: 800;
+    margin: 0 0 0.5rem 0;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  
+  .hero-subtitle {
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0;
+    font-size: 1.0625rem;
+  }
+}
+
+// STATS GRID
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  @include premium-card;
+  margin: 0;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  animation: fadeInUp 0.5s ease-out backwards;
+  
+  @for $i from 1 through 6 {
+    &:nth-child(#{$i}) {
+      animation-delay: #{0.1 * $i}s;
+    }
+  }
+  
+  &.highlight {
+    border: 2px solid $color-primary;
+    background: linear-gradient(135deg, rgba($color-primary, 0.05) 0%, rgba($color-secondary, 0.05) 100%);
+  }
+  
+  &:hover {
+    transform: translateY(-4px);
+    
+    .stat-icon {
+      transform: scale(1.1) rotate(5deg);
+    }
+  }
+  
+  .stat-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: $radius-md;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.2) 50%, transparent 70%);
+      background-size: 200% 200%;
+      animation: shimmer 2s ease-in-out infinite;
+    }
+    
+    svg {
+      width: 26px;
+      height: 26px;
+      stroke: white;
+      position: relative;
+      z-index: 1;
+    }
+    
+    &.ingresos { 
+      background: linear-gradient(135deg, $color-success, #34D399); 
+      box-shadow: 0 8px 20px rgba($color-success, 0.3);
+    }
+    &.comisiones { 
+      background: linear-gradient(135deg, $color-primary, $color-secondary); 
+      box-shadow: $shadow-primary;
+    }
+    &.total { 
+      background: linear-gradient(135deg, #6366F1, #4338CA); 
+      box-shadow: 0 8px 20px rgba(#6366F1, 0.3);
+    }
+    &.completado { 
+      background: linear-gradient(135deg, $color-success, #34D399); 
+      box-shadow: 0 8px 20px rgba($color-success, 0.3);
+    }
+    &.pendiente { 
+      background: linear-gradient(135deg, $color-warning, #FBBF24); 
+      box-shadow: 0 8px 20px rgba($color-warning, 0.3);
+    }
+    &.reembolsado { 
+      background: linear-gradient(135deg, #8B5CF6, #7C3AED); 
+      box-shadow: 0 8px 20px rgba(#8B5CF6, 0.3);
+    }
+  }
+  
+  .stat-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    
+    .stat-value {
+      font-family: $font-primary;
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: $color-text;
+      line-height: 1;
+    }
+    
+    .stat-label {
+      font-size: 0.875rem;
+      color: $color-text-secondary;
+      font-weight: 500;
+    }
+  }
+}
+
+// FILTERS SECTION
+.filters-section {
+  margin-bottom: 2rem;
+  animation: fadeInUp 0.5s ease-out 0.2s both;
+}
+
+.filter-tabs {
+  display: flex;
+  gap: 0.625rem;
+  flex-wrap: wrap;
+  background: white;
+  padding: 0.75rem;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-md;
+}
+
+.filter-tab {
+  padding: 0.75rem 1.5rem;
+  border-radius: $radius-full;
+  border: none;
+  background: transparent;
+  color: $color-text-secondary;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: rgba($color-primary, 0.1);
+    color: $color-primary;
+  }
+  
+  &.active {
+    background: linear-gradient(135deg, $color-primary, $color-secondary);
+    color: white;
+    box-shadow: $shadow-primary;
+  }
+}
+
+// TABLE CONTAINER
+.table-container {
+  @include premium-card;
+  margin: 0;
+  overflow: hidden;
+  animation: fadeInUp 0.5s ease-out 0.3s both;
+}
+
+.loading-state, .empty-state {
+  @include empty-state;
+  padding: 5rem 2rem;
+  
+  svg {
+    width: 80px;
+    height: 80px;
+    stroke: $color-text-muted;
+    margin-bottom: 1.5rem;
+  }
+  
+  h3 {
+    font-family: $font-primary;
+    color: $color-text;
+    margin: 0 0 0.75rem 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+  
+  p {
+    margin: 0;
+    color: $color-text-secondary;
+  }
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid $color-border;
+  border-top-color: $color-primary;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 1.5rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+// DATA TABLE
+.data-table {
+  @include table-premium;
+  
+  thead {
+    background: linear-gradient(135deg, rgba($color-primary, 0.04), transparent);
+    
+    th {
+      padding: 1.25rem 1rem;
+      text-align: left;
+      font-weight: 700;
+      color: $color-text-secondary;
+      font-size: 0.8125rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 2px solid $color-border;
+    }
+  }
+  
+  tbody {
+    tr {
+      border-bottom: 1px solid $color-border;
+      transition: all 0.3s ease;
+      animation: fadeInUp 0.3s ease-out backwards;
+      
+      @for $i from 1 through 10 {
+        &:nth-child(#{$i}) {
+          animation-delay: #{0.03 * $i}s;
+        }
+      }
+      
+      &:hover {
+        background: linear-gradient(135deg, rgba($color-primary, 0.02), rgba($color-secondary, 0.01));
+      }
+      
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+    
+    td {
+      padding: 1.25rem 1rem;
+      color: $color-text;
+      font-size: 0.9375rem;
+      vertical-align: middle;
+    }
+  }
+}
+
+.price-cell {
+  font-family: $font-primary;
+  font-weight: 800;
+  font-size: 1.0625rem;
+  color: $color-text;
+}
+
+.commission-cell {
+  font-family: $font-primary;
+  font-weight: 700;
+  color: $color-primary;
+}
+
+.trainer-amount {
+  font-family: $font-primary;
+  font-weight: 700;
+  color: #6366F1;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  border-radius: $radius-full;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  
+  &.completado {
+    background: linear-gradient(135deg, rgba($color-success, 0.1), rgba($color-success, 0.15));
+    color: $color-success;
+    
+    &::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: $color-success;
+      border-radius: 50%;
+      box-shadow: 0 0 6px $color-success;
+    }
+  }
+  
+  &.pendiente {
+    background: linear-gradient(135deg, rgba($color-warning, 0.1), rgba($color-warning, 0.15));
+    color: $color-warning;
+    
+    &::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: $color-warning;
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+  }
+  
+  &.reembolsado {
+    background: linear-gradient(135deg, rgba(#8B5CF6, 0.1), rgba(#8B5CF6, 0.15));
+    color: #7C3AED;
+  }
+}
+
+.actions-cell {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-action {
+  width: 40px;
+  height: 40px;
+  border-radius: $radius-xs;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+  
+  &.view {
+    background: rgba($color-info, 0.1);
+    
+    svg { stroke: $color-info; }
+    
+    &:hover {
+      background: $color-info;
+      transform: scale(1.1);
+      svg { stroke: white; }
+    }
+  }
+  
+  &.refund {
+    background: rgba(#8B5CF6, 0.1);
+    
+    svg { stroke: #8B5CF6; }
+    
+    &:hover {
+      background: #8B5CF6;
+      transform: scale(1.1);
+      svg { stroke: white; }
+    }
+  }
+}
+
+// RESPONSIVE
+@media (max-width: 768px) {
+  .hero-section .hero-title {
+    font-size: 1.5rem;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .stat-card {
+    padding: 1.25rem;
+    
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      
+      svg {
+        width: 22px;
+        height: 22px;
+      }
+    }
+    
+    .stat-content .stat-value {
+      font-size: 1.5rem;
+    }
+  }
+  
+  .data-table {
+    font-size: 0.875rem;
+    
+    th, td {
+      padding: 1rem 0.75rem;
+    }
+  }
+}

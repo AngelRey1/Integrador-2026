@@ -87,43 +87,43 @@ $nb-themes: nb-register-theme((
   slide-out-shadow-color-rtl: 0 4px 14px 0 #8f9bb3,
 ), dark, dark);
 
-// Sportconnecta Custom Theme
+// Sportconnecta Custom Theme - Premium SaaS
 $nb-themes: nb-register-theme((
-  // Colors principales de Sportconnecta
-  color-primary-100: #D4F8F0,
-  color-primary-200: #A9F1E1,
-  color-primary-300: #7DE3CD,
-  color-primary-400: #5DD4B9,
-  color-primary-500: #00D09C, // Color principal
-  color-primary-600: #00B386,
-  color-primary-700: #009670,
-  color-primary-800: #007A5A,
-  color-primary-900: #00644A,
+  // Colors principales de Sportconnecta - Verde Esmeralda Premium
+  color-primary-100: #D1FAE5,
+  color-primary-200: #A7F3D0,
+  color-primary-300: #6EE7B7,
+  color-primary-400: #34D399,
+  color-primary-500: #047857, // Color principal - Verde Esmeralda
+  color-primary-600: #065F46,
+  color-primary-700: #064E3B,
+  color-primary-800: #065F46,
+  color-primary-900: #064E3B,
 
-  color-success-100: #D4F8F0,
-  color-success-200: #A9F1E1,
-  color-success-300: #7DE3CD,
-  color-success-400: #5DD4B9,
-  color-success-500: #00D09C,
-  color-success-600: #00B386,
-  color-success-700: #009670,
-  color-success-800: #007A5A,
-  color-success-900: #00644A,
+  color-success-100: #D1FAE5,
+  color-success-200: #A7F3D0,
+  color-success-300: #6EE7B7,
+  color-success-400: #34D399,
+  color-success-500: #059669,
+  color-success-600: #047857,
+  color-success-700: #065F46,
+  color-success-800: #064E3B,
+  color-success-900: #022C22,
 
-  // Color secundario (azul del carrusel)
-  color-info-100: #D1F5FF,
-  color-info-200: #A3E9FF,
-  color-info-300: #75D6FF,
-  color-info-400: #52C2FF,
-  color-info-500: #0A7B8A,
-  color-info-600: #075F6B,
-  color-info-700: #05464F,
-  color-info-800: #033138,
-  color-info-900: #022028,
+  // Color secundario - Azul Petróleo
+  color-info-100: #CCFBF1,
+  color-info-200: #99F6E4,
+  color-info-300: #5EEAD4,
+  color-info-400: #2DD4BF,
+  color-info-500: #0F766E,
+  color-info-600: #115E59,
+  color-info-700: #134E4A,
+  color-info-800: #0F3D3E,
+  color-info-900: #042F2E,
 
-  // Grises
+  // Grises - Slate más neutro
   color-basic-100: #FFFFFF,
-  color-basic-200: #F8FAFC,
+  color-basic-200: #F9FAFB,
   color-basic-300: #F3F4F6,
   color-basic-400: #E2E8F0,
   color-basic-500: #CBD5E1,
@@ -136,35 +136,35 @@ $nb-themes: nb-register-theme((
 
   // Configuración del layout
   layout-padding-top: 2.25rem,
-  layout-background-color: #F8FAFC,
+  layout-background-color: #F9FAFB,
   layout-text-color: #0F172A,
-  layout-text-font-family: 'Open Sans' sans-serif,
+  layout-text-font-family: 'Inter' sans-serif,
   
-  // Sidebar/Menu
+  // Sidebar/Menu - Elegante
   menu-background-color: #FFFFFF,
-  menu-text-color: #475569,
-  menu-text-font-family: 'Open Sans' sans-serif,
-  menu-text-font-weight: 600,
-  menu-item-hover-background-color: #F3F4F6,
-  menu-item-hover-text-color: #00D09C,
-  menu-item-active-background-color: #D4F8F0,
-  menu-item-active-text-color: #00D09C,
-  menu-item-icon-margin: 0 0.5rem 0 0,
-  menu-item-icon-color: #64748B,
-  menu-item-icon-active-color: #00D09C,
+  menu-text-color: #64748B,
+  menu-text-font-family: 'Inter' sans-serif,
+  menu-text-font-weight: 500,
+  menu-item-hover-background-color: rgba(4, 120, 87, 0.06),
+  menu-item-hover-text-color: #047857,
+  menu-item-active-background-color: rgba(4, 120, 87, 0.1),
+  menu-item-active-text-color: #047857,
+  menu-item-icon-margin: 0 0.75rem 0 0,
+  menu-item-icon-color: #94A3B8,
+  menu-item-icon-active-color: #047857,
   
-  // Header
+  // Header - Limpio
   header-background-color: #FFFFFF,
   header-text-color: #0F172A,
-  header-text-font-family: 'Open Sans' sans-serif,
-  header-shadow: 0 2px 8px rgba(0, 0, 0, 0.08),
+  header-text-font-family: 'Inter' sans-serif,
+  header-shadow: 0 1px 3px rgba(0, 0, 0, 0.05),
   
-  // Cards
+  // Cards - Premium
   card-background-color: #FFFFFF,
   card-text-color: #0F172A,
-  card-text-font-family: 'Open Sans' sans-serif,
-  card-border-radius: 12px,
-  card-shadow: 0 2px 8px rgba(0, 0, 0, 0.08),
+  card-text-font-family: 'Inter' sans-serif,
+  card-border-radius: 20px,
+  card-shadow: 0 4px 12px rgba(0, 0, 0, 0.05),
   card-height-tiny: 13.5rem,
   card-height-small: 21.1875rem,
   card-height-medium: 28.875rem,
@@ -174,29 +174,29 @@ $nb-themes: nb-register-theme((
   card-header-with-select-padding-top: 0.5rem,
   card-header-with-select-padding-bottom: 0.5rem,
   
-  // Botones
-  button-filled-primary-background-color: #00D09C,
-  button-filled-primary-border-color: #00D09C,
+  // Botones - Gradiente elegante
+  button-filled-primary-background-color: #047857,
+  button-filled-primary-border-color: #047857,
   button-filled-primary-text-color: #FFFFFF,
-  button-filled-primary-hover-background-color: #00B386,
-  button-filled-primary-hover-border-color: #00B386,
-  button-filled-primary-active-background-color: #009670,
-  button-filled-primary-active-border-color: #009670,
+  button-filled-primary-hover-background-color: #065F46,
+  button-filled-primary-hover-border-color: #065F46,
+  button-filled-primary-active-background-color: #064E3B,
+  button-filled-primary-active-border-color: #064E3B,
   
   // Inputs/Forms
-  input-basic-background-color: #F8FAFC,
+  input-basic-background-color: #F9FAFB,
   input-basic-border-color: #E2E8F0,
   input-basic-text-color: #0F172A,
   input-basic-placeholder-text-color: #94A3B8,
-  input-basic-focus-border-color: #00D09C,
+  input-basic-focus-border-color: #047857,
   
   // Select
   select-min-width: 6rem,
   
   // Otros
-  slide-out-background: #F8FAFC,
-  slide-out-shadow-color: 0 4px 14px 0 rgba(0, 208, 156, 0.15),
-  slide-out-shadow-color-rtl: 0 4px 14px 0 rgba(0, 208, 156, 0.15),
+  slide-out-background: #F9FAFB,
+  slide-out-shadow-color: 0 4px 14px 0 rgba(4, 120, 87, 0.12),
+  slide-out-shadow-color-rtl: 0 4px 14px 0 rgba(4, 120, 87, 0.12),
   
   // Links
   link-text-color: #00D09C,

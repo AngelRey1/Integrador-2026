@@ -39,8 +39,8 @@ interface SesionProgramada {
 
 @Component({
   selector: 'ngx-gestion-clases',
-  templateUrl: './gestion-clases.component.html',
-  styleUrls: ['./gestion-clases.component.scss']
+  templateUrl: './gestion-clases-pro.component.html',
+  styleUrls: ['./gestion-clases-pro.scss']
 })
 export class GestionClasesComponent implements OnInit, OnDestroy {
   claseForm: FormGroup;

@@ -1,0 +1,156 @@
+<div class="ingresos-container">
+  <!-- Hero Header -->
+  <div class="ingresos-hero">
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1>
+          <span class="hero-icon">
+            <nb-icon icon="trending-up-outline"></nb-icon>
+          </span>
+          Mis Ingresos
+        </h1>
+        <p>Resumen de tus ganancias y estadísticas financieras</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="ingresos-loading">
+    <nb-spinner status="primary" size="large"></nb-spinner>
+    <p>Cargando datos de ingresos...</p>
+  </div>
+
+  <div *ngIf="!loading">
+    <!-- Revenue Stats -->
+    <div class="revenue-stats-grid">
+      <div class="revenue-stat-card primary">
+        <div class="stat-icon primary">
+          <nb-icon icon="credit-card-outline"></nb-icon>
+        </div>
+        <div class="stat-content">
+          <span class="stat-number">{{ formatearMoneda(ingresosTotales) }}</span>
+          <span class="stat-label">Ingresos Brutos</span>
+          <span class="stat-sublabel">Este mes</span>
+        </div>
+      </div>
+
+      <div class="revenue-stat-card danger">
+        <div class="stat-icon danger">
+          <nb-icon icon="minus-circle-outline"></nb-icon>
+        </div>
+        <div class="stat-content">
+          <span class="stat-number">{{ formatearMoneda(comisionPlataforma) }}</span>
+          <span class="stat-label">Comisión (10%)</span>
+          <span class="stat-sublabel">Cargo de plataforma</span>
+        </div>
+      </div>
+
+      <div class="revenue-stat-card success">
+        <div class="stat-icon success">
+          <nb-icon icon="checkmark-circle-outline"></nb-icon>
+        </div>
+        <div class="stat-content">
+          <span class="stat-number highlight">{{ formatearMoneda(ingresosNetos) }}</span>
+          <span class="stat-label">Ingresos Netos</span>
+          <span class="stat-sublabel">Tu ganancia real</span>
+        </div>
+      </div>
+
+      <div class="revenue-stat-card info">
+        <div class="stat-icon info">
+          <nb-icon icon="swap-outline"></nb-icon>
+        </div>
+        <div class="stat-content">
+          <span class="stat-number">{{ transacciones }}</span>
+          <span class="stat-label">Sesiones</span>
+          <span class="stat-sublabel">Últimos 4 meses</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart Section -->
+    <div class="chart-section">
+      <div class="chart-header">
+        <div class="chart-title">
+          <div class="title-icon">
+            <nb-icon icon="bar-chart-outline"></nb-icon>
+          </div>
+          <h3>Evolución Mensual</h3>
+        </div>
+      </div>
+      <div class="chart-body">
+        <div class="chart-bars-pro" *ngIf="estadisticas.length > 0">
+          <div class="bar-item" *ngFor="let item of estadisticas">
+            <span class="bar-value">{{ formatearMoneda(item.ingresos) }}</span>
+            <div class="bar-wrapper">
+              <div class="bar-fill" [style.height.%]="getBarHeight(item.ingresos)"></div>
+            </div>
+            <span class="bar-label">{{ item.mes }}</span>
+          </div>
+        </div>
+
+        <!-- Empty Chart State -->
+        <div class="empty-chart" *ngIf="estadisticas.length === 0">
+          <div class="empty-icon">
+            <nb-icon icon="bar-chart-outline"></nb-icon>
+          </div>
+          <h4>Sin datos históricos</h4>
+          <p>Tus estadísticas mensuales aparecerán aquí</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary Section -->
+    <div class="summary-section">
+      <div class="chart-header">
+        <div class="chart-title">
+          <div class="title-icon">
+            <nb-icon icon="file-text-outline"></nb-icon>
+          </div>
+          <h3>Resumen Financiero</h3>
+        </div>
+      </div>
+      <div class="summary-grid">
+        <div class="summary-item">
+          <div class="summary-icon income">
+            <nb-icon icon="arrow-upward-outline"></nb-icon>
+          </div>
+          <div class="summary-content">
+            <span class="summary-label">Ingresos Brutos</span>
+            <span class="summary-value">{{ formatearMoneda(ingresosTotales) }}</span>
+          </div>
+        </div>
+
+        <div class="summary-item">
+          <div class="summary-icon commission">
+            <nb-icon icon="arrow-downward-outline"></nb-icon>
+          </div>
+          <div class="summary-content">
+            <span class="summary-label">Comisión Plataforma</span>
+            <span class="summary-value">- {{ formatearMoneda(comisionPlataforma) }}</span>
+          </div>
+        </div>
+
+        <div class="summary-item">
+          <div class="summary-icon net">
+            <nb-icon icon="checkmark-done-outline"></nb-icon>
+          </div>
+          <div class="summary-content">
+            <span class="summary-label">Total a Recibir</span>
+            <span class="summary-value highlight">{{ formatearMoneda(ingresosNetos) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info Alert -->
+    <div class="info-alert">
+      <nb-icon icon="info-outline"></nb-icon>
+      <div class="alert-content">
+        <strong>Nota:</strong> La comisión del 10% incluye el procesamiento de pagos, 
+        soporte al cliente y mantenimiento de la plataforma. Los pagos se procesan 
+        semanalmente y se depositan a tu cuenta registrada.
+      </div>
+    </div>
+  </div>
+</div>

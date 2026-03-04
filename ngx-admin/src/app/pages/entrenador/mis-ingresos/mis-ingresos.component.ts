@@ -4,8 +4,8 @@ import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'ngx-mis-ingresos',
-  templateUrl: './mis-ingresos.component.html',
-  styleUrls: ['./mis-ingresos.component.scss']
+  templateUrl: './mis-ingresos-pro.component.html',
+  styleUrls: ['./mis-ingresos-pro.scss']
 })
 export class MisIngresosComponent implements OnInit, OnDestroy {
   loading = true;

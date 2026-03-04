@@ -1,0 +1,526 @@
+// ============================================
+// ADMIN SECTIONS - ESTILOS PREMIUM COMPARTIDOS
+// Usuarios, Entrenadores, Reservas, Pagos, etc.
+// ============================================
+
+@import '../_premium-base.scss';
+
+// ============================================
+// PAGE CONTAINER PREMIUM
+// ============================================
+.page-container {
+  @include page-container;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+// ============================================
+// PAGE HEADER PREMIUM
+// ============================================
+.page-header {
+  margin-bottom: 2rem;
+  animation: fadeInUp 0.5s ease-out;
+  
+  h1 {
+    font-family: $font-primary;
+    font-size: 2rem;
+    font-weight: 800;
+    color: $color-text;
+    margin: 0 0 0.5rem;
+    
+    &::after {
+      content: '';
+      display: block;
+      width: 60px;
+      height: 4px;
+      background: linear-gradient(90deg, $color-primary, $color-accent);
+      border-radius: 2px;
+      margin-top: 0.75rem;
+    }
+  }
+  
+  p {
+    margin: 0;
+    color: $color-text-secondary;
+    font-size: 1.0625rem;
+  }
+}
+
+// ============================================
+// STATS ROW PREMIUM
+// ============================================
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  @include premium-card;
+  margin: 0;
+  animation: fadeInUp 0.5s ease-out backwards;
+  
+  @for $i from 1 through 4 {
+    &:nth-child(#{$i}) {
+      animation-delay: #{0.1 * $i}s;
+    }
+  }
+
+  nb-card-body {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.75rem;
+  }
+  
+  &:hover {
+    .stat-icon {
+      transform: scale(1.1) rotate(5deg);
+    }
+  }
+}
+
+.stat-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: $radius-md;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.2) 50%, transparent 70%);
+    background-size: 200% 200%;
+    animation: shimmer 2s ease-in-out infinite;
+  }
+
+  nb-icon {
+    font-size: 1.75rem;
+    color: white;
+    position: relative;
+    z-index: 1;
+  }
+
+  &.primary { 
+    background: linear-gradient(135deg, $color-primary, $color-secondary); 
+    box-shadow: $shadow-primary;
+  }
+  &.success { 
+    background: linear-gradient(135deg, $color-success, #34D399); 
+    box-shadow: 0 8px 20px rgba($color-success, 0.3);
+  }
+  &.danger { 
+    background: linear-gradient(135deg, $color-danger, #F87171); 
+    box-shadow: 0 8px 20px rgba($color-danger, 0.3);
+  }
+  &.info { 
+    background: linear-gradient(135deg, $color-info, #38BDF8); 
+    box-shadow: 0 8px 20px rgba($color-info, 0.3);
+  }
+  &.warning { 
+    background: linear-gradient(135deg, $color-warning, #FBBF24); 
+    box-shadow: 0 8px 20px rgba($color-warning, 0.3);
+  }
+}
+
+.stat-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+
+  .stat-value {
+    font-family: $font-primary;
+    font-size: 2rem;
+    font-weight: 800;
+    color: $color-text;
+    line-height: 1;
+    animation: countUp 0.6s ease-out 0.3s both;
+  }
+
+  .stat-label {
+    font-size: 0.9375rem;
+    color: $color-text-secondary;
+    font-weight: 500;
+  }
+}
+
+// ============================================
+// FILTERS CARD PREMIUM
+// ============================================
+.filters-card {
+  @include premium-card;
+  margin-bottom: 2rem;
+  animation: fadeInUp 0.5s ease-out 0.2s both;
+
+  nb-card-body {
+    padding: 1.5rem 2rem;
+  }
+}
+
+.filters-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 280px;
+  
+  input {
+    @include input-premium;
+    padding-left: 3rem;
+  }
+  
+  nb-icon {
+    position: absolute;
+    left: 1rem;
+    color: $color-text-muted;
+  }
+}
+
+.filter-select {
+  min-width: 180px;
+  
+  ::ng-deep .select-button {
+    border: 2px solid $color-border;
+    border-radius: $radius-sm;
+    padding: 0.875rem 1rem;
+    transition: all 0.3s ease;
+    
+    &:focus {
+      border-color: $color-primary;
+      box-shadow: 0 0 0 4px rgba($color-primary, 0.1);
+    }
+  }
+}
+
+// ============================================
+// TABLE CARD PREMIUM
+// ============================================
+.table-card {
+  @include premium-card;
+  animation: fadeInUp 0.5s ease-out 0.3s both;
+  overflow: hidden;
+  
+  nb-card-header {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid $color-border;
+    background: linear-gradient(135deg, rgba($color-primary, 0.04) 0%, rgba($color-secondary, 0.02) 100%);
+    
+    h3 {
+      font-family: $font-primary;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: $color-text;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+  }
+  
+  nb-card-body {
+    padding: 0;
+  }
+}
+
+// ============================================
+// TABLE PREMIUM
+// ============================================
+.table-container {
+  overflow-x: auto;
+}
+
+table {
+  @include table-premium;
+}
+
+// User/Item Row Premium
+.user-cell,
+.item-cell {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-avatar,
+.item-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: $radius-sm;
+  overflow: hidden;
+  border: 2px solid rgba($color-primary, 0.2);
+  transition: all 0.3s ease;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  &:hover {
+    border-color: $color-primary;
+    transform: scale(1.05);
+  }
+}
+
+.user-info,
+.item-info {
+  .user-name,
+  .item-name {
+    font-weight: 600;
+    color: $color-text;
+    font-size: 0.9375rem;
+  }
+  
+  .user-email,
+  .item-subtitle {
+    font-size: 0.8125rem;
+    color: $color-text-secondary;
+  }
+}
+
+// ============================================
+// STATUS BADGES
+// ============================================
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.875rem;
+  border-radius: $radius-full;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  
+  &.active,
+  &.success,
+  &.completado {
+    background: $color-success-light;
+    color: $color-success;
+  }
+  
+  &.inactive,
+  &.danger,
+  &.cancelado {
+    background: $color-danger-light;
+    color: $color-danger;
+  }
+  
+  &.pending,
+  &.warning,
+  &.pendiente {
+    background: $color-warning-light;
+    color: $color-warning;
+  }
+  
+  &.info {
+    background: $color-info-light;
+    color: $color-info;
+  }
+}
+
+// ============================================
+// ACTION BUTTONS
+// ============================================
+.action-buttons,
+.actions-cell {
+  display: flex;
+  gap: 0.5rem;
+  
+  button {
+    width: 38px;
+    height: 38px;
+    border-radius: $radius-xs;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    
+    nb-icon {
+      font-size: 18px;
+    }
+    
+    &.btn-view,
+    &[status="info"] {
+      background: rgba($color-info, 0.1);
+      color: $color-info;
+      
+      &:hover {
+        background: $color-info;
+        color: white;
+        transform: scale(1.1);
+      }
+    }
+    
+    &.btn-edit,
+    &[status="primary"] {
+      background: rgba($color-primary, 0.1);
+      color: $color-primary;
+      
+      &:hover {
+        background: $color-primary;
+        color: white;
+        transform: scale(1.1);
+      }
+    }
+    
+    &.btn-delete,
+    &[status="danger"] {
+      background: rgba($color-danger, 0.1);
+      color: $color-danger;
+      
+      &:hover {
+        background: $color-danger;
+        color: white;
+        transform: scale(1.1);
+      }
+    }
+    
+    &.btn-approve,
+    &[status="success"] {
+      background: rgba($color-success, 0.1);
+      color: $color-success;
+      
+      &:hover {
+        background: $color-success;
+        color: white;
+        transform: scale(1.1);
+      }
+    }
+  }
+}
+
+// ============================================
+// PRIMARY BUTTON PREMIUM
+// ============================================
+.btn-primary,
+button[status="primary"]:not(.action-btn) {
+  @include btn-primary-premium;
+}
+
+// ============================================
+// EMPTY STATE PREMIUM
+// ============================================
+.empty-state {
+  @include empty-state;
+  padding: 4rem 2rem;
+}
+
+// ============================================
+// PAGINATION PREMIUM
+// ============================================
+.pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-top: 1px solid $color-border;
+  
+  .pagination-info {
+    color: $color-text-secondary;
+    font-size: 0.9375rem;
+  }
+  
+  .pagination-controls {
+    display: flex;
+    gap: 0.5rem;
+    
+    button {
+      width: 40px;
+      height: 40px;
+      border-radius: $radius-xs;
+      border: 2px solid $color-border;
+      background: white;
+      color: $color-text-secondary;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      
+      &:hover:not([disabled]) {
+        border-color: $color-primary;
+        color: $color-primary;
+      }
+      
+      &.active {
+        background: $color-primary;
+        border-color: $color-primary;
+        color: white;
+      }
+      
+      &[disabled] {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+// ============================================
+// RESPONSIVE
+// ============================================
+@media (max-width: 768px) {
+  .page-container {
+    padding: 1.5rem;
+  }
+  
+  .page-header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .stats-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .stat-card nb-card-body {
+    padding: 1.25rem;
+  }
+  
+  .stat-icon {
+    width: 52px;
+    height: 52px;
+    
+    nb-icon {
+      font-size: 1.5rem;
+    }
+  }
+  
+  .stat-info .stat-value {
+    font-size: 1.5rem;
+  }
+  
+  .filters-row {
+    flex-direction: column;
+    
+    .search-box {
+      width: 100%;
+      min-width: unset;
+    }
+    
+    .filter-select {
+      width: 100%;
+    }
+  }
+  
+  table {
+    font-size: 0.875rem;
+    
+    th, td {
+      padding: 1rem 0.75rem;
+    }
+  }
+}

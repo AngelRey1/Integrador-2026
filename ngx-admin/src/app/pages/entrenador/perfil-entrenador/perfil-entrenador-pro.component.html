@@ -1,0 +1,520 @@
+<!-- ====================================== -->
+<!-- PERFIL ENTRENADOR - DISEÑO PROFESIONAL -->
+<!-- ====================================== -->
+<div class="perfil-pro-container">
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-pro">
+    <div class="loading-spinner"></div>
+    <p>Cargando tu perfil...</p>
+  </div>
+
+  <div *ngIf="!loading">
+    
+    <!-- HERO HEADER -->
+    <section class="profile-hero">
+      <div class="hero-content">
+        <div class="hero-info">
+          <div class="hero-badge">
+            <span class="status-dot" 
+                  [class.active]="perfil?.verificado && perfil?.activo"
+                  [class.pending]="!perfil?.verificado"
+                  [class.inactive]="perfil?.verificado && !perfil?.activo">
+            </span>
+            <span *ngIf="perfil?.verificado && perfil?.activo">Perfil Activo</span>
+            <span *ngIf="!perfil?.verificado">Pendiente de Verificación</span>
+            <span *ngIf="perfil?.verificado && !perfil?.activo">Perfil Oculto</span>
+          </div>
+          <h1 class="hero-title">Mi Perfil Profesional</h1>
+          <p class="hero-subtitle">Configura tu información para que los clientes te encuentren</p>
+        </div>
+        
+        <div class="hero-actions">
+          <button *ngIf="editando" class="btn-hero btn-secondary" (click)="toggleEditar()">
+            <nb-icon icon="close-outline"></nb-icon>
+            Cancelar
+          </button>
+          <button class="btn-hero btn-primary" 
+                  [disabled]="guardando"
+                  (click)="editando ? guardar() : toggleEditar()">
+            <nb-icon [icon]="editando ? 'save-outline' : 'edit-outline'"></nb-icon>
+            {{ guardando ? 'Guardando...' : (editando ? 'Guardar Cambios' : 'Editar Perfil') }}
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Alertas de Estado -->
+    <div *ngIf="perfil && !perfil.verificado" class="alert-pro alert-warning">
+      <div class="alert-icon">
+        <nb-icon icon="clock-outline"></nb-icon>
+      </div>
+      <div class="alert-content">
+        <strong>Tu perfil está pendiente de verificación</strong>
+        <span>Un administrador debe aprobar tu cuenta para que aparezcas en las búsquedas de clientes.</span>
+      </div>
+    </div>
+
+    <div *ngIf="perfil?.verificado && !perfil?.activo" class="alert-pro alert-warning">
+      <div class="alert-icon">
+        <nb-icon icon="eye-off-outline"></nb-icon>
+      </div>
+      <div class="alert-content">
+        <strong>Tu perfil está oculto</strong>
+        <span>Activa la opción "Perfil visible al público" para aparecer en las búsquedas.</span>
+      </div>
+    </div>
+
+    <div *ngIf="perfil?.verificado && perfil?.activo" class="alert-pro alert-success">
+      <div class="alert-icon">
+        <nb-icon icon="checkmark-circle-2-outline"></nb-icon>
+      </div>
+      <div class="alert-content">
+        <strong>¡Tu perfil está activo!</strong>
+        <span>Los clientes pueden encontrarte en las búsquedas y reservar sesiones contigo.</span>
+      </div>
+    </div>
+
+    <!-- LAYOUT PRINCIPAL -->
+    <div class="profile-layout">
+      
+      <!-- COLUMNA IZQUIERDA -->
+      <div class="main-column">
+        
+        <!-- FOTO DE PERFIL -->
+        <div class="card-pro">
+          <div class="card-header-pro">
+            <div class="header-icon">
+              <nb-icon icon="camera-outline"></nb-icon>
+            </div>
+            <div class="header-text">
+              <h3>Foto de Perfil</h3>
+              <span class="header-subtitle">Tu imagen profesional</span>
+            </div>
+          </div>
+          <div class="card-body-pro">
+            <div class="photo-section">
+              <div class="photo-wrapper">
+                <div class="photo-container">
+                  <img [src]="getFotoActual()" 
+                       alt="Foto de perfil"
+                       (error)="$event.target.src = 'assets/images/nick.png'">
+                  <label *ngIf="!uploadingFoto" for="foto-input" class="photo-overlay">
+                    <nb-icon icon="camera-outline"></nb-icon>
+                    <span>Cambiar</span>
+                  </label>
+                </div>
+                <div class="photo-ring"></div>
+              </div>
+              
+              <input type="file" 
+                     id="foto-input" 
+                     accept="image/*" 
+                     (change)="onFileSelected($event)"
+                     [disabled]="uploadingFoto"
+                     hidden>
+
+              <div class="photo-info">
+                <div class="photo-hint">
+                  <nb-icon icon="info-outline"></nb-icon>
+                  Formatos: JPG, PNG, GIF. Máximo 5MB.
+                </div>
+                
+                <!-- Progreso de subida -->
+                <div *ngIf="uploadingFoto" class="upload-progress-pro">
+                  <div class="progress-bar">
+                    <div class="progress-fill" [style.width.%]="uploadProgress"></div>
+                  </div>
+                  <span>Subiendo... {{ uploadProgress | number:'1.0-0' }}%</span>
+                </div>
+                
+                <!-- Acciones de foto -->
+                <div *ngIf="fotoPreview && !uploadingFoto" class="photo-actions">
+                  <button class="btn-pro btn-primary btn-sm" (click)="subirFoto()">
+                    <nb-icon icon="upload-outline"></nb-icon>
+                    Guardar foto
+                  </button>
+                  <button class="btn-pro btn-secondary btn-sm" (click)="cancelarFoto()">
+                    <nb-icon icon="close-outline"></nb-icon>
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- GALERÍA DE FOTOS -->
+        <div class="card-pro">
+          <div class="card-header-pro">
+            <div class="header-icon">
+              <nb-icon icon="image-outline"></nb-icon>
+            </div>
+            <div class="header-text">
+              <h3>Galería de Fotos</h3>
+              <span class="header-subtitle">Muestra tu trabajo y logros</span>
+            </div>
+            <span class="header-badge">{{ galeria.length }}/6</span>
+          </div>
+          <div class="card-body-pro">
+            <p class="form-hint" style="margin-bottom: 1rem;">
+              Agrega fotos de tus entrenamientos, instalaciones o logros. Los clientes podrán verlas en tu perfil público.
+            </p>
+            
+            <div class="gallery-grid-pro">
+              <!-- Fotos existentes -->
+              <div *ngFor="let foto of galeria; let i = index" class="gallery-item">
+                <img [src]="foto" alt="Foto galería">
+                <button class="gallery-delete" (click)="eliminarFotoGaleria(i)" title="Eliminar">
+                  <nb-icon icon="close-outline"></nb-icon>
+                </button>
+              </div>
+              
+              <!-- Preview de nueva foto -->
+              <div *ngIf="galeriaPreview" class="gallery-item preview-item">
+                <img [src]="galeriaPreview" alt="Nueva foto">
+                <span class="preview-badge">Nueva</span>
+              </div>
+              
+              <!-- Botón agregar -->
+              <label *ngIf="galeria.length < 6 && !galeriaPreview" 
+                     for="galeria-input" 
+                     class="gallery-item add-item">
+                <nb-icon icon="plus-outline"></nb-icon>
+                <span>Agregar</span>
+              </label>
+              <input type="file" 
+                     id="galeria-input" 
+                     accept="image/*" 
+                     (change)="onGaleriaFileSelected($event)"
+                     [disabled]="uploadingGaleria"
+                     hidden>
+            </div>
+            
+            <!-- Progreso galería -->
+            <div *ngIf="uploadingGaleria" class="upload-progress-pro" style="margin-top: 1rem;">
+              <div class="progress-bar">
+                <div class="progress-fill" [style.width.%]="uploadGaleriaProgress"></div>
+              </div>
+              <span>Subiendo foto... {{ uploadGaleriaProgress | number:'1.0-0' }}%</span>
+            </div>
+            
+            <!-- Acciones galería -->
+            <div *ngIf="galeriaPreview && !uploadingGaleria" class="photo-actions" style="margin-top: 1rem;">
+              <button class="btn-pro btn-primary btn-sm" (click)="subirFotoGaleria()">
+                <nb-icon icon="upload-outline"></nb-icon>
+                Subir foto
+              </button>
+              <button class="btn-pro btn-secondary btn-sm" (click)="cancelarFotoGaleria()">
+                <nb-icon icon="close-outline"></nb-icon>
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- INFORMACIÓN PERSONAL -->
+        <div class="card-pro">
+          <div class="card-header-pro">
+            <div class="header-icon">
+              <nb-icon icon="person-outline"></nb-icon>
+            </div>
+            <div class="header-text">
+              <h3>Información Personal</h3>
+              <span class="header-subtitle">Datos básicos de contacto</span>
+            </div>
+          </div>
+          <div class="card-body-pro">
+            <form [formGroup]="perfilForm">
+              <div class="form-row">
+                <div class="form-group-pro">
+                  <label class="form-label">
+                    Nombre <span class="required">*</span>
+                  </label>
+                  <input nbInput fullWidth formControlName="nombre" placeholder="Tu nombre">
+                </div>
+                <div class="form-group-pro">
+                  <label class="form-label">Apellido</label>
+                  <input nbInput fullWidth formControlName="apellidoPaterno" placeholder="Tu apellido">
+                </div>
+              </div>
+              
+              <div class="form-row">
+                <div class="form-group-pro">
+                  <label class="form-label">
+                    <nb-icon icon="phone-outline"></nb-icon>
+                    Teléfono
+                  </label>
+                  <input nbInput fullWidth formControlName="telefono" placeholder="10 dígitos">
+                </div>
+                <div class="form-group-pro">
+                  <label class="form-label">
+                    <nb-icon icon="message-circle-outline"></nb-icon>
+                    WhatsApp
+                  </label>
+                  <input nbInput fullWidth formControlName="whatsapp" placeholder="Número de WhatsApp">
+                </div>
+              </div>
+              
+              <div class="form-group-pro">
+                <label class="form-label">
+                  <nb-icon icon="pin-outline"></nb-icon>
+                  Ciudad / Ubicación
+                </label>
+                <input nbInput fullWidth formControlName="ciudad" placeholder="Ej: Ciudad de México, Guadalajara...">
+                <span class="form-hint">Esta ubicación se mostrará a los clientes</span>
+              </div>
+              
+              <div class="form-group-pro">
+                <label class="form-label">
+                  <nb-icon icon="home-outline"></nb-icon>
+                  Dirección de Entrenamiento <span class="required">*</span>
+                </label>
+                <input nbInput fullWidth formControlName="direccionEntrenamiento" 
+                       placeholder="Ej: Gimnasio XYZ, Calle Principal #123, Col. Centro">
+                <span class="form-hint">Esta será la ubicación que verán tus clientes al reservar</span>
+              </div>
+              
+              <div class="form-group-pro">
+                <label class="form-label">
+                  <nb-icon icon="file-text-outline"></nb-icon>
+                  Biografía / Descripción <span class="required">*</span>
+                </label>
+                <textarea nbInput fullWidth formControlName="bio" rows="4" 
+                          placeholder="Cuéntale a tus clientes sobre ti, tu experiencia y metodología..."></textarea>
+                <span class="form-hint">Esta descripción se mostrará en tu perfil público</span>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- DEPORTES -->
+        <div class="card-pro">
+          <div class="card-header-pro">
+            <div class="header-icon">
+              <nb-icon icon="activity-outline"></nb-icon>
+            </div>
+            <div class="header-text">
+              <h3>Deportes que Enseño</h3>
+              <span class="header-subtitle">Tus áreas de entrenamiento</span>
+            </div>
+          </div>
+          <div class="card-body-pro">
+            <div class="tags-grid-pro">
+              <div *ngFor="let deporte of deportes" class="tag-pro">
+                {{ deporte }}
+                <button *ngIf="editando" class="tag-remove" (click)="eliminarDeporte(deporte)">
+                  <nb-icon icon="close-outline"></nb-icon>
+                </button>
+              </div>
+              <span *ngIf="deportes.length === 0" class="empty-text">No hay deportes seleccionados</span>
+            </div>
+            
+            <div *ngIf="editando" class="select-pro-container">
+              <span class="select-label">Agregar deporte:</span>
+              <nb-select placeholder="Selecciona un deporte" 
+                         (selectedChange)="agregarDeporte($event)"
+                         size="small">
+                <nb-option *ngFor="let d of getDeportesDisponiblesFiltrados()" [value]="d">{{ d }}</nb-option>
+              </nb-select>
+            </div>
+          </div>
+        </div>
+
+        <!-- TARIFAS -->
+        <div class="card-pro">
+          <div class="card-header-pro">
+            <div class="header-icon" style="background: linear-gradient(135deg, #059669, #34D399);">
+              <nb-icon icon="pricetags-outline"></nb-icon>
+            </div>
+            <div class="header-text">
+              <h3>Mis Tarifas</h3>
+              <span class="header-subtitle">Configura tus precios</span>
+            </div>
+          </div>
+          <div class="card-body-pro">
+            <form [formGroup]="perfilForm">
+              <div class="form-group-pro">
+                <label class="form-label">
+                  <nb-icon icon="home-outline"></nb-icon>
+                  Precio Presencial (MXN/hora)
+                </label>
+                <div class="price-input-pro">
+                  <span class="price-prefix">$</span>
+                  <input type="number" formControlName="precio" 
+                         placeholder="500" min="50" max="3000" step="50">
+                  <span class="price-suffix">MXN</span>
+                </div>
+                <span class="form-hint">Tarifa para sesiones presenciales (mín. $50 - máx. $3,000)</span>
+                <div *ngIf="perfilForm.get('precio')?.invalid && perfilForm.get('precio')?.touched" 
+                     style="color: #EF4444; font-size: 0.8125rem; margin-top: 0.5rem;">
+                  <span *ngIf="perfilForm.get('precio')?.errors?.['min']">El precio mínimo es $50 MXN</span>
+                  <span *ngIf="perfilForm.get('precio')?.errors?.['max']">El precio máximo es $3,000 MXN</span>
+                  <span *ngIf="perfilForm.get('precio')?.errors?.['required']">El precio es requerido</span>
+                </div>
+              </div>
+              
+              <div *ngIf="!editando && perfil" class="price-display-pro">
+                <div class="price-card">
+                  <span class="price-type">Presencial</span>
+                  <span class="price-value">${{ perfil.precio || 0 }} MXN</span>
+                  <span class="price-period">/hora</span>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- COLUMNA DERECHA -->
+      <div class="side-column">
+        
+        <!-- VISIBILIDAD -->
+        <div class="card-pro" [class.card-accent-success]="perfil?.activo" [class.card-accent-warning]="!perfil?.activo">
+          <div class="card-header-pro">
+            <div class="header-icon" [style.background]="perfil?.activo ? 'linear-gradient(135deg, #10B981, #34D399)' : 'linear-gradient(135deg, #F59E0B, #FBBF24)'">
+              <nb-icon icon="eye-outline"></nb-icon>
+            </div>
+            <div class="header-text">
+              <h3>Visibilidad</h3>
+            </div>
+          </div>
+          <div class="card-body-pro">
+            <div class="visibility-section">
+              <form [formGroup]="perfilForm">
+                <div class="toggle-pro">
+                  <span class="toggle-label">Perfil visible al público</span>
+                  <nb-toggle formControlName="activo" [disabled]="!editando"></nb-toggle>
+                </div>
+                <p class="visibility-hint">
+                  <span *ngIf="perfilForm.get('activo')?.value">
+                    Tu perfil aparecerá en las búsquedas de clientes.
+                  </span>
+                  <span *ngIf="!perfilForm.get('activo')?.value">
+                    Tu perfil está oculto. Los clientes no podrán encontrarte.
+                  </span>
+                </p>
+              </form>
+              
+              <div class="status-list" *ngIf="perfil">
+                <div class="status-item">
+                  <div class="status-icon" [class.success]="perfil.verificado" [class.warning]="!perfil.verificado">
+                    <nb-icon [icon]="perfil.verificado ? 'checkmark-outline' : 'clock-outline'"></nb-icon>
+                  </div>
+                  <span>{{ perfil.verificado ? 'Verificado por admin' : 'Pendiente de verificación' }}</span>
+                </div>
+                <div class="status-item">
+                  <div class="status-icon" [class.success]="perfil.activo" [class.danger]="!perfil.activo">
+                    <nb-icon [icon]="perfil.activo ? 'checkmark-outline' : 'close-outline'"></nb-icon>
+                  </div>
+                  <span>{{ perfil.activo ? 'Perfil activo' : 'Perfil oculto' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ESPECIALIDADES -->
+        <div class="card-pro">
+          <div class="card-header-pro">
+            <div class="header-icon" style="background: linear-gradient(135deg, #3B82F6, #60A5FA);">
+              <nb-icon icon="award-outline"></nb-icon>
+            </div>
+            <div class="header-text">
+              <h3>Especialidades</h3>
+            </div>
+          </div>
+          <div class="card-body-pro">
+            <div class="tags-grid-pro">
+              <div *ngFor="let esp of especialidades" class="tag-pro tag-info">
+                {{ esp }}
+                <button *ngIf="editando" class="tag-remove" (click)="eliminarEspecialidad(esp)">
+                  <nb-icon icon="close-outline"></nb-icon>
+                </button>
+              </div>
+              <span *ngIf="especialidades.length === 0" class="empty-text">Sin especialidades</span>
+            </div>
+            
+            <div *ngIf="editando" class="add-input-pro">
+              <input nbInput fullWidth [(ngModel)]="nuevaEspecialidad" 
+                     placeholder="Ej: Pérdida de peso..."
+                     (keyup.enter)="agregarEspecialidad()">
+              <button class="btn-pro btn-primary btn-sm" (click)="agregarEspecialidad()" 
+                      [disabled]="!nuevaEspecialidad.trim()">
+                <nb-icon icon="plus-outline"></nb-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- CERTIFICACIONES -->
+        <div class="card-pro">
+          <div class="card-header-pro">
+            <div class="header-icon" style="background: linear-gradient(135deg, #8B5CF6, #A78BFA);">
+              <nb-icon icon="file-text-outline"></nb-icon>
+            </div>
+            <div class="header-text">
+              <h3>Certificaciones</h3>
+            </div>
+          </div>
+          <div class="card-body-pro">
+            <div *ngIf="certificaciones.length > 0" class="cert-list-pro">
+              <div *ngFor="let cert of certificaciones" class="cert-item">
+                <div class="cert-icon">
+                  <nb-icon icon="checkmark-outline"></nb-icon>
+                </div>
+                <span class="cert-name">{{ cert }}</span>
+                <button *ngIf="editando" class="cert-delete" (click)="eliminarCertificacion(cert)">
+                  <nb-icon icon="close-outline"></nb-icon>
+                </button>
+              </div>
+            </div>
+            <span *ngIf="certificaciones.length === 0" class="empty-text" style="display: block; text-align: center; padding: 1rem;">
+              Sin certificaciones
+            </span>
+            
+            <div *ngIf="editando" class="add-input-pro">
+              <input nbInput fullWidth [(ngModel)]="nuevaCertificacion" 
+                     placeholder="Ej: NSCA-CPT, ACE..."
+                     (keyup.enter)="agregarCertificacion()">
+              <button class="btn-pro btn-primary btn-sm" (click)="agregarCertificacion()"
+                      [disabled]="!nuevaCertificacion.trim()">
+                <nb-icon icon="plus-outline"></nb-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ESTADÍSTICAS -->
+        <div class="card-pro">
+          <div class="card-header-pro">
+            <div class="header-icon" style="background: linear-gradient(135deg, #EC4899, #F472B6);">
+              <nb-icon icon="bar-chart-outline"></nb-icon>
+            </div>
+            <div class="header-text">
+              <h3>Estadísticas</h3>
+            </div>
+          </div>
+          <div class="card-body-pro">
+            <div class="stats-grid-pro">
+              <div class="stat-card">
+                <div class="stat-icon rating">
+                  <nb-icon icon="star"></nb-icon>
+                </div>
+                <span class="stat-value">{{ perfil?.calificacionPromedio | number:'1.1-1' }}</span>
+                <span class="stat-label">Calificación</span>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon reviews">
+                  <nb-icon icon="message-circle-outline"></nb-icon>
+                </div>
+                <span class="stat-value">{{ perfil?.totalReviews || 0 }}</span>
+                <span class="stat-label">Reseñas</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,10 +1,12 @@
 @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 @import "~@nebular/theme/styles/theming";
 @import "~@nebular/theme/styles/themes/default";
 
 body {
-  font-family: "Space Grotesk", "Helvetica Neue", Arial, sans-serif;
+  font-family: "Inter", "Space Grotesk", "Helvetica Neue", Arial, sans-serif;
   margin: 0;
+  background: #F8FAFC;
 }
 
 // ============================================
@@ -25,4 +27,334 @@ nb-icon {
     width: 100%;
     height: 100%;
   }
+}
+
+// ============================================
+// SIDEBAR PREMIUM STYLES - FIJA Y ELEGANTE
+// ============================================
+nb-sidebar {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+
+  &.menu-sidebar {
+    background: #FFFFFF !important;
+    border-right: 1px solid #E2E8F0 !important;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.03) !important;
+
+    .scrollable {
+      padding: 0.5rem 0 !important;
+    }
+  }
+}
+
+// Menu Items Premium
+nb-menu {
+  .menu-items {
+    padding: 0.5rem 0.75rem !important;
+  }
+
+  .menu-item {
+    margin-bottom: 0.25rem;
+
+    a.menu-link {
+      padding: 0.875rem 1rem !important;
+      border-radius: 12px !important;
+      font-size: 0.9375rem !important;
+      font-weight: 500 !important;
+      color: #64748B !important;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+      position: relative;
+      overflow: hidden;
+
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 3px;
+        height: 0;
+        background: linear-gradient(180deg, #047857 0%, #10B981 100%);
+        border-radius: 0 3px 3px 0;
+        transition: height 0.3s ease;
+      }
+
+      nb-icon {
+        color: #94A3B8 !important;
+        font-size: 20px !important;
+        margin-right: 0.75rem !important;
+        transition: all 0.3s ease !important;
+      }
+
+      &:hover {
+        background: rgba(4, 120, 87, 0.06) !important;
+        color: #047857 !important;
+        transform: translateX(4px);
+
+        nb-icon {
+          color: #047857 !important;
+        }
+      }
+    }
+
+    // Active State
+    &.menu-item-active > a.menu-link,
+    a.menu-link.active {
+      background: linear-gradient(135deg, rgba(4, 120, 87, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%) !important;
+      color: #047857 !important;
+      font-weight: 600 !important;
+
+      &::before {
+        height: 60%;
+      }
+
+      nb-icon {
+        color: #047857 !important;
+        transform: scale(1.1);
+      }
+    }
+  }
+
+  // Menu Group Title
+  .menu-group {
+    padding: 1.25rem 1rem 0.5rem !important;
+    
+    .menu-title {
+      font-size: 0.6875rem !important;
+      font-weight: 700 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.1em !important;
+      color: #94A3B8 !important;
+      opacity: 1 !important;
+    }
+  }
+
+  // Submenu
+  .menu-items .menu-item .menu-items {
+    padding-left: 0.5rem !important;
+
+    .menu-item a.menu-link {
+      padding: 0.625rem 1rem !important;
+      font-size: 0.875rem !important;
+      
+      &::before {
+        display: none;
+      }
+    }
+  }
+}
+
+// ============================================
+// HEADER PREMIUM
+// ============================================
+nb-layout-header {
+  background: #FFFFFF !important;
+  border-bottom: 1px solid #E2E8F0 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+
+  nav {
+    padding: 0 1.5rem !important;
+    height: 64px !important;
+  }
+
+  .logo-container {
+    .logo {
+      font-family: 'Space Grotesk', sans-serif !important;
+      font-weight: 700 !important;
+      font-size: 1.375rem !important;
+      color: #047857 !important;
+    }
+  }
+}
+
+// ============================================
+// LAYOUT CONTENT AREA
+// ============================================
+nb-layout .layout {
+  .content {
+    background: linear-gradient(180deg, #F8FAFC 0%, #F1F5F9 100%) !important;
+    
+    nb-layout-column {
+      padding: 0 !important;
+    }
+  }
+}
+
+// ============================================
+// CARDS PREMIUM - GLOBAL
+// ============================================
+nb-card {
+  border-radius: 20px !important;
+  border: 1px solid rgba(0, 0, 0, 0.04) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  overflow: hidden;
+
+  &:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
+  }
+
+  nb-card-header {
+    border-bottom: 1px solid #E2E8F0 !important;
+    font-family: 'Space Grotesk', 'Inter', sans-serif !important;
+    font-weight: 600 !important;
+    color: #1E293B !important;
+  }
+}
+
+// ============================================
+// BUTTONS PREMIUM
+// ============================================
+button[nbButton] {
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+
+  &.status-primary:not([disabled]) {
+    background: linear-gradient(135deg, #047857 0%, #10B981 100%) !important;
+    border-color: transparent !important;
+    box-shadow: 0 4px 14px rgba(4, 120, 87, 0.35) !important;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(4, 120, 87, 0.45) !important;
+    }
+  }
+}
+
+// ============================================
+// INPUTS PREMIUM
+// ============================================
+input[nbInput],
+textarea[nbInput] {
+  border-radius: 12px !important;
+  border: 2px solid #E2E8F0 !important;
+  transition: all 0.3s ease !important;
+
+  &:focus {
+    border-color: #047857 !important;
+    box-shadow: 0 0 0 3px rgba(4, 120, 87, 0.1) !important;
+  }
+}
+
+// ============================================
+// SELECT PREMIUM
+// ============================================
+nb-select {
+  .select-button {
+    border-radius: 12px !important;
+    border: 2px solid #E2E8F0 !important;
+    transition: all 0.3s ease !important;
+
+    &:focus {
+      border-color: #047857 !important;
+    }
+  }
+}
+
+nb-option-list {
+  border-radius: 12px !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12) !important;
+  border: 1px solid #E2E8F0 !important;
+  overflow: hidden;
+
+  nb-option {
+    transition: all 0.2s ease !important;
+
+    &:hover {
+      background: rgba(4, 120, 87, 0.06) !important;
+    }
+
+    &.selected {
+      background: rgba(4, 120, 87, 0.1) !important;
+      color: #047857 !important;
+    }
+  }
+}
+
+// ============================================
+// TOGGLE PREMIUM
+// ============================================
+nb-toggle {
+  .toggle {
+    transition: all 0.3s ease !important;
+  }
+
+  .toggle-switcher {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+
+  &.status-success .toggle.checked {
+    background: linear-gradient(135deg, #047857 0%, #10B981 100%) !important;
+    border-color: #047857 !important;
+  }
+}
+
+// ============================================
+// BADGE PREMIUM
+// ============================================
+nb-badge {
+  border-radius: 20px !important;
+  font-weight: 600 !important;
+  padding: 0.25rem 0.75rem !important;
+}
+
+// ============================================
+// SPINNER PREMIUM
+// ============================================
+nb-spinner {
+  .spin-circle {
+    border-color: transparent !important;
+    border-top-color: #047857 !important;
+  }
+}
+
+// ============================================
+// SCROLLBAR PREMIUM
+// ============================================
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F1F5F9;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 4px;
+  transition: background 0.3s ease;
+
+  &:hover {
+    background: #94A3B8;
+  }
+}
+
+// ============================================
+// ANIMATIONS
+// ============================================
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Apply animations to main content
+nb-layout-column {
+  animation: fadeIn 0.4s ease-out;
 }

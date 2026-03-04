@@ -1,0 +1,535 @@
+// ============================================================
+// MIS RESERVAS (SESIONES) - DISEÑO PREMIUM SAAS
+// Consistente con el dashboard del cliente
+// ============================================================
+
+@import '../_premium-base-cliente.scss';
+
+// === HOST ===
+:host {
+  display: block;
+}
+
+// Container principal
+.mis-reservas-container {
+  @include page-container;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// HERO HEADER
+// ═══════════════════════════════════════════════════════════════
+.reservas-hero {
+  @include page-hero;
+  margin-bottom: 2rem;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SECCIÓN DE FILTROS
+// ═══════════════════════════════════════════════════════════════
+.filtros-card {
+  @include section-card;
+  margin-bottom: 2rem;
+
+  nb-card-body {
+    padding: 1.5rem 2rem;
+  }
+}
+
+.filtros-row {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+
+  .busqueda {
+    flex: 1;
+    min-width: 280px;
+    position: relative;
+
+    input {
+      @include input-pro;
+      padding-left: 1rem;
+    }
+  }
+
+  .filtro-fecha {
+    min-width: 200px;
+
+    input {
+      @include input-pro;
+    }
+  }
+
+  button[nbButton] {
+    height: 48px;
+    padding: 0 1.25rem;
+    border-radius: $radius-sm;
+    font-weight: 600;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: rgba($color-danger, 0.08);
+      color: $color-danger;
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TABS PREMIUM
+// ═══════════════════════════════════════════════════════════════
+.reservas-tabs-card {
+  @include section-card;
+
+  nb-card-header {
+    @include section-header;
+    padding: 1.25rem 2rem;
+
+    h5 {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-family: 'Space Grotesk', 'Inter', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: $color-text;
+      margin: 0;
+
+      .header-icon {
+        width: 42px;
+        height: 42px;
+        background: linear-gradient(135deg, $color-primary 0%, $color-secondary 100%);
+        border-radius: $radius-xs;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba($color-primary, 0.3);
+
+        nb-icon {
+          font-size: 20px;
+          color: white;
+        }
+      }
+    }
+  }
+
+  nb-card-body {
+    padding: 0;
+  }
+
+  // Estilizar tabs de Nebular
+  nb-tabset {
+    ::ng-deep {
+      .tabset {
+        background: $color-bg;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid $color-border;
+
+        .tab {
+          padding: 1rem 1.75rem;
+          border-radius: $radius-sm;
+          margin: 0 0.375rem;
+          font-weight: 600;
+          transition: all 0.3s ease;
+
+          &.active {
+            background: $color-bg-card;
+            box-shadow: $shadow-sm;
+          }
+        }
+      }
+
+      .tab-content {
+        padding: 2.5rem 2.5rem;
+        min-height: 350px;
+      }
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// LISTA DE RESERVAS
+// ═══════════════════════════════════════════════════════════════
+.reservas-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-top: 0;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TARJETA DE RESERVA PREMIUM
+// ═══════════════════════════════════════════════════════════════
+.reserva-card {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  border: 1px solid $color-border;
+  box-shadow: $shadow-sm;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: fadeInUp 0.4s ease-out backwards;
+  position: relative;
+
+  @for $i from 1 through 5 {
+    &:nth-child(#{$i}) {
+      animation-delay: #{$i * 0.08}s;
+    }
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, $color-primary 0%, $color-accent 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-lg;
+    border-color: rgba($color-primary, 0.2);
+
+    &::before {
+      opacity: 1;
+    }
+
+    .entrenador-avatar img {
+      border-color: $color-primary;
+      transform: scale(1.05);
+    }
+  }
+
+  nb-card-body {
+    padding: 1.5rem;
+  }
+
+  // Alerta próxima sesión
+  .proxima-alert {
+    margin-bottom: 1.25rem;
+    border-radius: $radius-sm;
+    padding: 0.875rem 1rem;
+    background: linear-gradient(135deg, rgba($color-info, 0.1) 0%, rgba($color-info, 0.05) 100%);
+    border: 1px solid rgba($color-info, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+
+    nb-icon {
+      color: $color-info;
+      animation: pulse 2s ease-in-out infinite;
+    }
+  }
+}
+
+.reserva-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.25rem;
+  gap: 1rem;
+}
+
+.reserva-info {
+  display: flex;
+  gap: 1.25rem;
+  flex: 1;
+}
+
+.entrenador-avatar {
+  flex-shrink: 0;
+
+  img {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid $color-primary;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba($color-primary, 0.2);
+  }
+}
+
+.reserva-detalles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+
+  h6 {
+    font-family: 'Space Grotesk', 'Inter', sans-serif;
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: $color-text;
+    margin: 0;
+  }
+
+  .especialidad {
+    font-size: 0.9375rem;
+    color: $color-primary;
+    font-weight: 500;
+    margin: 0;
+  }
+
+  .numero-reserva {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.8125rem;
+    color: $color-text-muted;
+    margin: 0;
+
+    nb-icon {
+      font-size: 14px;
+    }
+  }
+}
+
+// Badge de estado
+nb-badge {
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 0.375rem 0.875rem;
+  border-radius: $radius-full;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// META INFORMACIÓN
+// ═══════════════════════════════════════════════════════════════
+.reserva-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  padding: 1.25rem;
+  background: linear-gradient(135deg, $color-bg 0%, rgba($color-primary, 0.02) 100%);
+  border-radius: $radius-md;
+  border: 1px solid $color-border;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.875rem;
+  background: $color-bg-card;
+  border-radius: $radius-xs;
+  font-size: 0.875rem;
+  color: $color-text-secondary;
+  transition: all 0.3s ease;
+
+  nb-icon {
+    font-size: 16px;
+    color: $color-primary;
+  }
+
+  &:hover {
+    background: rgba($color-primary, 0.08);
+  }
+
+  &.precio {
+    background: linear-gradient(135deg, rgba($color-success, 0.1) 0%, rgba($color-success, 0.05) 100%);
+    border: 1px solid rgba($color-success, 0.2);
+
+    strong {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: $color-success;
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BOTONES DE ACCIÓN
+// ═══════════════════════════════════════════════════════════════
+.reserva-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid $color-border;
+
+  button[nbButton] {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.625rem 1rem;
+    border-radius: $radius-sm;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+
+    nb-icon {
+      font-size: 16px;
+    }
+
+    &:hover {
+      transform: translateY(-2px);
+    }
+
+    // Info (Detalles)
+    &[status="info"] {
+      background: rgba($color-info, 0.08);
+      color: $color-info;
+      border: 1px solid transparent;
+
+      &:hover {
+        background: $color-info;
+        color: white;
+        box-shadow: 0 4px 12px rgba($color-info, 0.3);
+      }
+    }
+
+    // Success (Confirmar)
+    &[status="success"] {
+      background: rgba($color-success, 0.08);
+      color: $color-success;
+      border: 1px solid transparent;
+
+      &:hover {
+        background: $color-success;
+        color: white;
+        box-shadow: 0 4px 12px rgba($color-success, 0.3);
+      }
+    }
+
+    // Warning (Reprogramar)
+    &[status="warning"] {
+      background: rgba($color-warning, 0.08);
+      color: $color-warning;
+      border: 1px solid transparent;
+
+      &:hover {
+        background: $color-warning;
+        color: white;
+        box-shadow: 0 4px 12px rgba($color-warning, 0.3);
+      }
+    }
+
+    // Danger (Cancelar)
+    &[status="danger"] {
+      background: rgba($color-danger, 0.08);
+      color: $color-danger;
+      border: 1px solid transparent;
+
+      &:hover {
+        background: $color-danger;
+        color: white;
+        box-shadow: 0 4px 12px rgba($color-danger, 0.3);
+      }
+    }
+
+    // Primary (Reseña)
+    &[status="primary"] {
+      background: linear-gradient(135deg, $color-primary 0%, $color-secondary 100%);
+      color: white;
+      border: 1px solid transparent;
+      box-shadow: $shadow-primary;
+
+      &:hover {
+        box-shadow: $shadow-primary-lg;
+      }
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RESEÑA BADGE
+// ═══════════════════════════════════════════════════════════════
+.resena-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.875rem;
+  background: linear-gradient(135deg, rgba(#ffd700, 0.15) 0%, rgba(#ffd700, 0.05) 100%);
+  border: 1px solid rgba(#ffd700, 0.3);
+  border-radius: $radius-sm;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #B8860B;
+
+  nb-icon {
+    color: #ffd700;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ESTADO VACÍO
+// ═══════════════════════════════════════════════════════════════
+.no-reservas {
+  @include empty-state;
+  padding: 4rem 2rem;
+  margin: 1rem 0;
+
+  nb-icon {
+    font-size: 64px;
+    color: $color-primary;
+    margin-bottom: 1.5rem;
+    opacity: 0.8;
+  }
+
+  h5, h6 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: $color-text;
+    margin-bottom: 0.75rem;
+  }
+
+  p {
+    font-size: 1.0625rem;
+    color: $color-text-secondary;
+    margin: 0 0 1.5rem 0;
+    max-width: 380px;
+  }
+
+  button[nbButton] {
+    margin-top: 0.5rem;
+    padding: 0.875rem 1.75rem;
+    font-size: 0.9375rem;
+    border-radius: $radius-full;
+    font-weight: 600;
+    
+    &[status="primary"] {
+      background: linear-gradient(135deg, $color-primary 0%, $color-secondary 100%);
+      box-shadow: $shadow-primary;
+      
+      &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 28px rgba($color-primary, 0.35);
+      }
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RESPONSIVE
+// ═══════════════════════════════════════════════════════════════
+@media (max-width: 768px) {
+  .filtros-row {
+    flex-direction: column;
+
+    .busqueda, .filtro-fecha {
+      width: 100%;
+      min-width: unset;
+    }
+  }
+
+  .reserva-info {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .reserva-meta {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .meta-item {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}

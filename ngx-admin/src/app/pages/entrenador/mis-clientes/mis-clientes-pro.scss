@@ -1,0 +1,622 @@
+// ============================================================
+// MIS CLIENTES - DISEÑO PREMIUM SAAS
+// ============================================================
+
+@import '../_premium-base.scss';
+
+// Container
+.clientes-container {
+  @include page-container;
+}
+
+// Hero
+.clientes-hero {
+  @include page-hero;
+}
+
+// Stats Grid
+.clients-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 576px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.client-stat-card {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: 1.75rem;
+  box-shadow: $shadow-md;
+  border: 1px solid $color-border;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  animation: fadeInScale 0.5s ease-out backwards;
+
+  // Barra superior de color
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--accent-gradient);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  @for $i from 1 through 4 {
+    &:nth-child(#{$i}) {
+      animation-delay: #{$i * 0.1}s;
+    }
+  }
+
+  &.primary { 
+    --accent-color: #{$color-primary}; 
+    --accent-light: #{rgba($color-primary, 0.1)}; 
+    --accent-gradient: linear-gradient(90deg, #{$color-primary} 0%, #{$color-primary-light} 100%);
+  }
+  &.success { 
+    --accent-color: #{$color-success}; 
+    --accent-light: #{rgba($color-success, 0.1)}; 
+    --accent-gradient: linear-gradient(90deg, #{$color-success} 0%, #34D399 100%);
+  }
+  &.info { 
+    --accent-color: #{$color-info}; 
+    --accent-light: #{rgba($color-info, 0.1)}; 
+    --accent-gradient: linear-gradient(90deg, #{$color-info} 0%, #38BDF8 100%);
+  }
+  &.warning { 
+    --accent-color: #{$color-warning}; 
+    --accent-light: #{rgba($color-warning, 0.1)}; 
+    --accent-gradient: linear-gradient(90deg, #{$color-warning} 0%, #FBBF24 100%);
+  }
+
+  &:hover {
+    transform: translateY(-6px);
+    box-shadow: $shadow-xl;
+
+    &::before {
+      opacity: 1;
+    }
+
+    .stat-icon {
+      transform: scale(1.1);
+    }
+  }
+
+  // Fila superior: icono + número grande
+  .stat-top-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .stat-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: $radius-md;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    background: var(--accent-light);
+
+    &.primary {
+      background: linear-gradient(135deg, rgba($color-primary, 0.15) 0%, rgba($color-primary, 0.05) 100%);
+      color: $color-primary;
+    }
+    &.success {
+      background: linear-gradient(135deg, rgba($color-success, 0.15) 0%, rgba($color-success, 0.05) 100%);
+      color: $color-success;
+    }
+    &.info {
+      background: linear-gradient(135deg, rgba($color-info, 0.15) 0%, rgba($color-info, 0.05) 100%);
+      color: $color-info;
+    }
+    &.warning {
+      background: linear-gradient(135deg, rgba($color-warning, 0.15) 0%, rgba($color-warning, 0.05) 100%);
+      color: $color-warning;
+    }
+
+    nb-icon {
+      font-size: 26px;
+    }
+  }
+
+  .stat-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+
+    .stat-number {
+      font-family: 'Space Grotesk', 'Inter', sans-serif;
+      font-size: 2.25rem;
+      font-weight: 800;
+      color: $color-text;
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+
+    .stat-label {
+      font-size: 0.9375rem;
+      color: $color-text-secondary;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+    }
+  }
+}
+
+// Filters Section
+.filters-section {
+  @include section-card;
+  animation-delay: 0.3s;
+
+  .filters-content {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1.5rem 2rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .search-wrapper {
+    flex: 1;
+    min-width: 280px;
+    position: relative;
+
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: $color-text-muted;
+      font-size: 20px;
+      z-index: 1;
+    }
+
+    input {
+      @include input-pro;
+      padding-left: 3rem;
+    }
+  }
+
+  .filter-tabs {
+    display: flex;
+    gap: 0.5rem;
+    background: $color-bg;
+    padding: 0.375rem;
+    border-radius: $radius-md;
+
+    .filter-tab {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.625rem 1.25rem;
+      border-radius: $radius-sm;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: transparent;
+      color: $color-text-secondary;
+      border: none;
+
+      nb-icon {
+        font-size: 18px;
+      }
+
+      &:hover {
+        background: white;
+        color: $color-text;
+      }
+
+      &.active {
+        background: white;
+        color: $color-primary;
+        box-shadow: $shadow-sm;
+
+        &.success { color: $color-success; }
+        &.info { color: $color-info; }
+      }
+    }
+  }
+}
+
+// Clients Grid
+.clients-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+// Client Card
+.client-card {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-md;
+  border: 1px solid $color-border;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: fadeInUp 0.5s ease-out backwards;
+  position: relative;
+
+  @for $i from 1 through 12 {
+    &:nth-child(#{$i}) {
+      animation-delay: #{0.3 + ($i * 0.08)}s;
+    }
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, $color-primary 0%, $color-accent 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: $shadow-xl;
+
+    &::before {
+      opacity: 1;
+    }
+  }
+
+  &.frecuente {
+    &::before {
+      background: linear-gradient(90deg, $color-success 0%, #86EFAC 100%);
+      opacity: 1;
+    }
+
+    .client-header {
+      background: linear-gradient(135deg, rgba($color-success, 0.05) 0%, rgba($color-success, 0.02) 100%);
+    }
+  }
+
+  &.selected {
+    border-color: $color-primary;
+    box-shadow: $shadow-xl, 0 0 0 3px rgba($color-primary, 0.1);
+  }
+}
+
+.client-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+
+  &:hover {
+    background: $color-bg;
+  }
+}
+
+.client-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, $color-primary 0%, $color-accent 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba($color-primary, 0.2);
+  position: relative;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .avatar-iniciales {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: white;
+    text-transform: uppercase;
+  }
+
+  // Ring animation for frecuente
+  &.frecuente-ring::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border: 3px solid $color-success;
+    border-radius: 50%;
+    animation: ringPulse 2s ease-out infinite;
+  }
+}
+
+.client-info {
+  flex: 1;
+  min-width: 0;
+
+  .client-name {
+    font-family: 'Space Grotesk', 'Inter', sans-serif;
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: $color-text;
+    margin: 0 0 0.375rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .star-icon {
+      color: $color-warning;
+      font-size: 16px;
+      animation: pulse 2s ease-in-out infinite;
+    }
+  }
+
+  .client-since {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.8125rem;
+    color: $color-text-muted;
+
+    nb-icon {
+      font-size: 14px;
+    }
+  }
+}
+
+.frecuente-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.375rem 0.75rem;
+  background: linear-gradient(135deg, rgba($color-success, 0.15) 0%, rgba($color-success, 0.05) 100%);
+  color: $color-success;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 20px;
+  border: 1px solid rgba($color-success, 0.2);
+}
+
+// Client Stats
+.client-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  padding: 0 1.5rem 1.5rem;
+
+  .stat-item {
+    text-align: center;
+    padding: 1rem 0.75rem;
+    background: $color-bg;
+    border-radius: $radius-sm;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: rgba($color-primary, 0.05);
+      transform: translateY(-2px);
+    }
+
+    .stat-value {
+      display: block;
+      font-family: 'Space Grotesk', 'Inter', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: $color-text;
+      line-height: 1;
+    }
+
+    .stat-label {
+      display: block;
+      font-size: 0.75rem;
+      color: $color-text-muted;
+      margin-top: 0.375rem;
+      font-weight: 500;
+    }
+  }
+}
+
+// Asistencia colors
+.asistencia-high { color: $color-success !important; }
+.asistencia-medium { color: $color-warning !important; }
+.asistencia-low { color: $color-danger !important; }
+
+// Client Details (Expanded)
+.client-details {
+  padding: 0 1.5rem 1.5rem;
+  animation: fadeInUp 0.3s ease-out;
+
+  .details-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, $color-border 50%, transparent 100%);
+    margin-bottom: 1.25rem;
+  }
+
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: $color-bg;
+    border-radius: $radius-xs;
+    margin-bottom: 0.625rem;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: rgba($color-primary, 0.05);
+      transform: translateX(4px);
+    }
+
+    .detail-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      color: $color-text-secondary;
+
+      nb-icon {
+        font-size: 18px;
+        color: $color-primary;
+      }
+    }
+
+    .detail-value {
+      font-size: 0.9375rem;
+      font-weight: 600;
+      color: $color-text;
+
+      &.success {
+        color: $color-success;
+      }
+    }
+  }
+}
+
+// Client Footer
+.client-footer {
+  display: flex;
+  justify-content: center;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid $color-border;
+  background: $color-bg;
+
+  .btn-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    background: transparent;
+    border: 2px solid $color-border;
+    border-radius: $radius-sm;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: $color-text-secondary;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    nb-icon {
+      font-size: 18px;
+      transition: transform 0.3s ease;
+    }
+
+    &:hover {
+      border-color: $color-primary;
+      color: $color-primary;
+      background: rgba($color-primary, 0.05);
+    }
+
+    &.expanded {
+      border-color: $color-primary;
+      color: $color-primary;
+      background: rgba($color-primary, 0.05);
+
+      nb-icon {
+        transform: rotate(180deg);
+      }
+    }
+  }
+}
+
+// Empty State
+.clients-empty {
+  @include empty-state;
+  padding: 5rem 2rem;
+}
+
+// Loading State
+.clients-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5rem 2rem;
+  animation: fadeInUp 0.4s ease-out;
+
+  p {
+    font-size: 1rem;
+    color: $color-text-secondary;
+    margin-top: 1.5rem;
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .clientes-container {
+    padding: 1rem;
+  }
+
+  .clientes-hero {
+    padding: 1.5rem;
+    border-radius: $radius-lg;
+
+    .hero-content {
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .hero-text {
+      text-align: center;
+
+      h1 {
+        font-size: 1.5rem;
+        justify-content: center;
+      }
+
+      p {
+        padding-left: 0;
+      }
+    }
+  }
+
+  .filters-section {
+    .filters-content {
+      flex-direction: column;
+      padding: 1rem 1.25rem;
+    }
+
+    .search-wrapper {
+      width: 100%;
+    }
+
+    .filter-tabs {
+      width: 100%;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+  }
+
+  .clients-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .client-stats {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+
+    .stat-item {
+      padding: 0.75rem 0.5rem;
+
+      .stat-value {
+        font-size: 1.25rem;
+      }
+    }
+  }
+}
