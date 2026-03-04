@@ -1,0 +1,1189 @@
+// ============================================
+// CHAT SPORTCONNECT - DISEÑO ÚNICO PREMIUM
+// Panel de Administración
+// ============================================
+
+// Variables SportConnect
+$sc-primary: #047857;
+$sc-primary-light: #10B981;
+$sc-primary-dark: #065F46;
+$sc-secondary: #0F766E;
+$sc-accent: #14B8A6;
+$sc-gradient: linear-gradient(135deg, $sc-primary 0%, $sc-secondary 100%);
+$sc-bg-main: #F4F7FA;
+$sc-bg-sidebar: #FFFFFF;
+$sc-bg-chat: linear-gradient(180deg, #E8F5F0 0%, #F0F7F5 50%, #F8FAFB 100%);
+$sc-border: #E2E8F0;
+$sc-text-primary: #1E293B;
+$sc-text-secondary: #64748B;
+$sc-text-muted: #94A3B8;
+$sc-hover: #F1F9F7;
+$sc-message-sent: linear-gradient(135deg, #047857 0%, #059669 100%);
+$sc-message-received: #FFFFFF;
+$sc-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+$sc-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+$sc-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+$sc-radius-xs: 8px;
+$sc-radius-sm: 12px;
+$sc-radius-md: 16px;
+$sc-radius-lg: 20px;
+$sc-radius-xl: 24px;
+
+// Animations
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes messageBounce {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) translateY(30px);
+  }
+  50% {
+    transform: scale(1.05) translateY(-5px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes typingDot {
+  0%, 60%, 100% { 
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  30% { 
+    transform: translateY(-6px);
+    opacity: 1;
+  }
+}
+
+// HOST
+:host {
+  display: block;
+  background: $sc-bg-main;
+  min-height: 100vh;
+  padding: 0;
+}
+
+// HERO SECTION - SportConnect Style
+.hero-section {
+  background: $sc-gradient;
+  padding: 1.5rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: 10%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 60%);
+    animation: float 8s ease-in-out infinite reverse;
+  }
+  
+  .hero-content {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .hero-title {
+    color: white;
+    font-family: 'Space Grotesk', 'Inter', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    letter-spacing: -0.02em;
+  }
+  
+  .hero-subtitle {
+    color: rgba(255, 255, 255, 0.85);
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 400;
+  }
+}
+
+.btn-new-chat {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0.75rem 1.5rem;
+  border-radius: $sc-radius-xl;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  z-index: 1;
+  font-size: 0.9375rem;
+  
+  svg, nb-icon {
+    width: 20px;
+    height: 20px;
+  }
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// MODAL - SportConnect Style
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.25s ease-out both;
+}
+
+.modal-content {
+  background: white;
+  border-radius: $sc-radius-lg;
+  width: 100%;
+  max-width: 480px;
+  max-height: 80vh;
+  overflow: hidden;
+  animation: fadeInScale 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  box-shadow: $sc-shadow-lg;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  background: $sc-gradient;
+  
+  h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: white;
+    flex: 1;
+    font-family: 'Space Grotesk', 'Inter', sans-serif;
+  }
+}
+
+.btn-close {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: $sc-radius-xs;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  svg, nb-icon {
+    width: 20px;
+    height: 20px;
+    stroke: white;
+    color: white;
+  }
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg);
+  }
+}
+
+.modal-body {
+  padding: 0;
+  overflow-y: auto;
+  max-height: calc(80vh - 70px);
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 1rem 1.5rem;
+  background: #F8FAFC;
+  border-bottom: 1px solid $sc-border;
+  
+  svg, nb-icon {
+    width: 20px;
+    height: 20px;
+    stroke: $sc-text-muted;
+    color: $sc-text-muted;
+    flex-shrink: 0;
+  }
+  
+  input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 0.9375rem;
+    color: $sc-text-primary;
+    background: transparent;
+    padding: 0.5rem;
+    
+    &::placeholder {
+      color: $sc-text-muted;
+    }
+  }
+}
+
+.entrenadores-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.entrenador-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid rgba($sc-border, 0.5);
+  
+  &:hover {
+    background: $sc-hover;
+    
+    .entrenador-avatar {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba($sc-primary, 0.3);
+    }
+  }
+  
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.entrenador-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: $sc-radius-sm;
+  background: $sc-gradient;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 1.125rem;
+  overflow: hidden;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.entrenador-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  
+  .entrenador-nombre {
+    font-weight: 600;
+    color: $sc-text-primary;
+    font-size: 1rem;
+  }
+  
+  .entrenador-email {
+    font-size: 0.8125rem;
+    color: $sc-text-secondary;
+  }
+}
+
+.empty-entrenadores {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: $sc-text-secondary;
+  
+  nb-icon {
+    font-size: 3rem;
+    color: $sc-text-muted;
+    margin-bottom: 1rem;
+    display: block;
+  }
+}
+
+// CHAT CONTAINER - SportConnect Style
+.chat-container {
+  display: flex;
+  height: calc(100vh - 100px);
+  max-width: 1600px;
+  margin: 1.5rem auto;
+  background: white;
+  border-radius: $sc-radius-lg;
+  box-shadow: $sc-shadow-lg;
+  overflow: hidden;
+  animation: fadeInUp 0.4s ease-out both;
+}
+
+// PANEL DE CONVERSACIONES - Sidebar SportConnect
+.conversaciones-panel {
+  width: 340px;
+  min-width: 300px;
+  max-width: 380px;
+  border-right: 1px solid $sc-border;
+  display: flex;
+  flex-direction: column;
+  background: $sc-bg-sidebar;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  background: linear-gradient(180deg, #F8FAFB 0%, #FFFFFF 100%);
+  border-bottom: 1px solid $sc-border;
+  
+  h3 {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: $sc-text-primary;
+    flex: 1;
+    font-family: 'Space Grotesk', 'Inter', sans-serif;
+  }
+  
+  .badge {
+    background: $sc-gradient;
+    color: white;
+    font-size: 0.75rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: $sc-radius-xl;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba($sc-primary, 0.3);
+  }
+}
+
+.loading-state {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  .spinner {
+    width: 44px;
+    height: 44px;
+    border: 3px solid $sc-border;
+    border-top-color: $sc-primary;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.empty-conversations {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: $sc-text-secondary;
+  text-align: center;
+  
+  svg, nb-icon {
+    width: 72px;
+    height: 72px;
+    stroke: $sc-text-muted;
+    color: $sc-text-muted;
+    margin-bottom: 1.25rem;
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  p {
+    margin: 0 0 1.25rem;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+  
+  .btn-start {
+    background: $sc-gradient;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.75rem;
+    border-radius: $sc-radius-xl;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba($sc-primary, 0.3);
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba($sc-primary, 0.4);
+    }
+  }
+}
+
+.conversaciones-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.5rem 0;
+  
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: rgba($sc-primary, 0.2);
+    border-radius: 3px;
+    
+    &:hover {
+      background: rgba($sc-primary, 0.3);
+    }
+  }
+}
+
+.conversacion-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.875rem 1.25rem;
+  margin: 0.25rem 0.75rem;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: $sc-radius-sm;
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%) scaleY(0);
+    width: 4px;
+    height: 60%;
+    background: $sc-gradient;
+    border-radius: 0 4px 4px 0;
+    transition: transform 0.25s ease;
+  }
+  
+  &:hover {
+    background: $sc-hover;
+    
+    .conv-avatar {
+      transform: scale(1.05);
+    }
+  }
+  
+  &.active {
+    background: linear-gradient(135deg, rgba($sc-primary, 0.08) 0%, rgba($sc-secondary, 0.05) 100%);
+    
+    &::before {
+      transform: translateY(-50%) scaleY(1);
+    }
+    
+    .conv-nombre {
+      color: $sc-primary;
+    }
+  }
+}
+
+.conv-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: $sc-radius-sm;
+  background: $sc-gradient;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 1.125rem;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba($sc-primary, 0.2);
+}
+
+.conv-content {
+  flex: 1;
+  min-width: 0;
+  
+  .conv-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.375rem;
+  }
+  
+  .conv-nombre {
+    font-weight: 600;
+    color: $sc-text-primary;
+    font-size: 0.9375rem;
+    transition: color 0.2s ease;
+  }
+  
+  .conv-fecha {
+    font-size: 0.75rem;
+    color: $sc-text-muted;
+    font-weight: 500;
+  }
+  
+  .conv-preview {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: $sc-text-secondary;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    
+    .preview-icon {
+      width: 14px;
+      height: 14px;
+      color: $sc-text-muted;
+    }
+  }
+}
+
+.conv-badge {
+  background: $sc-gradient;
+  color: white;
+  font-size: 0.6875rem;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: $sc-radius-xl;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba($sc-primary, 0.3);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+// PANEL DE MENSAJES - Chat area SportConnect
+.mensajes-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: $sc-bg-chat;
+  position: relative;
+  overflow: hidden;
+  
+  // Patrón de fondo único SportConnect
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+      radial-gradient(circle at 20% 80%, rgba($sc-primary, 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba($sc-secondary, 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, rgba($sc-accent, 0.02) 0%, transparent 30%);
+    z-index: 0;
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23047857' fill-opacity='0.015' fill-rule='evenodd'/%3E%3C/svg%3E");
+    z-index: 0;
+    opacity: 0.8;
+  }
+}
+
+.no-conversation {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  background: linear-gradient(180deg, #F8FAFB 0%, #F0F4F3 100%);
+  
+  .no-conv-icon {
+    width: 120px;
+    height: 120px;
+    background: $sc-gradient;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+    box-shadow: 0 12px 40px rgba($sc-primary, 0.25);
+    animation: float 4s ease-in-out infinite;
+    
+    svg, nb-icon {
+      width: 60px;
+      height: 60px;
+      stroke: white;
+      color: white;
+    }
+  }
+  
+  h3 {
+    margin: 0 0 0.75rem;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: $sc-text-primary;
+    font-family: 'Space Grotesk', 'Inter', sans-serif;
+  }
+  
+  p {
+    margin: 0;
+    color: $sc-text-secondary;
+    font-size: 1rem;
+    max-width: 360px;
+    line-height: 1.6;
+  }
+}
+
+// CHAT HEADER - SportConnect style
+.chat-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFB 100%);
+  border-bottom: 1px solid $sc-border;
+  position: relative;
+  z-index: 1;
+}
+
+.chat-header-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: $sc-radius-sm;
+  background: $sc-gradient;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 1.125rem;
+  box-shadow: 0 4px 12px rgba($sc-primary, 0.2);
+}
+
+.chat-header-info {
+  flex: 1;
+  
+  .chat-header-nombre {
+    font-weight: 700;
+    color: $sc-text-primary;
+    font-size: 1.0625rem;
+    font-family: 'Space Grotesk', 'Inter', sans-serif;
+    margin-bottom: 0.125rem;
+  }
+  
+  .chat-header-status {
+    font-size: 0.8125rem;
+    color: $sc-text-secondary;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: $sc-primary-light;
+      box-shadow: 0 0 8px rgba($sc-primary-light, 0.6);
+      animation: pulse 2s ease-in-out infinite;
+    }
+  }
+}
+
+.chat-header-actions {
+  display: flex;
+  gap: 0.5rem;
+  
+  button {
+    width: 40px;
+    height: 40px;
+    border-radius: $sc-radius-xs;
+    border: 1px solid $sc-border;
+    background: white;
+    color: $sc-text-secondary;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    svg, nb-icon {
+      width: 20px;
+      height: 20px;
+    }
+    
+    &:hover {
+      border-color: $sc-primary;
+      color: $sc-primary;
+      background: $sc-hover;
+    }
+  }
+}
+
+// MESSAGES AREA - SportConnect Style
+.mensajes-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+  position: relative;
+  z-index: 1;
+  
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: rgba($sc-primary, 0.15);
+    border-radius: 4px;
+    
+    &:hover {
+      background: rgba($sc-primary, 0.25);
+    }
+  }
+}
+
+.mensaje-grupo {
+  margin-bottom: 0.75rem;
+  display: flex;
+  flex-direction: column;
+}
+
+// DATE SEPARATOR
+.fecha-separador {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 1.5rem 0;
+  
+  span {
+    background: rgba($sc-primary, 0.08);
+    color: $sc-text-secondary;
+    padding: 0.5rem 1.25rem;
+    border-radius: $sc-radius-xl;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    backdrop-filter: blur(4px);
+  }
+}
+
+// MESSAGE BUBBLES - Unique SportConnect Design
+.mensaje {
+  max-width: 70%;
+  margin-bottom: 0.375rem;
+  animation: messageBounce 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  
+  &.enviado {
+    align-self: flex-end;
+    
+    .mensaje-burbuja {
+      background: $sc-message-sent;
+      color: white;
+      border-radius: $sc-radius-md $sc-radius-md 6px $sc-radius-md;
+      box-shadow: 0 4px 16px rgba($sc-primary, 0.25);
+      
+      &::before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        right: -8px;
+        width: 16px;
+        height: 16px;
+        background: linear-gradient(135deg, transparent 50%, $sc-primary 50%);
+        border-radius: 0 0 0 8px;
+      }
+    }
+    
+    .mensaje-tiempo {
+      color: rgba(255, 255, 255, 0.8);
+    }
+    
+    .mensaje-check {
+      color: rgba(255, 255, 255, 0.9);
+      
+      &.leido {
+        color: #A7F3D0;
+      }
+    }
+  }
+  
+  &.recibido {
+    align-self: flex-start;
+    
+    .mensaje-burbuja {
+      background: $sc-message-received;
+      color: $sc-text-primary;
+      border-radius: $sc-radius-md $sc-radius-md $sc-radius-md 6px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+      border: 1px solid rgba($sc-border, 0.5);
+      
+      &::before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: -8px;
+        width: 16px;
+        height: 16px;
+        background: linear-gradient(225deg, transparent 50%, white 50%);
+        border-radius: 0 0 8px 0;
+      }
+    }
+    
+    .mensaje-tiempo {
+      color: $sc-text-muted;
+    }
+  }
+}
+
+.mensaje-burbuja {
+  padding: 0.875rem 1rem;
+  position: relative;
+  word-break: break-word;
+  
+  .mensaje-texto {
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    margin: 0;
+  }
+}
+
+.mensaje-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.375rem;
+  margin-top: 0.375rem;
+}
+
+.mensaje-tiempo {
+  font-size: 0.6875rem;
+  font-weight: 500;
+}
+
+.mensaje-check {
+  display: flex;
+  
+  svg, nb-icon {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+// TYPING INDICATOR
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  align-self: flex-start;
+  
+  .typing-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: $sc-gradient;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  
+  .typing-dots {
+    display: flex;
+    gap: 4px;
+    padding: 0.75rem 1rem;
+    background: white;
+    border-radius: $sc-radius-md;
+    border: 1px solid $sc-border;
+    
+    span {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: $sc-primary;
+      animation: typingDot 1.4s ease-in-out infinite;
+      
+      &:nth-child(2) { animation-delay: 0.2s; }
+      &:nth-child(3) { animation-delay: 0.4s; }
+    }
+  }
+}
+
+// INPUT AREA - SportConnect Style
+.input-area {
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(180deg, #F8FAFB 0%, #FFFFFF 100%);
+  border-top: 1px solid $sc-border;
+  position: relative;
+  z-index: 1;
+}
+
+.input-actions {
+  display: flex;
+  gap: 0.375rem;
+  
+  button {
+    width: 42px;
+    height: 42px;
+    border-radius: $sc-radius-xs;
+    border: none;
+    background: transparent;
+    color: $sc-text-secondary;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    svg, nb-icon {
+      width: 22px;
+      height: 22px;
+    }
+    
+    &:hover {
+      background: $sc-hover;
+      color: $sc-primary;
+    }
+  }
+}
+
+.input-wrapper {
+  flex: 1;
+  position: relative;
+  
+  textarea, input {
+    width: 100%;
+    padding: 0.875rem 1.25rem;
+    border: 2px solid $sc-border;
+    border-radius: $sc-radius-md;
+    font-size: 0.9375rem;
+    color: $sc-text-primary;
+    background: white;
+    resize: none;
+    outline: none;
+    transition: all 0.3s ease;
+    min-height: 48px;
+    max-height: 120px;
+    
+    &::placeholder {
+      color: $sc-text-muted;
+    }
+    
+    &:focus {
+      border-color: $sc-primary;
+      box-shadow: 0 0 0 4px rgba($sc-primary, 0.1);
+    }
+  }
+}
+
+.btn-send {
+  width: 48px;
+  height: 48px;
+  border-radius: $sc-radius-sm;
+  border: none;
+  background: $sc-gradient;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba($sc-primary, 0.3);
+  
+  svg, nb-icon {
+    width: 22px;
+    height: 22px;
+    transform: rotate(-45deg) translateX(2px);
+  }
+  
+  &:hover:not([disabled]) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba($sc-primary, 0.4);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+  
+  &[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// RESPONSIVE
+@media (max-width: 1024px) {
+  .chat-container {
+    margin: 0.75rem;
+    height: calc(100vh - 85px);
+  }
+  
+  .conversaciones-panel {
+    width: 280px;
+    min-width: 260px;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-section {
+    padding: 1rem 1.25rem;
+    
+    .hero-title {
+      font-size: 1.375rem;
+    }
+    
+    .hero-subtitle {
+      display: none;
+    }
+  }
+  
+  .btn-new-chat span {
+    display: none;
+  }
+  
+  .chat-container {
+    margin: 0;
+    border-radius: 0;
+    height: calc(100vh - 70px);
+    flex-direction: column;
+  }
+  
+  .conversaciones-panel {
+    width: 100%;
+    max-width: none;
+    height: auto;
+    max-height: 40vh;
+    border-right: none;
+    border-bottom: 1px solid $sc-border;
+    
+    &.hidden {
+      display: none;
+    }
+  }
+  
+  .mensajes-panel {
+    height: 60vh;
+  }
+  
+  .mensaje {
+    max-width: 85%;
+  }
+}
