@@ -63,25 +63,28 @@
     }
   }
 
-  &.primary { 
-    --accent-color: #{$color-primary}; 
-    --accent-light: #{rgba($color-primary, 0.1)}; 
+  &.primary {
+    --accent-color: #{$color-primary};
+    --accent-light: #{rgba($color-primary, 0.1)};
     --accent-gradient: linear-gradient(90deg, #{$color-primary} 0%, #{$color-primary-light} 100%);
   }
-  &.success { 
-    --accent-color: #{$color-success}; 
-    --accent-light: #{rgba($color-success, 0.1)}; 
-    --accent-gradient: linear-gradient(90deg, #{$color-success} 0%, #34D399 100%);
+
+  &.success {
+    --accent-color: #{$color-success};
+    --accent-light: #{rgba($color-success, 0.1)};
+    --accent-gradient: linear-gradient(90deg, #{$color-success} 0%, #34d399 100%);
   }
-  &.info { 
-    --accent-color: #{$color-info}; 
-    --accent-light: #{rgba($color-info, 0.1)}; 
-    --accent-gradient: linear-gradient(90deg, #{$color-info} 0%, #38BDF8 100%);
+
+  &.info {
+    --accent-color: #{$color-info};
+    --accent-light: #{rgba($color-info, 0.1)};
+    --accent-gradient: linear-gradient(90deg, #{$color-info} 0%, #38bdf8 100%);
   }
-  &.warning { 
-    --accent-color: #{$color-warning}; 
-    --accent-light: #{rgba($color-warning, 0.1)}; 
-    --accent-gradient: linear-gradient(90deg, #{$color-warning} 0%, #FBBF24 100%);
+
+  &.warning {
+    --accent-color: #{$color-warning};
+    --accent-light: #{rgba($color-warning, 0.1)};
+    --accent-gradient: linear-gradient(90deg, #{$color-warning} 0%, #fbbf24 100%);
   }
 
   &:hover {
