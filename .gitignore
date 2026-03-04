@@ -63,9 +63,10 @@ Desktop.ini
 **/google-services.json
 
 # Archivos de environment con credenciales
-**/environments/environment.ts
-**/environments/environment.prod.ts
-!**/environments/environment.example.ts
+# NOTA: Estos archivos SÍ se versionan porque solo contienen claves públicas
+# (Firebase apiKey y Stripe publishable key son seguros para exponer)
+# !**/environments/environment.ts
+# !**/environments/environment.prod.ts
 
 # ============================================
 # Firebase
