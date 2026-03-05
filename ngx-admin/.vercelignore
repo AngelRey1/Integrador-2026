@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+.npm/
+
+# Build outputs (Vercel builds on their servers)
+dist/
+.angular/
+
+# IDE
+.idea/
+.vscode/
+*.sublime-*
+
+# Testing
+coverage/
+e2e/
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+*.md
+docs/
+
+# Misc
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+
+# Large assets that aren't needed
+*.psd
+*.ai
+*.sketch
