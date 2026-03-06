@@ -14,7 +14,7 @@
         <h1 class="welcome-name">{{ cliente?.nombre || 'Atleta' }}</h1>
         <p class="member-since">
           <ngx-sport-icon name="calendar" [size]="14" color="rgba(255,255,255,0.7)"></ngx-sport-icon>
-          Miembro desde {{ cliente?.fecha_registro | date:'MMMM yyyy' }}
+          Miembro desde {{ toDate(cliente?.fecha_registro) | date:'MMMM yyyy' }}
         </p>
       </div>
     </div>
@@ -71,9 +71,9 @@
               color="rgba(255,255,255,0.3)"></ngx-sport-icon>
           </div>
           <div class="session-date-block">
-            <span class="day-big">{{ proximaSesion.fecha_hora | date:'dd' }}</span>
-            <span class="month-abbr">{{ proximaSesion.fecha_hora | date:'MMM' | uppercase }}</span>
-            <span class="time-highlight">{{ proximaSesion.fecha_hora | date:'HH:mm' }}</span>
+            <span class="day-big">{{ toDate(proximaSesion.fecha_hora) | date:'dd' }}</span>
+            <span class="month-abbr">{{ toDate(proximaSesion.fecha_hora) | date:'MMM' | uppercase }}</span>
+            <span class="time-highlight">{{ toDate(proximaSesion.fecha_hora) | date:'HH:mm' }}</span>
           </div>
         </div>
 
@@ -167,8 +167,8 @@
         <div class="session-card-compact" *ngFor="let sesion of proximasSesiones; let i = index"
           [class.featured]="i === 0">
           <div class="card-date-strip" [ngClass]="'sport-' + (sesion.deporte | lowercase)">
-            <span class="strip-day">{{ sesion.fecha_hora | date:'dd' }}</span>
-            <span class="strip-month">{{ sesion.fecha_hora | date:'MMM' }}</span>
+            <span class="strip-day">{{ toDate(sesion.fecha_hora) | date:'dd' }}</span>
+            <span class="strip-month">{{ toDate(sesion.fecha_hora) | date:'MMM' }}</span>
           </div>
 
           <div class="card-main-content">
@@ -181,7 +181,7 @@
             </div>
             <div class="time-badge">
               <ngx-sport-icon name="clock" [size]="14"></ngx-sport-icon>
-              {{ sesion.fecha_hora | date:'HH:mm' }}
+              {{ toDate(sesion.fecha_hora) | date:'HH:mm' }}
             </div>
           </div>
 
@@ -206,8 +206,8 @@
       <div class="sessions-grid history" *ngIf="vistaActiva === 'pasadas'">
         <div class="session-card-compact past" *ngFor="let sesion of historialSesiones; let i = index">
           <div class="card-date-strip past">
-            <span class="strip-day">{{ sesion.fecha_hora | date:'dd' }}</span>
-            <span class="strip-month">{{ sesion.fecha_hora | date:'MMM' }}</span>
+            <span class="strip-day">{{ toDate(sesion.fecha_hora) | date:'dd' }}</span>
+            <span class="strip-month">{{ toDate(sesion.fecha_hora) | date:'MMM' }}</span>
           </div>
 
           <div class="card-main-content">

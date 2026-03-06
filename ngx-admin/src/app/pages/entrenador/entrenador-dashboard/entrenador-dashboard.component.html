@@ -264,8 +264,8 @@
           <div class="upcoming-item-pro" *ngFor="let sesion of proximasSesiones; let i = index"
                [style.animation-delay]="i * 0.08 + 's'">
             <div class="upcoming-date-box">
-              <span class="date-day">{{ sesion.fecha | date:'dd' }}</span>
-              <span class="date-month">{{ sesion.fecha | date:'MMM' }}</span>
+              <span class="date-day">{{ toDate(sesion.fecha) | date:'dd' }}</span>
+              <span class="date-month">{{ toDate(sesion.fecha) | date:'MMM' }}</span>
             </div>
             <div class="upcoming-details">
               <span class="upcoming-client">{{ sesion.cliente.nombre }}</span>

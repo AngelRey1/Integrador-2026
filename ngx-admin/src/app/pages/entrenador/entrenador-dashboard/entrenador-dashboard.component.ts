@@ -290,5 +290,22 @@ export class EntrenadorDashboardComponent implements OnInit, OnDestroy {
   irAPerfil(): void {
     this.router.navigate(['/pages/entrenador/perfil']);
   }
+
+  /**
+   * Convierte cualquier formato de fecha a Date nativo
+   * Soporta: Date, Firestore Timestamp, string ISO
+   */
+  toDate(fecha: any): Date {
+    if (!fecha) return new Date();
+    if (fecha instanceof Date && !isNaN(fecha.getTime())) return fecha;
+    if (typeof fecha === 'object' && 'seconds' in fecha) {
+      return new Date(fecha.seconds * 1000);
+    }
+    if (typeof fecha === 'string') {
+      const parsed = new Date(fecha);
+      if (!isNaN(parsed.getTime())) return parsed;
+    }
+    return new Date();
+  }
 }
 
