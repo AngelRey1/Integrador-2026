@@ -585,7 +585,7 @@
               <h4>Tu plan incluye {{ fechasRecurrentes.length }} sesiones:</h4>
               <div class="fechas-grid">
                 <span class="fecha-chip" *ngFor="let fecha of fechasRecurrentes">
-                  {{ fecha | date:'EEE d MMM':'':'es' }}
+                  {{ parseFecha(fecha) | date:'EEE d MMM':'':'es' }}
                 </span>
               </div>
             </div>
@@ -613,8 +613,8 @@
             </div>
             <div class="sesion-chip-mejorado" *ngFor="let sesion of sesionesSeleccionadas; let i = index">
               <div class="sesion-info">
-                <span class="sesion-fecha">{{ sesion.fecha | date:'EEEE d':'':'es' }}</span>
-                <span class="sesion-mes">{{ sesion.fecha | date:'MMMM':'':'es' }}</span>
+                <span class="sesion-fecha">{{ parseFecha(sesion.fecha) | date:'EEEE d':'':'es' }}</span>
+                <span class="sesion-mes">{{ parseFecha(sesion.fecha) | date:'MMMM':'':'es' }}</span>
               </div>
               <div class="sesion-horario">
                 <nb-icon icon="clock-outline"></nb-icon>
@@ -958,7 +958,7 @@
               <strong>{{ getTotalSesiones() }} Sesiones programadas</strong>
               <div class="resumen-sesiones-lista">
                 <span class="sesion-mini" *ngFor="let sesion of sesionesSeleccionadas | slice:0:5">
-                  {{ sesion.fecha | date:'EEE d MMM':'':'es' }} · {{ sesion.horaInicio }}-{{ sesion.horaFin }}
+                  {{ parseFecha(sesion.fecha) | date:'EEE d MMM':'':'es' }} · {{ sesion.horaInicio }}-{{ sesion.horaFin }}
                 </span>
                 <span class="sesion-mini mas" *ngIf="sesionesSeleccionadas.length > 5">
                   +{{ sesionesSeleccionadas.length - 5 }} más...
