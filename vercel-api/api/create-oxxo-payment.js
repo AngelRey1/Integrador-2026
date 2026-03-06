@@ -1,7 +1,9 @@
 const Stripe = require('stripe');
 
 // Inicializar Stripe con la clave secreta desde variables de entorno
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+// Limpiar posibles caracteres de newline añadidos por el CLI
+const stripeKey = (process.env.STRIPE_SECRET_KEY || '').trim().replace(/[\r\n]/g, '');
+const stripe = new Stripe(stripeKey);
 
 module.exports = async function handler(req, res) {
   // Configurar CORS
