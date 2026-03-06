@@ -18,7 +18,7 @@ export const environment = {
 
   // Stripe Configuration
   stripe: {
-    publishableKey: 'pk_test_51SxfDODedWVOZwp7nQkcMstSmOPb5QhheyyjmG7UB0ZAv3Tm8QIttkWM58gxOmGKMWKLuhJRxQ71ReIQsn2H8DTt00XPL3kROR',
+    publishableKey: 'pk_test_51SxfCtDveaissX7we9MZnolhuSFCKdG1ImD40Bvnnig2U2nO01Myqyp12yTq1yTDMz1vh7HlyclRiySaNlK9mMbv00U6oswd0F',
     functionsUrl: 'https://sportconnecta-stripe-api.vercel.app',
     simulatedMode: false
   }
