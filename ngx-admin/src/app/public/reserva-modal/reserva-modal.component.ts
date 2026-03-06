@@ -1929,7 +1929,20 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
     if (fecha instanceof Date && !isNaN(fecha.getTime())) return fecha;
     // Manejar Timestamps de Firestore
     if (fecha && typeof fecha === 'object' && 'seconds' in fecha) {
-      return new Date(fecha.seconds * 1000);
+      const seconds = fecha.seconds;
+      if (typeof seconds === 'number' && !isNaN(seconds)) {
+        const result = new Date(seconds * 1000);
+        if (!isNaN(result.getTime())) return result;
+      }
+      return new Date(); // Fallback si timestamp inválido
+    }
+    // Manejar objetos con método toDate() (Firestore Timestamp instances)
+    if (fecha && typeof fecha === 'object' && typeof fecha.toDate === 'function') {
+      try {
+        const result = fecha.toDate();
+        if (result instanceof Date && !isNaN(result.getTime())) return result;
+      } catch (e) {}
+      return new Date();
     }
     if (typeof fecha === 'string') {
       // Intentar parsing directo primero
