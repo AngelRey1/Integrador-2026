@@ -1922,20 +1922,38 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
 
   /**
    * Parsear string ISO a Date de forma segura (para usar en templates)
+   * Retorna fecha actual si no se puede parsear (evita error NG02100)
    */
-  parseFecha(fecha: string | Date | null | undefined | any): Date | null {
-    if (!fecha) return null;
-    if (fecha instanceof Date) return fecha;
+  parseFecha(fecha: string | Date | null | undefined | any): Date {
+    if (!fecha) return new Date(); // Fecha por defecto para evitar error en pipe
+    if (fecha instanceof Date && !isNaN(fecha.getTime())) return fecha;
     // Manejar Timestamps de Firestore
     if (fecha && typeof fecha === 'object' && 'seconds' in fecha) {
       return new Date(fecha.seconds * 1000);
     }
     if (typeof fecha === 'string') {
+      // Intentar parsing directo primero
+      let parsed = new Date(fecha);
+      if (!isNaN(parsed.getTime())) return parsed;
       // Agregar timezone para evitar problemas de parsing
-      const parsed = new Date(fecha + 'T12:00:00');
-      return isNaN(parsed.getTime()) ? null : parsed;
+      parsed = new Date(fecha + 'T12:00:00');
+      if (!isNaN(parsed.getTime())) return parsed;
     }
-    return null;
+    return new Date(); // Fallback a fecha actual
+  }
+
+  /**
+   * Verificar si una fecha es válida para mostrar
+   */
+  fechaValida(fecha: string | Date | null | undefined | any): boolean {
+    if (!fecha) return false;
+    if (fecha instanceof Date) return !isNaN(fecha.getTime());
+    if (typeof fecha === 'object' && 'seconds' in fecha) return true;
+    if (typeof fecha === 'string' && fecha.length > 0) {
+      const parsed = new Date(fecha);
+      return !isNaN(parsed.getTime());
+    }
+    return false;
   }
 
   /**
