@@ -70,6 +70,10 @@ export interface Pago {
     comision: number;
     estado: 'PENDIENTE' | 'COMPLETADO' | 'REEMBOLSADO';
     fecha: Date;
+    // Campos de Stripe para OXXO
+    stripePaymentIntentId?: string;
+    metodoPago?: 'tarjeta' | 'oxxo' | 'efectivo' | 'transferencia';
+    oxxoReferencia?: string;
 }
 
 export interface Deporte {
@@ -352,6 +356,22 @@ export class AdminFirebaseService {
         } catch (error) {
             console.error('Error:', error);
             return { success: false, message: 'Error al reembolsar pago' };
+        }
+    }
+
+    /**
+     * Marcar un pago como completado (para demo/simulación)
+     */
+    async completarPago(id: string): Promise<{ success: boolean; message: string }> {
+        try {
+            await this.firestore.doc(`pagos/${id}`).update({ 
+                estado: 'COMPLETADO',
+                fechaCompletado: new Date()
+            });
+            return { success: true, message: 'Pago completado' };
+        } catch (error) {
+            console.error('Error:', error);
+            return { success: false, message: 'Error al completar pago' };
         }
     }
 

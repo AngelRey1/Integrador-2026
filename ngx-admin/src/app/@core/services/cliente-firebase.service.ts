@@ -80,10 +80,13 @@ export interface Pago {
     monto: number;
     comisionPlataforma: number;
     montoEntrenador: number;
-    metodo: 'tarjeta' | 'efectivo' | 'transferencia';
+    metodo: 'tarjeta' | 'oxxo' | 'efectivo' | 'transferencia';
     estado: 'PENDIENTE' | 'COMPLETADO' | 'REEMBOLSADO';
     referencia?: string;
     fecha: Date;
+    // Campos de Stripe para OXXO
+    stripePaymentIntentId?: string;
+    oxxoReferencia?: string;
 }
 
 export interface Deporte {
@@ -480,6 +483,55 @@ export class ClienteFirebaseService {
                 ).valueChanges({ idField: 'id' });
             })
         );
+    }
+
+    /**
+     * Crear un registro de pago (para OXXO y otros métodos)
+     */
+    async crearPago(pagoData: {
+        reservaId: string;
+        entrenadorId: string;
+        monto: number;
+        metodo: 'tarjeta' | 'oxxo' | 'efectivo' | 'transferencia';
+        stripePaymentIntentId?: string;
+        oxxoReferencia?: string;
+    }): Promise<{ success: boolean; message: string; id?: string }> {
+        try {
+            const user = await this.afAuth.currentUser;
+            if (!user) {
+                return { success: false, message: 'Usuario no autenticado' };
+            }
+
+            // Calcular comisión (10%) y monto del entrenador
+            const comision = pagoData.monto * 0.10;
+            const montoEntrenador = pagoData.monto - comision;
+
+            const nuevoPago: Omit<Pago, 'id'> = {
+                reservaId: pagoData.reservaId,
+                clienteId: user.uid,
+                entrenadorId: pagoData.entrenadorId,
+                monto: pagoData.monto,
+                comisionPlataforma: comision,
+                montoEntrenador: montoEntrenador,
+                metodo: pagoData.metodo,
+                estado: pagoData.metodo === 'oxxo' ? 'PENDIENTE' : 'COMPLETADO',
+                fecha: new Date(),
+                stripePaymentIntentId: pagoData.stripePaymentIntentId,
+                oxxoReferencia: pagoData.oxxoReferencia
+            };
+
+            const docRef = await this.pagosRef.add(nuevoPago);
+            console.log('✅ Pago creado:', docRef.id);
+
+            return {
+                success: true,
+                message: 'Pago registrado exitosamente',
+                id: docRef.id
+            };
+        } catch (error) {
+            console.error('Error al crear pago:', error);
+            return { success: false, message: 'Error al registrar el pago' };
+        }
     }
 
     // ==================== DASHBOARD ====================

@@ -1,7 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { NbToastrService } from '@nebular/theme';
 import { AdminFirebaseService, Pago as PagoFirebase } from '../../../../core/services/admin-firebase.service';
 import { Subscription } from 'rxjs';
+import { environment } from '../../../../../environments/environment';
 
 interface Pago {
   id: string;
@@ -12,6 +14,10 @@ interface Pago {
   fecha: Date;
   clienteId: string;
   entrenadorId: string;
+  // Campos para OXXO
+  stripePaymentIntentId?: string;
+  metodoPago?: string;
+  oxxoReferencia?: string;
 }
 
 @Component({
@@ -35,10 +41,12 @@ export class PagosListComponent implements OnInit, OnDestroy {
   };
 
   private subscription: Subscription | null = null;
+  simulandoPago: { [key: string]: boolean } = {};
 
   constructor(
     private adminFirebase: AdminFirebaseService,
-    private toastr: NbToastrService
+    private toastr: NbToastrService,
+    private http: HttpClient
   ) { }
 
   ngOnInit(): void {
@@ -76,7 +84,10 @@ export class PagosListComponent implements OnInit, OnDestroy {
       estado: p.estado,
       fecha: fecha,
       clienteId: p.clienteId,
-      entrenadorId: p.entrenadorId
+      entrenadorId: p.entrenadorId,
+      stripePaymentIntentId: p.stripePaymentIntentId,
+      metodoPago: p.metodoPago,
+      oxxoReferencia: p.oxxoReferencia
     };
   }
 
@@ -128,6 +139,70 @@ export class PagosListComponent implements OnInit, OnDestroy {
       style: 'currency',
       currency: 'MXN'
     }).format(monto);
+  }
+
+  /**
+   * Simular pago OXXO (solo modo TEST)
+   * Abre el dashboard de Stripe para el PaymentIntent
+   */
+  simularPagoOxxo(pago: Pago): void {
+    if (!pago.stripePaymentIntentId) {
+      this.toastr.warning('Este pago no tiene un PaymentIntent de Stripe asociado', 'Información');
+      // Abrir el dashboard de Stripe para ver todos los pagos
+      window.open('https://dashboard.stripe.com/test/payments', '_blank');
+      return;
+    }
+
+    this.simulandoPago[pago.id] = true;
+
+    // Llamar al endpoint para simular
+    this.http.post<any>(`${environment.stripe.functionsUrl}/api/simulate-oxxo-payment`, {
+      paymentIntentId: pago.stripePaymentIntentId
+    }).subscribe({
+      next: (response) => {
+        this.simulandoPago[pago.id] = false;
+        
+        if (response.success) {
+          this.toastr.success(response.message, 'Simulación');
+          
+          // Si hay instrucciones, mostrar modal o abrir Stripe
+          if (response.instructions) {
+            this.toastr.info('Abriendo dashboard de Stripe...', 'Instrucciones');
+            window.open(`https://dashboard.stripe.com/test/payments/${pago.stripePaymentIntentId}`, '_blank');
+          }
+        } else {
+          this.toastr.warning(response.message, 'Advertencia');
+        }
+      },
+      error: (error) => {
+        this.simulandoPago[pago.id] = false;
+        console.error('Error simulando pago:', error);
+        this.toastr.danger(error.error?.error || 'Error al simular el pago', 'Error');
+      }
+    });
+  }
+
+  /**
+   * Abrir dashboard de Stripe para ver el pago
+   */
+  abrirEnStripe(pago: Pago): void {
+    if (pago.stripePaymentIntentId) {
+      window.open(`https://dashboard.stripe.com/test/payments/${pago.stripePaymentIntentId}`, '_blank');
+    } else {
+      window.open('https://dashboard.stripe.com/test/payments', '_blank');
+    }
+  }
+
+  /**
+   * Marcar pago como completado en Firestore (demo)
+   */
+  async marcarComoCompletado(pago: Pago): Promise<void> {
+    const result = await this.adminFirebase.completarPago(pago.id);
+    if (result.success) {
+      this.toastr.success('Pago marcado como completado', 'Éxito');
+    } else {
+      this.toastr.danger(result.message, 'Error');
+    }
   }
 }
 

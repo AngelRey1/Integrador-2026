@@ -1073,10 +1073,13 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
     const fechaReserva = new Date(this.paso1Form.get('fecha')?.value);
     const horaInicio = this.paso1Form.get('horaInicio')?.value;
     const horaFin = this.paso1Form.get('horaFin')?.value;
+    const metodoPago = this.paso4Form.get('metodoPago')?.value;
 
     // Combinar fecha y hora de inicio
     const [horas, minutos] = horaInicio.split(':').map(Number);
     fechaReserva.setHours(horas, minutos, 0, 0);
+
+    const precioTotal = this.calcularPrecioTotal();
 
     const reservaData: Omit<Reserva, 'id' | 'clienteId' | 'fechaCreacion'> = {
       entrenadorId: this.entrenador!.id!,
@@ -1086,23 +1089,54 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
       hora: horaInicio,
       horaFin: horaFin,
       duracion: this.getDuracionSesion(),
-      precio: this.calcularPrecioTotal(),
+      precio: precioTotal,
       modalidad: this.paso2Form.get('modalidad')?.value,
       estado: this.pagoCompletado ? 'CONFIRMADA' : 'PENDIENTE',
       notas: this.paso2Form.get('notas')?.value || '',
       ubicacion: this.paso2Form.get('ubicacion')?.value || ''
     };
 
-    this.clienteFirebase.crearReserva(reservaData).then(result => {
-      this.enviando = false;
-
-      if (result.success) {
+    this.clienteFirebase.crearReserva(reservaData).then(async (result) => {
+      if (result.success && result.id) {
         this.reservaConfirmada = true;
-        this.numeroReserva = 'RSV-' + (result.id?.substring(0, 8).toUpperCase() || Math.random().toString(36).substr(2, 9).toUpperCase());
+        this.numeroReserva = 'RSV-' + (result.id.substring(0, 8).toUpperCase());
         console.log('Reserva creada exitosamente:', result.id);
+
+        // Si es pago con OXXO, crear registro de pago pendiente
+        if (metodoPago === 'oxxo' && this.paymentIntentId) {
+          try {
+            await this.clienteFirebase.crearPago({
+              reservaId: result.id,
+              entrenadorId: this.entrenador!.id!,
+              monto: precioTotal,
+              metodo: 'oxxo',
+              stripePaymentIntentId: this.paymentIntentId,
+              oxxoReferencia: this.voucherOxxo?.referencia
+            });
+            console.log('✅ Pago OXXO registrado con PaymentIntent:', this.paymentIntentId);
+          } catch (error) {
+            console.error('Error al registrar pago OXXO:', error);
+          }
+        }
+        // Si es pago con tarjeta, crear registro de pago completado
+        else if (metodoPago === 'tarjeta' && this.pagoCompletado && this.paymentIntentId) {
+          try {
+            await this.clienteFirebase.crearPago({
+              reservaId: result.id,
+              entrenadorId: this.entrenador!.id!,
+              monto: precioTotal,
+              metodo: 'tarjeta',
+              stripePaymentIntentId: this.paymentIntentId
+            });
+            console.log('✅ Pago con tarjeta registrado');
+          } catch (error) {
+            console.error('Error al registrar pago:', error);
+          }
+        }
       } else {
         alert('Error al crear la reserva: ' + result.message);
       }
+      this.enviando = false;
     }).catch(error => {
       this.enviando = false;
       console.error('Error al confirmar reserva:', error);

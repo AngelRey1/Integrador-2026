@@ -126,6 +126,7 @@
     <thead>
       <tr>
         <th>Fecha</th>
+        <th>Método</th>
         <th>Monto Total</th>
         <th>Comisión (10%)</th>
         <th>Monto Entrenador</th>
@@ -136,6 +137,11 @@
     <tbody>
       <tr *ngFor="let pago of filteredPagos">
         <td>{{ formatearFecha(pago.fecha) }}</td>
+        <td>
+          <span class="metodo-badge" [ngClass]="pago.metodoPago || 'tarjeta'">
+            {{ pago.metodoPago === 'oxxo' ? 'OXXO' : (pago.metodoPago || 'Tarjeta') | titlecase }}
+          </span>
+        </td>
         <td class="price-cell">{{ formatearMoneda(pago.monto) }}</td>
         <td class="commission-cell">{{ formatearMoneda(pago.comision) }}</td>
         <td class="trainer-amount">{{ formatearMoneda(pago.montoEntrenador) }}</td>
@@ -146,12 +152,40 @@
         </td>
         <td>
           <div class="actions-cell">
-            <button class="btn-action view" title="Ver detalles">
+            <!-- Ver en Stripe -->
+            <button class="btn-action view" 
+                    title="Ver en Stripe Dashboard"
+                    (click)="abrirEnStripe(pago)">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                 <circle cx="12" cy="12" r="3"></circle>
               </svg>
             </button>
+            
+            <!-- Simular pago OXXO (solo para pendientes) -->
+            <button *ngIf="pago.estado === 'PENDIENTE' && pago.metodoPago === 'oxxo'" 
+                    class="btn-action simulate"
+                    [class.loading]="simulandoPago[pago.id]"
+                    title="Simular pago recibido (TEST)"
+                    (click)="simularPagoOxxo(pago)">
+              <svg *ngIf="!simulandoPago[pago.id]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+              <span *ngIf="simulandoPago[pago.id]" class="spinner-small"></span>
+            </button>
+            
+            <!-- Marcar como completado (para demo) -->
+            <button *ngIf="pago.estado === 'PENDIENTE'" 
+                    class="btn-action complete"
+                    title="Marcar como completado (Demo)"
+                    (click)="marcarComoCompletado(pago)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+            </button>
+            
+            <!-- Reembolsar -->
             <button *ngIf="pago.estado === 'COMPLETADO'" 
                     class="btn-action refund" 
                     title="Reembolsar"
