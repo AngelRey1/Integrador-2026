@@ -1925,34 +1925,39 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
    * Retorna fecha actual si no se puede parsear (evita error NG02100)
    */
   parseFecha(fecha: string | Date | null | undefined | any): Date {
-    if (!fecha) return new Date(); // Fecha por defecto para evitar error en pipe
-    if (fecha instanceof Date && !isNaN(fecha.getTime())) return fecha;
-    // Manejar Timestamps de Firestore
-    if (fecha && typeof fecha === 'object' && 'seconds' in fecha) {
-      const seconds = fecha.seconds;
-      if (typeof seconds === 'number' && !isNaN(seconds)) {
-        const result = new Date(seconds * 1000);
-        if (!isNaN(result.getTime())) return result;
+    try {
+      if (!fecha) return new Date(); // Fecha por defecto para evitar error en pipe
+      if (fecha instanceof Date && !isNaN(fecha.getTime())) return fecha;
+      // Manejar Timestamps de Firestore
+      if (fecha && typeof fecha === 'object' && 'seconds' in fecha) {
+        const seconds = fecha.seconds;
+        if (typeof seconds === 'number' && !isNaN(seconds)) {
+          const result = new Date(seconds * 1000);
+          if (!isNaN(result.getTime())) return result;
+        }
+        return new Date(); // Fallback si timestamp inválido
       }
-      return new Date(); // Fallback si timestamp inválido
+      // Manejar objetos con método toDate() (Firestore Timestamp instances)
+      if (fecha && typeof fecha === 'object' && typeof fecha.toDate === 'function') {
+        try {
+          const result = fecha.toDate();
+          if (result instanceof Date && !isNaN(result.getTime())) return result;
+        } catch (e) {}
+        return new Date();
+      }
+      if (typeof fecha === 'string') {
+        // Intentar parsing directo primero
+        let parsed = new Date(fecha);
+        if (!isNaN(parsed.getTime())) return parsed;
+        // Agregar timezone para evitar problemas de parsing
+        parsed = new Date(fecha + 'T12:00:00');
+        if (!isNaN(parsed.getTime())) return parsed;
+      }
+      return new Date(); // Fallback a fecha actual
+    } catch (e) {
+      console.warn('Error en parseFecha:', e, 'Input:', fecha);
+      return new Date(); // Fallback seguro
     }
-    // Manejar objetos con método toDate() (Firestore Timestamp instances)
-    if (fecha && typeof fecha === 'object' && typeof fecha.toDate === 'function') {
-      try {
-        const result = fecha.toDate();
-        if (result instanceof Date && !isNaN(result.getTime())) return result;
-      } catch (e) {}
-      return new Date();
-    }
-    if (typeof fecha === 'string') {
-      // Intentar parsing directo primero
-      let parsed = new Date(fecha);
-      if (!isNaN(parsed.getTime())) return parsed;
-      // Agregar timezone para evitar problemas de parsing
-      parsed = new Date(fecha + 'T12:00:00');
-      if (!isNaN(parsed.getTime())) return parsed;
-    }
-    return new Date(); // Fallback a fecha actual
   }
 
   /**
