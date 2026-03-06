@@ -144,7 +144,7 @@
             <input type="hidden" formControlName="fecha" />
             <div class="fecha-seleccionada-info" *ngIf="paso1Form.get('fecha')?.value">
               <nb-icon icon="checkmark-circle-outline"></nb-icon>
-              <span>{{ paso1Form.get('fecha')?.value | date:'EEEE d \'de\' MMMM, yyyy':'':'es' }}</span>
+              <span>{{ parseFecha(paso1Form.get('fecha')?.value) | date:'EEEE d \'de\' MMMM, yyyy':'':'es' }}</span>
             </div>
           </div>
 
@@ -887,7 +887,7 @@
             
             <div class="confirmacion-item" *ngIf="tipoReserva === 'unica'">
               <span class="conf-label">Fecha</span>
-              <span class="conf-value">{{ paso1Form.get('fecha')?.value | date:'fullDate':'':'es' }}</span>
+              <span class="conf-value">{{ parseFecha(paso1Form.get('fecha')?.value) | date:'fullDate':'':'es' }}</span>
             </div>
             
             <div class="confirmacion-item" *ngIf="tipoReserva === 'unica'">
@@ -946,7 +946,7 @@
             <nb-icon icon="calendar-outline"></nb-icon>
             <div>
               <strong>Fecha y Hora</strong>
-              <p>{{ paso1Form.get('fecha')?.value | date:'fullDate':'':'es' }}</p>
+              <p>{{ parseFecha(paso1Form.get('fecha')?.value) | date:'fullDate':'':'es' }}</p>
               <small>{{ paso1Form.get('horaInicio')?.value }} - {{ paso1Form.get('horaFin')?.value }} ({{ getDuracionFormateada() }})</small>
             </div>
           </div>
@@ -1098,7 +1098,7 @@
             <nb-icon icon="calendar-outline"></nb-icon>
             <div class="resumen-info">
               <span class="resumen-label">Fecha</span>
-              <span class="resumen-value">{{ paso1Form.get('fecha')?.value | date:'EEEE d MMMM':'':'es' }}</span>
+              <span class="resumen-value">{{ parseFecha(paso1Form.get('fecha')?.value) | date:'EEEE d MMMM':'':'es' }}</span>
             </div>
           </div>
 
@@ -1119,7 +1119,7 @@
               <span class="resumen-value">{{ sesionesSeleccionadas.length }} sesiones</span>
               <div class="mini-sesiones">
                 <span class="mini-sesion" *ngFor="let s of sesionesSeleccionadas | slice:0:3">
-                  {{ s.fecha | date:'d/M':'':'es' }}
+                  {{ parseFecha(s.fecha) | date:'d/M':'':'es' }}
                 </span>
                 <span class="mini-sesion more" *ngIf="sesionesSeleccionadas.length > 3">
                   +{{ sesionesSeleccionadas.length - 3 }}
