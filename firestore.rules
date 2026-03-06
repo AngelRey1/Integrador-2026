@@ -100,9 +100,9 @@ service cloud.firestore {
     // RESERVAS
     // ===========================================
     match /reservas/{reservaId} {
-      // Permitir lectura a usuarios autenticados para consultar horarios disponibles
-      // Los datos sensibles se filtran en el frontend
-      allow read: if isAuthenticated();
+      // Permitir lectura pública para consultar horarios disponibles
+      // (necesario para flujo de reserva sin login)
+      allow read: if true;
       allow create: if isAuthenticated();
       allow update: if isAuthenticated() && (
         resource.data.clienteId == request.auth.uid ||
