@@ -1923,12 +1923,19 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
   /**
    * Parsear string ISO a Date de forma segura (para usar en templates)
    */
-  parseFecha(fecha: string | Date | null | undefined): Date | null {
+  parseFecha(fecha: string | Date | null | undefined | any): Date | null {
     if (!fecha) return null;
     if (fecha instanceof Date) return fecha;
-    // Agregar timezone para evitar problemas de parsing
-    const parsed = new Date(fecha + 'T12:00:00');
-    return isNaN(parsed.getTime()) ? null : parsed;
+    // Manejar Timestamps de Firestore
+    if (fecha && typeof fecha === 'object' && 'seconds' in fecha) {
+      return new Date(fecha.seconds * 1000);
+    }
+    if (typeof fecha === 'string') {
+      // Agregar timezone para evitar problemas de parsing
+      const parsed = new Date(fecha + 'T12:00:00');
+      return isNaN(parsed.getTime()) ? null : parsed;
+    }
+    return null;
   }
 
   /**

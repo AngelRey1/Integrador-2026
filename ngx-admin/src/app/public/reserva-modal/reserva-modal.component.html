@@ -382,10 +382,10 @@
                 <div class="horario-modal-header-pro">
                   <div class="modal-fecha-badge">
                     <nb-icon icon="calendar-outline"></nb-icon>
-                    <span>{{ diaSeleccionandoHorario?.fecha | date:'EEEE':'':'es' }}</span>
+                    <span>{{ parseFecha(diaSeleccionandoHorario?.fecha) | date:'EEEE':'':'es' }}</span>
                   </div>
                   <h4 class="modal-fecha-titulo">
-                    {{ diaSeleccionandoHorario?.fecha | date:'d \' de \' MMMM, yyyy':'':'es' }}
+                    {{ parseFecha(diaSeleccionandoHorario?.fecha) | date:'d \' de \' MMMM, yyyy':'':'es' }}
                   </h4>
                   <button class="btn-cerrar-modal-pro" (click)="cerrarSelectorHorario()">
                     <nb-icon icon="close-outline"></nb-icon>
