@@ -113,51 +113,91 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
   procesandoPago = false;
   cargandoHorarios = false;
 
-  // ========== NUEVO: Sistema de reservas múltiples/recurrentes ==========
-  tipoReserva: 'unica' | 'multiple' = 'unica';
+  // ========== NUEVO SISTEMA DE RESERVAS PROFESIONAL ==========
+  modoReserva: 'unica' | 'multiple' | 'plan' = 'unica';
+  usarPlanSemanal: boolean = false; // Toggle: false = calendario, true = plan semanal
+  tipoReserva: 'unica' | 'multiple' = 'multiple'; // Compatibilidad legacy
   modoMultiple: 'calendario' | 'plan' = 'calendario';
   sesionesSeleccionadas: SesionSeleccionada[] = [];
   
-  // Calendario visual para múltiples sesiones
+  // Calendario
   calendarioMes: DiaCalendario[][] = [];
   mesActual: Date = new Date();
-  diasConDisponibilidad: Set<string> = new Set(); // formato 'YYYY-MM-DD'
+  diasConDisponibilidad: Set<string> = new Set();
   
-  // Calendario visual para sesión única
+  // Calendario visual para sesión única (legacy)
   calendarioUnica: DiaCalendario[][] = [];
   mesActualUnica: Date = new Date();
   
-  // Plan semanal (unificado)
-  planRecurrente = {
-    duracionMeses: 1 as 1 | 2 | 3,
-    diaSemana: '' as string, // Legacy, ya no se usa
-    horaInicio: '',
-    horaFin: ''
-  };
-  diasSemanaPlan: string[] = []; // Array para múltiple selección de días
-  fechasRecurrentes: string[] = []; // Fechas calculadas del plan
+  // ===== MODO ÚNICO =====
+  fechaUnicaSeleccionada: string = '';
+  horarioUnico = { horaInicio: '', horaFin: '' };
+  horasDisponiblesUnico: string[] = [];
+  horasFinDisponiblesUnico: string[] = [];
+  rangosDisponiblesDiaUnico: { inicio: string; fin: string }[] = [];
   
-  // Opciones de días de semana con disponibilidad del entrenador
-  diasSemanaOpciones: { key: string; label: string; disponible: boolean }[] = [];
-  
-  // Horas disponibles para modo múltiple (basadas en entrenador)
-  horasDisponiblesMultiple: string[] = [];
-  horasFinDisponiblesMultiple: string[] = [];
-  horasDisponiblesPlan: string[] = [];
-  horasFinDisponiblesPlan: string[] = [];
-  
-  // Horario para sesiones múltiples (se usa para todas las fechas seleccionadas)
-  horarioMultiple = {
-    horaInicio: '',
-    horaFin: ''
-  };
-  
-  // Modal de selección de horario por día
+  // ===== MODO MÚLTIPLE =====
   diaSeleccionandoHorario: DiaCalendario | null = null;
   horarioTemporal = { horaInicio: '', horaFin: '' };
   horasDisponiblesDia: string[] = [];
   horasFinDisponiblesDia: string[] = [];
   rangosDisponiblesDia: { inicio: string; fin: string }[] = [];
+  
+  // ===== MODO PLAN RECURRENTE =====
+  planConfig = {
+    duracion: 4 as number, // semanas
+    mismaHora: true,
+    horaGlobalInicio: '',
+    horaGlobalFin: ''
+  };
+  
+  duracionesDisponibles = [
+    { valor: 2, label: '2 semanas', sesiones: 4 },
+    { valor: 4, label: '1 mes', sesiones: 8 },
+    { valor: 8, label: '2 meses', sesiones: 16 },
+    { valor: 12, label: '3 meses', sesiones: 24 }
+  ];
+  
+  diasSemanaConfig: { 
+    key: string; 
+    letra: string; 
+    nombre: string; 
+    disponible: boolean; 
+    seleccionado: boolean;
+    horaInicio: string;
+    horaFin: string;
+    horasFinDisponibles?: string[];
+  }[] = [
+    { key: 'domingo', letra: 'D', nombre: 'Domingo', disponible: false, seleccionado: false, horaInicio: '', horaFin: '' },
+    { key: 'lunes', letra: 'L', nombre: 'Lunes', disponible: false, seleccionado: false, horaInicio: '', horaFin: '' },
+    { key: 'martes', letra: 'M', nombre: 'Martes', disponible: false, seleccionado: false, horaInicio: '', horaFin: '' },
+    { key: 'miercoles', letra: 'X', nombre: 'Miércoles', disponible: false, seleccionado: false, horaInicio: '', horaFin: '' },
+    { key: 'jueves', letra: 'J', nombre: 'Jueves', disponible: false, seleccionado: false, horaInicio: '', horaFin: '' },
+    { key: 'viernes', letra: 'V', nombre: 'Viernes', disponible: false, seleccionado: false, horaInicio: '', horaFin: '' },
+    { key: 'sabado', letra: 'S', nombre: 'Sábado', disponible: false, seleccionado: false, horaInicio: '', horaFin: '' }
+  ];
+  
+  sesionesGeneradasPlan: SesionSeleccionada[] = [];
+  horasDisponiblesPlan: string[] = [];
+  horasFinDisponiblesPlan: string[] = [];
+  
+  // Legacy (compatibilidad)
+  planRecurrente = {
+    duracionMeses: 1 as 1 | 2 | 3,
+    diaSemana: '' as string,
+    horaInicio: '',
+    horaFin: ''
+  };
+  diasSemanaPlan: string[] = [];
+  fechasRecurrentes: string[] = [];
+  diasSemanaOpciones: { key: string; label: string; disponible: boolean }[] = [];
+  horasDisponiblesMultiple: string[] = [];
+  horasFinDisponiblesMultiple: string[] = [];
+  
+  horarioMultiple = {
+    horaInicio: '',
+    horaFin: ''
+  };
   
   // Resumen lateral colapsable
   resumenExpandido = false;
@@ -314,6 +354,15 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
     if (this.feedbackTimeout) {
       clearTimeout(this.feedbackTimeout);
     }
+  }
+
+  /**
+   * Cambiar entre modo calendario y plan semanal
+   */
+  toggleTipoSeleccion(usarPlan: boolean): void {
+    this.usarPlanSemanal = usarPlan;
+    // Limpiar sesiones al cambiar de modo
+    this.sesionesSeleccionadas = [];
   }
 
   /**
@@ -674,16 +723,11 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
    */
   incrementarPersonas(): void {
     const current = this.paso1Form.get('cantidadPersonas')?.value || 1;
-    const max = this.tipoReserva === 'multiple' ? this.capacidadMaximaMultiple : this.capacidadMaxima;
+    const max = this.capacidadMaximaMultiple;
     
     // Verificar si puede incrementar
     if (current >= max) {
-      // Si no hay fecha seleccionada y el máximo es 1, mostrar mensaje de seleccionar fecha
-      if (this.tipoReserva === 'unica' && !this.paso1Form.get('fecha')?.value) {
-        this.mostrarMensajeFeedback('Selecciona primero una fecha para ver la capacidad disponible');
-      } else {
-        this.mostrarMensajeFeedback(`La capacidad máxima es de ${max} persona${max > 1 ? 's' : ''}`);
-      }
+      this.mostrarMensajeFeedback(`La capacidad máxima es de ${max} persona${max > 1 ? 's' : ''}`);
       return;
     }
     
@@ -767,15 +811,9 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
   getMensajeFaltante(): string {
     switch (this.pasoActual) {
       case 1:
-        if (this.tipoReserva === 'unica') {
-          if (!this.paso1Form.get('fecha')?.value) return 'Selecciona una fecha';
-          if (!this.paso1Form.get('horaInicio')?.value) return 'Selecciona hora de inicio';
-          if (!this.paso1Form.get('horaFin')?.value) return 'Selecciona hora de fin';
-          if (this.paso1Form.get('cantidadPersonas')?.hasError('excedeCupos')) return 'Reduce el número de personas';
-        } else {
-          if (this.sesionesSeleccionadas.length === 0) return 'Agrega al menos una sesión';
-          if (this.paso1Form.get('cantidadPersonas')?.hasError('excedeCupos')) return 'Reduce el número de personas';
-        }
+        // Flujo unificado: siempre usa sesionesSeleccionadas
+        if (this.sesionesSeleccionadas.length === 0) return 'Agrega al menos una sesión';
+        if (this.paso1Form.get('cantidadPersonas')?.hasError('excedeCupos')) return 'Reduce el número de personas';
         return '';
       case 2:
         return 'Completa los datos de ubicación';
@@ -858,11 +896,9 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
    * Si simulatedMode=true, genera voucher simulado sin llamar al backend
    */
   procesarPagoOxxo() {
-    // Calcular precio según tipo de reserva
-    const precioFinal = this.tipoReserva === 'unica' 
-      ? (this.calcularPrecioTotal() || this.entrenador?.precio || 350)
-      : this.calcularPrecioTotalMultiple();
-    const email = this.paso3Form.get('email')?.value; // Usar email del paso 3
+    // Sistema unificado: siempre usar calcularPrecioTotalMultiple
+    const precioFinal = this.calcularPrecioTotalMultiple();
+    const email = this.paso3Form.get('email')?.value;
     const nombre = this.paso3Form.get('nombre')?.value;
 
     // Validar límite de OXXO ($10,000 MXN máximo)
@@ -997,10 +1033,8 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
    * Procesar pago con tarjeta usando Stripe real
    */
   procesarPagoTarjeta() {
-    // Calcular precio según tipo de reserva
-    const precioFinal = this.tipoReserva === 'unica' 
-      ? this.calcularPrecioTotal()
-      : this.calcularPrecioTotalMultiple();
+    // Sistema unificado: siempre usar calcularPrecioTotalMultiple
+    const precioFinal = this.calcularPrecioTotalMultiple();
     const montoEnCentavos = Math.round(precioFinal * 100);
     const email = this.paso3Form.get('email')?.value;
     const nombre = this.paso3Form.get('nombre')?.value;
@@ -1058,12 +1092,8 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
 
     this.enviando = true;
 
-    // Manejar según tipo de reserva
-    if (this.tipoReserva === 'unica') {
-      this.crearReservaUnica();
-    } else {
-      this.crearReservasMultiples();
-    }
+    // Sistema unificado: siempre usar flujo de sesiones múltiples
+    this.crearReservasMultiples();
   }
 
   /**
@@ -1222,7 +1252,401 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
   // ==================== MÉTODOS PARA RESERVAS MÚLTIPLES/RECURRENTES ====================
 
   /**
-   * Cambiar tipo de reserva y resetear selecciones
+   * Cambiar modo de reserva (nuevo sistema profesional)
+   */
+  cambiarModoReserva(modo: 'unica' | 'multiple' | 'plan') {
+    this.modoReserva = modo;
+    this.sesionesSeleccionadas = [];
+    this.sesionesGeneradasPlan = [];
+    this.fechaUnicaSeleccionada = '';
+    this.horarioUnico = { horaInicio: '', horaFin: '' };
+    this.horarioTemporal = { horaInicio: '', horaFin: '' };
+    
+    // Reset plan config
+    this.planConfig.horaGlobalInicio = '';
+    this.planConfig.horaGlobalFin = '';
+    this.diasSemanaConfig.forEach(d => {
+      d.seleccionado = false;
+      d.horaInicio = '';
+      d.horaFin = '';
+    });
+    
+    // Cargar disponibilidad
+    this.cargarDiasConDisponibilidad();
+    this.generarCalendario();
+    this.actualizarDisponibilidadDiasSemana();
+    this.cargarHorasDisponiblesPlan();
+  }
+
+  /**
+   * Seleccionar día para cita única (nuevo sistema)
+   */
+  seleccionarDiaUnicoNuevo(dia: DiaCalendario) {
+    if (!dia.disponible || !dia.esMesActual) return;
+    
+    // Deseleccionar anterior
+    this.calendarioMes.forEach(semana => {
+      semana.forEach(d => d.seleccionado = false);
+    });
+    
+    // Seleccionar nuevo
+    dia.seleccionado = true;
+    this.fechaUnicaSeleccionada = this.formatearFechaISO(dia.fecha);
+    this.horarioUnico = { horaInicio: '', horaFin: '' };
+    
+    // Cargar horarios disponibles para este día
+    this.cargarHorariosParaDiaUnico(dia);
+  }
+
+  /**
+   * Formatear fecha a string ISO
+   */
+  formatearFechaISO(fecha: Date | string): string {
+    if (fecha instanceof Date) {
+      return fecha.toISOString().split('T')[0];
+    }
+    return fecha;
+  }
+
+  /**
+   * Cargar horarios disponibles para día único
+   */
+  cargarHorariosParaDiaUnico(dia: DiaCalendario) {
+    const fecha = dia.fecha instanceof Date ? dia.fecha : new Date(dia.fecha);
+    const diaSemana = this.getDiaSemanaKey(fecha.getDay());
+    
+    // Obtener rangos del entrenador para este día
+    const disponibilidad = this.entrenador?.disponibilidad || {};
+    const horariosDelDia = disponibilidad[diaSemana] || [];
+    
+    this.rangosDisponiblesDiaUnico = horariosDelDia.map((h: any) => ({ inicio: h.inicio, fin: h.fin }));
+    
+    // Generar horas disponibles
+    this.horasDisponiblesUnico = this.generarHorasDesdeRangos(horariosDelDia);
+    this.horasFinDisponiblesUnico = [];
+  }
+
+  /**
+   * Cuando cambia la hora de inicio en modo único
+   */
+  onCambioHorarioUnico() {
+    if (!this.horarioUnico.horaInicio) {
+      this.horasFinDisponiblesUnico = [];
+      return;
+    }
+    
+    // Generar horas de fin válidas
+    this.horasFinDisponiblesUnico = this.generarHorasFin(
+      this.horarioUnico.horaInicio, 
+      this.rangosDisponiblesDiaUnico
+    );
+    
+    // Si hay sesión única válida, agregarla automáticamente a sesionesSeleccionadas
+    if (this.horarioUnico.horaInicio && this.horarioUnico.horaFin) {
+      this.actualizarSesionUnica();
+    }
+  }
+
+  /**
+   * Actualizar sesión única cuando se completa el horario
+   */
+  actualizarSesionUnica() {
+    if (!this.fechaUnicaSeleccionada || !this.horarioUnico.horaInicio || !this.horarioUnico.horaFin) {
+      return;
+    }
+    
+    // Calcular duración
+    const duracion = this.calcularDuracionEnMinutos(this.horarioUnico.horaInicio, this.horarioUnico.horaFin);
+    
+    // Reemplazar cualquier sesión existente
+    this.sesionesSeleccionadas = [{
+      fecha: this.fechaUnicaSeleccionada,
+      horaInicio: this.horarioUnico.horaInicio,
+      horaFin: this.horarioUnico.horaFin,
+      duracionMinutos: duracion
+    }];
+  }
+
+  /**
+   * Calcular duración en minutos entre dos horas
+   */
+  calcularDuracionEnMinutos(horaInicio: string, horaFin: string): number {
+    if (!horaInicio || !horaFin) return 60;
+    const [h1, m1] = horaInicio.split(':').map(Number);
+    const [h2, m2] = horaFin.split(':').map(Number);
+    return ((h2 * 60 + m2) - (h1 * 60 + m1));
+  }
+
+  /**
+   * Aplicar rango rápido para día único
+   */
+  aplicarRangoRapido(rango: { inicio: string; fin: string }) {
+    this.horarioUnico.horaInicio = rango.inicio;
+    this.onCambioHorarioUnico();
+    this.horarioUnico.horaFin = rango.fin;
+    this.actualizarSesionUnica();
+  }
+
+  /**
+   * Aplicar rango temporal (para modal múltiple)
+   */
+  aplicarRangoTemporal(rango: { inicio: string; fin: string }) {
+    this.horarioTemporal.horaInicio = rango.inicio;
+    this.onHoraInicioTemporalChange();
+    this.horarioTemporal.horaFin = rango.fin;
+  }
+
+  /**
+   * Toggle día de semana para plan (nuevo sistema)
+   */
+  toggleDiaSemanaPlan(dia: any) {
+    if (!dia.disponible) return;
+    dia.seleccionado = !dia.seleccionado;
+    this.actualizarConteoSesionesPlan();
+    this.generarSesionesPlan();
+  }
+
+  /**
+   * Obtener días seleccionados
+   */
+  getDiasSeleccionados() {
+    return this.diasSemanaConfig.filter(d => d.seleccionado);
+  }
+
+  /**
+   * Actualizar conteo de sesiones en duraciones
+   */
+  actualizarConteoSesionesPlan() {
+    const diasSeleccionados = this.getDiasSeleccionados().length;
+    this.duracionesDisponibles = [
+      { valor: 2, label: '2 semanas', sesiones: diasSeleccionados * 2 },
+      { valor: 4, label: '1 mes', sesiones: diasSeleccionados * 4 },
+      { valor: 8, label: '2 meses', sesiones: diasSeleccionados * 8 },
+      { valor: 12, label: '3 meses', sesiones: diasSeleccionados * 12 }
+    ];
+  }
+
+  /**
+   * Calcular total de sesiones del plan
+   */
+  calcularTotalSesionesPlan(): number {
+    return this.getDiasSeleccionados().length * this.planConfig.duracion;
+  }
+
+  /**
+   * Cuando cambia el horario del plan
+   */
+  onCambioHorarioPlan() {
+    if (!this.planConfig.horaGlobalInicio) {
+      this.horasFinDisponiblesPlan = [];
+      return;
+    }
+    
+    // Generar horas de fin
+    const horaInicio = this.planConfig.horaGlobalInicio;
+    const [h, m] = horaInicio.split(':').map(Number);
+    
+    this.horasFinDisponiblesPlan = [];
+    for (let i = h + 1; i <= 22; i++) {
+      this.horasFinDisponiblesPlan.push(`${i.toString().padStart(2, '0')}:00`);
+    }
+    
+    this.generarSesionesPlan();
+  }
+
+  /**
+   * Actualizar horas de fin para un día específico
+   */
+  actualizarHorasFinDia(dia: any) {
+    if (!dia.horaInicio) {
+      dia.horasFinDisponibles = [];
+      return;
+    }
+    
+    const [h] = dia.horaInicio.split(':').map(Number);
+    dia.horasFinDisponibles = [];
+    for (let i = h + 1; i <= 22; i++) {
+      dia.horasFinDisponibles.push(`${i.toString().padStart(2, '0')}:00`);
+    }
+  }
+
+  /**
+   * Generar sesiones del plan basado en configuración
+   */
+  generarSesionesPlan() {
+    this.sesionesGeneradasPlan = [];
+    const diasSeleccionados = this.getDiasSeleccionados();
+    
+    if (diasSeleccionados.length === 0) return;
+    
+    // Verificar horarios
+    if (this.planConfig.mismaHora) {
+      if (!this.planConfig.horaGlobalInicio || !this.planConfig.horaGlobalFin) return;
+    } else {
+      // Verificar que todos los días tengan horario
+      const todosConHorario = diasSeleccionados.every(d => d.horaInicio && d.horaFin);
+      if (!todosConHorario) return;
+    }
+    
+    // Generar fechas
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    
+    // Mapeo de días
+    const diaNumero: { [key: string]: number } = {
+      'domingo': 0, 'lunes': 1, 'martes': 2, 'miercoles': 3,
+      'jueves': 4, 'viernes': 5, 'sabado': 6
+    };
+    
+    for (let semana = 0; semana < this.planConfig.duracion; semana++) {
+      for (const dia of diasSeleccionados) {
+        const numeroDia = diaNumero[dia.key];
+        const fecha = new Date(hoy);
+        
+        // Calcular próxima fecha de este día de la semana
+        const diasHasta = (numeroDia + 7 - hoy.getDay()) % 7;
+        fecha.setDate(hoy.getDate() + diasHasta + (semana * 7));
+        
+        // Si es hoy o antes, ir a la próxima semana
+        if (fecha <= hoy && semana === 0) {
+          fecha.setDate(fecha.getDate() + 7);
+        }
+        
+        const horaInicio = this.planConfig.mismaHora ? this.planConfig.horaGlobalInicio : dia.horaInicio;
+        const horaFin = this.planConfig.mismaHora ? this.planConfig.horaGlobalFin : dia.horaFin;
+        
+        const duracion = this.calcularDuracionEnMinutos(horaInicio, horaFin);
+        this.sesionesGeneradasPlan.push({
+          fecha: fecha.toISOString().split('T')[0],
+          horaInicio,
+          horaFin,
+          duracionMinutos: duracion
+        });
+      }
+    }
+    
+    // Ordenar por fecha
+    this.sesionesGeneradasPlan.sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime());
+  }
+
+  /**
+   * Aplicar plan a sesiones seleccionadas
+   */
+  aplicarPlanASesiones() {
+    this.sesionesSeleccionadas = [...this.sesionesGeneradasPlan];
+    // Marcar días en calendario
+    this.actualizarCalendarioConSesiones();
+  }
+
+  /**
+   * Actualizar calendario visual con sesiones seleccionadas
+   */
+  actualizarCalendarioConSesiones() {
+    const fechasSeleccionadas = new Set(this.sesionesSeleccionadas.map(s => s.fecha));
+    
+    this.calendarioMes.forEach(semana => {
+      semana.forEach(dia => {
+        const fechaStr = dia.fecha instanceof Date ? dia.fecha.toISOString().split('T')[0] : dia.fecha;
+        dia.seleccionado = fechasSeleccionadas.has(fechaStr);
+      });
+    });
+  }
+
+  /**
+   * Actualizar disponibilidad de días de semana según entrenador
+   */
+  actualizarDisponibilidadDiasSemana() {
+    const disponibilidad = this.entrenador?.disponibilidad || {};
+    
+    this.diasSemanaConfig.forEach(dia => {
+      const horariosDelDia = disponibilidad[dia.key] || [];
+      dia.disponible = horariosDelDia.length > 0;
+    });
+  }
+
+  /**
+   * Cargar horas disponibles para plan
+   */
+  cargarHorasDisponiblesPlan() {
+    // Generar horas de 6:00 a 21:00
+    this.horasDisponiblesPlan = [];
+    for (let h = 6; h <= 21; h++) {
+      this.horasDisponiblesPlan.push(`${h.toString().padStart(2, '0')}:00`);
+    }
+    this.horasFinDisponiblesPlan = [];
+  }
+
+  /**
+   * Limpiar todas las sesiones
+   */
+  limpiarSesiones() {
+    this.sesionesSeleccionadas = [];
+    this.sesionesGeneradasPlan = [];
+    
+    // Limpiar selección en calendario
+    this.calendarioMes.forEach(semana => {
+      semana.forEach(dia => dia.seleccionado = false);
+    });
+    
+    // Reset horarios
+    this.fechaUnicaSeleccionada = '';
+    this.horarioUnico = { horaInicio: '', horaFin: '' };
+  }
+
+  /**
+   * Generar horas desde rangos de horarios
+   */
+  generarHorasDesdeRangos(horarios: any[]): string[] {
+    const horas: string[] = [];
+    
+    for (const h of horarios) {
+      const [inicioH] = h.inicio.split(':').map(Number);
+      const [finH] = h.fin.split(':').map(Number);
+      
+      for (let hora = inicioH; hora < finH; hora++) {
+        const horaStr = `${hora.toString().padStart(2, '0')}:00`;
+        if (!horas.includes(horaStr)) {
+          horas.push(horaStr);
+        }
+      }
+    }
+    
+    return horas.sort();
+  }
+
+  /**
+   * Generar horas de fin válidas
+   */
+  generarHorasFin(horaInicio: string, rangos: { inicio: string; fin: string }[]): string[] {
+    const [h] = horaInicio.split(':').map(Number);
+    const horas: string[] = [];
+    
+    // Encontrar el rango que contiene esta hora
+    for (const rango of rangos) {
+      const [finH] = rango.fin.split(':').map(Number);
+      const [inicioH] = rango.inicio.split(':').map(Number);
+      
+      if (h >= inicioH && h < finH) {
+        for (let hora = h + 1; hora <= finH; hora++) {
+          horas.push(`${hora.toString().padStart(2, '0')}:00`);
+        }
+        break;
+      }
+    }
+    
+    return horas;
+  }
+
+  /**
+   * Obtener key del día de la semana
+   */
+  getDiaSemanaKey(diaNro: number): string {
+    const dias = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
+    return dias[diaNro];
+  }
+
+  /**
+   * Cambiar tipo de reserva y resetear selecciones (legacy)
    */
   cambiarTipoReserva(tipo: 'unica' | 'multiple') {
     this.tipoReserva = tipo;
@@ -1911,16 +2335,6 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Formatear fecha a ISO (YYYY-MM-DD)
-   */
-  private formatearFechaISO(fecha: Date): string {
-    const año = fecha.getFullYear();
-    const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
-    const dia = fecha.getDate().toString().padStart(2, '0');
-    return `${año}-${mes}-${dia}`;
-  }
-
-  /**
    * Parsear string ISO a Date de forma segura (para usar en templates)
    * Retorna fecha actual si no se puede parsear (evita error NG02100)
    */
@@ -1998,19 +2412,14 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
    * Obtener total de sesiones seleccionadas
    */
   getTotalSesiones(): number {
-    if (this.tipoReserva === 'unica') return 1;
     return this.sesionesSeleccionadas.length;
   }
 
   /**
-   * Validar paso 1 considerando tipo de reserva
+   * Validar paso 1 - sistema unificado
    */
   validarPaso1Multiple(): boolean {
-    if (this.tipoReserva === 'unica') {
-      return this.paso1Form.valid;
-    }
-    
-    // Para múltiple/recurrente, debe haber al menos una sesión
+    // Debe haber al menos una sesión seleccionada
     return this.sesionesSeleccionadas.length > 0 && this.paso1Form.get('cantidadPersonas')?.valid === true;
   }
 
