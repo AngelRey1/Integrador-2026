@@ -65,26 +65,10 @@
           Agenda tus sesiones
         </h3>
 
-        <!-- ========== INTERFAZ UNIFICADA ========== -->
+        <!-- ========== INTERFAZ UNIFICADA - TODO EN UNO ========== -->
         
-        <!-- Toggle: Calendario vs Plan Semanal -->
-        <div class="tipo-seleccion-toggle">
-          <button class="toggle-tipo-btn" 
-                  [class.active]="!usarPlanSemanal"
-                  (click)="usarPlanSemanal = false; limpiarSesiones()">
-            <nb-icon icon="calendar-outline"></nb-icon>
-            <span>Elegir fechas</span>
-          </button>
-          <button class="toggle-tipo-btn" 
-                  [class.active]="usarPlanSemanal"
-                  (click)="usarPlanSemanal = true; limpiarSesiones()">
-            <nb-icon icon="sync-outline"></nb-icon>
-            <span>Plan semanal</span>
-          </button>
-        </div>
-
-        <!-- ========== MODO CALENDARIO ========== -->
-        <div class="seccion-calendario" *ngIf="!usarPlanSemanal">
+        <!-- CALENDARIO SIEMPRE VISIBLE -->
+        <div class="seccion-calendario-unificada">
           <p class="instruccion-texto">
             <nb-icon icon="bulb-outline"></nb-icon>
             Haz clic en los días que quieras agendar
@@ -133,152 +117,242 @@
           </div>
 
           <div class="horario-modal-overlay" *ngIf="diaSeleccionandoHorario" (click)="cerrarSelectorHorario()">
-            <div class="horario-modal-compact" (click)="$event.stopPropagation()">
-              <div class="modal-header-compact">
-                <span class="modal-fecha">{{ parseFecha(diaSeleccionandoHorario?.fecha) | date:'EEEE d \'de\' MMMM':'':'es' }}</span>
-                <button class="btn-cerrar" (click)="cerrarSelectorHorario()">
+            <div class="horario-modal-pro" (click)="$event.stopPropagation()">
+              <!-- Header del modal -->
+              <div class="modal-header-pro">
+                <div class="header-fecha">
+                  <div class="fecha-icono">
+                    <nb-icon icon="calendar-outline"></nb-icon>
+                  </div>
+                  <div class="fecha-texto">
+                    <span class="fecha-dia">{{ parseFecha(diaSeleccionandoHorario?.fecha) | date:'EEEE':'':'es' | titlecase }}</span>
+                    <span class="fecha-completa">{{ parseFecha(diaSeleccionandoHorario?.fecha) | date:'d \'de\' MMMM, yyyy':'':'es' }}</span>
+                  </div>
+                </div>
+                <button class="btn-cerrar-pro" (click)="cerrarSelectorHorario()">
                   <nb-icon icon="close-outline"></nb-icon>
                 </button>
               </div>
-              <div class="modal-body-compact">
-                <div class="horario-inline">
-                  <select [(ngModel)]="horarioTemporal.horaInicio" (ngModelChange)="onHoraInicioTemporalChange()">
-                    <option value="">Inicio</option>
-                    <option *ngFor="let h of horasDisponiblesDia" [value]="h">{{ h }}</option>
-                  </select>
-                  <span class="horario-a">a</span>
-                  <select [(ngModel)]="horarioTemporal.horaFin">
-                    <option value="">Fin</option>
-                    <option *ngFor="let h of horasFinDisponiblesDia" [value]="h">{{ h }}</option>
-                  </select>
-                </div>
-                <div class="rangos-rapidos-mini" *ngIf="rangosDisponiblesDia?.length > 0">
-                  <span class="rango-label-mini">Horarios disponibles:</span>
-                  <div class="rangos-chips-mini">
-                    <span class="rango-mini" *ngFor="let r of rangosDisponiblesDia" 
-                          (click)="aplicarRangoTemporal(r)">
-                      {{ r.inicio }} - {{ r.fin }}
-                    </span>
+
+              <!-- Contenido del modal -->
+              <div class="modal-body-pro">
+                <p class="instruccion-horario">Selecciona el horario para tu sesión</p>
+                
+                <!-- Selector de horario visual -->
+                <div class="horario-selector-pro">
+                  <div class="horario-campo">
+                    <label>Hora inicio</label>
+                    <div class="select-wrapper">
+                      <select [(ngModel)]="horarioTemporal.horaInicio" (ngModelChange)="onHoraInicioTemporalChange()">
+                        <option value="">Seleccionar</option>
+                        <option *ngFor="let h of horasDisponiblesDia" [value]="h">{{ h }}</option>
+                      </select>
+                      <nb-icon icon="clock-outline" class="select-icon"></nb-icon>
+                    </div>
+                  </div>
+                  
+                  <div class="horario-separador">
+                    <nb-icon icon="arrow-forward-outline"></nb-icon>
+                  </div>
+                  
+                  <div class="horario-campo">
+                    <label>Hora fin</label>
+                    <div class="select-wrapper">
+                      <select [(ngModel)]="horarioTemporal.horaFin" [disabled]="!horarioTemporal.horaInicio">
+                        <option value="">Seleccionar</option>
+                        <option *ngFor="let h of horasFinDisponiblesDia" [value]="h">{{ h }}</option>
+                      </select>
+                      <nb-icon icon="clock-outline" class="select-icon"></nb-icon>
+                    </div>
                   </div>
                 </div>
+
+                <!-- Chips de horarios rápidos -->
+                <div class="horarios-rapidos" *ngIf="rangosDisponiblesDia?.length > 0">
+                  <span class="rapidos-titulo">
+                    <nb-icon icon="flash-outline"></nb-icon>
+                    Horarios disponibles
+                  </span>
+                  <div class="rapidos-chips">
+                    <button class="chip-horario" *ngFor="let r of rangosDisponiblesDia" 
+                            (click)="aplicarRangoTemporal(r)"
+                            [class.selected]="horarioTemporal.horaInicio === r.inicio && horarioTemporal.horaFin === r.fin">
+                      <span class="chip-tiempo">{{ r.inicio }} - {{ r.fin }}</span>
+                      <span class="chip-duracion">{{ calcularDuracion(r.inicio, r.fin) }}</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Resumen de la sesión -->
+                <div class="sesion-preview" *ngIf="horarioTemporal.horaInicio && horarioTemporal.horaFin">
+                  <nb-icon icon="checkmark-circle-2-outline"></nb-icon>
+                  <span>Sesión de <strong>{{ calcularDuracion(horarioTemporal.horaInicio, horarioTemporal.horaFin) }}</strong></span>
+                </div>
               </div>
-              <div class="modal-footer-compact">
-                <button class="btn-cancelar-compact" (click)="cerrarSelectorHorario()">Cancelar</button>
-                <button class="btn-agregar-compact" 
+
+              <!-- Footer del modal -->
+              <div class="modal-footer-pro">
+                <button class="btn-cancelar-pro" (click)="cerrarSelectorHorario()">
+                  Cancelar
+                </button>
+                <button class="btn-agregar-pro" 
                         [disabled]="!horarioTemporal.horaInicio || !horarioTemporal.horaFin"
                         (click)="confirmarSesionMultiple()">
-                  <nb-icon icon="plus-outline"></nb-icon> Agregar
+                  <nb-icon icon="plus-circle-outline"></nb-icon>
+                  Agregar sesión
                 </button>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- ========== MODO PLAN SEMANAL ========== -->
-        <div class="seccion-plan-semanal" *ngIf="usarPlanSemanal">
-          <div class="plan-paso">
-            <div class="plan-paso-header">
-              <span class="plan-paso-num">1</span>
-              <span class="plan-paso-titulo">Duración</span>
+        <!-- ========== PLAN SEMANAL PROFESIONAL ========== -->
+        <div class="plan-semanal-pro">
+          <div class="plan-header-pro" (click)="usarPlanSemanal = !usarPlanSemanal">
+            <div class="plan-info">
+              <div class="plan-icono" [class.active]="usarPlanSemanal">
+                <nb-icon icon="sync-outline"></nb-icon>
+              </div>
+              <div class="plan-textos">
+                <span class="plan-titulo">Plan semanal recurrente</span>
+                <span class="plan-descripcion">Agenda automáticamente varias semanas</span>
+              </div>
             </div>
-            <div class="duracion-grid">
-              <button *ngFor="let d of duracionesDisponibles"
-                      class="duracion-opcion"
-                      [class.active]="planConfig.duracion === d.valor"
-                      (click)="setPlanDuracion(d.valor)">
-                <span class="duracion-semanas">{{ d.label }}</span>
-                <span class="duracion-sesiones-aprox">~{{ d.sesiones }} sesiones</span>
-              </button>
-            </div>
-          </div>
-
-          <div class="plan-paso">
-            <div class="plan-paso-header">
-              <span class="plan-paso-num">2</span>
-              <span class="plan-paso-titulo">Días de entrenamiento</span>
-            </div>
-            <div class="dias-semana-grid">
-              <button *ngFor="let dia of diasSemanaConfig"
-                      class="dia-btn"
-                      [class.active]="dia.seleccionado"
-                      [class.disabled]="!dia.disponible"
-                      [disabled]="!dia.disponible"
-                      (click)="toggleDiaSemanaPlan(dia)">
-                <span class="dia-inicial">{{ dia.letra }}</span>
-                <span class="dia-nombre-corto">{{ dia.nombre }}</span>
-              </button>
-            </div>
-            <div class="resumen-dias" *ngIf="getDiasSeleccionados().length > 0">
-              <nb-icon icon="checkmark-circle-2-outline"></nb-icon>
-              {{ getDiasSeleccionados().length }} día(s) × {{ planConfig.duracion }} semanas = 
-              <strong>{{ calcularTotalSesionesPlan() }} sesiones</strong>
+            <div class="plan-switch" [class.active]="usarPlanSemanal">
+              <div class="switch-track">
+                <div class="switch-thumb"></div>
+              </div>
             </div>
           </div>
-
-          <div class="plan-paso" *ngIf="getDiasSeleccionados().length > 0">
-            <div class="plan-paso-header">
-              <span class="plan-paso-num">3</span>
-              <span class="plan-paso-titulo">Horario</span>
-            </div>
-            
-            <div class="horario-tipo-selector">
-              <button class="horario-tipo-btn" 
-                      [class.active]="planConfig.mismaHora"
-                      (click)="planConfig.mismaHora = true">
-                <nb-icon icon="clock-outline"></nb-icon>
-                Mismo horario
-              </button>
-              <button class="horario-tipo-btn" 
-                      [class.active]="!planConfig.mismaHora"
-                      (click)="planConfig.mismaHora = false">
-                <nb-icon icon="options-2-outline"></nb-icon>
-                Diferente por día
-              </button>
+          
+          <div class="plan-body-pro" *ngIf="usarPlanSemanal">
+            <!-- Paso 1: Duración -->
+            <div class="plan-seccion">
+              <div class="seccion-header">
+                <span class="seccion-numero">1</span>
+                <span class="seccion-titulo">¿Por cuánto tiempo?</span>
+              </div>
+              <div class="duracion-cards">
+                <button *ngFor="let d of duracionesDisponibles"
+                        class="duracion-card"
+                        [class.selected]="planConfig.duracion === d.valor"
+                        (click)="setPlanDuracion(d.valor)">
+                  <span class="duracion-tiempo">{{ d.label }}</span>
+                  <span class="duracion-sesiones">{{ d.sesiones }} sesiones</span>
+                </button>
+              </div>
             </div>
 
-            <div class="horario-unico-plan" *ngIf="planConfig.mismaHora">
-              <div class="horario-row">
-                <div class="horario-field">
-                  <label>Inicio</label>
-                  <select [(ngModel)]="planConfig.horaGlobalInicio" (ngModelChange)="onCambioHorarioPlan()">
-                    <option value="">--:--</option>
-                    <option *ngFor="let h of horasDisponiblesPlan" [value]="h">{{ h }}</option>
-                  </select>
+            <!-- Paso 2: Días -->
+            <div class="plan-seccion">
+              <div class="seccion-header">
+                <span class="seccion-numero">2</span>
+                <span class="seccion-titulo">¿Qué días entrenas?</span>
+              </div>
+              <div class="dias-selector-pro">
+                <button *ngFor="let dia of diasSemanaConfig"
+                        class="dia-chip"
+                        [class.selected]="dia.seleccionado"
+                        [class.unavailable]="!dia.disponible"
+                        [disabled]="!dia.disponible"
+                        (click)="toggleDiaSemanaPlan(dia)">
+                  <span class="dia-letra">{{ dia.letra }}</span>
+                  <span class="dia-nombre">{{ dia.nombre }}</span>
+                  <nb-icon *ngIf="dia.seleccionado" icon="checkmark-outline" class="dia-check"></nb-icon>
+                </button>
+              </div>
+              <div class="dias-resumen" *ngIf="getDiasSeleccionados().length > 0">
+                <nb-icon icon="calendar-outline"></nb-icon>
+                <span>{{ getDiasSeleccionados().length }} días × {{ planConfig.duracion }} semanas = <strong>{{ calcularTotalSesionesPlan() }} sesiones</strong></span>
+              </div>
+            </div>
+
+            <!-- Paso 3: Horario -->
+            <div class="plan-seccion" *ngIf="getDiasSeleccionados().length > 0">
+              <div class="seccion-header">
+                <span class="seccion-numero">3</span>
+                <span class="seccion-titulo">¿A qué hora?</span>
+              </div>
+              
+              <div class="horario-tabs">
+                <button class="horario-tab" 
+                        [class.active]="planConfig.mismaHora"
+                        (click)="planConfig.mismaHora = true">
+                  <nb-icon icon="clock-outline"></nb-icon>
+                  Mismo horario
+                </button>
+                <button class="horario-tab" 
+                        [class.active]="!planConfig.mismaHora"
+                        (click)="planConfig.mismaHora = false">
+                  <nb-icon icon="options-2-outline"></nb-icon>
+                  Por día
+                </button>
+              </div>
+
+              <!-- Horario único -->
+              <div class="horario-unico-pro" *ngIf="planConfig.mismaHora">
+                <div class="horario-inputs">
+                  <div class="input-grupo">
+                    <label>Inicio</label>
+                    <div class="select-pro">
+                      <select [(ngModel)]="planConfig.horaGlobalInicio" (ngModelChange)="onCambioHorarioPlan()">
+                        <option value="">--:--</option>
+                        <option *ngFor="let h of horasDisponiblesPlan" [value]="h">{{ h }}</option>
+                      </select>
+                    </div>
+                  </div>
+                  <span class="input-arrow">→</span>
+                  <div class="input-grupo">
+                    <label>Fin</label>
+                    <div class="select-pro">
+                      <select [(ngModel)]="planConfig.horaGlobalFin" (ngModelChange)="generarSesionesPlan()">
+                        <option value="">--:--</option>
+                        <option *ngFor="let h of horasFinDisponiblesPlan" [value]="h">{{ h }}</option>
+                      </select>
+                    </div>
+                  </div>
                 </div>
-                <span class="horario-arrow">→</span>
-                <div class="horario-field">
-                  <label>Fin</label>
-                  <select [(ngModel)]="planConfig.horaGlobalFin" (ngModelChange)="generarSesionesPlan()">
-                    <option value="">--:--</option>
-                    <option *ngFor="let h of horasFinDisponiblesPlan" [value]="h">{{ h }}</option>
-                  </select>
+              </div>
+
+              <!-- Horarios por día -->
+              <div class="horarios-por-dia" *ngIf="!planConfig.mismaHora">
+                <div class="dia-horario-row" *ngFor="let dia of getDiasSeleccionados()">
+                  <span class="dia-label">{{ dia.nombre }}</span>
+                  <div class="dia-inputs">
+                    <select [(ngModel)]="dia.horaInicio" (ngModelChange)="actualizarHorasFinDia(dia); generarSesionesPlan()">
+                      <option value="">Inicio</option>
+                      <option *ngFor="let h of horasDisponiblesPlan" [value]="h">{{ h }}</option>
+                    </select>
+                    <span>a</span>
+                    <select [(ngModel)]="dia.horaFin" (ngModelChange)="generarSesionesPlan()">
+                      <option value="">Fin</option>
+                      <option *ngFor="let h of dia.horasFinDisponibles || horasFinDisponiblesPlan" [value]="h">{{ h }}</option>
+                    </select>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div class="horarios-diferentes" *ngIf="!planConfig.mismaHora">
-              <div class="horario-dia-item" *ngFor="let dia of getDiasSeleccionados()">
-                <span class="horario-dia-nombre">{{ dia.nombre }}</span>
-                <div class="horario-dia-selects">
-                  <select [(ngModel)]="dia.horaInicio" (ngModelChange)="actualizarHorasFinDia(dia); generarSesionesPlan()">
-                    <option value="">Inicio</option>
-                    <option *ngFor="let h of horasDisponiblesPlan" [value]="h">{{ h }}</option>
-                  </select>
-                  <span>a</span>
-                  <select [(ngModel)]="dia.horaFin" (ngModelChange)="generarSesionesPlan()">
-                    <option value="">Fin</option>
-                    <option *ngFor="let h of dia.horasFinDisponibles || horasFinDisponiblesPlan" [value]="h">{{ h }}</option>
-                  </select>
+            <!-- Vista previa de sesiones -->
+            <div class="plan-preview" *ngIf="sesionesGeneradasPlan.length > 0">
+              <div class="preview-header">
+                <nb-icon icon="eye-outline"></nb-icon>
+                <span>Vista previa: {{ sesionesGeneradasPlan.length }} sesiones</span>
+              </div>
+              <div class="preview-scroll">
+                <div class="preview-item" *ngFor="let s of sesionesGeneradasPlan.slice(0, 6)">
+                  <span class="preview-fecha">{{ parseFecha(s.fecha) | date:'EEE d MMM':'':'es' }}</span>
+                  <span class="preview-hora">{{ s.horaInicio }} - {{ s.horaFin }}</span>
+                </div>
+                <div class="preview-more" *ngIf="sesionesGeneradasPlan.length > 6">
+                  +{{ sesionesGeneradasPlan.length - 6 }} más...
                 </div>
               </div>
+              <button class="btn-aplicar-pro" (click)="aplicarPlanASesiones()">
+                <nb-icon icon="checkmark-circle-outline"></nb-icon>
+                Agregar {{ sesionesGeneradasPlan.length }} sesiones al calendario
+              </button>
             </div>
-
-            <button class="btn-aplicar-plan" 
-                    *ngIf="sesionesGeneradasPlan.length > 0"
-                    (click)="aplicarPlanASesiones()">
-              <nb-icon icon="checkmark-circle-outline"></nb-icon>
-              Aplicar plan ({{ sesionesGeneradasPlan.length }} sesiones)
-            </button>
           </div>
         </div>
 

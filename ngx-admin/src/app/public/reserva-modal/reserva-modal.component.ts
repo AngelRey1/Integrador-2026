@@ -377,6 +377,10 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
           // Inicializar calendario para sesión única con disponibilidad del entrenador
           this.cargarDiasConDisponibilidad();
           this.generarCalendarioUnica();
+          // Inicializar plan semanal con disponibilidad del entrenador
+          this.actualizarDisponibilidadDiasSemana();
+          this.cargarHorasDisponiblesPlan();
+          this.generarCalendario();
         } else {
           // Entrenador no encontrado
           console.warn('Entrenador no encontrado con ID:', id);
@@ -1431,6 +1435,29 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
    */
   calcularTotalSesionesPlan(): number {
     return this.getDiasSeleccionados().length * this.planConfig.duracion;
+  }
+
+  /**
+   * Calcular duración entre dos horas (para mostrar en UI)
+   */
+  calcularDuracion(horaInicio: string, horaFin: string): string {
+    if (!horaInicio || !horaFin) return '';
+    
+    const [hI, mI] = horaInicio.split(':').map(Number);
+    const [hF, mF] = horaFin.split(':').map(Number);
+    
+    const minutos = (hF * 60 + mF) - (hI * 60 + mI);
+    
+    if (minutos < 60) {
+      return `${minutos} min`;
+    } else if (minutos % 60 === 0) {
+      const horas = minutos / 60;
+      return `${horas} ${horas === 1 ? 'hora' : 'horas'}`;
+    } else {
+      const horas = Math.floor(minutos / 60);
+      const mins = minutos % 60;
+      return `${horas}h ${mins}m`;
+    }
   }
 
   /**
