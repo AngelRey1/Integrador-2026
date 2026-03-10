@@ -1938,11 +1938,11 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Establecer duración del plan
+   * Establecer duración del plan en semanas
    */
-  setPlanDuracion(meses: 1 | 2 | 3) {
-    this.planRecurrente.duracionMeses = meses;
-    this.calcularFechasRecurrentes();
+  setPlanDuracion(semanas: number) {
+    this.planConfig.duracion = semanas;
+    this.generarSesionesPlan();
   }
 
   /**
