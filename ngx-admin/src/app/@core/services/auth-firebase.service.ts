@@ -27,6 +27,31 @@ export class AuthFirebaseService {
   private currentRole: string | null = null;
   private tokenKey = 'firebase_user_data';
 
+  private mapClienteToUserData(uid: string, email: string | null | undefined, data: any): UserData {
+    return {
+      uid,
+      email: data.email || email || '',
+      nombre: data.nombre || '',
+      apellido: data.apellidos || '',
+      rol: 'CLIENTE',
+      estado: 'ACTIVO',
+      fechaRegistro: data.fechaRegistro || new Date(),
+    };
+  }
+
+  private mapEntrenadorToUserData(uid: string, email: string | null | undefined, data: any): UserData {
+    return {
+      uid,
+      email: data.email || email || '',
+      nombre: data.nombre || '',
+      apellido: data.apellidoPaterno || '',
+      rol: 'ENTRENADOR',
+      estado: data.activo ? 'ACTIVO' : 'PENDIENTE',
+      fechaRegistro: data.fechaRegistro || new Date(),
+      motivoRechazo: data.documentos?.motivoRechazo,
+    };
+  }
+
   constructor(
     private afAuth: AngularFireAuth,
     private firestore: AngularFirestore
@@ -42,56 +67,47 @@ export class AuthFirebaseService {
           this.clearSession();
           return of(null);
         }
-        // Buscar en múltiples colecciones
-        return this.firestore.collection('usuarios').doc(user.uid).valueChanges().pipe(
+        // Fuente canónica: users. Mantener fallback temporal a usuarios por migración.
+        return this.firestore.collection('users').doc(user.uid).valueChanges().pipe(
           switchMap(userData => {
             if (userData) return of(userData as UserData);
-            // Si no está en usuarios, buscar en clientes
-            return this.firestore.collection('clientes').doc(user.uid).valueChanges().pipe(
-              switchMap(clienteData => {
-                if (clienteData) {
-                  const data = clienteData as any;
-                  return of({
-                    uid: user.uid,
-                    email: data.email || user.email || '',
-                    nombre: data.nombre || '',
-                    apellido: data.apellidos || '',
-                    rol: 'CLIENTE' as const,
-                    estado: 'ACTIVO' as const,
-                    fechaRegistro: data.fechaRegistro || new Date()
-                  } as UserData);
-                }
-                // Si no está en clientes, buscar en entrenadores
-                return this.firestore.collection('entrenadores').doc(user.uid).valueChanges().pipe(
-                  map(entrenadorData => {
-                    if (entrenadorData) {
-                      const data = entrenadorData as any;
-                      return {
-                        uid: user.uid,
-                        email: data.email || user.email || '',
-                        nombre: data.nombre || '',
-                        apellido: data.apellidoPaterno || '',
-                        rol: 'ENTRENADOR' as const,
-                        estado: data.activo ? 'ACTIVO' as const : 'PENDIENTE' as const,
-                        fechaRegistro: data.fechaRegistro || new Date()
-                      } as UserData;
+            return this.firestore.collection('usuarios').doc(user.uid).valueChanges().pipe(
+              switchMap(legacyUserData => {
+                if (legacyUserData) return of(legacyUserData as UserData);
+                // Si no está en users/usuarios, buscar en clientes
+                return this.firestore.collection('clientes').doc(user.uid).valueChanges().pipe(
+                  switchMap(clienteData => {
+                    if (clienteData) {
+                      return of(this.mapClienteToUserData(user.uid, user.email, clienteData));
                     }
-                    return null;
+                    // Si no está en clientes, buscar en entrenadores
+                    return this.firestore.collection('entrenadores').doc(user.uid).valueChanges().pipe(
+                      map(entrenadorData => {
+                        if (entrenadorData) {
+                          return this.mapEntrenadorToUserData(user.uid, user.email, entrenadorData);
+                        }
+                        return null;
+                      }),
+                      catchError(err => {
+                        console.warn('Error buscando en entrenadores:', err);
+                        return of(null);
+                      })
+                    );
                   }),
                   catchError(err => {
-                    console.warn('Error buscando en entrenadores:', err);
+                    console.warn('Error buscando en clientes:', err);
                     return of(null);
                   })
                 );
               }),
               catchError(err => {
-                console.warn('Error buscando en clientes:', err);
+                console.warn('Error buscando en usuarios legacy:', err);
                 return of(null);
               })
             );
           }),
           catchError(err => {
-            console.warn('Error buscando en usuarios:', err);
+            console.warn('Error buscando en users:', err);
             return of(null);
           })
         );
@@ -168,7 +184,7 @@ export class AuthFirebaseService {
         fechaRegistro: new Date()
       };
 
-      await this.firestore.collection('usuarios').doc(credential.user.uid).set(userData);
+      await this.firestore.collection('users').doc(credential.user.uid).set(userData);
 
       // Si es entrenador, crear documento en colección de entrenadores
       if (rol === 'ENTRENADOR') {
@@ -247,9 +263,18 @@ export class AuthFirebaseService {
         return { success: false, message: 'Error al iniciar sesión' };
       }
 
-      // Primero buscar en colección 'usuarios'
-      let userDoc = await this.firestore.collection('usuarios').doc(credential.user.uid).get().toPromise();
+      // Primero buscar en colección canónica 'users'
+      let userDoc = await this.firestore.collection('users').doc(credential.user.uid).get().toPromise();
       let userData = userDoc?.data() as UserData | undefined;
+
+      // Fallback legacy temporal: usuarios
+      if (!userData) {
+        const legacyUserDoc = await this.firestore.collection('usuarios').doc(credential.user.uid).get().toPromise();
+        userData = legacyUserDoc?.data() as UserData | undefined;
+        if (userData) {
+          await this.firestore.collection('users').doc(credential.user.uid).set(userData, { merge: true });
+        }
+      }
 
       // Si no está en usuarios, buscar en 'entrenadores'
       if (!userData) {
@@ -257,16 +282,8 @@ export class AuthFirebaseService {
         const entrenadorData = entrenadorDoc?.data() as any;
         
         if (entrenadorData) {
-          // Convertir datos de entrenador a formato UserData
-          userData = {
-            uid: credential.user.uid,
-            email: entrenadorData.email || credential.user.email || '',
-            nombre: entrenadorData.nombre || '',
-            apellido: entrenadorData.apellidoPaterno || '',
-            rol: 'ENTRENADOR',
-            estado: entrenadorData.activo ? 'ACTIVO' : 'PENDIENTE',
-            fechaRegistro: entrenadorData.fechaRegistro || new Date()
-          };
+          userData = this.mapEntrenadorToUserData(credential.user.uid, credential.user.email, entrenadorData);
+          await this.firestore.collection('users').doc(credential.user.uid).set(userData, { merge: true });
         }
       }
 
@@ -278,15 +295,8 @@ export class AuthFirebaseService {
         
         if (entrenadoresSnapshot && !entrenadoresSnapshot.empty) {
           const entrenadorData = entrenadoresSnapshot.docs[0].data() as any;
-          userData = {
-            uid: credential.user.uid,
-            email: entrenadorData.email || credential.user.email || '',
-            nombre: entrenadorData.nombre || '',
-            apellido: entrenadorData.apellidoPaterno || '',
-            rol: 'ENTRENADOR',
-            estado: entrenadorData.activo ? 'ACTIVO' : 'PENDIENTE',
-            fechaRegistro: entrenadorData.fechaRegistro || new Date()
-          };
+          userData = this.mapEntrenadorToUserData(credential.user.uid, credential.user.email, entrenadorData);
+          await this.firestore.collection('users').doc(credential.user.uid).set(userData, { merge: true });
         }
       }
 
@@ -301,6 +311,7 @@ export class AuthFirebaseService {
           estado: 'ACTIVO',
           fechaRegistro: new Date()
         };
+        await this.firestore.collection('users').doc(credential.user.uid).set(userData, { merge: true });
       }
 
       // Verificar rol si es necesario

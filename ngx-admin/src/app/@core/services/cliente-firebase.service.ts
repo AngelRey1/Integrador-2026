@@ -81,6 +81,7 @@ export interface Pago {
     comision: number;
     montoEntrenador: number;
     metodo: 'tarjeta' | 'oxxo' | 'efectivo' | 'transferencia';
+    metodoPago?: 'tarjeta' | 'oxxo' | 'efectivo' | 'transferencia';
     estado: 'PENDIENTE' | 'COMPLETADO' | 'REEMBOLSADO';
     referencia?: string;
     fecha: Date;

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from '../../@core/services/auth.service';
+import { AuthFirebaseService } from '../../@core/services/auth-firebase.service';
 
 @Component({
   selector: 'ngx-solicitud-rechazada',
@@ -46,7 +46,7 @@ export class SolicitudRechazadaComponent {
 
   constructor(
     private router: Router,
-    private auth: AuthService
+    private authFirebase: AuthFirebaseService
   ) {
     // Cargar motivo del rechazo si existe
     const motivo = localStorage.getItem('rejected_reason');
@@ -55,8 +55,8 @@ export class SolicitudRechazadaComponent {
     }
   }
 
-  volverAlInicio() {
-    this.auth.logout();
+  async volverAlInicio() {
+    await this.authFirebase.logout();
     this.router.navigate(['/']);
   }
 

@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NbToastrService } from '@nebular/theme';
-import { AuthService } from '../../../@core/services/auth.service';
+import { AuthFirebaseService } from '../../../@core/services/auth-firebase.service';
 import { ClienteFirebaseService } from '../../../@core/services/cliente-firebase.service';
 import { Subscription } from 'rxjs';
 
@@ -138,13 +138,12 @@ export class PerfilClienteComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private toastrService: NbToastrService,
-    private authService: AuthService,
+    private authFirebase: AuthFirebaseService,
     private clienteFirebase: ClienteFirebaseService
   ) {
-    // Obtener email y nombre de usuario del token JWT
-    const tokenPayload = this.authService.decodeToken(this.authService.token || '');
-    const email = tokenPayload?.email || '';
-    const nombreUsuario = tokenPayload?.nombreUsuario || tokenPayload?.sub || '';
+    // Obtener email y nombre desde sesión Firebase
+    const email = this.authFirebase.getEmail() || '';
+    const nombreUsuario = this.authFirebase.getNombreUsuario() || '';
     
     // Generar una foto consistente basada en el nombre de usuario o email
     const fotoId = this.generarFotoIdHombre(nombreUsuario || email || 'usuario');
@@ -258,27 +257,17 @@ export class PerfilClienteComponent implements OnInit, OnDestroy {
           this.avatarPreview = this.usuario.avatar;
           this.cargarDatosUsuario();
         } else {
-          // Si no hay perfil en Firebase, usar datos del token
-          const tokenPayload = this.authService.decodeToken(this.authService.token || '');
-          if (tokenPayload) {
-            if (tokenPayload.email) {
-              this.usuario.email = tokenPayload.email;
-            }
-            if (tokenPayload.nombreUsuario || tokenPayload.sub) {
-              this.usuario.nombreUsuario = tokenPayload.nombreUsuario || tokenPayload.sub;
-            }
-          }
+          // Si no hay perfil en Firebase, usar datos de sesión
+          this.usuario.email = this.authFirebase.getEmail() || this.usuario.email;
+          this.usuario.nombreUsuario = this.authFirebase.getNombreUsuario() || this.usuario.nombreUsuario;
           this.cargarDatosUsuario();
         }
       },
       error: (error) => {
         this.cargandoPerfil = false;
         console.error('Error al cargar perfil:', error);
-        // Continuar con datos del token si hay error
-        const tokenPayload = this.authService.decodeToken(this.authService.token || '');
-        if (tokenPayload?.email) {
-          this.usuario.email = tokenPayload.email;
-        }
+        // Continuar con datos de sesión si hay error
+        this.usuario.email = this.authFirebase.getEmail() || this.usuario.email;
         this.cargarDatosUsuario();
       }
     });

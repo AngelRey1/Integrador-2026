@@ -368,6 +368,15 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
     this.sesionesSeleccionadas = [];
   }
 
+  togglePlanSemanal(): void {
+    this.usarPlanSemanal = !this.usarPlanSemanal;
+
+    // Evita que se mezcle el flujo manual por día con el plan recurrente.
+    if (this.usarPlanSemanal) {
+      this.cerrarSelectorHorario();
+    }
+  }
+
   /**
    * Cargar datos del entrenador desde Firebase
    */
@@ -1208,6 +1217,11 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
       const fechaReserva = new Date(sesion.fecha);
       const [horas, minutos] = sesion.horaInicio.split(':').map(Number);
       fechaReserva.setHours(horas, minutos, 0, 0);
+      const duracionSesion: number = Number(
+        'duracionMinutos' in sesion
+          ? sesion.duracionMinutos
+          : (this.parseHora(sesion.horaFin) - this.parseHora(sesion.horaInicio)),
+      );
 
       const reservaData: Omit<Reserva, 'id' | 'clienteId' | 'fechaCreacion'> = {
         entrenadorId: this.entrenador!.id!,
@@ -1216,7 +1230,7 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
         fecha: fechaReserva,
         hora: sesion.horaInicio,
         horaFin: sesion.horaFin,
-        duracion: this.getDuracionSesion(),
+        duracion: duracionSesion,
         precio: precioUnitario,
         modalidad: this.paso2Form.get('modalidad')?.value,
         estado: (this.paso4Form.get('metodoPago')?.value === 'oxxo' ? 'PENDIENTE' : (this.pagoCompletado ? 'CONFIRMADA' : 'PENDIENTE')) as any,
@@ -2140,6 +2154,11 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
    * Abrir modal para seleccionar horario de un día específico
    */
   abrirSelectorHorario(dia: DiaCalendario) {
+    if (this.usarPlanSemanal) {
+      this.mostrarMensajeFeedback('Con plan recurrente activo, define un solo horario en el panel derecho.');
+      return;
+    }
+
     if (!dia.esMesActual) {
       return;
     }

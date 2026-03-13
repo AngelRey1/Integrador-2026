@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from '../../@core/services/auth.service';
+import { AuthFirebaseService } from '../../@core/services/auth-firebase.service';
 
 @Component({
   selector: 'ngx-pendiente-aprobacion',
@@ -48,14 +48,13 @@ export class PendienteAprobacionComponent {
 
   constructor(
     private router: Router,
-    private auth: AuthService
+    private authFirebase: AuthFirebaseService
   ) {
-    // Intentar obtener email de localStorage (guardado en login)
-    this.userEmail = localStorage.getItem('pending_user_email') || 'tu email registrado';
+    this.userEmail = this.authFirebase.getEmail() || localStorage.getItem('pending_user_email') || 'tu email registrado';
   }
 
-  logout() {
-    this.auth.logout();
+  async logout() {
+    await this.authFirebase.logout();
     this.router.navigate(['/auth/login']);
   }
 

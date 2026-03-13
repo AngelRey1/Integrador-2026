@@ -242,7 +242,7 @@ export class AdminFirebaseService {
             });
 
             // Actualizar estado en usuarios
-            await this.firestore.doc(`usuarios/${id}`).update({
+            await this.firestore.doc(`users/${id}`).update({
                 estado: 'ACTIVO'
             });
 
@@ -264,7 +264,7 @@ export class AdminFirebaseService {
             });
 
             // Actualizar estado en usuarios
-            await this.firestore.doc(`usuarios/${id}`).update({
+            await this.firestore.doc(`users/${id}`).update({
                 estado: 'RECHAZADO',
                 motivoRechazo: motivo
             });

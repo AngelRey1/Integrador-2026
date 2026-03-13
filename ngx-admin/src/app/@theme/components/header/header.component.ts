@@ -5,7 +5,7 @@ import { UserData } from '../../../@core/data/users';
 import { LayoutService } from '../../../@core/utils';
 import { map, takeUntil, filter, switchMap } from 'rxjs/operators';
 import { Subject, of } from 'rxjs';
-import { AuthService } from '../../../@core/services/auth.service';
+import { AuthFirebaseService } from '../../../@core/services/auth-firebase.service';
 import { Router } from '@angular/router';
 import { NotificacionesFirebaseService, Notificacion } from '../../../@core/services/notificaciones-firebase.service';
 import { CloudinaryService } from '../../../@core/services/cloudinary.service';
@@ -64,7 +64,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     private userService: UserData,
     private layoutService: LayoutService,
     private breakpointService: NbMediaBreakpointsService,
-    private authService: AuthService,
+    private authFirebase: AuthFirebaseService,
     private router: Router,
     private notificacionesService: NotificacionesFirebaseService,
     private cloudinaryService: CloudinaryService,
@@ -75,8 +75,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.currentTheme = this.themeService.currentTheme;
-    this.currentRole = this.authService.getRole() || 'cliente';
-    this.userRole = this.authService.getRole() || '';
+    this.currentRole = this.authFirebase.getRole()?.toLowerCase() || 'cliente';
+    this.userRole = this.authFirebase.getRole()?.toLowerCase() || '';
 
     // Cargar datos reales del usuario desde Firebase
     this.cargarDatosUsuario();
@@ -124,8 +124,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
       switchMap(user => {
         if (!user) {
           // Si no hay usuario autenticado, usar datos del token
-          const nombreUsuario = this.authService.getNombreUsuario() || '';
-          const email = this.authService.getEmail() || '';
+          const nombreUsuario = this.authFirebase.getNombreUsuario() || '';
+          const email = this.authFirebase.getEmail() || '';
           const displayName = nombreUsuario || email || 'Usuario';
           this.user = {
             name: displayName,
@@ -233,15 +233,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   async logout() {
     // Cerrar sesión de Firebase
-    await this.afAuth.signOut();
-    // Cerrar sesión local (eliminar token)
-    this.authService.logout();
+    await this.authFirebase.logout();
     // Redirigir a la landing page
     this.router.navigate(['/']);
   }
 
   goToProfile() {
-    const role = this.authService.getRole();
+    const role = this.authFirebase.getRole()?.toLowerCase();
     if (role === 'entrenador') {
       this.router.navigate(['/pages/entrenador/perfil']);
     } else if (role === 'admin') {

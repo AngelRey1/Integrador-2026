@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { ClienteDashboardComponent } from './cliente-dashboard/cliente-dashboard.component';
 import { BuscarEntrenadoresComponent } from './buscar-entrenadores/buscar-entrenadores.component';
-import { AgendarSesionComponent } from './agendar-sesion/agendar-sesion.component';
 import { MisReservasComponent } from './mis-reservas/mis-reservas.component';
 import { MisPagosComponent } from './mis-pagos/mis-pagos.component';
 import { MisResenasComponent } from './mis-resenas/mis-resenas.component';
@@ -24,11 +23,13 @@ const routes: Routes = [
       },
       {
         path: 'agendar-sesion',
-        component: AgendarSesionComponent
+        redirectTo: '/entrenadores',
+        pathMatch: 'full'
       },
       {
         path: 'agendar-sesion/:id',
-        component: AgendarSesionComponent
+        redirectTo: '/entrenadores/reservar/:id',
+        pathMatch: 'full'
       },
       {
         path: 'mis-reservas',  // Ahora es "Mis Sesiones"

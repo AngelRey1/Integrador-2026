@@ -90,7 +90,8 @@
                        [class.disponible]="dia.disponible && dia.esMesActual"
                        [class.seleccionado]="dia.seleccionado"
                        [class.hoy]="dia.esHoy"
-                       (click)="abrirSelectorHorario(dia)">
+                       [class.bloqueado-plan]="usarPlanSemanal"
+                       (click)="!usarPlanSemanal && abrirSelectorHorario(dia)">
                     {{ dia.dia }}
                   </div>
                 </ng-container>
@@ -107,7 +108,7 @@
           <div class="col-panel">
             <!-- Toggle Plan Semanal -->
             <div class="panel-plan">
-              <div class="plan-toggle" (click)="usarPlanSemanal = !usarPlanSemanal">
+              <div class="plan-toggle" (click)="togglePlanSemanal()">
                 <div class="toggle-info">
                   <nb-icon icon="sync-outline"></nb-icon>
                   <div>
@@ -204,7 +205,7 @@
         <!-- Mensaje vacío -->
         <div class="mensaje-vacio-compact" *ngIf="sesionesSeleccionadas.length === 0">
           <nb-icon icon="calendar-outline"></nb-icon>
-          <span>Selecciona fechas del calendario{{ usarPlanSemanal ? ' o configura tu plan' : '' }}</span>
+          <span>{{ usarPlanSemanal ? 'Configura tu plan y presiona "Agregar sesiones"' : 'Selecciona fechas del calendario' }}</span>
         </div>
 
         <!-- TOTAL -->
@@ -217,7 +218,7 @@
         </div>
 
         <!-- Modal de horario (se mantiene igual) -->
-        <div class="horario-modal-overlay" *ngIf="diaSeleccionandoHorario" (click)="cerrarSelectorHorario()">
+        <div class="horario-modal-overlay" *ngIf="diaSeleccionandoHorario && !usarPlanSemanal" (click)="cerrarSelectorHorario()">
           <div class="horario-modal-pro" (click)="$event.stopPropagation()">
             <div class="modal-header-pro">
               <div class="header-fecha">

@@ -4,12 +4,12 @@ import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { NbToastrService } from '@nebular/theme';
-import { AuthService } from '../services/auth.service';
+import { AuthFirebaseService } from '../services/auth-firebase.service';
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
   constructor(
-    private authService: AuthService,
+    private authFirebase: AuthFirebaseService,
     private router: Router,
     private toastrService: NbToastrService
   ) {}
@@ -28,7 +28,7 @@ export class ErrorInterceptor implements HttpInterceptor {
           switch (error.status) {
             case 401:
               errorMessage = 'No autorizado. Por favor, inicia sesión nuevamente.';
-              this.authService.logout();
+              this.authFirebase.logout().catch(() => undefined);
               this.router.navigate(['/auth/login']);
               break;
             case 403:
