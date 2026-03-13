@@ -280,7 +280,7 @@
                   </div>
                   <small class="text-muted">Tarifa para sesiones presenciales (mín. $50 - máx. $3,000)</small>
                   <div *ngIf="perfilForm.get('precio')?.invalid && perfilForm.get('precio')?.touched" class="text-danger small mt-1">
-                    <span *ngIf="perfilForm.get('precio')?.errors?.['min']">El precio mínimo es $50 MXN</span>
+                    <span *ngIf="perfilForm.get('precio')?.errors?.['min']">El precio mínimo es $10 MXN</span>
                     <span *ngIf="perfilForm.get('precio')?.errors?.['max']">El precio máximo es $3,000 MXN</span>
                     <span *ngIf="perfilForm.get('precio')?.errors?.['required']">El precio es requerido</span>
                   </div>

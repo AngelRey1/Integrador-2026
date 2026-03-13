@@ -22,16 +22,12 @@ export const environment = {
     appId: '1:129548411869:web:63bbd269f0ef7d80c18c34'
   },
 
-  // Stripe Configuration
-  // IMPORTANTE: Reemplaza con tus claves reales de Stripe
-  // Obtén tus claves en: https://dashboard.stripe.com/apikeys
+  // Stripe Configuration - LIVE (mismo backend que producción)
   stripe: {
-    // Clave pública (publishable key) - segura para el frontend
-    publishableKey: 'pk_test_51SxfCtDveaissX7we9MZnolhuSFCKdG1ImD40Bvnnig2U2nO01Myqyp12yTq1yTDMz1vh7HlyclRiySaNlK9mMbv00U6oswd0F',
+    // Clave pública LIVE - debe coincidir con sk_live_ que usa el backend en Vercel
+    publishableKey: 'pk_live_51SxfCtDveaissX7wlqYZak9vsK4VMl4P7mByJ9Vvc0outf4QZJhJZv45SlrzxnApslIn0ItzCjXIGQAx3Inkc1Yj00T3Qn9DnD',
     // URL del backend para Stripe (Vercel)
     functionsUrl: 'https://sportconnecta-stripe-api.vercel.app',
-    // Modo simulado: true = genera vouchers fake sin llamar a Stripe, false = usa Stripe real
-    // Cambiar a false cuando Vercel esté configurado con STRIPE_SECRET_KEY
     simulatedMode: false
   }
 };

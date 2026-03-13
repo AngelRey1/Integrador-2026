@@ -30,6 +30,7 @@ export class PagosListComponent implements OnInit, OnDestroy {
   filteredPagos: Pago[] = [];
   filterEstado = 'todos';
   loading = true;
+  isProduction = environment.production;
 
   stats = {
     total: 0,
@@ -76,17 +77,20 @@ export class PagosListComponent implements OnInit, OnDestroy {
         ? new Date((p.fecha as any)?.seconds * 1000)
         : new Date();
 
+    const monto = p.monto || 0;
+    const comision = p.comision ?? ((p as any).comisionPlataforma) ?? (monto * 0.10);
+    const montoEntrenador = p.montoEntrenador ?? (monto - comision);
     return {
       id: p.id || '',
-      monto: p.monto,
-      comision: p.comision,
-      montoEntrenador: p.montoEntrenador,
+      monto: monto,
+      comision: comision,
+      montoEntrenador: montoEntrenador,
       estado: p.estado,
       fecha: fecha,
       clienteId: p.clienteId,
       entrenadorId: p.entrenadorId,
       stripePaymentIntentId: p.stripePaymentIntentId,
-      metodoPago: p.metodoPago,
+      metodoPago: p.metodoPago || (p as any).metodo,
       oxxoReferencia: p.oxxoReferencia
     };
   }
@@ -146,10 +150,16 @@ export class PagosListComponent implements OnInit, OnDestroy {
    * Abre el dashboard de Stripe para el PaymentIntent
    */
   simularPagoOxxo(pago: Pago): void {
+    if (this.isProduction) {
+      this.toastr.warning('La simulacion de pagos solo esta disponible en modo TEST', 'No disponible en produccion');
+      this.abrirEnStripe(pago);
+      return;
+    }
+
     if (!pago.stripePaymentIntentId) {
       this.toastr.warning('Este pago no tiene un PaymentIntent de Stripe asociado', 'Información');
       // Abrir el dashboard de Stripe para ver todos los pagos
-      window.open('https://dashboard.stripe.com/test/payments', '_blank');
+      window.open(this.getStripeDashboardUrl(), '_blank');
       return;
     }
 
@@ -168,7 +178,7 @@ export class PagosListComponent implements OnInit, OnDestroy {
           // Si hay instrucciones, mostrar modal o abrir Stripe
           if (response.instructions) {
             this.toastr.info('Abriendo dashboard de Stripe...', 'Instrucciones');
-            window.open(`https://dashboard.stripe.com/test/payments/${pago.stripePaymentIntentId}`, '_blank');
+            window.open(this.getStripeDashboardUrl(pago.stripePaymentIntentId), '_blank');
           }
         } else {
           this.toastr.warning(response.message, 'Advertencia');
@@ -187,10 +197,15 @@ export class PagosListComponent implements OnInit, OnDestroy {
    */
   abrirEnStripe(pago: Pago): void {
     if (pago.stripePaymentIntentId) {
-      window.open(`https://dashboard.stripe.com/test/payments/${pago.stripePaymentIntentId}`, '_blank');
+      window.open(this.getStripeDashboardUrl(pago.stripePaymentIntentId), '_blank');
     } else {
-      window.open('https://dashboard.stripe.com/test/payments', '_blank');
+      window.open(this.getStripeDashboardUrl(), '_blank');
     }
+  }
+
+  private getStripeDashboardUrl(paymentIntentId?: string): string {
+    const baseUrl = this.isProduction ? 'https://dashboard.stripe.com' : 'https://dashboard.stripe.com/test';
+    return paymentIntentId ? `${baseUrl}/payments/${paymentIntentId}` : `${baseUrl}/payments`;
   }
 
   /**

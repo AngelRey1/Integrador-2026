@@ -54,6 +54,7 @@ interface DiaCalendario {
 export class ReservaModalComponent implements OnInit, OnDestroy {
   pasoActual = 1;
   totalPasos = 5;
+  pagosConTarjetaHabilitados = !environment.production;
   fechaMinima: string;
   entrenador: Entrenador | null = null;
   cargandoEntrenador = true;
@@ -248,8 +249,10 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
       aceptaTerminos: [false, Validators.requiredTrue]
     });
 
+    const metodoPagoInicial = this.pagosConTarjetaHabilitados ? 'tarjeta' : 'oxxo';
+
     this.paso4Form = this.fb.group({
-      metodoPago: ['tarjeta', Validators.required],
+      metodoPago: [metodoPagoInicial, Validators.required],
       // Campos para tarjeta
       numeroTarjeta: [''],
       nombreTitular: [''],
@@ -263,8 +266,8 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
     this.paso4Form.get('metodoPago')?.valueChanges.subscribe(metodo => {
       this.actualizarValidacionesPago(metodo);
     });
-    // Inicializar validaciones para tarjeta
-    this.actualizarValidacionesPago('tarjeta');
+    // Inicializar validaciones para el método por defecto
+    this.actualizarValidacionesPago(metodoPagoInicial);
   }
 
   // Variables para cupos
@@ -1037,6 +1040,13 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
    * Procesar pago con tarjeta usando Stripe real
    */
   procesarPagoTarjeta() {
+    if (!this.pagosConTarjetaHabilitados) {
+      this.procesandoPago = false;
+      this.stripeError = 'El pago con tarjeta no esta habilitado en produccion aun. Por favor utiliza OXXO.';
+      alert(this.stripeError);
+      return;
+    }
+
     // Sistema unificado: siempre usar calcularPrecioTotalMultiple
     const precioFinal = this.calcularPrecioTotalMultiple();
     const montoEnCentavos = Math.round(precioFinal * 100);
@@ -1125,7 +1135,7 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
       duracion: this.getDuracionSesion(),
       precio: precioTotal,
       modalidad: this.paso2Form.get('modalidad')?.value,
-      estado: this.pagoCompletado ? 'CONFIRMADA' : 'PENDIENTE',
+      estado: (this.paso4Form.get('metodoPago')?.value === 'oxxo' ? 'PENDIENTE' : (this.pagoCompletado ? 'CONFIRMADA' : 'PENDIENTE')) as any,
       notas: this.paso2Form.get('notas')?.value || '',
       ubicacion: this.paso2Form.get('ubicacion')?.value || ''
     };
@@ -1209,7 +1219,7 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
         duracion: this.getDuracionSesion(),
         precio: precioUnitario,
         modalidad: this.paso2Form.get('modalidad')?.value,
-        estado: this.pagoCompletado ? 'CONFIRMADA' : 'PENDIENTE',
+        estado: (this.paso4Form.get('metodoPago')?.value === 'oxxo' ? 'PENDIENTE' : (this.pagoCompletado ? 'CONFIRMADA' : 'PENDIENTE')) as any,
         notas: `${this.paso2Form.get('notas')?.value || ''} [${this.tipoReserva === 'multiple' ? 'Sesión múltiple' : 'Plan recurrente'} - ${reservasCreadas.length + 1}/${sesiones.length}]`.trim(),
         ubicacion: this.paso2Form.get('ubicacion')?.value || ''
       };
@@ -1233,7 +1243,29 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
       this.reservaConfirmada = true;
       this.numeroReserva = 'RSV-' + reservasCreadas[0].substring(0, 8).toUpperCase() + ` (+${reservasCreadas.length - 1} más)`;
       console.log(`${reservasCreadas.length} reservas creadas exitosamente`);
-      
+
+      // Registrar pago en Firestore (igual que en crearReservaUnica)
+      const metodoPago = this.paso4Form.get('metodoPago')?.value;
+      const totalMonto = this.calcularPrecioTotalMultiple();
+      if (this.paymentIntentId) {
+        try {
+          const pagoData: any = {
+            reservaId: reservasCreadas[0],
+            entrenadorId: this.entrenador!.id!,
+            monto: totalMonto,
+            metodo: metodoPago,
+            stripePaymentIntentId: this.paymentIntentId
+          };
+          if (metodoPago === 'oxxo' && this.voucherOxxo?.referencia) {
+            pagoData.oxxoReferencia = this.voucherOxxo.referencia;
+          }
+          await this.clienteFirebase.crearPago(pagoData);
+          console.log('✅ Pago múltiple registrado con PaymentIntent:', this.paymentIntentId);
+        } catch (error) {
+          console.error('Error al registrar pago múltiple:', error);
+        }
+      }
+
       if (errores.length > 0) {
         console.warn('Algunas reservas fallaron:', errores);
       }

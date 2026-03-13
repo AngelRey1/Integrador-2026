@@ -20,8 +20,9 @@ export const environment = {
 
   // Stripe Configuration - PRODUCCIÓN
   stripe: {
-    // Clave pública (publishable key) - segura para el frontend
-    publishableKey: 'pk_test_51SxfCtDveaissX7we9MZnolhuSFCKdG1ImD40Bvnnig2U2nO01Myqyp12yTq1yTDMz1vh7HlyclRiySaNlK9mMbv00U6oswd0F',
+    // Clave pública LIVE (publishable key) - segura para el frontend
+    // ⚠️ REEMPLAZA ESTA CLAVE con tu pk_live_xxx de Stripe Dashboard
+    publishableKey: 'pk_live_51SxfCtDveaissX7wlqYZak9vsK4VMl4P7mByJ9Vvc0outf4QZJhJZv45SlrzxnApslIn0ItzCjXIGQAx3Inkc1Yj00T3Qn9DnD',
     // URL del backend para Stripe (Vercel)
     functionsUrl: 'https://sportconnecta-stripe-api.vercel.app',
     // Modo simulado: false en producción para usar Stripe real

@@ -354,7 +354,7 @@
             </div>
             <div class="form-group">
               <label>Teléfono *</label>
-              <input type="tel" formControlName="telefono" placeholder="+52 999 123 4567" class="form-input" />
+              <input type="tel" formControlName="telefono" placeholder="+52 999 225 8507" class="form-input" />
             </div>
           </div>
 
@@ -387,8 +387,10 @@
         <form [formGroup]="paso4Form" class="paso-form">
           <!-- Selector de método de pago -->
           <div class="metodos-pago-grid">
-            <label class="metodo-pago-card" [class.selected]="paso4Form.get('metodoPago')?.value === 'tarjeta'">
-              <input type="radio" formControlName="metodoPago" value="tarjeta" />
+            <label class="metodo-pago-card"
+                   [class.selected]="paso4Form.get('metodoPago')?.value === 'tarjeta'"
+                   [class.disabled]="!pagosConTarjetaHabilitados">
+              <input type="radio" formControlName="metodoPago" value="tarjeta" [disabled]="!pagosConTarjetaHabilitados" />
               <div class="metodo-content">
                 <nb-icon icon="credit-card-outline"></nb-icon>
                 <span class="metodo-titulo">Tarjeta</span>
@@ -406,6 +408,14 @@
                 <span class="metodo-desc">Pago en efectivo</span>
               </div>
             </label>
+          </div>
+
+          <div class="oxxo-info-box" *ngIf="!pagosConTarjetaHabilitados">
+            <nb-icon icon="info-outline"></nb-icon>
+            <div>
+              <strong>Pago con tarjeta no disponible por ahora</strong>
+              <p style="margin: 4px 0 0 0;">Usa OXXO para procesar pagos reales mientras se completa la integracion segura con Stripe Elements.</p>
+            </div>
           </div>
 
           <!-- Campos para TARJETA -->

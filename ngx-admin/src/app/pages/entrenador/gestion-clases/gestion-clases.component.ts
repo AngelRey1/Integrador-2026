@@ -81,7 +81,7 @@ export class GestionClasesComponent implements OnInit, OnDestroy {
       descripcion: ['', [Validators.required, Validators.maxLength(300)]],
       modalidad: ['presencial', Validators.required],
       duracion: [60, [Validators.required, Validators.min(15)]],
-      precio: [500, [Validators.required, Validators.min(50)]],
+      precio: [500, [Validators.required, Validators.min(10)]],
       capacidad: [10, [Validators.required, Validators.min(1)]],
       ubicacion: [''],
       nivel: ['Todos los niveles', Validators.required],

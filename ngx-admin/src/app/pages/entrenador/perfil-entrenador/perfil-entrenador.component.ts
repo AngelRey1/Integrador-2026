@@ -65,8 +65,8 @@ export class PerfilEntrenadorComponent implements OnInit, OnDestroy {
       nombre: [{ value: '', disabled: true }, Validators.required],
       apellidoPaterno: [{ value: '', disabled: true }],
       bio: [{ value: '', disabled: true }],
-      precio: [{ value: 500, disabled: true }, [Validators.required, Validators.min(50), Validators.max(3000)]],
-      precioOnline: [{ value: 400, disabled: true }, [Validators.required, Validators.min(50), Validators.max(3000)]],
+      precio: [{ value: 500, disabled: true }, [Validators.required, Validators.min(10), Validators.max(3000)]],
+      precioOnline: [{ value: 400, disabled: true }, [Validators.required, Validators.min(10), Validators.max(3000)]],
       telefono: [{ value: '', disabled: true }],
       whatsapp: [{ value: '', disabled: true }],
       ciudad: [{ value: '', disabled: true }],
@@ -224,7 +224,7 @@ export class PerfilEntrenadorComponent implements OnInit, OnDestroy {
       const precioErrors = this.perfilForm.get('precio')?.errors;
       if (precioErrors) {
         if (precioErrors['min']) {
-          this.toastrService.warning('El precio mínimo es $50 MXN', 'Precio inválido');
+          this.toastrService.warning('El precio mínimo es $10 MXN', 'Precio inválido');
         } else if (precioErrors['max']) {
           this.toastrService.warning('El precio máximo es $3,000 MXN', 'Precio inválido');
         }

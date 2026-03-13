@@ -78,7 +78,7 @@ export interface Pago {
     clienteId: string;
     entrenadorId: string;
     monto: number;
-    comisionPlataforma: number;
+    comision: number;
     montoEntrenador: number;
     metodo: 'tarjeta' | 'oxxo' | 'efectivo' | 'transferencia';
     estado: 'PENDIENTE' | 'COMPLETADO' | 'REEMBOLSADO';
@@ -511,9 +511,10 @@ export class ClienteFirebaseService {
                 clienteId: user.uid,
                 entrenadorId: pagoData.entrenadorId,
                 monto: pagoData.monto,
-                comisionPlataforma: comision,
+                comision: comision,
                 montoEntrenador: montoEntrenador,
                 metodo: pagoData.metodo,
+                metodoPago: pagoData.metodo, // campo esperado por el panel admin
                 estado: pagoData.metodo === 'oxxo' ? 'PENDIENTE' : 'COMPLETADO',
                 fecha: new Date(),
                 stripePaymentIntentId: pagoData.stripePaymentIntentId,

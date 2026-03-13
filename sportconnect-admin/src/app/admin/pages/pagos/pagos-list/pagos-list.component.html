@@ -163,7 +163,7 @@
             </button>
             
             <!-- Simular pago OXXO (solo para pendientes) -->
-            <button *ngIf="pago.estado === 'PENDIENTE' && pago.metodoPago === 'oxxo'" 
+                <button *ngIf="!isProduction && pago.estado === 'PENDIENTE' && pago.metodoPago === 'oxxo'" 
                     class="btn-action simulate"
                     [class.loading]="simulandoPago[pago.id]"
                     title="Simular pago recibido (TEST)"
@@ -175,7 +175,7 @@
             </button>
             
             <!-- Marcar como completado (para demo) -->
-            <button *ngIf="pago.estado === 'PENDIENTE'" 
+                <button *ngIf="!isProduction && pago.estado === 'PENDIENTE'" 
                     class="btn-action complete"
                     title="Marcar como completado (Demo)"
                     (click)="marcarComoCompletado(pago)">

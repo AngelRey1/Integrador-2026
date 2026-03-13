@@ -1,13 +1,32 @@
 const Stripe = require('stripe');
+const admin = require('firebase-admin');
 
 // Inicializar Stripe
-// Limpiar posibles caracteres de newline añadidos por el CLI
 const stripeKey = (process.env.STRIPE_SECRET_KEY || '').trim().replace(/[\r\n]/g, '');
 const stripe = new Stripe(stripeKey);
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
+// Inicializar Firebase Admin (singleton)
+if (!admin.apps.length) {
+  const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT;
+  if (serviceAccountJson) {
+    try {
+      const serviceAccount = JSON.parse(serviceAccountJson);
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount)
+      });
+    } catch (e) {
+      console.error('Error al inicializar Firebase Admin:', e.message);
+    }
+  } else {
+    console.warn('FIREBASE_SERVICE_ACCOUNT no configurada: los pagos no se actualizarán en Firebase');
+  }
+}
+
+const db = admin.apps.length ? admin.firestore() : null;
+
 // Necesitamos el body raw para verificar la firma
-export const config = {
+const config = {
   api: {
     bodyParser: false,
   },
@@ -22,7 +41,7 @@ async function getRawBody(req) {
   return Buffer.concat(chunks);
 }
 
-module.exports = async function handler(req, res) {
+async function handler(req, res) {
   // Solo permitir POST
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -47,8 +66,39 @@ module.exports = async function handler(req, res) {
       case 'payment_intent.succeeded':
         const paymentIntent = event.data.object;
         console.log('✅ Pago exitoso:', paymentIntent.id);
-        // Aquí puedes agregar lógica para actualizar tu base de datos
-        // Por ejemplo, marcar la reserva como pagada
+        if (db) {
+          try {
+            // Buscar el documento de pago por stripePaymentIntentId
+            const pagosSnap = await db.collection('pagos')
+              .where('stripePaymentIntentId', '==', paymentIntent.id)
+              .limit(1)
+              .get();
+
+            if (!pagosSnap.empty) {
+              const pagoDoc = pagosSnap.docs[0];
+              const pagoData = pagoDoc.data();
+
+              // Actualizar estado del pago a COMPLETADO
+              await pagoDoc.ref.update({
+                estado: 'COMPLETADO',
+                fechaPago: admin.firestore.FieldValue.serverTimestamp()
+              });
+              console.log('✅ Pago actualizado a COMPLETADO:', pagoDoc.id);
+
+              // Actualizar la reserva relacionada a CONFIRMADA
+              if (pagoData.reservaId) {
+                await db.collection('reservas').doc(pagoData.reservaId).update({
+                  estado: 'CONFIRMADA'
+                });
+                console.log('✅ Reserva actualizada a CONFIRMADA:', pagoData.reservaId);
+              }
+            } else {
+              console.warn('No se encontró pago con PaymentIntent:', paymentIntent.id);
+            }
+          } catch (err) {
+            console.error('Error al actualizar Firebase:', err.message);
+          }
+        }
         break;
 
       case 'payment_intent.payment_failed':
@@ -75,4 +125,7 @@ module.exports = async function handler(req, res) {
     console.error('Error processing webhook:', error);
     return res.status(500).json({ error: 'Webhook processing failed' });
   }
-};
+}
+
+module.exports = handler;
+module.exports.config = config;
