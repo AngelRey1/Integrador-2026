@@ -1221,8 +1221,143 @@
           text-transform: uppercase;
         }
       }
+    }
+
+    .config-manual {
+      padding: 1rem;
+      animation: fadeIn 0.3s ease;
+
+      .mensaje-selecciona-dia {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: #94a3b8;
+        padding: 2rem 1rem;
+        background: #f8fafc;
+        border-radius: 8px;
+        border: 1px dashed #cbd5e1;
+
+        nb-icon {
+          font-size: 2.5rem;
+          margin-bottom: 1rem;
+          color: #cbd5e1;
+        }
+
+        p {
+          margin: 0;
+          font-size: 0.9rem;
+          line-height: 1.4;
+        }
+      }
+
+      .dia-config {
+        .fecha-header-inline {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0.75rem 1rem;
+          background: #f1f5f9;
+          border-radius: 8px;
+          margin-bottom: 1rem;
+
+          .fecha-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #334155;
+
+            nb-icon {
+              font-size: 1.2rem;
+              color: #7d5aed;
+            }
+
+            h5 {
+              margin: 0;
+              font-size: 0.95rem;
+              font-weight: 600;
+            }
+          }
+
+          .btn-cancelar-dia {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 1.2rem;
+            line-height: 1;
+            padding: 0 0.25rem;
+            cursor: pointer;
+            transition: color 0.15s;
+
+            &:hover {
+              color: #ef4444;
+            }
+          }
+        }
+
+        .config-grupo {
+          margin-top: 1rem;
+          
+          label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #64748b;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+          }
+        }
+
+        .horarios-rapidos-inline {
+          margin-top: 1.5rem;
+          
+          .rapidos-titulo {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 0.75rem;
+
+            nb-icon {
+              color: #eab308;
+            }
+          }
+
+          .rapidos-chips-inline {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+
+            .chip-horario-inline {
+              background: #fff;
+              border: 1px solid #e2e8f0;
+              color: #475569;
+              padding: 0.4rem 0.75rem;
+              border-radius: 6px;
+              font-size: 0.85rem;
+              cursor: pointer;
+              transition: all 0.2s;
+
+              &:hover {
+                background: #f8fafc;
+                border-color: #cbd5e1;
+              }
+
+              &.selected {
+                background: #7d5aed;
+                border-color: #7d5aed;
+                color: #fff;
+              }
+            }
+          }
+        }
+      }
+    }
       
-      .duracion-chips {
+    .duracion-chips {
         display: flex;
         flex-wrap: wrap;
         gap: 0.5rem;
