@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { Observable, of, combineLatest } from 'rxjs';
+import { Observable, of, combineLatest, forkJoin } from 'rxjs';
 import { map, switchMap, catchError, tap } from 'rxjs/operators';
 
 export interface Entrenador {
@@ -45,6 +45,7 @@ export interface Reserva {
     clienteNombre: string;
     entrenadorId: string;
     entrenadorNombre: string;
+    entrenadorFoto?: string; // ✅ NUEVO: Foto del entrenador desde Firebase
     claseId?: string;
     fecha: Date;
     hora: string;
@@ -65,6 +66,8 @@ export interface Review {
     clienteNombre: string;
     clienteFoto?: string;
     entrenadorId: string;
+    entrenadorNombre?: string; // ✅ NUEVO: Nombre del entrenador desde Firebase
+    entrenadorFoto?: string;   // ✅ NUEVO: Foto del entrenador desde Firebase
     reservaId: string;
     calificacion: number;
     comentario: string;
@@ -268,7 +271,27 @@ export class ClienteFirebaseService {
                 return this.firestore.collection<Reserva>('reservas', ref =>
                     ref.where('clienteId', '==', user.uid)
                         .orderBy('fecha', 'desc')
-                ).valueChanges({ idField: 'id' });
+                ).valueChanges({ idField: 'id' }).pipe(
+                    switchMap(reservas => {
+                        // Enriquecer cada reserva con datos del entrenador
+                        if (reservas.length === 0) return of([]);
+                        
+                        const reservasEnriquecidas = reservas.map(r => 
+                            this.firestore.doc<Entrenador>(`entrenadores/${r.entrenadorId}`)
+                                .valueChanges()
+                                .pipe(
+                                    map(entrenador => ({
+                                        ...r,
+                                        entrenadorFoto: entrenador?.foto // ✅ DATOS REALES desde Firebase
+                                    }))
+                                )
+                        );
+                        
+                        return reservasEnriquecidas.length > 0 
+                            ? forkJoin(reservasEnriquecidas)
+                            : of([]);
+                    })
+                );
             })
         );
     }
@@ -282,7 +305,27 @@ export class ClienteFirebaseService {
                 if (!user) return of([]);
                 return this.firestore.collection<Reserva>('reservas', ref =>
                     ref.where('clienteId', '==', user.uid)
-                ).valueChanges({ idField: 'id' });
+                ).valueChanges({ idField: 'id' }).pipe(
+                    switchMap(reservas => {
+                        // Enriquecer cada reserva con datos del entrenador
+                        if (reservas.length === 0) return of([]);
+                        
+                        const reservasEnriquecidas = reservas.map(r => 
+                            this.firestore.doc<Entrenador>(`entrenadores/${r.entrenadorId}`)
+                                .valueChanges()
+                                .pipe(
+                                    map(entrenador => ({
+                                        ...r,
+                                        entrenadorFoto: entrenador?.foto // ✅ DATOS REALES desde Firebase
+                                    }))
+                                )
+                        );
+                        
+                        return reservasEnriquecidas.length > 0 
+                            ? forkJoin(reservasEnriquecidas)
+                            : of([]);
+                    })
+                );
             })
         );
     }
@@ -300,7 +343,28 @@ export class ClienteFirebaseService {
                         .where('fecha', '>=', ahora)
                         .where('estado', 'in', ['PENDIENTE', 'CONFIRMADA'])
                         .orderBy('fecha', 'asc')
-                ).valueChanges({ idField: 'id' });
+                ).valueChanges({ idField: 'id' }).pipe(
+                    switchMap(reservas => {
+                        // Enriquecer cada reserva con datos del entrenador
+                        if (reservas.length === 0) return of([]);
+                        
+                        const reservasEnriquecidas = reservas.map(r => 
+                            this.firestore.doc<Entrenador>(`entrenadores/${r.entrenadorId}`)
+                                .valueChanges()
+                                .pipe(
+                                    map(entrenador => ({
+                                        ...r,
+                                        entrenadorFoto: entrenador?.foto, // ✅ DATOS REALES desde Firebase
+                                        entrenadorNombre: entrenador?.nombre || r.entrenadorNombre || 'Entrenador'
+                                    }))
+                                )
+                        );
+                        
+                        return reservasEnriquecidas.length > 0 
+                            ? forkJoin(reservasEnriquecidas)
+                            : of([]);
+                    })
+                );
             })
         );
     }
@@ -412,7 +476,28 @@ export class ClienteFirebaseService {
                 return this.firestore.collection<Review>('reviews', ref =>
                     ref.where('clienteId', '==', user.uid)
                         .orderBy('fecha', 'desc')
-                ).valueChanges({ idField: 'id' });
+                ).valueChanges({ idField: 'id' }).pipe(
+                    switchMap(reviews => {
+                        // Enriquecer cada reseña con datos del entrenador
+                        if (reviews.length === 0) return of([]);
+                        
+                        const resennasEnriquecidas = reviews.map(r => 
+                            this.firestore.doc<Entrenador>(`entrenadores/${r.entrenadorId}`)
+                                .valueChanges()
+                                .pipe(
+                                    map(entrenador => ({
+                                        ...r,
+                                        entrenadorNombre: entrenador?.nombre || 'Entrenador',
+                                        entrenadorFoto: entrenador?.foto // ✅ DATOS REALES desde Firebase
+                                    }))
+                                )
+                        );
+                        
+                        return resennasEnriquecidas.length > 0 
+                            ? forkJoin(resennasEnriquecidas)
+                            : of([]);
+                    })
+                );
             })
         );
     }
@@ -733,5 +818,125 @@ export class ClienteFirebaseService {
             }
             return { success: false, message: 'Error al cambiar la contraseña' };
         }
+    }
+
+    // ==================== LOGROS ====================
+
+    /**
+     * Calcular logros desbloqueados del usuario basados en sus reservas completadas
+     * 
+     * Logros disponibles:
+     * - Primera Sesión: 1+ sesiones completadas
+     * - Racha de Disciplina: 5+ sesiones completadas
+     * - Explorador: 3+ deportes diferentes
+     * - Campeón: 10+ sesiones completadas
+     * - Madrugador: Sesión completada antes de las 7am
+     */
+    getLogrosDesbloqueados(): Observable<any[]> {
+        return this.getMisReservas().pipe(
+            map(reservas => {
+                const logros: any[] = [];
+                
+                // Filtrar solo las completadas
+                const completadas = reservas.filter(r => r.estado === 'COMPLETADA');
+                
+                console.log(`📊 Total sesiones completadas: ${completadas.length}`);
+
+                // LOGRO 1: Primera sesión completada
+                if (completadas.length >= 1) {
+                    logros.push({
+                        id: 'logro_primera_sesion',
+                        nombre: 'Primera Sesión',
+                        tipo: 'bronce',
+                        icono: 'award',
+                        descripcion: 'Completaste tu primera sesión de entrenamiento',
+                        fechaDesbloqueado: completadas[0].fecha
+                    });
+                    console.log('✅ DESBLOQUEADO: Primera Sesión');
+                }
+
+                // LOGRO 2: Racha de disciplina (5 sesiones)
+                if (completadas.length >= 5) {
+                    logros.push({
+                        id: 'logro_racha_5',
+                        nombre: 'Racha de Disciplina',
+                        tipo: 'plata',
+                        icono: 'fire',
+                        descripcion: 'Completaste 5 sesiones de entrenamiento',
+                        progreso: {
+                            actual: completadas.length,
+                            requerido: 5
+                        }
+                    });
+                    console.log('✅ DESBLOQUEADO: Racha de Disciplina');
+                }
+
+                // LOGRO 3: Explorador (3+ deportes distintos)
+                const deportesUnicos = new Set(
+                    completadas
+                        .map((r: any) => r.deporte || r.entrenadorId)
+                        .filter(Boolean)
+                );
+
+                if (deportesUnicos.size >= 3) {
+                    logros.push({
+                        id: 'logro_explorador',
+                        nombre: 'Explorador',
+                        tipo: 'oro',
+                        icono: 'globe',
+                        descripcion: `Entrenaste en ${deportesUnicos.size} deportes diferentes`,
+                        deportes: Array.from(deportesUnicos),
+                        progreso: {
+                            actual: deportesUnicos.size,
+                            requerido: 3
+                        }
+                    });
+                    console.log(`✅ DESBLOQUEADO: Explorador (${deportesUnicos.size} deportes)`);
+                }
+
+                // LOGRO 4: Campeón (10+ sesiones)
+                if (completadas.length >= 10) {
+                    logros.push({
+                        id: 'logro_campeon',
+                        nombre: 'Campeón',
+                        tipo: 'platino',
+                        icono: 'star',
+                        descripcion: 'Completaste 10+ sesiones de entrenamiento',
+                        progreso: {
+                            actual: completadas.length,
+                            requerido: 10
+                        }
+                    });
+                    console.log('✅ DESBLOQUEADO: Campeón');
+                }
+
+                // LOGRO 5: Madrugador (sesión antes de 7am)
+                const madrugadas = completadas.filter(r => {
+                    const hora = new Date(r.fecha).getHours();
+                    return hora < 7;
+                });
+                if (madrugadas.length >= 1) {
+                    logros.push({
+                        id: 'logro_madrugador',
+                        nombre: 'Madrugador',
+                        tipo: 'plata',
+                        icono: 'moon',
+                        descripcion: 'Completaste una sesión antes de las 7am',
+                        progreso: {
+                            actual: madrugadas.length,
+                            requerido: 1
+                        }
+                    });
+                    console.log('✅ DESBLOQUEADO: Madrugador');
+                }
+
+                console.log(`🏆 Total logros desbloqueados: ${logros.length}`);
+                return logros;
+            }),
+            catchError(err => {
+                console.error('❌ Error calculando logros:', err);
+                return of([]);
+            })
+        );
     }
 }

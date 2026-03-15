@@ -87,3 +87,18 @@ export const SESSION_STATUS = {
   COMPLETADA: { label: 'Completada', color: '#00D09C', bgColor: 'rgba(0, 208, 156, 0.1)' },
   CANCELADA: { label: 'Cancelada', color: '#EF4444', bgColor: 'rgba(239, 68, 68, 0.1)' }
 };
+
+// Modalidades de Entrenamiento
+export const MODALIDADES_DISPONIBLES = [
+  { value: '', label: 'Todas' },
+  { value: 'presencial', label: 'Presencial' },
+  { value: 'online', label: 'Online' }
+];
+
+// Niveles de Experiencia
+export const NIVELES_DISPONIBLES = [
+  { value: '', label: 'Todos' },
+  { value: 'PRINCIPIANTE', label: 'Principiante' },
+  { value: 'INTERMEDIO', label: 'Intermedio' },
+  { value: 'AVANZADO', label: 'Avanzado' }
+];

@@ -138,7 +138,7 @@ export class PublicHomeComponent implements OnInit, OnDestroy {
       id: e.id || '',
       nombre: `${e.nombre} ${e.apellidoPaterno || ''}`.trim(),
       deporte: e.deportes?.[0] || 'Fitness',
-      foto: e.foto || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
+      foto: e.foto || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(`${e.nombre} ${e.apellidoPaterno || ''}`.trim()) + '&background=00D09C&color=fff&size=100',
       estrellas: e.calificacionPromedio || 5.0,
       reviews: e.totalReviews || 0,
       precio: e.precio || 300,

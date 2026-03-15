@@ -1,16 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-privacidad',
+  selector: 'ngx-app-privacidad',
   templateUrl: './privacidad.component.html',
   styleUrls: ['./privacidad.component.scss']
 })
-export class PrivacidadComponent implements OnInit {
+export class PrivacidadComponent {
   today: Date = new Date();
 
   constructor() { }
-
-  ngOnInit(): void {
-  }
 
 }

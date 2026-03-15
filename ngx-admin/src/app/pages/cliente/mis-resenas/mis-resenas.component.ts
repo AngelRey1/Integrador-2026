@@ -129,8 +129,8 @@ export class MisResenasComponent implements OnInit, OnDestroy {
       entrenadorId: r.entrenadorId,
       reservaId: r.reservaId,
       entrenador: {
-        nombre: 'Entrenador', // Se podría enriquecer con datos del entrenador
-        avatar: 'https://ui-avatars.com/api/?name=E&background=ff6b35&color=fff&size=100',
+        nombre: r.entrenadorNombre || 'Entrenador',
+        avatar: r.entrenadorFoto || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(r.entrenadorNombre || 'E') + '&background=00D09C&color=ffffff&size=128',
         especialidad: 'Deportes'
       },
       sesion: {

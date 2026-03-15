@@ -130,7 +130,7 @@ export class EntrenadoresListComponent implements OnInit, OnDestroy {
       id: e.id || '',
       nombre: `${e.nombre} ${e.apellidoPaterno || ''}`.trim(),
       ubicacion: e.ubicacion?.ciudad || 'México',
-      foto: e.foto || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
+      foto: e.foto || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(`${e.nombre} ${e.apellidoPaterno || ''}`.trim()) + '&background=00D09C&color=fff&size=100',
       especialidad: e.deportes?.[0] || 'Fitness',
       deportes: e.deportes || [],
       calificacion: e.calificacionPromedio || 5.0,

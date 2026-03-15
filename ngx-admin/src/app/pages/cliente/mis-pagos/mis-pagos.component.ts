@@ -121,7 +121,7 @@ export class MisPagosComponent implements OnInit, OnDestroy {
       fecha: fecha,
       concepto: `Sesión con entrenador`,
       entrenador: 'Entrenador', // Se podría enriquecer con datos del entrenador
-      metodo_pago: p.metodo === 'tarjeta' ? 'Tarjeta •••• 4242' : p.metodo === 'efectivo' ? 'Efectivo' : 'Transferencia',
+      metodo_pago: p.metodo === 'tarjeta' ? 'Tarjeta' : p.metodo === 'efectivo' ? 'Efectivo' : 'Transferencia',
       monto: p.monto || 0,
       estado: estado
     };

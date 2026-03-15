@@ -76,14 +76,13 @@ export class MisReservasComponent implements OnInit, OnDestroy {
     const fecha = r.fecha instanceof Date ? r.fecha : new Date((r.fecha as any)?.seconds * 1000);
     const fechaCreacion = r.fechaCreacion instanceof Date ? r.fechaCreacion : new Date((r.fechaCreacion as any)?.seconds * 1000);
 
-
     return {
       id: r.id || '',
       numero_reserva: `RSV-${(r.id || '').slice(-6).toUpperCase()}`,
       entrenador: {
         id: r.entrenadorId,
         nombre: r.entrenadorNombre,
-        foto_url: 'https://ui-avatars.com/api/?name=E&background=ff6b35&color=fff&size=100',
+        foto_url: r.entrenadorFoto || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(r.entrenadorNombre) + '&background=00D09C&color=ffffff&size=128',
         especialidad: (r as any).deporte || 'General'
       },
       fecha: fecha,

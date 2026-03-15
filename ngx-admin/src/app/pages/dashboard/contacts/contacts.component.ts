@@ -1,34 +1,26 @@
-import { Component, OnDestroy } from '@angular/core';
-import { takeWhile } from 'rxjs/operators';
-import { forkJoin } from 'rxjs';
-
-import { Contacts, RecentUsers, UserData } from '../../../@core/data/users';
+import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'ngx-contacts',
   styleUrls: ['./contacts.component.scss'],
   templateUrl: './contacts.component.html',
 })
-export class ContactsComponent implements OnDestroy {
+export class ContactsComponent implements OnInit {
 
-  private alive = true;
+  contacts: any[] = [];
+  recent: any[] = [];
 
-  contacts: any[];
-  recent: any[];
+  constructor() {}
 
-  constructor(private userService: UserData) {
-    forkJoin(
-      this.userService.getContacts(),
-      this.userService.getRecentUsers(),
-    )
-      .pipe(takeWhile(() => this.alive))
-      .subscribe(([contacts, recent]: [Contacts[], RecentUsers[]]) => {
-        this.contacts = contacts;
-        this.recent = recent;
-      });
-  }
-
-  ngOnDestroy() {
-    this.alive = false;
+  ngOnInit() {
+    // ℹ️ NOTA: Este componente originalmente usaba UserData (mock service)
+    // que devolvía usuarios ficticios (Nick, Eva, Jack, Lee, Alan, Kate)
+    // 
+    // En una aplicación real, los "contactos" en SportCONNECT son:
+    // - Para Clientes: Sus entrenadores (accesibles desde ClienteDashboard)
+    // - Para Entrenadores: Sus clientes (accesibles desde EntrenadorDashboard)
+    // 
+    // Por ahora, este componente está deshabilitado.
+    // Si necesitas mostrar contactos reales, consulta ChatFirebaseService.
   }
 }

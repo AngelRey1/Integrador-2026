@@ -1,16 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-politicas-pago',
+  selector: 'ngx-app-politicas-pago',
   templateUrl: './politicas-pago.component.html',
   styleUrls: ['./politicas-pago.component.scss']
 })
-export class PoliticasPagoComponent implements OnInit {
+export class PoliticasPagoComponent {
   today: Date = new Date();
 
   constructor() { }
-
-  ngOnInit(): void {
-  }
 
 }

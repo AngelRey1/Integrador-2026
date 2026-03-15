@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { NbDialogService } from '@nebular/theme';
 import { ClienteFirebaseService, Entrenador as EntrenadorFirebase } from '../../../@core/services/cliente-firebase.service';
+import { MODALIDADES_DISPONIBLES, NIVELES_DISPONIBLES } from '../../../@core/config/sportconnect.config';
 import { Subscription } from 'rxjs';
 
 interface Entrenador {
@@ -54,25 +55,11 @@ export class BuscarEntrenadoresComponent implements OnInit, OnDestroy {
   };
 
   // Opciones para selects
-  deportesDisponibles = [
-    'Fútbol', 'Básquetbol', 'Basketball', 'Tenis', 'Natación', 'Running', 
-    'Ciclismo', 'Yoga', 'Pilates', 'CrossFit', 'Boxeo', 'Béisbol', 'Softball',
-    'Artes Marciales', 'Volleyball', 'Golf', 'Gimnasia',
-    'Entrenamiento Funcional', 'Pesas', 'Cardio', 'Fitness General'
-  ];
+  deportesDisponibles: string[] = []; // Cargar dinámicamente desde Firebase
 
-  modalidadesDisponibles = [
-    { value: '', label: 'Todas' },
-    { value: 'presencial', label: 'Presencial' },
-    { value: 'online', label: 'Online' }
-  ];
+  modalidadesDisponibles = MODALIDADES_DISPONIBLES;
 
-  nivelesDisponibles = [
-    { value: '', label: 'Todos' },
-    { value: 'PRINCIPIANTE', label: 'Principiante' },
-    { value: 'INTERMEDIO', label: 'Intermedio' },
-    { value: 'AVANZADO', label: 'Avanzado' }
-  ];
+  nivelesDisponibles = NIVELES_DISPONIBLES;
 
   ordenarOpciones = [
     { value: 'calificacion', label: 'Mayor calificación' },
@@ -95,6 +82,12 @@ export class BuscarEntrenadoresComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
+    // Cargar deportes dinámicamente desde Firebase (en lugar de array hardcodeado)
+    this.clienteFirebase.getDeportesNombres().subscribe(deportes => {
+      this.deportesDisponibles = deportes;
+      console.log('✅ Deportes cargados desde Firebase:', deportes);
+    });
+
     this.cargarEntrenadores();
   }
 
@@ -124,7 +117,7 @@ export class BuscarEntrenadoresComponent implements OnInit, OnDestroy {
     return {
       id: e.id || '',
       nombre_completo: `${e.nombre} ${e.apellidoPaterno}`,
-      foto_url: e.foto || 'https://ui-avatars.com/api/?name=E&background=ff6b35&color=fff&size=200',
+      foto_url: e.foto || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(`${e.nombre} ${e.apellidoPaterno || ''}`.trim()) + '&background=00D09C&color=fff&size=100',
       especialidad: e.especialidades?.join(' & ') || e.deportes?.join(' & ') || 'General',
       deportes: e.deportes || [],
       calificacion: e.calificacionPromedio || 0,

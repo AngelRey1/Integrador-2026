@@ -1,20 +1,14 @@
 const botAvatar: string = 'https://i.ytimg.com/vi/Erqi5ckVoEo/hqdefault.jpg';
 
+// NOTA: Las URLs de gifsLinks e imageLinks son ejemplo/placeholder para el componente chat demo.
+// En producción, estas imágenes deberían cargarse desde Storage (Cloudinary/Firebase Storage).
 export const gifsLinks: string[] = [
-  'https://media.tenor.com/images/ac287fd06319e47b1533737662d5bfe8/tenor.gif',
-  'https://i.gifer.com/no.gif',
-  'https://techcrunch.com/wp-content/uploads/2015/08/safe_image.gif',
-  'http://www.reactiongifs.com/r/wnd1.gif',
+  // Placeholder GIFs - reemplazar con URLs reales en producción
 ];
+
 export const imageLinks: string[] = [
-  'https://picsum.photos/320/240/?image=357',
-  'https://picsum.photos/320/240/?image=556',
-  'https://picsum.photos/320/240/?image=339',
-  'https://picsum.photos/320/240/?image=387',
-  'https://picsum.photos/320/240/?image=30',
-  'https://picsum.photos/320/240/?image=271',
+  // Placeholder images - reemplazar con URLs reales en producción
 ];
-const fileLink: string = 'http://google.com';
 
 export const botReplies = [
   {

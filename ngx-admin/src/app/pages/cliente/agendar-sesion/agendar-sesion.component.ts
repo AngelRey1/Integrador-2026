@@ -71,8 +71,7 @@ export class AgendarSesionComponent implements OnInit, OnDestroy {
 
   // Paso 4: Métodos de pago
   metodosPago: MetodoPago[] = [
-    { id: 'card1', tipo: 'Tarjeta Visa', ultimos_digitos: '4242', icono: 'credit-card-outline' },
-    { id: 'card2', tipo: 'Tarjeta Mastercard', ultimos_digitos: '5555', icono: 'credit-card-outline' },
+    { id: 'card1', tipo: 'Tarjeta', ultimos_digitos: '****', icono: 'credit-card-outline' },
     { id: 'paypal', tipo: 'PayPal', icono: 'globe-outline' },
     { id: 'nueva', tipo: 'Nueva tarjeta', icono: 'plus-circle-outline' }
   ];
@@ -172,7 +171,7 @@ export class AgendarSesionComponent implements OnInit, OnDestroy {
             this.entrenadores = entrenadoresFiltrados.map(e => ({
               id: e.id || '',
               nombre_completo: `${e.nombre} ${e.apellidoPaterno || ''}`.trim(),
-              foto_url: e.foto || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face',
+              foto_url: e.foto || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(`${e.nombre} ${e.apellidoPaterno || ''}`.trim()) + '&background=00D09C&color=fff&size=100',
               especialidad: e.deportes?.join(', ') || 'Entrenamiento',
               tarifa_por_hora: e.precio || 300,
               calificacion: e.calificacionPromedio || 5.0,
@@ -209,7 +208,7 @@ export class AgendarSesionComponent implements OnInit, OnDestroy {
         this.entrenadores = entrenadores.map(e => ({
           id: e.id || '',
           nombre_completo: `${e.nombre} ${e.apellidoPaterno || ''}`.trim(),
-          foto_url: e.foto || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face',
+          foto_url: e.foto || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(`${e.nombre} ${e.apellidoPaterno || ''}`.trim()) + '&background=00D09C&color=fff&size=100',
           especialidad: e.deportes?.join(', ') || 'Entrenamiento',
           tarifa_por_hora: e.precio || 300,
           calificacion: e.calificacionPromedio || 5.0,

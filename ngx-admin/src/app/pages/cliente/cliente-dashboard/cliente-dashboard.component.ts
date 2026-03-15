@@ -42,11 +42,7 @@ export class ClienteDashboardComponent implements OnInit, OnDestroy {
   historialSesiones: any[] = [];
 
   // === LOGROS ===
-  logrosRecientes: any[] = [
-    { nombre: 'Primera Sesión', tipo: 'bronce', icono: 'award' },
-    { nombre: 'Racha de 7 días', tipo: 'plata', icono: 'fire' },
-    { nombre: 'Explorador', tipo: 'oro', icono: 'trophy' }
-  ];
+  logrosRecientes: any[] = []; // Cargar dinámicamente desde Firebase
 
   // Próximas sesiones
   proximasSesiones: any[] = [];
@@ -208,6 +204,16 @@ export class ClienteDashboardComponent implements OnInit, OnDestroy {
       this.deportesPracticados = deportes.size;
     });
     this.dataSubscriptions.push(historialSub);
+
+    // Cargar logros desbloqueados en tiempo real (DINÁMICAMENTE)
+    const logrosSub = this.clienteFirebase
+      .getLogrosDesbloqueados()
+      .subscribe(logros => {
+        console.log('🏆 Logros del usuario:', logros);
+        this.logrosRecientes = logros;
+        this.logrosDesbloqueados = logros.length;
+      });
+    this.dataSubscriptions.push(logrosSub);
   }
 
   private formatearReserva(reserva: Reserva): any {
@@ -217,7 +223,7 @@ export class ClienteDashboardComponent implements OnInit, OnDestroy {
       entrenador: {
         id: reserva.entrenadorId,
         nombre: reserva.entrenadorNombre,
-        foto: 'https://ui-avatars.com/api/?name=E&background=ff6b35&color=fff&size=100'
+        foto: reserva.entrenadorFoto || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(reserva.entrenadorNombre || 'E') + '&background=00D09C&color=fff&size=100'
       },
       deporte: (reserva as any).deporte || 'General',
       duracion: reserva.duracion || 60,

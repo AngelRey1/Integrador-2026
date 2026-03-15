@@ -200,7 +200,7 @@ export class EntrenadorPerfilComponent implements OnInit, OnDestroy {
     this.entrenador = {
       id: e.id || '',
       nombre: nombre,
-      foto: e.foto || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
+      foto: e.foto || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(nombre) + '&background=00D09C&color=fff&size=100',
       ubicacion: e.ubicacion?.ciudad || 'México',
       especialidad: e.deportes?.[0] || 'Fitness',
       deportes: e.deportes || [],
