@@ -212,4 +212,44 @@ export class ChatFirebaseService {
       .valueChanges()
       .pipe(map(data => data ? { ...data, id: conversacionId } : undefined));
   }
+
+  // Obtener o crear conversación con soporte/admin
+  async obtenerOCrearConversacionSoporte(): Promise<string> {
+    const user = await this.afAuth.currentUser;
+    if (!user) throw new Error('Usuario no autenticado');
+
+    const adminId = 'admin-soporte'; // ID fijo para el usuario de soporte
+    const adminNombre = 'Soporte SportCONNECT';
+
+    // Buscar conversación existente
+    const existente = await this.firestore.collection('conversaciones', ref =>
+      ref.where('clienteId', '==', user.uid)
+         .where('entrenadorId', '==', adminId) // Reutilizamos el campo entrenadorId para admin
+    ).get().toPromise();
+
+    if (existente && !existente.empty) {
+      return existente.docs[0].id;
+    }
+
+    // Obtener datos del cliente actuálizado
+    const userDoc = await this.firestore.collection('users').doc(user.uid).get().toPromise();
+    const userData = userDoc?.data() as any;
+    const clienteNombre = userData?.nombre || user.displayName || 'Cliente';
+
+    // Crear nueva conversación de soporte
+    const conversacion: Conversacion = {
+      clienteId: user.uid,
+      clienteNombre,
+      entrenadorId: adminId, // Usamos entrenadorId para admin también
+      entrenadorNombre: adminNombre,
+      ultimoMensaje: '',
+      ultimoMensajeTimestamp: new Date(),
+      noLeidosCliente: 0,
+      noLeidosEntrenador: 0,
+      activa: true
+    };
+
+    const docRef = await this.firestore.collection('conversaciones').add(conversacion);
+    return docRef.id;
+  }
 }

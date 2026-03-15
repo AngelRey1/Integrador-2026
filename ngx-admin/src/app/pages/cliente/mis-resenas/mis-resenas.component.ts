@@ -196,12 +196,23 @@ export class MisResenasComponent implements OnInit, OnDestroy {
     this.dialogService.open(dialog, { context: resena });
   }
 
-  confirmarEliminar(ref: any): void {
+  async confirmarEliminar(ref: any): Promise<void> {
     if (this.resenaEnEdicion) {
-      // Por ahora solo eliminar localmente (Firebase no tiene método de eliminar reseñas aún)
-      this.resenas = this.resenas.filter(r => r.id !== this.resenaEnEdicion!.id);
-      this.aplicarFiltros();
-      this.toastr.success('Reseña eliminada correctamente', 'Eliminada');
+      this.cargando = true;
+      const result = await this.clienteFirebase.eliminarResena(
+        this.resenaEnEdicion.id,
+        this.resenaEnEdicion.entrenadorId
+      );
+
+      if (result.success) {
+        this.resenas = this.resenas.filter(r => r.id !== this.resenaEnEdicion!.id);
+        this.aplicarFiltros();
+        this.toastr.success('Reseña eliminada correctamente', 'Eliminada');
+      } else {
+        this.toastr.danger(result.message, 'Error');
+      }
+
+      this.cargando = false;
     }
     ref.close();
   }

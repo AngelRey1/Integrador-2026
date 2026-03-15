@@ -23,12 +23,7 @@ const routes: Routes = [
       },
       {
         path: 'agendar-sesion',
-        redirectTo: '/entrenadores',
-        pathMatch: 'full'
-      },
-      {
-        path: 'agendar-sesion/:id',
-        redirectTo: '/entrenadores/reservar/:id',
+        redirectTo: '/pages/cliente/buscar-entrenadores',
         pathMatch: 'full'
       },
       {

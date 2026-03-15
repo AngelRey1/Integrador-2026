@@ -67,47 +67,12 @@ export class AuthFirebaseService {
           this.clearSession();
           return of(null);
         }
-        // Fuente canónica: users. Mantener fallback temporal a usuarios por migración.
+        
+        // Fuente canónica: users collection (todos los usuarios tienen un documento aquí)
         return this.firestore.collection('users').doc(user.uid).valueChanges().pipe(
-          switchMap(userData => {
-            if (userData) return of(userData as UserData);
-            return this.firestore.collection('usuarios').doc(user.uid).valueChanges().pipe(
-              switchMap(legacyUserData => {
-                if (legacyUserData) return of(legacyUserData as UserData);
-                // Si no está en users/usuarios, buscar en clientes
-                return this.firestore.collection('clientes').doc(user.uid).valueChanges().pipe(
-                  switchMap(clienteData => {
-                    if (clienteData) {
-                      return of(this.mapClienteToUserData(user.uid, user.email, clienteData));
-                    }
-                    // Si no está en clientes, buscar en entrenadores
-                    return this.firestore.collection('entrenadores').doc(user.uid).valueChanges().pipe(
-                      map(entrenadorData => {
-                        if (entrenadorData) {
-                          return this.mapEntrenadorToUserData(user.uid, user.email, entrenadorData);
-                        }
-                        return null;
-                      }),
-                      catchError(err => {
-                        console.warn('Error buscando en entrenadores:', err);
-                        return of(null);
-                      })
-                    );
-                  }),
-                  catchError(err => {
-                    console.warn('Error buscando en clientes:', err);
-                    return of(null);
-                  })
-                );
-              }),
-              catchError(err => {
-                console.warn('Error buscando en usuarios legacy:', err);
-                return of(null);
-              })
-            );
-          }),
+          map(userData => userData as UserData),
           catchError(err => {
-            console.warn('Error buscando en users:', err);
+            console.warn('Error buscando usuario en users:', err);
             return of(null);
           })
         );
@@ -267,47 +232,15 @@ export class AuthFirebaseService {
       let userDoc = await this.firestore.collection('users').doc(credential.user.uid).get().toPromise();
       let userData = userDoc?.data() as UserData | undefined;
 
-      // Fallback legacy temporal: usuarios
       if (!userData) {
-        const legacyUserDoc = await this.firestore.collection('usuarios').doc(credential.user.uid).get().toPromise();
-        userData = legacyUserDoc?.data() as UserData | undefined;
-        if (userData) {
-          await this.firestore.collection('users').doc(credential.user.uid).set(userData, { merge: true });
-        }
-      }
-
-      // Si no está en usuarios, buscar en 'entrenadores'
-      if (!userData) {
-        const entrenadorDoc = await this.firestore.collection('entrenadores').doc(credential.user.uid).get().toPromise();
-        const entrenadorData = entrenadorDoc?.data() as any;
-        
-        if (entrenadorData) {
-          userData = this.mapEntrenadorToUserData(credential.user.uid, credential.user.email, entrenadorData);
-          await this.firestore.collection('users').doc(credential.user.uid).set(userData, { merge: true });
-        }
-      }
-
-      // Si tampoco está en entrenadores, buscar por email en entrenadores
-      if (!userData) {
-        const entrenadoresSnapshot = await this.firestore.collection('entrenadores', ref => 
-          ref.where('email', '==', email).limit(1)
-        ).get().toPromise();
-        
-        if (entrenadoresSnapshot && !entrenadoresSnapshot.empty) {
-          const entrenadorData = entrenadoresSnapshot.docs[0].data() as any;
-          userData = this.mapEntrenadorToUserData(credential.user.uid, credential.user.email, entrenadorData);
-          await this.firestore.collection('users').doc(credential.user.uid).set(userData, { merge: true });
-        }
-      }
-
-      if (!userData) {
-        // Si aún no encontramos, crear un userData básico con los datos de Firebase Auth
+        // Si el usuario no existe en 'users', crear un registro básico
+        // (Esto maneja casos de migraciones incompletas)
         userData = {
           uid: credential.user.uid,
           email: credential.user.email || email,
           nombre: credential.user.displayName?.split(' ')[0] || 'Usuario',
           apellido: credential.user.displayName?.split(' ').slice(1).join(' ') || '',
-          rol: rol as 'CLIENTE' | 'ENTRENADOR' | 'ADMIN',
+          rol: (rol !== 'ANY' ? rol : 'CLIENTE') as 'CLIENTE' | 'ENTRENADOR' | 'ADMIN',
           estado: 'ACTIVO',
           fechaRegistro: new Date()
         };

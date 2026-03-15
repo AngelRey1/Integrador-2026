@@ -23,6 +23,22 @@
   <div class="period-display">
     <span class="period-text">{{ getSelectedMonthName() }} {{ selectedYear }}</span>
   </div>
+  
+  <!-- Export Buttons -->
+  <div class="export-buttons">
+    <button class="export-btn csv" (click)="exportarCSV()" title="Descargar como CSV">
+      <span class="icon">📊</span>
+      <span class="label">CSV</span>
+    </button>
+    <button class="export-btn json" (click)="exportarJSON()" title="Descargar como JSON">
+      <span class="icon">📋</span>
+      <span class="label">JSON</span>
+    </button>
+    <button class="export-btn copy" (click)="copiarAlPortapapeles()" title="Copiar al portapapeles">
+      <span class="icon">📋</span>
+      <span class="label">Copiar</span>
+    </button>
+  </div>
 </div>
 
 <!-- LOADING STATE -->

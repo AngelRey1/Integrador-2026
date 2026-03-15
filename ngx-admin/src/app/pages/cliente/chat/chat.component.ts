@@ -89,6 +89,25 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     }
   }
 
+  // Iniciar chat de soporte/contactar admin
+  async iniciarSoporteChat(): Promise<void> {
+    try {
+      const conversacionId = await this.chatService.obtenerOCrearConversacionSoporte();
+      
+      // Buscar la conversación en la lista o recargar
+      const existente = this.conversaciones.find(c => c.id === conversacionId);
+      if (existente) {
+        this.seleccionarConversacion(existente);
+      } else {
+        // La conversación es nueva, recargar lista
+        this.cargarConversaciones();
+      }
+    } catch (error) {
+      console.error('Error iniciando chat de soporte:', error);
+      this.toastr.danger('No se pudo iniciar contacto con soporte', 'Error');
+    }
+  }
+
   seleccionarConversacion(conversacion: Conversacion): void {
     this.conversacionActiva = conversacion;
     this.cargarMensajes(conversacion.id!);

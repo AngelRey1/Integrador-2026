@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AdminFirebaseService } from '../../../../core/services/admin-firebase.service';
 import { Subscription } from 'rxjs';
+import * as XLSX from 'xlsx';
 
 interface ReporteMensual {
   totalReservas: number;
@@ -97,5 +98,123 @@ export class ReportesListComponent implements OnInit, OnDestroy {
       style: 'currency',
       currency: 'MXN'
     }).format(monto);
+  }
+
+  /**
+   * Exportar reporte a CSV
+   */
+  exportarCSV(): void {
+    if (!this.reporte) {
+      alert('No hay datos de reporte para exportar');
+      return;
+    }
+
+    const monthName = this.getSelectedMonthName();
+    const filename = `Reporte_${monthName}_${this.selectedYear}.csv`;
+
+    // Preparar datos para CSV
+    const data = [
+      ['REPORTE MENSUAL SPORTCONNECT'],
+      [],
+      [`Período: ${monthName} ${this.selectedYear}`],
+      [],
+      ['RESUMEN DE RESERVAS'],
+      ['Total de Reservas', this.reporte.totalReservas],
+      ['Reservas Completadas', this.reporte.reservasCompletadas, `(${this.tasaCompletadas}%)`],
+      ['Reservas Canceladas', this.reporte.reservasCanceladas, `(${this.tasaCanceladas}%)`],
+      [],
+      ['INGRESOS'],
+      ['Ingresos Totales', `$${this.reporte.ingresosTotales.toFixed(2)}`],
+      ['Comisión de Plataforma', `$${this.reporte.comisionesPlatforma.toFixed(2)}`],
+      [],
+      [`Generado: ${new Date().toLocaleString('es-MX')}`]
+    ];
+
+    // Crear worksheet
+    const ws: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(data);
+    
+    // Ajustar ancho de columnas
+    ws['!cols'] = [{ wch: 30 }, { wch: 15 }, { wch: 15 }];
+
+    // Crear workbook y agregar worksheet
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Reporte');
+
+    // Descargar archivo
+    XLSX.writeFile(wb, filename);
+  }
+
+  /**
+   * Exportar reporte a JSON (formato estructurado)
+   */
+  exportarJSON(): void {
+    if (!this.reporte) {
+      alert('No hay datos de reporte para exportar');
+      return;
+    }
+
+    const monthName = this.getSelectedMonthName();
+    const filename = `Reporte_${monthName}_${this.selectedYear}.json`;
+
+    const reporteJSON = {
+      periodo: {
+        mes: this.selectedMonth + 1,
+        año: this.selectedYear,
+        nombreMes: monthName
+      },
+      fecha_generacion: new Date().toISOString(),
+      resumenReservas: {
+        total: this.reporte.totalReservas,
+        completadas: this.reporte.reservasCompletadas,
+        canceladas: this.reporte.reservasCanceladas,
+        tasaCompletadas: `${this.tasaCompletadas}%`,
+        tasaCanceladas: `${this.tasaCanceladas}%`
+      },
+      ingresos: {
+        total: this.reporte.ingresosTotales,
+        comisiones: this.reporte.comisionesPlatforma
+      }
+    };
+
+    // Crear blob y descargar
+    const dataStr = JSON.stringify(reporteJSON, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
+  /**
+   * Copiar reporte a portapapeles
+   */
+  copiarAlPortapapeles(): void {
+    if (!this.reporte) {
+      alert('No hay datos de reporte para copiar');
+      return;
+    }
+
+    const monthName = this.getSelectedMonthName();
+    const texto = `REPORTE MENSUAL SPORTCONNECT
+Período: ${monthName} ${this.selectedYear}
+
+RESUMEN DE RESERVAS
+Total de Reservas: ${this.reporte.totalReservas}
+Reservas Completadas: ${this.reporte.reservasCompletadas} (${this.tasaCompletadas}%)
+Reservas Canceladas: ${this.reporte.reservasCanceladas} (${this.tasaCanceladas}%)
+
+INGRESOS
+Ingresos Totales: $${this.reporte.ingresosTotales.toFixed(2)}
+Comisión de Plataforma: $${this.reporte.comisionesPlatforma.toFixed(2)}
+
+Generado: ${new Date().toLocaleString('es-MX')}`;
+
+    navigator.clipboard.writeText(texto).then(() => {
+      alert('Reporte copiado al portapapeles');
+    }).catch(() => {
+      alert('Error al copiar al portapapeles');
+    });
   }
 }

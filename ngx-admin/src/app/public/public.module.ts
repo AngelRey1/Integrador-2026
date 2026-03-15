@@ -23,6 +23,26 @@ const routes: Routes = [
       import('./client/client.module').then((m) => m.ClientModule),
   },
   {
+    path: 'legal',
+    loadChildren: () =>
+      import('./legal/legal.module').then((m) => m.LegalModule),
+  },
+  {
+    path: 'terminos',
+    redirectTo: 'legal/terminos',
+    pathMatch: 'full'
+  },
+  {
+    path: 'politicas-pago',
+    redirectTo: 'legal/politicas-pago',
+    pathMatch: 'full'
+  },
+  {
+    path: 'privacidad',
+    redirectTo: 'legal/privacidad',
+    pathMatch: 'full'
+  },
+  {
     path: '',
     loadChildren: () =>
       import('./landing/landing.module').then((m) => m.LandingModule),

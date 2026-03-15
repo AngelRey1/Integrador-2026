@@ -451,6 +451,41 @@ export class ClienteFirebaseService {
     }
 
     /**
+     * Eliminar una reseña
+     */
+    async eliminarResena(resenaId: string, entrenadorId: string): Promise<{ success: boolean; message: string }> {
+        try {
+            const user = await this.afAuth.currentUser;
+            if (!user) {
+                return { success: false, message: 'Debes iniciar sesión' };
+            }
+
+            // Verificar que la reseña pertenece al usuario actual
+            const resenaDoc = await this.firestore.doc(`reviews/${resenaId}`).get().toPromise();
+            const resena = resenaDoc?.data() as any;
+
+            if (!resena) {
+                return { success: false, message: 'Reseña no encontrada' };
+            }
+
+            if (resena.clienteId !== user.uid) {
+                return { success: false, message: 'No puedes eliminar reseñas de otros usuarios' };
+            }
+
+            // Eliminar la reseña
+            await this.firestore.doc(`reviews/${resenaId}`).delete();
+
+            // Actualizar calificación promedio del entrenador
+            await this.actualizarCalificacionEntrenador(entrenadorId);
+
+            return { success: true, message: 'Reseña eliminada correctamente' };
+        } catch (error) {
+            console.error('Error al eliminar reseña:', error);
+            return { success: false, message: 'Error al eliminar la reseña' };
+        }
+    }
+
+    /**
      * Actualizar calificación promedio de un entrenador
      */
     private async actualizarCalificacionEntrenador(entrenadorId: string): Promise<void> {

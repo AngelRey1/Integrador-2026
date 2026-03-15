@@ -25,7 +25,7 @@ const CLIENTE_MENU: NbMenuItem[] = [
   {
     title: 'Agendar Sesión',
     icon: 'plus-circle-outline',
-    link: '/pages/cliente/agendar-sesion',
+    link: '/pages/cliente/buscar-entrenadores',
   },
   {
     title: 'HISTORIAL',

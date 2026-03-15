@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { ClienteService } from '../../../@core/services/cliente.service';
+import { NbDialogService } from '@nebular/theme';
 import { catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
 
@@ -20,9 +21,12 @@ interface Catalogo {
   styleUrls: ['./catalogos-cliente.component.scss']
 })
 export class CatalogosClienteComponent implements OnInit {
+  @ViewChild('detalleModal') detalleModal: TemplateRef<any> | undefined;
+
   catalogos: Catalogo[] = [];
   catalogosFiltrados: Catalogo[] = [];
   loading = false;
+  catalogoSeleccionado: Catalogo | null = null;
   
   // Filtros
   filtroBusqueda = '';
@@ -38,7 +42,10 @@ export class CatalogosClienteComponent implements OnInit {
     { value: 'servicios', label: 'Servicios' }
   ];
 
-  constructor(private clienteService: ClienteService) {}
+  constructor(
+    private clienteService: ClienteService,
+    private dialogService: NbDialogService
+  ) {}
 
   ngOnInit(): void {
     this.cargarCatalogos();
@@ -80,8 +87,13 @@ export class CatalogosClienteComponent implements OnInit {
   }
 
   verDetalle(catalogo: Catalogo): void {
-    console.log('Ver detalle de catálogo:', catalogo);
-    // TODO: Abrir modal o navegar a detalle
+    this.catalogoSeleccionado = catalogo;
+    if (this.detalleModal) {
+      this.dialogService.open(this.detalleModal, {
+        context: catalogo,
+        hasBackdrop: true
+      });
+    }
   }
 
   getCategoriaLabel(categoria: string): string {

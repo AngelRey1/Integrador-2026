@@ -63,6 +63,9 @@ export class MisPagosComponent implements OnInit, OnDestroy {
     { value: '11', label: 'Diciembre 2025' }
   ];
 
+  // Datos del cliente para recibos
+  clienteDatos: any = { nombre: 'cliente', email: '' };
+
   private subscription: Subscription | null = null;
 
   constructor(
@@ -72,6 +75,16 @@ export class MisPagosComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
+    // Cargar datos del perfil del cliente
+    this.clienteFirebase.getMiPerfil().subscribe(perfil => {
+      if (perfil) {
+        this.clienteDatos = {
+          nombre: perfil.nombre || 'Cliente',
+          email: perfil.email || ''
+        };
+      }
+    });
+    
     this.cargarPagos();
   }
 
@@ -193,7 +206,8 @@ export class MisPagosComponent implements OnInit, OnDestroy {
       numero: pago.numero_transaccion,
       fecha: pago.fecha,
       cliente: {
-        nombre: 'Cliente' // Se obtiene del usuario actual
+        nombre: this.clienteDatos.nombre,
+        email: this.clienteDatos.email
       },
       entrenador: {
         nombre: pago.entrenador,
@@ -213,9 +227,9 @@ export class MisPagosComponent implements OnInit, OnDestroy {
       }
     });
     this.toastr.success(
-      `Recibo ${pago.numero_transaccion} generado`,
+      `Recibo ${pago.numero_transaccion} generado. Se abrirá en una nueva ventana para imprimir/guardar como PDF.`,
       'Recibo Listo',
-      { duration: 3000, icon: 'checkmark-outline' }
+      { duration: 4000, icon: 'checkmark-outline' }
     );
   }
 
