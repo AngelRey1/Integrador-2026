@@ -94,7 +94,7 @@ export class MisClientesComponent implements OnInit, OnDestroy {
     return {
       id: c.clienteId,
       nombre: c.nombre,
-      avatar: c.foto || '',
+      avatar: c.foto || `https://ui-avatars.com/api/?name=${encodeURIComponent(c.nombre || 'Cliente')}&background=random&color=fff`,
       totalReservas,
       sesionesCompletadas,
       ultimaSesion,

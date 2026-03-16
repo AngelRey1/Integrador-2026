@@ -44,7 +44,11 @@ export class MisReservasComponent implements OnInit, OnDestroy {
   // Todas las reservas desde Firebase
   todasReservas: Reserva[] = [];
 
+  // Datos del cliente para recibos
+  clienteDatos: any = { nombre: 'Cliente', email: '' };
+
   private reservasSubscription: Subscription | null = null;
+  private perfilSubscription: Subscription | null = null;
 
   constructor(
     private dialogService: NbDialogService,
@@ -55,12 +59,24 @@ export class MisReservasComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
+    // Cargar datos del perfil del cliente
+    this.perfilSubscription = this.clienteFirebase.getMiPerfil().subscribe(perfil => {
+      if (perfil) {
+        this.clienteDatos = {
+          nombre: perfil.nombre || 'Cliente',
+          email: perfil.email || ''
+        };
+      }
+    });
     this.cargarReservas();
   }
 
   ngOnDestroy(): void {
     if (this.reservasSubscription) {
       this.reservasSubscription.unsubscribe();
+    }
+    if (this.perfilSubscription) {
+      this.perfilSubscription.unsubscribe();
     }
   }
 
@@ -212,7 +228,8 @@ export class MisReservasComponent implements OnInit, OnDestroy {
       numero: reserva.numero_reserva,
       fecha: reserva.fecha_creacion || new Date(),
       cliente: {
-        nombre: 'Cliente' // Se obtendría del usuario logueado
+        nombre: this.clienteDatos.nombre,
+        email: this.clienteDatos.email
       },
       entrenador: {
         nombre: reserva.entrenador.nombre,

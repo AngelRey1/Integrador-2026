@@ -43,13 +43,22 @@
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
   margin-bottom: 2rem;
+  align-items: start;
 }
 
 .entrenador-card {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   cursor: pointer;
-  height: 100%;
-  overflow: hidden;
+  max-width: 350px;
+  margin: 0;
+  min-height: 100%;
+  display: flex !important;
+  flex-direction: column !important;
+
+  ::ng-deep nb-card-header.no-padding {
+    padding: 0 !important;
+    border-bottom: none !important;
+  }
 }
 
 .entrenador-card:hover {

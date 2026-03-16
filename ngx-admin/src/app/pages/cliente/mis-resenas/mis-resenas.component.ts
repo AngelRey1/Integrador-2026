@@ -52,6 +52,9 @@ export class MisResenasComponent implements OnInit, OnDestroy {
   entrenadorIdNuevo: string | null = null;
   sesionIdNueva: string | null = null;
 
+  // Lista de reservas completadas para elegir a quién reseñar
+  reservasCompletadas: any[] = [];
+
   // Opciones de filtro
   calificacionesDisponibles = [
     { value: 0, label: 'Todas las calificaciones' },
@@ -87,6 +90,7 @@ export class MisResenasComponent implements OnInit, OnDestroy {
     private clienteFirebase: ClienteFirebaseService
   ) {
     this.resenaForm = this.fb.group({
+      reservaId: [null], // Se usa para seleccionar la sesión si no viene por params
       calificacion: [0, [Validators.required, Validators.min(1), Validators.max(5)]],
       comentario: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(500)]]
     });
@@ -104,6 +108,11 @@ export class MisResenasComponent implements OnInit, OnDestroy {
     });
 
     this.cargarResenas();
+
+    // Cargar historial de sesiones completadas para poder elegir a quién reseñar
+    this.clienteFirebase.getMisReservas().subscribe(reservas => {
+       this.reservasCompletadas = reservas.filter(r => r.estado === 'COMPLETADA');
+    });
   }
 
   ngOnDestroy(): void {
@@ -178,7 +187,13 @@ export class MisResenasComponent implements OnInit, OnDestroy {
 
   nuevaResena(): void {
     this.resenaEnEdicion = null;
-    this.resenaForm.reset({ calificacion: 0, comentario: '' });
+    this.resenaForm.reset({ calificacion: 0, comentario: '', reservaId: null });
+    
+    // Si viene de URL, asignamos esa sesión. Si no, le pediremos que elija una en el HTML
+    if (this.sesionIdNueva) {
+      this.resenaForm.patchValue({ reservaId: this.sesionIdNueva });
+    }
+
     this.mostrarFormulario = true;
   }
 
@@ -242,11 +257,17 @@ export class MisResenasComponent implements OnInit, OnDestroy {
       }
       this.cargando = false;
     } else {
+      // Si el usuario seleccionó del desplegable, lo sacamos del formulario
+      const reservaSeleccionadaId = this.resenaForm.get('reservaId')?.value || this.sesionIdNueva;
+      const reservaRelacionada = this.reservasCompletadas.find(r => r.id === reservaSeleccionadaId);
+      
+      const targetEntrenadorId = reservaRelacionada?.entrenadorId || this.entrenadorIdNuevo;
+
       // Nueva reseña a Firebase
-      if (this.entrenadorIdNuevo && this.sesionIdNueva) {
+      if (targetEntrenadorId && reservaSeleccionadaId) {
         const result = await this.clienteFirebase.crearResena({
-          entrenadorId: this.entrenadorIdNuevo,
-          reservaId: this.sesionIdNueva,
+          entrenadorId: targetEntrenadorId,
+          reservaId: reservaSeleccionadaId,
           calificacion: formValue.calificacion,
           comentario: formValue.comentario
         });

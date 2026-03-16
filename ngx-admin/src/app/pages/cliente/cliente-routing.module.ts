@@ -8,6 +8,7 @@ import { MisResenasComponent } from './mis-resenas/mis-resenas.component';
 import { PerfilClienteComponent } from './perfil-cliente/perfil-cliente.component';
 import { CatalogosClienteComponent } from './catalogos-cliente/catalogos-cliente.component';
 import { ChatComponent } from './chat/chat.component';
+import { AgendarSesionComponent } from './agendar-sesion/agendar-sesion.component';
 
 const routes: Routes = [
   {
@@ -23,8 +24,7 @@ const routes: Routes = [
       },
       {
         path: 'agendar-sesion',
-        redirectTo: '/pages/cliente/buscar-entrenadores',
-        pathMatch: 'full'
+        component: AgendarSesionComponent
       },
       {
         path: 'mis-reservas',  // Ahora es "Mis Sesiones"

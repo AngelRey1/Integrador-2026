@@ -74,7 +74,7 @@
         </nb-card-header>
         <nb-card-body>
           <form [formGroup]="resenaForm" (ngSubmit)="guardarResena()">
-            <!-- Calificación -->
+            <!-- Seleccionar Sesión --><div class="form-group mb-4" *ngIf="!resenaEnEdicion && !sesionIdNueva"><label class="label">Elige la sesión a reseñar *</label><nb-select fullWidth formControlName="reservaId" placeholder="Selecciona una sesión pasada"><nb-option *ngFor="let reserva of reservasCompletadas" [value]="reserva.id">{{ reserva.entrenador?.nombre || ' }} - {{ reserva.deporte }} (clic para calificar)</nb-option></nb-select></div><!-- Calificación -->
             <div class="form-group mb-4">
               <label class="label">Calificación *</label>
               <div class="star-rating">
@@ -253,11 +253,8 @@
               No se encontraron reseñas con los filtros aplicados
             </p>
             <p *ngIf="!filtroBusqueda && !filtroCalificacion && totalResenas === 0">
-              Aún no has dejado ninguna reseña. ¡Comparte tu experiencia!
-            </p>
-            <button nbButton status="primary" (click)="nuevaResena()" *ngIf="totalResenas === 0">
-              Crear Primera Reseña
-            </button>
+                Aún no has dejado ninguna reseña. ¡Comparte tu experiencia! Para publicar una, ve a "Mis Sesiones" y selecciona una sesión completada.
+              </p>
             <button nbButton status="basic" (click)="limpiarFiltros()" *ngIf="filtroBusqueda || filtroCalificacion">
               Limpiar Filtros
             </button>

@@ -145,18 +145,15 @@ export class PerfilClienteComponent implements OnInit, OnDestroy {
     const email = this.authFirebase.getEmail() || '';
     const nombreUsuario = this.authFirebase.getNombreUsuario() || '';
     
-    // Generar una foto consistente basada en el nombre de usuario o email
-    const fotoId = this.generarFotoIdHombre(nombreUsuario || email || 'usuario');
-    
-    // Inicializar datos desde token - se actualizarán desde Firebase
+// Inicializar datos desde token - se actualizarán desde Firebase
     this.usuario = {
       id: 1,
-      nombre: '',
-      apellidos: '',
+      nombre: nombreUsuario.split(' ')[0] || '',
+      apellidos: nombreUsuario.split(' ').slice(1).join(' ') || '',
       email: email,
       nombreUsuario: nombreUsuario,
       telefono: '',
-      fecha_nacimiento: null,
+      fecha_nacimiento: null as any,
       genero: '',
       direccion: {
         calle: '',
@@ -164,7 +161,7 @@ export class PerfilClienteComponent implements OnInit, OnDestroy {
         codigo_postal: '',
         pais: 'MX'
       },
-      avatar: `https://randomuser.me/api/portraits/men/${fotoId}.jpg`
+      avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(nombreUsuario || email || 'Usuario')}&background=00D09C&color=fff&size=150`
     };
 
     this.preferencias = {

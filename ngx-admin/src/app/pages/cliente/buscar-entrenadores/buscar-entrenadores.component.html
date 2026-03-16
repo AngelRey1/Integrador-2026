@@ -136,14 +136,16 @@
     <!-- Grid de Entrenadores -->
     <div class="entrenadores-grid" *ngIf="!cargando">
       <nb-card *ngFor="let entrenador of entrenadoresFiltrados" class="entrenador-card">
-        <!-- Imagen -->
-        <div class="entrenador-imagen">
-          <img [src]="entrenador.foto_url" [alt]="entrenador.nombre_completo">
-          <span class="certificado-badge" *ngIf="entrenador.certificado">
-            <nb-icon icon="checkmark-circle"></nb-icon>
-            Certificado
-          </span>
-        </div>
+        <nb-card-header class="no-padding">
+          <!-- Imagen -->
+          <div class="entrenador-imagen">
+            <img [src]="entrenador.foto_url" [alt]="entrenador.nombre_completo">
+            <span class="certificado-badge" *ngIf="entrenador.certificado">
+              <nb-icon icon="checkmark-circle"></nb-icon>
+              Certificado
+            </span>
+          </div>
+        </nb-card-header>
 
         <nb-card-body>
           <!-- Nombre y especialidad -->

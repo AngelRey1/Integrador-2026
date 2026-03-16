@@ -70,11 +70,7 @@ export class AgendarSesionComponent implements OnInit, OnDestroy {
   ];
 
   // Paso 4: Métodos de pago
-  metodosPago: MetodoPago[] = [
-    { id: 'card1', tipo: 'Tarjeta', ultimos_digitos: '****', icono: 'credit-card-outline' },
-    { id: 'paypal', tipo: 'PayPal', icono: 'globe-outline' },
-    { id: 'nueva', tipo: 'Nueva tarjeta', icono: 'plus-circle-outline' }
-  ];
+  metodosPago: MetodoPago[] = [];
 
   // Resumen y cálculo
   precioTotal = 0;
@@ -122,6 +118,11 @@ export class AgendarSesionComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     // Cargar entrenadores desde Firebase
     this.cargarEntrenadores();
+
+    // Cargar métodos de pago vinculados al usuario
+    this.clienteFirebase.getMetodosPago().subscribe(metodos => {
+        this.metodosPago = metodos;
+    });
 
     // Verificar si viene ID de entrenador por parámetro
     this.route.paramMap.subscribe(params => {
@@ -246,17 +247,29 @@ export class AgendarSesionComponent implements OnInit, OnDestroy {
   }
 
   generarHorariosDisponibles(fecha: Date): string[] {
-    // Generar horarios de 8:00 a 20:00, excluyendo los ocupados
     const horarios: string[] = [];
-    for (let hora = 8; hora <= 19; hora++) {
+    const diaSemana = fecha.getDay(); // 0 = Domingo, 1 = Lunes, etc.
+    
+    // Aquí deberíamos cruzar dinámicamente con la configuración del entrenador 
+    // `entrenadorSeleccionado.disponibilidad` dependiendo del día de la semana.
+    // Por defecto, asumimos que trabaja de 8:00 a 19:00 si es entre semana.
+    let horaInicio = 8;
+    let horaFin = 19;
+
+    if (diaSemana === 0) { // Domingo
+      return horarios; // Por defecto no disponible en domingos sin configurar
+    } else if (diaSemana === 6) { // Sábado
+      horaFin = 14; // Sábado hasta las 2 PM
+    }
+
+    for (let hora = horaInicio; hora <= horaFin; hora++) {
       const h1 = `${hora.toString().padStart(2, '0')}:00`;
       const h2 = `${hora.toString().padStart(2, '0')}:30`;
-      
+
       if (!this.horariosOcupados.includes(h1)) {
         horarios.push(h1);
       }
-      if (hora < 19 && !this.horariosOcupados.includes(h2)) {
-        horarios.push(h2);
+      if (hora < horaFin && !this.horariosOcupados.includes(h2)) {
       }
     }
     return horarios;

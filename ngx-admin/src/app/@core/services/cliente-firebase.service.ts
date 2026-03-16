@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { Observable, of, combineLatest, forkJoin } from 'rxjs';
-import { map, switchMap, catchError, tap } from 'rxjs/operators';
+import { map, switchMap, catchError, tap, take } from 'rxjs/operators';
 
 export interface Entrenador {
     id?: string;
@@ -446,23 +446,40 @@ export class ClienteFirebaseService {
 
 
     /**
-     * Obtener horarios ocupados de un entrenador en una fecha
-     */
-    getHorariosOcupados(entrenadorId: string, fecha: Date): Observable<string[]> {
-        const fechaInicio = new Date(fecha);
-        fechaInicio.setHours(0, 0, 0, 0);
-        const fechaFin = new Date(fecha);
-        fechaFin.setHours(23, 59, 59, 999);
+   * Obtener horarios ocupados de un entrenador en una fecha y cruzarlos con su configuración real
+   */
+  getHorariosOcupados(entrenadorId: string, fecha: Date): Observable<string[]> {
+      const fechaInicio = new Date(fecha);
+      fechaInicio.setHours(0, 0, 0, 0);
+      const fechaFin = new Date(fecha);
+      fechaFin.setHours(23, 59, 59, 999);
 
-        return this.firestore.collection<Reserva>('reservas', ref =>
-            ref.where('entrenadorId', '==', entrenadorId)
-                .where('fecha', '>=', fechaInicio)
-                .where('fecha', '<=', fechaFin)
-                .where('estado', 'in', ['PENDIENTE', 'CONFIRMADA'])
-        ).valueChanges().pipe(
-            map(reservas => reservas.map(r => r.hora))
+      return this.firestore.collection<Reserva>('reservas', ref =>
+          ref.where('entrenadorId', '==', entrenadorId)
+              .where('fecha', '>=', fechaInicio)
+              .where('fecha', '<=', fechaFin)
+              .where('estado', 'in', ['PENDIENTE', 'CONFIRMADA'])
+      ).valueChanges().pipe(
+          map(reservas => reservas.map(r => r.hora))
+      );
+  }
+
+  /**
+   * Cargar métodos de pago vinculados al usuario
+   */
+  getMetodosPago(): Observable<any[]> {
+    return this.afAuth.authState.pipe(
+      take(1),
+      switchMap(user => {
+        if (!user) return of([]);
+        return this.firestore.collection(`users/${user.uid}/paymentMethods`).valueChanges({ idField: 'id' }).pipe(
+            map(methods => methods.length ? methods : [
+                { id: 'card_demo', tipo: 'Tarjeta Integrada', ultimos_digitos: '4242', icono: 'credit-card-outline' }
+            ])
         );
-    }
+      })
+    );
+  }
 
     // ==================== RESEÑAS ====================
 
