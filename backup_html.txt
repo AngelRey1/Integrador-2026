@@ -90,8 +90,8 @@
                        [class.disponible]="dia.disponible && dia.esMesActual"
                        [class.seleccionado]="dia.seleccionado"
                        [class.hoy]="dia.esHoy"
-                       [class.dia-recurrente]="dia.esRecurrente && !dia.seleccionado"
-                       (click)="usarPlanSemanal ? toggleDiaSemanalDesdeCalendario(dia) : abrirSelectorHorario(dia)">
+                       [class.bloqueado-plan]="usarPlanSemanal"
+                       (click)="!usarPlanSemanal && abrirSelectorHorario(dia)">
                     {{ dia.dia }}
                   </div>
                 </ng-container>
@@ -100,7 +100,6 @@
               <div class="cal-leyenda">
                 <span><i class="dot disponible"></i>Disponible</span>
                 <span><i class="dot seleccionado"></i>Seleccionado</span>
-                <span *ngIf="usarPlanSemanal"><i class="dot recurrente"></i>Recurrente</span>
               </div>
             </div>
           </div>
@@ -114,7 +113,7 @@
                   <nb-icon icon="sync-outline"></nb-icon>
                   <div>
                     <span class="toggle-titulo">Plan recurrente</span>
-                    <span class="toggle-desc">Selecciona días en el calendario</span>
+                    <span class="toggle-desc">Mismos días cada semana</span>
                   </div>
                 </div>
                 <div class="toggle-switch" [class.active]="usarPlanSemanal">
@@ -136,17 +135,17 @@
                   </div>
                 </div>
 
-                <!-- Mensaje indicando selección desde calendario -->
-                <div class="plan-calendario-hint" *ngIf="getDiasSeleccionados().length === 0">
-                  <nb-icon icon="calendar-outline"></nb-icon>
-                  <p>Haz clic en un día del calendario para seleccionar ese día de la semana de forma recurrente.</p>
-                </div>
-
-                <!-- Días seleccionados (solo informativo) -->
-                <div class="config-grupo" *ngIf="getDiasSeleccionados().length > 0">
-                  <label>Días seleccionados</label>
-                  <div class="dias-seleccionados-info">
-                    <span class="dia-badge" *ngFor="let dia of getDiasSeleccionados()">{{ dia.nombre }}</span>
+                <div class="config-grupo">
+                  <label>Días de entrenamiento</label>
+                  <div class="dias-chips">
+                    <button *ngFor="let dia of diasSemanaConfig"
+                            class="chip-dia"
+                            [class.active]="dia.seleccionado"
+                            [class.disabled]="!dia.disponible"
+                            [disabled]="!dia.disponible"
+                            (click)="toggleDiaSemanaPlan(dia)">
+                      {{ dia.letra }}
+                    </button>
                   </div>
                 </div>
 

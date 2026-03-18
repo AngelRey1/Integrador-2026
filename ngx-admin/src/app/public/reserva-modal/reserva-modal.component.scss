@@ -977,24 +977,26 @@
 // LAYOUT UNIFICADO - CALENDARIO + PANEL
 // ==========================================
 .reserva-layout-unificado {
-  display: grid;
-  grid-template-columns: 1fr 280px;
+  display: flex;
+  flex-direction: column;
   gap: 1.5rem;
   margin-bottom: 1.5rem;
-  
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
 }
 
 // Calendario Compacto
 .col-calendario {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  
   .calendario-compacto {
     background: white;
     border: 1px solid #e2e8f0;
     border-radius: 16px;
     padding: 1rem;
+    width: 100%;
+    max-width: 400px;
     
     .cal-header {
       display: flex;
@@ -1093,6 +1095,19 @@
           color: white;
           font-weight: 700;
         }
+
+        &.dia-recurrente {
+          background: linear-gradient(135deg, #ede9fe 0%, #e0e7ff 100%);
+          color: #7c3aed;
+          font-weight: 600;
+          border: 2px solid rgba(124, 58, 237, 0.3);
+          animation: pulseRecurrente 2s ease-in-out infinite;
+
+          &:hover {
+            background: linear-gradient(135deg, #ddd6fe 0%, #c7d2fe 100%);
+            transform: scale(1.08);
+          }
+        }
       }
     }
     
@@ -1118,6 +1133,7 @@
           
           &.disponible { background: #d1fae5; }
           &.seleccionado { background: #00D09C; }
+          &.recurrente { background: #7c3aed; }
         }
       }
     }
@@ -1208,6 +1224,48 @@
       padding: 0 1rem 1rem;
       border-top: 1px solid #f1f5f9;
       animation: fadeIn 0.3s ease;
+
+      .plan-calendario-hint {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        padding: 0.75rem;
+        margin-top: 0.75rem;
+        background: #f0f9ff;
+        border: 1px dashed #7dd3fc;
+        border-radius: 10px;
+        color: #0369a1;
+        
+        nb-icon {
+          font-size: 1.25rem !important;
+          width: 1.25rem !important;
+          height: 1.25rem !important;
+          flex-shrink: 0;
+          margin-top: 2px;
+        }
+
+        p {
+          margin: 0;
+          font-size: 0.8rem;
+          line-height: 1.4;
+        }
+      }
+
+      .dias-seleccionados-info {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        
+        .dia-badge {
+          padding: 0.3rem 0.65rem;
+          background: linear-gradient(135deg, #ede9fe 0%, #e0e7ff 100%);
+          border: 1px solid rgba(124, 58, 237, 0.25);
+          border-radius: 20px;
+          font-size: 0.75rem;
+          font-weight: 600;
+          color: #7c3aed;
+        }
+      }
       
       .config-grupo {
         margin-top: 1rem;
@@ -8049,3 +8107,91 @@
   }
 }
 
+/* =======================================
+   ESTILOS FUERTES PARA LA PARTE INFERIOR Y BOTON
+   ======================================= */
+:host ::ng-deep {
+  .dia-config {
+    background: white !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 16px !important;
+    padding: 1.5rem !important;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.02) !important;
+    margin-bottom: 1.5rem !important;
+  }
+
+  .horario-inline {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    margin-bottom: 1.5rem !important;
+
+    select {
+      flex: 1 !important;
+      padding: 0.75rem 1rem !important;
+      border: 2px solid #e2e8f0 !important;
+      border-radius: 12px !important;
+      font-size: 0.95rem !important;
+      font-family: inherit !important;
+      font-weight: 500 !important;
+      color: #334155 !important;
+      background-color: white !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+      appearance: none !important;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+      background-repeat: no-repeat !important;
+      background-position: right 1rem center !important;
+      background-size: 1rem !important;
+      padding-right: 2.5rem !important;
+
+      &:focus {
+        outline: none !important;
+        border-color: #00D09C !important;
+        box-shadow: 0 0 0 4px rgba(0, 208, 156, 0.15) !important;
+      }
+      
+      &:disabled {
+        background-color: #f8fafc !important;
+        color: #94a3b8 !important;
+        cursor: not-allowed !important;
+      }
+    }
+    
+    span {
+      font-weight: 700 !important;
+      color: #64748b !important;
+    }
+  }
+
+  .btn-aplicar-plan {
+    width: 100% !important;
+    margin-top: 1.5rem !important;
+    padding: 1rem !important;
+    background: #00D09C !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 12px !important;
+    font-size: 1.1rem !important;
+    font-weight: 700 !important;
+    box-shadow: 0 4px 12px rgba(0,208,156,0.25) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+    
+    &:disabled {
+      background: #e2e8f0 !important;
+      color: #94a3b8 !important;
+      box-shadow: none !important;
+      cursor: not-allowed !important;
+      transform: none !important;
+    }
+  }
+}
+
+// Animación para días recurrentes
+@keyframes pulseRecurrente {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.15); }
+  50% { box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.1); }
+}

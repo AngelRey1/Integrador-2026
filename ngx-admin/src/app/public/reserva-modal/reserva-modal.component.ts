@@ -44,6 +44,7 @@ interface DiaCalendario {
   seleccionado: boolean;
   esMesActual: boolean;
   esHoy: boolean;
+  esRecurrente?: boolean;
 }
 
 @Component({
@@ -168,6 +169,7 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
     horaInicio: string;
     horaFin: string;
     horasFinDisponibles?: string[];
+    fechaInicio?: Date;
   }[] = [
     { key: 'domingo', letra: 'D', nombre: 'Domingo', disponible: false, seleccionado: false, horaInicio: '', horaFin: '' },
     { key: 'lunes', letra: 'L', nombre: 'Lunes', disponible: false, seleccionado: false, horaInicio: '', horaFin: '' },
@@ -371,10 +373,21 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
   togglePlanSemanal(): void {
     this.usarPlanSemanal = !this.usarPlanSemanal;
 
-    // Evita que se mezcle el flujo manual por día con el plan recurrente.
     if (this.usarPlanSemanal) {
+      // Evita que se mezcle el flujo manual por día con el plan recurrente.
       this.cerrarSelectorHorario();
+    } else {
+      // Al desactivar plan, limpiar selecciones recurrentes
+      this.diasSemanaConfig.forEach(d => {
+        d.seleccionado = false;
+        d.horaInicio = '';
+        d.horaFin = '';
+        d.fechaInicio = undefined;
+      });
+      this.sesionesGeneradasPlan = [];
     }
+    // Regenerar calendario para actualizar marcas de días recurrentes
+    this.generarCalendario();
   }
 
   /**
@@ -1454,6 +1467,74 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
     dia.seleccionado = !dia.seleccionado;
     this.actualizarConteoSesionesPlan();
     this.generarSesionesPlan();
+    this.generarCalendario(); // Actualizar marcas recurrentes en calendario
+  }
+
+  /**
+   * Toggle día de semana desde el calendario (plan recurrente)
+   * Detecta el día de la semana del día clickeado y alterna toda esa columna
+   */
+  toggleDiaSemanalDesdeCalendario(dia: DiaCalendario): void {
+    if (!dia.esMesActual || !dia.disponible) {
+      if (!dia.disponible && dia.esMesActual) {
+        const diasSemana = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+        const nombreDia = diasSemana[dia.fecha.getDay()];
+        this.mostrarMensajeFeedback(`El entrenador no tiene disponibilidad los ${nombreDia}.`);
+      }
+      return;
+    }
+
+    // Detectar qué día de la semana es (0=domingo, 1=lunes, etc.)
+    const numeroDia = dia.fecha.getDay();
+    const diaKeys = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
+    const diaKey = diaKeys[numeroDia];
+
+    // Buscar en diasSemanaConfig y alternar
+    const diaConfig = this.diasSemanaConfig.find(d => d.key === diaKey);
+    if (!diaConfig) return;
+
+    if (!diaConfig.disponible) {
+      const diasNombres = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+      this.mostrarMensajeFeedback(`El entrenador no trabaja los ${diasNombres[numeroDia]}.`);
+      return;
+    }
+
+    // Toggle
+    diaConfig.seleccionado = !diaConfig.seleccionado;
+
+    // Establecer fecha de inicio PER-DAY basada en el día clickeado
+    if (diaConfig.seleccionado) {
+      const fechaDia = new Date(dia.fecha);
+      fechaDia.setHours(0, 0, 0, 0);
+      diaConfig.fechaInicio = fechaDia;
+    } else {
+      diaConfig.fechaInicio = undefined;
+      diaConfig.horaInicio = '';
+      diaConfig.horaFin = '';
+    }
+
+    const diasNombres = ['Domingos', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábados'];
+    if (diaConfig.seleccionado) {
+      this.mostrarMensajeFeedback(`Todos los ${diasNombres[numeroDia]} agregados al plan`);
+    } else {
+      this.mostrarMensajeFeedback(`${diasNombres[numeroDia]} removidos del plan`);
+    }
+
+    // Actualizar conteos y sesiones
+    this.actualizarConteoSesionesPlan();
+    this.generarSesionesPlan();
+    
+    // Regenerar calendario para reflejar los cambios
+    this.generarCalendario();
+  }
+
+  /**
+   * Cambiar la duración del plan recurrente
+   */
+  setPlanDuracion(semanas: number): void {
+    this.planConfig.duracion = semanas;
+    this.generarSesionesPlan();
+    this.generarCalendario();
   }
 
   /**
@@ -1552,18 +1633,9 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
     
     if (diasSeleccionados.length === 0) return;
     
-    // Verificar horarios
-    if (this.planConfig.mismaHora) {
-      if (!this.planConfig.horaGlobalInicio || !this.planConfig.horaGlobalFin) return;
-    } else {
-      // Verificar que todos los días tengan horario
-      const todosConHorario = diasSeleccionados.every(d => d.horaInicio && d.horaFin);
-      if (!todosConHorario) return;
-    }
-    
-    // Generar fechas
-    const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0);
+    // Verificar que todos los días tengan horario configurado
+    const todosConHorario = diasSeleccionados.every(d => d.horaInicio && d.horaFin);
+    if (!todosConHorario) return;
     
     // Mapeo de días
     const diaNumero: { [key: string]: number } = {
@@ -1571,28 +1643,23 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
       'jueves': 4, 'viernes': 5, 'sabado': 6
     };
     
-    for (let semana = 0; semana < this.planConfig.duracion; semana++) {
-      for (const dia of diasSeleccionados) {
-        const numeroDia = diaNumero[dia.key];
-        const fecha = new Date(hoy);
+    for (const dia of diasSeleccionados) {
+      // Usar la fechaInicio propia de cada día
+      const fechaBase = dia.fechaInicio ? new Date(dia.fechaInicio) : new Date();
+      fechaBase.setHours(0, 0, 0, 0);
+      const numeroDia = diaNumero[dia.key];
+      
+      for (let semana = 0; semana < this.planConfig.duracion; semana++) {
+        const fecha = new Date(fechaBase);
         
-        // Calcular próxima fecha de este día de la semana
-        const diasHasta = (numeroDia + 7 - hoy.getDay()) % 7;
-        fecha.setDate(hoy.getDate() + diasHasta + (semana * 7));
+        // Calcular fecha: fechaInicio del día + semana * 7
+        fecha.setDate(fechaBase.getDate() + (semana * 7));
         
-        // Si es hoy o antes, ir a la próxima semana
-        if (fecha <= hoy && semana === 0) {
-          fecha.setDate(fecha.getDate() + 7);
-        }
-        
-        const horaInicio = this.planConfig.mismaHora ? this.planConfig.horaGlobalInicio : dia.horaInicio;
-        const horaFin = this.planConfig.mismaHora ? this.planConfig.horaGlobalFin : dia.horaFin;
-        
-        const duracion = this.calcularDuracionEnMinutos(horaInicio, horaFin);
+        const duracion = this.calcularDuracionEnMinutos(dia.horaInicio, dia.horaFin);
         this.sesionesGeneradasPlan.push({
           fecha: fecha.toISOString().split('T')[0],
-          horaInicio,
-          horaFin,
+          horaInicio: dia.horaInicio,
+          horaFin: dia.horaFin,
           duracionMinutos: duracion
         });
       }
@@ -1984,14 +2051,6 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Establecer duración del plan en semanas
-   */
-  setPlanDuracion(semanas: number) {
-    this.planConfig.duracion = semanas;
-    this.generarSesionesPlan();
-  }
-
-  /**
    * Generar calendario del mes actual
    */
   generarCalendario() {
@@ -2025,12 +2084,40 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
       });
     }
     
+    // Preparar mapa de rangos per-day para plan recurrente
+    const diasRecurrenteRanges: Map<string, { inicio: Date; fin: Date }> = new Map();
+    if (this.usarPlanSemanal) {
+      this.diasSemanaConfig.filter(d => d.seleccionado && d.fechaInicio).forEach(d => {
+        const inicio = new Date(d.fechaInicio!);
+        inicio.setHours(0, 0, 0, 0);
+        const fin = new Date(inicio);
+        fin.setDate(inicio.getDate() + (this.planConfig.duracion * 7));
+        diasRecurrenteRanges.set(d.key, { inicio, fin });
+      });
+    }
+
+    // Mapeo inverso de número de día a key
+    const numeroDiaAKey: { [key: number]: string } = {
+      0: 'domingo', 1: 'lunes', 2: 'martes', 3: 'miercoles',
+      4: 'jueves', 5: 'viernes', 6: 'sabado'
+    };
+
     // Días del mes actual
     for (let d = 1; d <= ultimoDia.getDate(); d++) {
       const fecha = new Date(año, mes, d);
       const fechaStr = this.formatearFechaISO(fecha);
       const esPasado = fecha < hoy;
       const tieneDisponibilidad = this.diasConDisponibilidad.has(fechaStr);
+      const diaSemanaKey = numeroDiaAKey[fecha.getDay()];
+      
+      // Check per-day recurrence range
+      let esRecurrente = false;
+      if (this.usarPlanSemanal && !esPasado && tieneDisponibilidad) {
+        const rango = diasRecurrenteRanges.get(diaSemanaKey);
+        if (rango) {
+          esRecurrente = fecha >= rango.inicio && fecha < rango.fin;
+        }
+      }
       
       semanaActual.push({
         fecha,
@@ -2038,7 +2125,8 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
         disponible: !esPasado && tieneDisponibilidad,
         seleccionado: this.sesionesSeleccionadas.some(s => s.fecha === fechaStr),
         esMesActual: true,
-        esHoy: fecha.getTime() === hoy.getTime()
+        esHoy: fecha.getTime() === hoy.getTime(),
+        esRecurrente
       });
       
       if (semanaActual.length === 7) {
