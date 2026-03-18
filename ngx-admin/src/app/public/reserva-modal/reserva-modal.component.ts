@@ -1612,8 +1612,10 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
    * Actualizar horas de fin para un día específico
    */
   actualizarHorasFinDia(dia: any) {
+    dia.horaFin = ''; // Resetear hora de fin
     if (!dia.horaInicio) {
       dia.horasFinDisponibles = [];
+      this.generarSesionesPlan();
       return;
     }
     
@@ -1622,6 +1624,7 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
     for (let i = h + 1; i <= 22; i++) {
       dia.horasFinDisponibles.push(`${i.toString().padStart(2, '0')}:00`);
     }
+    this.generarSesionesPlan();
   }
 
   /**

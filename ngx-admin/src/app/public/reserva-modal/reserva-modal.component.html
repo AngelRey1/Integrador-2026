@@ -151,17 +151,22 @@
                 </div>
 
                 <div class="config-grupo" *ngIf="getDiasSeleccionados().length > 0">
-                  <label>Horario</label>
-                  <div class="horario-inline">
-                    <select [(ngModel)]="planConfig.horaGlobalInicio" (ngModelChange)="onCambioHorarioPlan()">
-                      <option value="">Inicio</option>
-                      <option *ngFor="let h of horasDisponiblesPlan" [value]="h">{{ h }}</option>
-                    </select>
-                    <span>a</span>
-                    <select [(ngModel)]="planConfig.horaGlobalFin" (ngModelChange)="generarSesionesPlan()">
-                      <option value="">Fin</option>
-                      <option *ngFor="let h of horasFinDisponiblesPlan" [value]="h">{{ h }}</option>
-                    </select>
+                  <label>Horarios por día</label>
+                  <div class="horarios-dia-list">
+                    <div class="horario-dia-item" *ngFor="let dia of getDiasSeleccionados()">
+                      <span class="dia-nombre">{{ dia.nombre }}</span>
+                      <div class="horario-inline">
+                        <select [(ngModel)]="dia.horaInicio" (ngModelChange)="actualizarHorasFinDia(dia)">
+                          <option value="">Inicio</option>
+                          <option *ngFor="let h of horasDisponiblesPlan" [value]="h">{{ h }}</option>
+                        </select>
+                        <span>a</span>
+                        <select [(ngModel)]="dia.horaFin" (ngModelChange)="generarSesionesPlan()" [disabled]="!dia.horaInicio">
+                          <option value="">Fin</option>
+                          <option *ngFor="let h of dia.horasFinDisponibles" [value]="h">{{ h }}</option>
+                        </select>
+                      </div>
+                    </div>
                   </div>
                 </div>
 

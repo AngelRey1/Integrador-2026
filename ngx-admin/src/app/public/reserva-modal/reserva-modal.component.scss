@@ -8116,8 +8116,35 @@
     border: 1px solid #e2e8f0 !important;
     border-radius: 16px !important;
     padding: 1.5rem !important;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.02) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02) !important;
     margin-bottom: 1.5rem !important;
+  }
+
+  .horarios-dia-list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+    margin-bottom: 1.5rem !important;
+  }
+
+  .horario-dia-item {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+    background: #f8fafc !important;
+    padding: 1rem !important;
+    border-radius: 12px !important;
+    border: 1px solid #e2e8f0 !important;
+
+    .dia-nombre {
+      font-weight: 700 !important;
+      color: #334155 !important;
+      font-size: 0.95rem !important;
+    }
+
+    .horario-inline {
+      margin-bottom: 0 !important;
+    }
   }
 
   .horario-inline {
@@ -8174,7 +8201,7 @@
     border-radius: 12px !important;
     font-size: 1.1rem !important;
     font-weight: 700 !important;
-    box-shadow: 0 4px 12px rgba(0,208,156,0.25) !important;
+    box-shadow: 0 4px 12px rgba(0, 208, 156, 0.25) !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
