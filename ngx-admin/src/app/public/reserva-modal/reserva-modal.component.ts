@@ -1658,9 +1658,14 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
         // Calcular fecha: fechaInicio del día + semana * 7
         fecha.setDate(fechaBase.getDate() + (semana * 7));
         
+        const year = fecha.getFullYear();
+        const month = (fecha.getMonth() + 1).toString().padStart(2, '0');
+        const day = fecha.getDate().toString().padStart(2, '0');
+        const fechaStrLocal = `${year}-${month}-${day}`;
+        
         const duracion = this.calcularDuracionEnMinutos(dia.horaInicio, dia.horaFin);
         this.sesionesGeneradasPlan.push({
-          fecha: fecha.toISOString().split('T')[0],
+          fecha: fechaStrLocal,
           horaInicio: dia.horaInicio,
           horaFin: dia.horaFin,
           duracionMinutos: duracion
@@ -2529,6 +2534,13 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
         return new Date();
       }
       if (typeof fecha === 'string') {
+        // Si es formato YYYY-MM-DD estricto, parsear usando campos locales para evitar que 
+        // new Date("2026-04-07") se tome como UTC y al mostrar cambie al día anterior (e.g. Lunes 6)
+        if (/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
+          const parts = fecha.split('-');
+          return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+        }
+        
         // Intentar parsing directo primero
         let parsed = new Date(fecha);
         if (!isNaN(parsed.getTime())) return parsed;
