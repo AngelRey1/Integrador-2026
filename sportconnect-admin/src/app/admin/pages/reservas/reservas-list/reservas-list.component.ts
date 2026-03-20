@@ -10,6 +10,7 @@ interface Reserva {
   fecha: Date;
   precio: number;
   estado: string;
+  estadoPago?: string;
 }
 
 @Component({
@@ -71,7 +72,8 @@ export class ReservasListComponent implements OnInit, OnDestroy {
       entrenador: r.entrenadorNombre,
       fecha: fecha,
       precio: r.precio,
-      estado: r.estado
+      estado: r.estado,
+      estadoPago: r.estadoPago || ((r.estado === 'CONFIRMADA' || r.estado === 'COMPLETADA') ? 'COMPLETADO' : 'PENDIENTE')
     };
   }
 
@@ -101,6 +103,13 @@ export class ReservasListComponent implements OnInit, OnDestroy {
     } else {
       this.toastr.danger(result.message, 'Error');
     }
+  }
+
+  getEstadoPagoBadgeStatus(estado: string | undefined): string {
+    if (estado === 'COMPLETADO') return 'completada';
+    if (estado === 'REEMBOLSADO') return 'cancelada';
+    if (estado === 'NO_REQUERIDO') return 'confirmada';
+    return 'pendiente';
   }
 
   formatearFecha(fecha: Date): string {

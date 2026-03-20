@@ -22,6 +22,7 @@ interface Reserva {
   duracion: number;
   modalidad: string;
   estado: EstadoReserva;
+  estadoPago?: string;
   precio_total: number;
   notas?: string;
   fecha_creacion: Date;
@@ -106,6 +107,7 @@ export class MisReservasComponent implements OnInit, OnDestroy {
       duracion: r.duracion ? r.duracion / 60 : 1,
       modalidad: r.modalidad || 'Presencial',
       estado: r.estado as EstadoReserva,
+      estadoPago: r.estadoPago || ((r.estado === 'CONFIRMADA' || r.estado === 'COMPLETADA') ? 'COMPLETADO' : 'PENDIENTE'),
       precio_total: r.precio || 0,
       notas: r.notas,
       fecha_creacion: fechaCreacion
@@ -271,6 +273,13 @@ export class MisReservasComponent implements OnInit, OnDestroy {
       'CANCELADA': 'danger'
     };
     return statusMap[estado];
+  }
+
+  getEstadoPagoBadgeStatus(estado: string): string {
+    if (estado === 'COMPLETADO') return 'success';
+    if (estado === 'REEMBOLSADO') return 'basic';
+    if (estado === 'NO_REQUERIDO') return 'info';
+    return 'warning'; // PENDIENTE
   }
 
   formatearFecha(fecha: Date): string {

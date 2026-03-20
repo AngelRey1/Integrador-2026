@@ -189,6 +189,9 @@
             <span class="status-chip" [ngClass]="'status-' + sesion.estado?.toLowerCase()">
               {{ sesion.estado }}
             </span>
+            <span class="status-chip" [ngClass]="getEstadoPagoStatusClass(sesion.estadoPago)" style="margin-left: 0.25rem;">
+              {{ sesion.estadoPago }}
+            </span>
             <button class="icon-btn" (click)="verSesion(sesion)" title="Ver detalles">
               <ngx-sport-icon name="eye" [size]="16"></ngx-sport-icon>
             </button>
@@ -226,6 +229,9 @@
           </div>
 
           <div class="card-actions">
+            <span class="status-chip" [ngClass]="getEstadoPagoStatusClass(sesion.estadoPago)" style="margin-right: 0.5rem; flex-shrink: 0;" *ngIf="sesion.estadoPago">
+              {{ sesion.estadoPago }}
+            </span>
             <button class="btn-rebook" (click)="reagendarSesion(sesion)" title="Volver a agendar">
               <ngx-sport-icon name="refresh" [size]="16"></ngx-sport-icon>
               Reagendar

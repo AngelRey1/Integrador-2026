@@ -228,6 +228,7 @@ export class ClienteDashboardComponent implements OnInit, OnDestroy {
       deporte: (reserva as any).deporte || 'General',
       duracion: reserva.duracion || 60,
       estado: reserva.estado,
+      estadoPago: reserva.estadoPago || ((reserva.estado === 'CONFIRMADA' || reserva.estado === 'COMPLETADA') ? 'COMPLETADO' : 'PENDIENTE'),
       ubicacion: reserva.ubicacion || reserva.modalidad || 'No especificada'
     };
   }
@@ -270,6 +271,12 @@ export class ClienteDashboardComponent implements OnInit, OnDestroy {
       'CANCELADA': 'danger'
     };
     return statusMap[estado] || 'basic';
+  }
+
+  getEstadoPagoStatusClass(estado: string | undefined): string {
+    if (estado === 'COMPLETADO' || estado === 'NO_REQUERIDO') return 'status-completada';
+    if (estado === 'REEMBOLSADO') return 'status-cancelada';
+    return 'status-pendiente';
   }
 
   /**

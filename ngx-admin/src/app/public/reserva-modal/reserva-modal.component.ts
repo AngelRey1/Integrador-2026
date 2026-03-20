@@ -1236,6 +1236,7 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
           : (this.parseHora(sesion.horaFin) - this.parseHora(sesion.horaInicio)),
       );
 
+      const metodoPago = this.paso4Form.get('metodoPago')?.value;
       const reservaData: Omit<Reserva, 'id' | 'clienteId' | 'fechaCreacion'> = {
         entrenadorId: this.entrenador!.id!,
         entrenadorNombre: this.entrenador!.nombre + ' ' + (this.entrenador!.apellidoPaterno || ''),
@@ -1246,7 +1247,8 @@ export class ReservaModalComponent implements OnInit, OnDestroy {
         duracion: duracionSesion,
         precio: precioUnitario,
         modalidad: this.paso2Form.get('modalidad')?.value,
-        estado: (this.paso4Form.get('metodoPago')?.value === 'oxxo' ? 'PENDIENTE' : (this.pagoCompletado ? 'CONFIRMADA' : 'PENDIENTE')) as any,
+        estado: (metodoPago === 'oxxo' ? 'PENDIENTE' : (this.pagoCompletado ? 'CONFIRMADA' : 'PENDIENTE')) as any,
+        estadoPago: (metodoPago === 'oxxo' ? 'PENDIENTE' : (this.pagoCompletado ? 'COMPLETADO' : 'PENDIENTE')),
         notas: `${this.paso2Form.get('notas')?.value || ''} [${this.tipoReserva === 'multiple' ? 'Sesión múltiple' : 'Plan recurrente'} - ${reservasCreadas.length + 1}/${sesiones.length}]`.trim(),
         ubicacion: this.paso2Form.get('ubicacion')?.value || ''
       };

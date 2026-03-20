@@ -123,6 +123,7 @@
         <th>Fecha y Hora</th>
         <th>Precio</th>
         <th>Estado</th>
+        <th>Pago</th>
         <th>Acciones</th>
       </tr>
     </thead>
@@ -145,6 +146,11 @@
         <td>
           <span class="status-badge" [ngClass]="reserva.estado.toLowerCase()">
             {{ reserva.estado }}
+          </span>
+        </td>
+        <td>
+          <span class="status-badge pago-badge" [ngClass]="getEstadoPagoBadgeStatus(reserva.estadoPago)">
+            {{ reserva.estadoPago }}
           </span>
         </td>
         <td>

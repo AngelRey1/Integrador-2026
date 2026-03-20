@@ -99,9 +99,10 @@
                   <nb-icon icon="clock-outline"></nb-icon>
                   {{ sesion.duracion }} min
                 </span>
-                <span class="detail-item">
+                <span class="detail-item" style="display: flex; align-items: center;">
                   <nb-icon icon="pricetags-outline"></nb-icon>
                   ${{ sesion.precio }} MXN
+                  <nb-badge [text]="sesion.estadoPago" [status]="getEstadoPagoBadgeStatus(sesion.estadoPago)" class="ml-2" style="font-size: 0.65rem; padding: 2px 6px; margin-left: 0.5rem;"></nb-badge>
                 </span>
                 <span class="detail-item" *ngIf="sesion.modalidad">
                   <nb-icon [icon]="sesion.modalidad === 'online' ? 'video-outline' : 'home-outline'"></nb-icon>
@@ -155,9 +156,10 @@
                   <nb-icon icon="clock-outline"></nb-icon>
                   {{ sesion.duracion }} min
                 </span>
-                <span class="detail-item">
+                <span class="detail-item" style="display: flex; align-items: center;">
                   <nb-icon icon="pricetags-outline"></nb-icon>
                   ${{ sesion.precio }} MXN
+                  <nb-badge [text]="sesion.estadoPago" [status]="getEstadoPagoBadgeStatus(sesion.estadoPago)" class="ml-2" style="font-size: 0.65rem; padding: 2px 6px; margin-left: 0.5rem;"></nb-badge>
                 </span>
                 <span class="detail-item" *ngIf="sesion.modalidad">
                   <nb-icon [icon]="sesion.modalidad === 'online' ? 'video-outline' : 'home-outline'"></nb-icon>
@@ -220,6 +222,7 @@
                 <th>Duración</th>
                 <th>Precio</th>
                 <th>Estado</th>
+                <th>Pago</th>
                 <th>Acciones</th>
               </tr>
             </thead>
@@ -238,6 +241,9 @@
                         [class.pending]="sesion.estado === 'PENDIENTE'">
                     {{ sesion.estado === 'PENDIENTE' ? 'Esperando pago' : getEstadoTexto(sesion.estado) }}
                   </span>
+                </td>
+                <td class="col-payment">
+                  <nb-badge [text]="sesion.estadoPago" [status]="getEstadoPagoBadgeStatus(sesion.estadoPago)"></nb-badge>
                 </td>
                 <td class="col-actions">
                   <button class="btn-action" 

@@ -54,6 +54,7 @@ export interface Reserva {
     precio: number;
     modalidad: 'presencial' | 'online';
     estado: 'PENDIENTE' | 'CONFIRMADA' | 'COMPLETADA' | 'CANCELADA';
+    estadoPago?: 'PENDIENTE' | 'COMPLETADO' | 'REEMBOLSADO' | 'NO_REQUERIDO'; // ✅ NUEVO: Seguimiento del pago
     notas?: string;
     ubicacion?: string;
     motivoCancelacion?: string;

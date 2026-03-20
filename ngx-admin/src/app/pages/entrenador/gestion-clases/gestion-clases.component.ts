@@ -30,6 +30,7 @@ interface SesionProgramada {
   precio: number;
   modalidad: string;
   estado: string;
+  estadoPago?: string;
   notas?: string;
   ubicacion?: string;
   esHoy: boolean;
@@ -152,6 +153,7 @@ export class GestionClasesComponent implements OnInit, OnDestroy {
       precio: r.precio,
       modalidad: r.modalidad,
       estado: r.estado,
+      estadoPago: r.estadoPago || ((r.estado === 'CONFIRMADA' || r.estado === 'COMPLETADA') ? 'COMPLETADO' : 'PENDIENTE'),
       notas: r.notas,
       ubicacion: r.ubicacion,
       esHoy,
@@ -280,6 +282,13 @@ export class GestionClasesComponent implements OnInit, OnDestroy {
       case 'CANCELADA': return 'Cancelada';
       default: return estado;
     }
+  }
+
+  getEstadoPagoBadgeStatus(estado: string | undefined): string {
+    if (estado === 'COMPLETADO') return 'success';
+    if (estado === 'REEMBOLSADO') return 'basic';
+    if (estado === 'NO_REQUERIDO') return 'info';
+    return 'warning';
   }
 
   // ==================== CLASES ====================

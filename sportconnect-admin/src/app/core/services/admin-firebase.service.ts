@@ -58,6 +58,7 @@ export interface Reserva {
     fecha: Date;
     precio: number;
     estado: 'PENDIENTE' | 'CONFIRMADA' | 'COMPLETADA' | 'CANCELADA';
+    estadoPago?: 'PENDIENTE' | 'COMPLETADO' | 'REEMBOLSADO' | 'NO_REQUERIDO';
 }
 
 export interface Pago {

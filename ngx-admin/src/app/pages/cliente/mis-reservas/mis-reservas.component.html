@@ -81,9 +81,10 @@
                     <nb-icon icon="pin-outline"></nb-icon>
                     <span>{{ reserva.modalidad }}</span>
                   </div>
-                  <div class="meta-item precio">
+                  <div class="meta-item precio flex-align-center">
                     <nb-icon icon="credit-card-outline"></nb-icon>
                     <strong>{{ reserva.precio_total }} MXN</strong>
+                    <nb-badge [text]="reserva.estadoPago" [status]="getEstadoPagoBadgeStatus(reserva.estadoPago)" class="ml-2 badge-pago"></nb-badge>
                   </div>
                 </div>
 
@@ -154,9 +155,10 @@
                     <nb-icon icon="pin-outline"></nb-icon>
                     <span>{{ reserva.modalidad }}</span>
                   </div>
-                  <div class="meta-item precio">
+                  <div class="meta-item precio flex-align-center">
                     <nb-icon icon="credit-card-outline"></nb-icon>
                     <strong>{{ reserva.precio_total }} MXN</strong>
+                    <nb-badge [text]="reserva.estadoPago" [status]="getEstadoPagoBadgeStatus(reserva.estadoPago)" class="ml-2 badge-pago"></nb-badge>
                   </div>
                 </div>
 
@@ -222,9 +224,10 @@
                     <nb-icon icon="pin-outline"></nb-icon>
                     <span>{{ reserva.modalidad }}</span>
                   </div>
-                  <div class="meta-item precio">
+                  <div class="meta-item precio flex-align-center">
                     <nb-icon icon="credit-card-outline"></nb-icon>
                     <strong>{{ reserva.precio_total }} MXN</strong>
+                    <nb-badge [text]="reserva.estadoPago" [status]="getEstadoPagoBadgeStatus(reserva.estadoPago)" class="ml-2 badge-pago"></nb-badge>
                   </div>
                 </div>
 
