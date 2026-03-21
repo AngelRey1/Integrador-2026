@@ -105,7 +105,7 @@
 
       ::ng-deep nb-badge {
         position: relative !important;
-        
+
         .badge {
           position: relative !important;
           display: inline-flex !important;
@@ -400,10 +400,10 @@
   nb-tabset .tabset {
     ul.tabs {
       padding: 0 1rem;
-      
+
       @media (max-width: 768px) {
         padding: 0 0.5rem;
-        
+
         li {
           a {
             padding: 0.75rem 0.5rem;

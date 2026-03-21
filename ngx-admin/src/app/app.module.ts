@@ -30,6 +30,7 @@ import { AuthModule } from './auth/auth.module';
 import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
 import { AngularFireAuthModule } from '@angular/fire/compat/auth';
+import { AngularFireStorageModule } from '@angular/fire/compat/storage';
 import { environment } from '../environments/environment';
 
 // Registrar locale español para DatePipe
@@ -48,6 +49,7 @@ registerLocaleData(localeEs, 'es');
     AngularFireModule.initializeApp(environment.firebase),
     AngularFirestoreModule,
     AngularFireAuthModule,
+    AngularFireStorageModule,
 
     // Nebular Modules
     NbSidebarModule.forRoot(),

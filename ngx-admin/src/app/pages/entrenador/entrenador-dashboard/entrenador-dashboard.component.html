@@ -281,6 +281,59 @@
 
     <!-- COLUMNA DERECHA: Sidebar -->
     <div class="content-column side-column">
+
+      <!-- PLAN ACTUAL (SUSCRIPCIÓN) -->
+      <div class="card-pro subscription-card" [ngClass]="planSuscripcion === 'free' ? 'plan-free' : 'plan-pro'">
+        <div class="card-header-pro compact">
+          <div class="header-left">
+            <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+            <h3>Mi Plan</h3>
+          </div>
+          <span class="plan-badge">{{ getPlanDisplayName() }}</span>
+        </div>
+
+        <div class="plan-details">
+          <!-- Detalles para Plan Free -->
+          <ng-container *ngIf="planSuscripcion === 'free'">
+            <div class="plan-stat-row">
+              <span class="stat-label">Días restantes de Prueba</span>
+              <span class="stat-value highlight-warning">{{ diasTrialRestantes }}</span>
+            </div>
+            
+            <div class="plan-progress-container mt-3">
+              <div class="progress-header">
+                <span class="progress-label">Alumnos Activos</span>
+                <span class="progress-count">{{ clientesActivos }} / {{ limiteAlumnos }}</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" [style.width]="getAlumnosProgreso() + '%'" [ngClass]="getAlumnosProgreso() >= 100 ? 'danger' : 'active'"></div>
+              </div>
+              <p class="progress-hint hint-danger" *ngIf="clientesActivos >= limiteAlumnos">Has alcanzado tu límite de alumnos.</p>
+            </div>
+            <button class="btn-upgrade mt-3" (click)="goToUpgrade()">
+              <nb-icon icon="star-outline"></nb-icon> Mejorar a Pro
+            </button>
+          </ng-container>
+
+          <!-- Detalles para Plan Pro/Anual -->
+          <ng-container *ngIf="planSuscripcion !== 'free'">
+            <div class="plan-stat-row">
+              <span class="stat-label">Estado</span>
+              <span class="stat-value text-success"><span class="pulse-dot success"></span> Activo</span>
+            </div>
+            <div class="plan-stat-row">
+              <span class="stat-label">Alumnos</span>
+              <span class="stat-value highlight-success">Ilimitados</span>
+            </div>
+            <div class="plan-pro-features mt-3">
+              <p><nb-icon icon="checkmark-outline"></nb-icon> 0% Comisiones</p>
+              <p><nb-icon icon="arrow-up-outline"></nb-icon> Posicionamiento Destacado</p>
+            </div>
+          </ng-container>
+        </div>
+      </div>
       
       <!-- CLIENTES RECIENTES -->
       <div class="card-pro clients-card">

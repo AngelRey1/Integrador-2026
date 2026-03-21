@@ -1,8 +1,8 @@
 // Variables
-$primary-color: #00D09C;
-$primary-dark: #00B589;
-$secondary-color: #0F172A;
-$accent-color: #1ADBAF;
+$primary-color: #00d09c;
+$primary-dark: #00b589;
+$secondary-color: #0f172a;
+$accent-color: #1adbaf;
 $text-dark: #1e293b;
 $text-muted: #64748b;
 $border-color: #e2e8f0;
@@ -33,13 +33,17 @@ $white: #ffffff;
   overflow: hidden;
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: -50%;
     left: -50%;
     width: 200%;
     height: 200%;
-    background: radial-gradient(circle, rgba($primary-color, 0.1) 0%, transparent 50%);
+    background: radial-gradient(
+      circle,
+      rgba($primary-color, 0.1) 0%,
+      transparent 50%
+    );
     animation: pulse 15s infinite;
   }
 
@@ -50,8 +54,13 @@ $white: #ffffff;
 }
 
 @keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
 }
 
 .branding-content {
@@ -397,7 +406,9 @@ $white: #ffffff;
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 // Login link

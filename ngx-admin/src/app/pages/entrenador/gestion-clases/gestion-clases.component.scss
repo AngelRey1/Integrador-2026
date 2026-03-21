@@ -107,22 +107,22 @@ nb-card.inactive {
   nb-card-body {
     padding: 1rem;
   }
-  
+
   .summary-icon {
     font-size: 2.5rem;
     margin-right: 1rem;
   }
-  
+
   .summary-text {
     display: flex;
     flex-direction: column;
-    
+
     .summary-number {
       font-size: 1.75rem;
       font-weight: 700;
       line-height: 1;
     }
-    
+
     .summary-label {
       font-size: 0.875rem;
       color: #8f9bb3;
@@ -145,12 +145,12 @@ nb-card.inactive {
   border-radius: 8px;
   gap: 1rem;
   transition: all 0.2s ease;
-  
+
   &:hover {
     background: #edf1f7;
     transform: translateX(4px);
   }
-  
+
   &.sesion-hoy {
     background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
     border-left: 4px solid #ff9800;
@@ -167,19 +167,19 @@ nb-card.inactive {
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  
+
   .hora {
     font-size: 1.25rem;
     font-weight: 700;
     color: #222b45;
   }
-  
+
   .dia {
     font-size: 0.875rem;
     font-weight: 600;
     color: #3366ff;
   }
-  
+
   .tiempo-restante {
     font-size: 0.75rem;
     color: #ff9800;
@@ -189,7 +189,7 @@ nb-card.inactive {
 
 .sesion-info {
   flex: 1;
-  
+
   .cliente-nombre {
     font-size: 1rem;
     font-weight: 600;
@@ -198,37 +198,37 @@ nb-card.inactive {
     align-items: center;
     gap: 0.5rem;
     margin-bottom: 0.5rem;
-    
+
     nb-icon {
       color: #3366ff;
     }
   }
-  
+
   .sesion-detalles {
     display: flex;
     flex-wrap: wrap;
     gap: 1rem;
-    
+
     .detalle {
       display: flex;
       align-items: center;
       gap: 0.25rem;
       font-size: 0.875rem;
       color: #8f9bb3;
-      
+
       nb-icon {
         font-size: 14px;
       }
     }
   }
-  
+
   .sesion-notas {
     margin-top: 0.5rem;
     font-size: 0.8125rem;
     color: #8f9bb3;
     font-style: italic;
   }
-  
+
   .tiempo-restante-badge {
     display: inline-block;
     margin-top: 0.5rem;
@@ -246,7 +246,7 @@ nb-card.inactive {
   flex-direction: column;
   align-items: flex-end;
   gap: 0.5rem;
-  
+
   .acciones-btns {
     display: flex;
     gap: 0.25rem;
@@ -260,29 +260,30 @@ nb-card.inactive {
 
 .table-responsive {
   overflow-x: auto;
-  
+
   .table {
     width: 100%;
     border-collapse: collapse;
-    
-    th, td {
+
+    th,
+    td {
       padding: 0.75rem;
       text-align: left;
       border-bottom: 1px solid #edf1f7;
     }
-    
+
     th {
       font-weight: 600;
       color: #8f9bb3;
       font-size: 0.8125rem;
       text-transform: uppercase;
     }
-    
+
     td {
       color: #222b45;
       font-size: 0.875rem;
     }
-    
+
     tr:hover {
       background: #f7f9fc;
     }

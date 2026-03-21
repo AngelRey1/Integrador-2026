@@ -1,6 +1,6 @@
-@import 'bootstrap/scss/mixins/breakpoints';
-@import '@nebular/theme/styles/global/breakpoints';
-@import '../../styles/themes';
+@import "bootstrap/scss/mixins/breakpoints";
+@import "@nebular/theme/styles/global/breakpoints";
+@import "../../styles/themes";
 
 @include nb-install-component() {
   display: flex;
@@ -21,11 +21,11 @@
 
   nb-user {
     cursor: pointer;
-    
+
     ::ng-deep .user-picture {
       background-size: cover !important;
       background-position: center !important;
-      border: 2px solid #E2E8F0;
+      border: 2px solid #e2e8f0;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     }
   }
@@ -58,16 +58,16 @@
       @include nb-rtl(border-right, 1px solid nb-theme(divider-color));
       white-space: nowrap;
       text-decoration: none;
-      color: #00D09C !important;
+      color: #00d09c !important;
       font-weight: 700;
     }
-    
+
     // Theme selector styling
     .theme-selector {
       nb-select {
         min-width: 100px;
         margin-right: 0.5rem;
-        
+
         button {
           padding: 0.375rem 0.75rem;
           font-size: 0.8rem;

@@ -1,0 +1,35 @@
+<nb-card class="dialog-card">
+  <nb-card-header>Adquirir {{ plan?.nombre }}</nb-card-header>
+  <nb-card-body>
+    <div class="instructions">
+      <p>Para activar tu plan <strong>{{ plan?.nombre }}</strong>, realiza una transferencia o depósito por la cantidad de:</p>
+      <h3 class="monto-pagar">${{ plan?.precio }} MXN</h3>
+
+      <div class="banco-info mt-4">
+        <strong>Datos Bancarios:</strong>
+        <ul>
+          <li><strong>Banco:</strong> BBVA Bancomer</li>
+          <li><strong>Cuenta:</strong> 0123456789</li>
+          <li><strong>CLABE:</strong> 012345678901234567</li>
+          <li><strong>Titular:</strong> SportConnecta S.A de C.V</li>
+        </ul>
+      </div>
+
+      <div class="upload-section mt-4">
+        <label>Sube tu comprobante de pago (Imagen o PDF):</label>
+        <input type="file" nbInput fullWidth accept="image/*,.pdf" (change)="onFileSelected($event)">
+        <p class="file-name" *ngIf="archivoSeleccionado">
+          <nb-icon icon="file-text-outline"></nb-icon> {{ archivoSeleccionado.name }}
+        </p>
+      </div>
+    </div>
+  </nb-card-body>
+  <nb-card-footer>
+    <div class="d-flex justify-content-end gap-3">
+      <button nbButton ghost status="basic" (click)="cancelar()" [disabled]="loading">Cancelar</button>
+      <button nbButton status="primary" [disabled]="!archivoSeleccionado || loading" [nbSpinner]="loading" (click)="enviarComprobante()">
+        Enviar Comprobante
+      </button>
+    </div>
+  </nb-card-footer>
+</nb-card>

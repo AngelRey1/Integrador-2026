@@ -2,7 +2,7 @@
 // CALENDARIO DISPONIBILIDAD - DISEÑO PREMIUM SAAS
 // ============================================================
 
-@import '../_premium-base.scss';
+@import "../_premium-base.scss";
 
 // Container
 .calendario-container {
@@ -22,15 +22,15 @@
       gap: 0.625rem;
       padding: 1rem 2rem;
       border-radius: 50px;
-      font-family: 'Inter', 'Space Grotesk', sans-serif;
+      font-family: "Inter", "Space Grotesk", sans-serif;
       font-size: 0.9375rem;
       font-weight: 700;
       letter-spacing: 0.02em;
       cursor: pointer;
       border: none;
-      background: linear-gradient(135deg, #FFFFFF 0%, #F0FDF4 100%);
+      background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
       color: $color-primary;
-      box-shadow: 
+      box-shadow:
         0 4px 15px rgba(0, 0, 0, 0.15),
         0 8px 30px rgba(255, 255, 255, 0.25),
         inset 0 2px 0 rgba(255, 255, 255, 0.8);
@@ -39,7 +39,7 @@
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 
       &::before {
-        content: '';
+        content: "";
         position: absolute;
         top: 0;
         left: -100%;
@@ -55,11 +55,15 @@
       }
 
       &::after {
-        content: '';
+        content: "";
         position: absolute;
         inset: 2px;
         border-radius: 48px;
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, transparent 50%);
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.5) 0%,
+          transparent 50%
+        );
         pointer-events: none;
       }
 
@@ -70,7 +74,7 @@
 
       &:hover {
         transform: translateY(-4px) scale(1.03);
-        box-shadow: 
+        box-shadow:
           0 8px 25px rgba(0, 0, 0, 0.2),
           0 15px 50px rgba(255, 255, 255, 0.3),
           inset 0 2px 0 rgba(255, 255, 255, 0.8);
@@ -92,10 +96,10 @@
         opacity: 0.7;
         cursor: not-allowed;
         transform: none !important;
-        
+
         &:hover {
           transform: none !important;
-          box-shadow: 
+          box-shadow:
             0 4px 15px rgba(0, 0, 0, 0.15),
             0 8px 30px rgba(255, 255, 255, 0.25);
         }
@@ -134,7 +138,7 @@
   }
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
@@ -160,7 +164,11 @@
     }
 
     .day-header {
-      background: linear-gradient(135deg, rgba($color-primary, 0.08) 0%, rgba($color-primary, 0.02) 100%);
+      background: linear-gradient(
+        135deg,
+        rgba($color-primary, 0.08) 0%,
+        rgba($color-primary, 0.02) 100%
+      );
     }
   }
 
@@ -168,7 +176,11 @@
     opacity: 0.7;
 
     &::before {
-      background: linear-gradient(90deg, $color-text-muted 0%, $color-border 100%);
+      background: linear-gradient(
+        90deg,
+        $color-text-muted 0%,
+        $color-border 100%
+      );
     }
 
     .day-header {
@@ -186,7 +198,7 @@
   transition: background 0.3s ease;
 
   .day-name {
-    font-family: 'Space Grotesk', 'Inter', sans-serif;
+    font-family: "Space Grotesk", "Inter", sans-serif;
     font-size: 1.125rem;
     font-weight: 700;
     color: $color-text;
@@ -377,7 +389,11 @@
   .disabled-icon {
     width: 60px;
     height: 60px;
-    background: linear-gradient(135deg, rgba($color-text-muted, 0.1) 0%, rgba($color-text-muted, 0.05) 100%);
+    background: linear-gradient(
+      135deg,
+      rgba($color-text-muted, 0.1) 0%,
+      rgba($color-text-muted, 0.05) 100%
+    );
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -420,7 +436,11 @@
   .summary-icon {
     width: 42px;
     height: 42px;
-    background: linear-gradient(135deg, $color-primary 0%, $color-secondary 100%);
+    background: linear-gradient(
+      135deg,
+      $color-primary 0%,
+      $color-secondary 100%
+    );
     border-radius: $radius-sm;
     display: flex;
     align-items: center;
@@ -434,7 +454,7 @@
   }
 
   h3 {
-    font-family: 'Space Grotesk', 'Inter', sans-serif;
+    font-family: "Space Grotesk", "Inter", sans-serif;
     font-size: 1.25rem;
     font-weight: 700;
     color: $color-text;
@@ -507,7 +527,11 @@
 
 // Info Alert
 .info-alert {
-  background: linear-gradient(135deg, rgba($color-info, 0.08) 0%, rgba($color-info, 0.03) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba($color-info, 0.08) 0%,
+    rgba($color-info, 0.03) 100%
+  );
   border: 1px solid rgba($color-info, 0.2);
   border-radius: $radius-md;
   padding: 1rem 1.5rem;

@@ -3,7 +3,7 @@
 // Consistente con el dashboard del cliente
 // ============================================================
 
-@import '../_premium-base-cliente.scss';
+@import "../_premium-base-cliente.scss";
 
 // === HOST ===
 :host {
@@ -88,7 +88,7 @@
       display: flex;
       align-items: center;
       gap: 0.75rem;
-      font-family: 'Space Grotesk', 'Inter', sans-serif;
+      font-family: "Space Grotesk", "Inter", sans-serif;
       font-size: 1.25rem;
       font-weight: 700;
       color: $color-text;
@@ -97,7 +97,11 @@
       .header-icon {
         width: 42px;
         height: 42px;
-        background: linear-gradient(135deg, $color-primary 0%, $color-secondary 100%);
+        background: linear-gradient(
+          135deg,
+          $color-primary 0%,
+          $color-secondary 100%
+        );
         border-radius: $radius-xs;
         display: flex;
         align-items: center;
@@ -176,7 +180,7 @@
   }
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
@@ -211,7 +215,11 @@
     margin-bottom: 1.25rem;
     border-radius: $radius-sm;
     padding: 0.875rem 1rem;
-    background: linear-gradient(135deg, rgba($color-info, 0.1) 0%, rgba($color-info, 0.05) 100%);
+    background: linear-gradient(
+      135deg,
+      rgba($color-info, 0.1) 0%,
+      rgba($color-info, 0.05) 100%
+    );
     border: 1px solid rgba($color-info, 0.2);
     display: flex;
     align-items: center;
@@ -258,7 +266,7 @@
   gap: 0.375rem;
 
   h6 {
-    font-family: 'Space Grotesk', 'Inter', sans-serif;
+    font-family: "Space Grotesk", "Inter", sans-serif;
     font-size: 1.125rem;
     font-weight: 700;
     color: $color-text;
@@ -305,7 +313,11 @@ nb-badge {
   gap: 1rem;
   margin-bottom: 1.25rem;
   padding: 1.25rem;
-  background: linear-gradient(135deg, $color-bg 0%, rgba($color-primary, 0.02) 100%);
+  background: linear-gradient(
+    135deg,
+    $color-bg 0%,
+    rgba($color-primary, 0.02) 100%
+  );
   border-radius: $radius-md;
   border: 1px solid $color-border;
 }
@@ -331,11 +343,15 @@ nb-badge {
   }
 
   &.precio {
-    background: linear-gradient(135deg, rgba($color-success, 0.1) 0%, rgba($color-success, 0.05) 100%);
+    background: linear-gradient(
+      135deg,
+      rgba($color-success, 0.1) 0%,
+      rgba($color-success, 0.05) 100%
+    );
     border: 1px solid rgba($color-success, 0.2);
 
     strong {
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: "Space Grotesk", sans-serif;
       font-size: 1rem;
       font-weight: 700;
       color: $color-success;
@@ -432,7 +448,11 @@ nb-badge {
 
     // Primary (Reseña)
     &[status="primary"] {
-      background: linear-gradient(135deg, $color-primary 0%, $color-secondary 100%);
+      background: linear-gradient(
+        135deg,
+        $color-primary 0%,
+        $color-secondary 100%
+      );
       color: white;
       border: 1px solid transparent;
       box-shadow: $shadow-primary;
@@ -452,12 +472,16 @@ nb-badge {
   align-items: center;
   gap: 0.375rem;
   padding: 0.5rem 0.875rem;
-  background: linear-gradient(135deg, rgba(#ffd700, 0.15) 0%, rgba(#ffd700, 0.05) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(#ffd700, 0.15) 0%,
+    rgba(#ffd700, 0.05) 100%
+  );
   border: 1px solid rgba(#ffd700, 0.3);
   border-radius: $radius-sm;
   font-size: 0.875rem;
   font-weight: 600;
-  color: #B8860B;
+  color: #b8860b;
 
   nb-icon {
     color: #ffd700;
@@ -479,7 +503,8 @@ nb-badge {
     opacity: 0.8;
   }
 
-  h5, h6 {
+  h5,
+  h6 {
     font-size: 1.25rem;
     font-weight: 700;
     color: $color-text;
@@ -499,11 +524,15 @@ nb-badge {
     font-size: 0.9375rem;
     border-radius: $radius-full;
     font-weight: 600;
-    
+
     &[status="primary"] {
-      background: linear-gradient(135deg, $color-primary 0%, $color-secondary 100%);
+      background: linear-gradient(
+        135deg,
+        $color-primary 0%,
+        $color-secondary 100%
+      );
       box-shadow: $shadow-primary;
-      
+
       &:hover {
         transform: translateY(-3px);
         box-shadow: 0 12px 28px rgba($color-primary, 0.35);
@@ -519,7 +548,8 @@ nb-badge {
   .filtros-row {
     flex-direction: column;
 
-    .busqueda, .filtro-fecha {
+    .busqueda,
+    .filtro-fecha {
       width: 100%;
       min-width: unset;
     }

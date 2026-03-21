@@ -28,10 +28,20 @@ export class CoachJoinComponent {
   constructor(private router: Router) {}
 
   irARegistro() {
+    const pricingSection = document.getElementById('pricing');
+    if (pricingSection) {
+      pricingSection.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      this.seleccionarPlan('free');
+    }
+  }
+
+  seleccionarPlan(plan: string) {
     this.router.navigate(['/auth/register'], {
       queryParams: {
         role: 'coach',
-        action: 'signup'
+        action: 'signup',
+        plan: plan
       }
     });
   }

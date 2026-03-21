@@ -22,6 +22,7 @@ export class RegisterComponent implements OnInit {
   successMessage = '';
   private requestedRole: string = 'CLIENTE';
   isClienteRegistro: boolean = true;
+  selectedPlan: string = 'free';
 
   // Documentos para entrenadores
   documentoINE: DocumentoSubido | null = null;
@@ -52,8 +53,14 @@ export class RegisterComponent implements OnInit {
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
-      this.requestedRole = params['rol'] || 'CLIENTE';
+      const roleParam = params['rol'] || params['role'];
+      if (roleParam === 'ENTRENADOR' || roleParam === 'coach') {
+        this.requestedRole = 'ENTRENADOR';
+      } else {
+        this.requestedRole = roleParam || 'CLIENTE';
+      }
       this.isClienteRegistro = (this.requestedRole !== 'ENTRENADOR');
+      this.selectedPlan = params['plan'] || 'free';
     });
   }
 
@@ -248,7 +255,8 @@ export class RegisterComponent implements OnInit {
       email,
       password,
       rol,
-      documentos
+      documentos,
+      planSuscripcion: this.selectedPlan
     });
 
     this.loading = false;

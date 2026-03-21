@@ -9,27 +9,27 @@
 
 // Colores principales
 $color-primary: #047857;
-$color-primary-light: #10B981;
-$color-primary-dark: #065F46;
-$color-secondary: #0F766E;
-$color-accent: #14B8A6;
+$color-primary-light: #10b981;
+$color-primary-dark: #065f46;
+$color-secondary: #0f766e;
+$color-accent: #14b8a6;
 
 // Colores semánticos
-$color-success: #22C55E;
-$color-warning: #F59E0B;
-$color-warning-light: #FCD34D;
-$color-warning-dark: #D97706;
-$color-info: #0EA5E9;
-$color-info-light: #38BDF8;
-$color-danger: #EF4444;
+$color-success: #22c55e;
+$color-warning: #f59e0b;
+$color-warning-light: #fcd34d;
+$color-warning-dark: #d97706;
+$color-info: #0ea5e9;
+$color-info-light: #38bdf8;
+$color-danger: #ef4444;
 
 // Colores neutros
-$color-bg: #F8FAFC;
-$color-bg-card: #FFFFFF;
-$color-text: #1E293B;
-$color-text-secondary: #64748B;
-$color-text-muted: #94A3B8;
-$color-border: #E2E8F0;
+$color-bg: #f8fafc;
+$color-bg-card: #ffffff;
+$color-text: #1e293b;
+$color-text-secondary: #64748b;
+$color-text-muted: #94a3b8;
+$color-border: #e2e8f0;
 
 // Radios
 $radius-xl: 24px;
@@ -40,9 +40,15 @@ $radius-xs: 8px;
 
 // Sombras
 $shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
-$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
-$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
-$shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.03);
+$shadow-md:
+  0 4px 6px -1px rgba(0, 0, 0, 0.07),
+  0 2px 4px -1px rgba(0, 0, 0, 0.04);
+$shadow-lg:
+  0 10px 15px -3px rgba(0, 0, 0, 0.08),
+  0 4px 6px -2px rgba(0, 0, 0, 0.04);
+$shadow-xl:
+  0 20px 25px -5px rgba(0, 0, 0, 0.08),
+  0 10px 10px -5px rgba(0, 0, 0, 0.03);
 $shadow-glow: 0 0 40px rgba(16, 185, 129, 0.15);
 
 // ============================================================
@@ -94,7 +100,8 @@ $shadow-glow: 0 0 40px rgba(16, 185, 129, 0.15);
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
   }
   50% {
@@ -112,7 +119,8 @@ $shadow-glow: 0 0 40px rgba(16, 185, 129, 0.15);
 }
 
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {
@@ -161,12 +169,17 @@ $shadow-glow: 0 0 40px rgba(16, 185, 129, 0.15);
 @mixin page-container {
   padding: 2rem;
   min-height: 100vh;
-  background: linear-gradient(180deg, $color-bg 0%, #F1F5F9 100%);
+  background: linear-gradient(180deg, $color-bg 0%, #f1f5f9 100%);
   animation: fadeInUp 0.6s ease-out;
 }
 
 @mixin page-hero {
-  background: linear-gradient(135deg, $color-primary 0%, $color-secondary 50%, $color-primary-dark 100%);
+  background: linear-gradient(
+    135deg,
+    $color-primary 0%,
+    $color-secondary 50%,
+    $color-primary-dark 100%
+  );
   background-size: 200% 200%;
   animation: gradientMove 8s ease infinite;
   border-radius: $radius-xl;
@@ -177,25 +190,33 @@ $shadow-glow: 0 0 40px rgba(16, 185, 129, 0.15);
   box-shadow: $shadow-xl, $shadow-glow;
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: -50%;
     right: -20%;
     width: 400px;
     height: 400px;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    background: radial-gradient(
+      circle,
+      rgba(255, 255, 255, 0.1) 0%,
+      transparent 70%
+    );
     border-radius: 50%;
     animation: float 6s ease-in-out infinite;
   }
 
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     bottom: -30%;
     left: 10%;
     width: 200px;
     height: 200px;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+    background: radial-gradient(
+      circle,
+      rgba(255, 255, 255, 0.08) 0%,
+      transparent 70%
+    );
     border-radius: 50%;
     animation: float 8s ease-in-out infinite reverse;
   }
@@ -225,13 +246,17 @@ $shadow-glow: 0 0 40px rgba(16, 185, 129, 0.15);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(90deg, var(--accent-color) 0%, var(--accent-light) 100%);
+    background: linear-gradient(
+      90deg,
+      var(--accent-color) 0%,
+      var(--accent-light) 100%
+    );
     opacity: 0;
     transition: opacity 0.3s ease;
   }
@@ -251,7 +276,11 @@ $shadow-glow: 0 0 40px rgba(16, 185, 129, 0.15);
   align-items: center;
   gap: 0.5rem;
   padding: 0.875rem 1.5rem;
-  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  background: linear-gradient(
+    135deg,
+    $color-primary 0%,
+    $color-primary-light 100%
+  );
   color: white;
   border: none;
   border-radius: $radius-md;
@@ -310,7 +339,7 @@ $shadow-glow: 0 0 40px rgba(16, 185, 129, 0.15);
   overflow: hidden;
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     left: 0;
     top: 0;
@@ -358,7 +387,11 @@ $shadow-glow: 0 0 40px rgba(16, 185, 129, 0.15);
   .empty-icon {
     width: 100px;
     height: 100px;
-    background: linear-gradient(135deg, rgba($color-primary, 0.1) 0%, rgba($color-accent, 0.05) 100%);
+    background: linear-gradient(
+      135deg,
+      rgba($color-primary, 0.1) 0%,
+      rgba($color-accent, 0.05) 100%
+    );
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -373,7 +406,7 @@ $shadow-glow: 0 0 40px rgba(16, 185, 129, 0.15);
   }
 
   h4 {
-    font-family: 'Space Grotesk', 'Inter', sans-serif;
+    font-family: "Space Grotesk", "Inter", sans-serif;
     font-size: 1.375rem;
     font-weight: 700;
     color: $color-text;
@@ -411,7 +444,7 @@ $shadow-glow: 0 0 40px rgba(16, 185, 129, 0.15);
 
   .hero-text {
     h1 {
-      font-family: 'Space Grotesk', 'Inter', sans-serif;
+      font-family: "Space Grotesk", "Inter", sans-serif;
       font-size: 2.25rem;
       font-weight: 700;
       color: white;
@@ -457,7 +490,7 @@ $shadow-glow: 0 0 40px rgba(16, 185, 129, 0.15);
       gap: 0.625rem;
       padding: 0.875rem 1.75rem;
       border-radius: 50px;
-      font-family: 'Inter', 'Space Grotesk', sans-serif;
+      font-family: "Inter", "Space Grotesk", sans-serif;
       font-size: 0.9375rem;
       font-weight: 600;
       cursor: pointer;
@@ -478,7 +511,7 @@ $shadow-glow: 0 0 40px rgba(16, 185, 129, 0.15);
       &:hover {
         background: rgba(255, 255, 255, 0.25);
         transform: translateY(-3px);
-        
+
         nb-icon {
           transform: scale(1.1);
         }
@@ -489,9 +522,9 @@ $shadow-glow: 0 0 40px rgba(16, 185, 129, 0.15);
       }
 
       &.btn-primary-hero {
-        background: linear-gradient(135deg, #FFFFFF 0%, #F0FDF4 100%);
+        background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
         color: $color-primary;
-        box-shadow: 
+        box-shadow:
           0 4px 15px rgba(0, 0, 0, 0.15),
           0 8px 30px rgba(255, 255, 255, 0.2),
           inset 0 -2px 10px rgba(0, 0, 0, 0.03);
@@ -499,7 +532,7 @@ $shadow-glow: 0 0 40px rgba(16, 185, 129, 0.15);
         overflow: hidden;
 
         &::before {
-          content: '';
+          content: "";
           position: absolute;
           top: 0;
           left: -100%;
@@ -516,7 +549,7 @@ $shadow-glow: 0 0 40px rgba(16, 185, 129, 0.15);
 
         &:hover {
           transform: translateY(-4px) scale(1.02);
-          box-shadow: 
+          box-shadow:
             0 8px 25px rgba(0, 0, 0, 0.2),
             0 12px 40px rgba(255, 255, 255, 0.25),
             inset 0 -2px 10px rgba(0, 0, 0, 0.03);
@@ -534,10 +567,10 @@ $shadow-glow: 0 0 40px rgba(16, 185, 129, 0.15);
           opacity: 0.7;
           cursor: not-allowed;
           transform: none;
-          
+
           &:hover {
             transform: none;
-            box-shadow: 
+            box-shadow:
               0 4px 15px rgba(0, 0, 0, 0.15),
               0 8px 30px rgba(255, 255, 255, 0.2);
           }
@@ -577,7 +610,11 @@ $shadow-glow: 0 0 40px rgba(16, 185, 129, 0.15);
       .title-icon {
         width: 42px;
         height: 42px;
-        background: linear-gradient(135deg, $color-primary 0%, $color-secondary 100%);
+        background: linear-gradient(
+          135deg,
+          $color-primary 0%,
+          $color-secondary 100%
+        );
         border-radius: $radius-sm;
         display: flex;
         align-items: center;
@@ -591,7 +628,7 @@ $shadow-glow: 0 0 40px rgba(16, 185, 129, 0.15);
       }
 
       h3 {
-        font-family: 'Space Grotesk', 'Inter', sans-serif;
+        font-family: "Space Grotesk", "Inter", sans-serif;
         font-size: 1.25rem;
         font-weight: 700;
         color: $color-text;
@@ -606,7 +643,11 @@ $shadow-glow: 0 0 40px rgba(16, 185, 129, 0.15);
       min-width: 28px;
       height: 28px;
       padding: 0 0.625rem;
-      background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+      background: linear-gradient(
+        135deg,
+        $color-primary 0%,
+        $color-primary-light 100%
+      );
       color: white;
       font-size: 0.8125rem;
       font-weight: 700;
@@ -660,7 +701,7 @@ $shadow-glow: 0 0 40px rgba(16, 185, 129, 0.15);
 
   &.danger {
     --accent-color: #{$color-danger};
-    --accent-light: #FCA5A5;
+    --accent-light: #fca5a5;
   }
 
   .stat-icon {
@@ -672,25 +713,45 @@ $shadow-glow: 0 0 40px rgba(16, 185, 129, 0.15);
     justify-content: center;
     flex-shrink: 0;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    background: linear-gradient(135deg, rgba(var(--accent-color), 0.15) 0%, rgba(var(--accent-color), 0.05) 100%);
+    background: linear-gradient(
+      135deg,
+      rgba(var(--accent-color), 0.15) 0%,
+      rgba(var(--accent-color), 0.05) 100%
+    );
 
     &.primary {
-      background: linear-gradient(135deg, rgba($color-primary, 0.15) 0%, rgba($color-primary, 0.05) 100%);
+      background: linear-gradient(
+        135deg,
+        rgba($color-primary, 0.15) 0%,
+        rgba($color-primary, 0.05) 100%
+      );
       color: $color-primary;
     }
 
     &.success {
-      background: linear-gradient(135deg, rgba($color-success, 0.15) 0%, rgba($color-success, 0.05) 100%);
+      background: linear-gradient(
+        135deg,
+        rgba($color-success, 0.15) 0%,
+        rgba($color-success, 0.05) 100%
+      );
       color: $color-success;
     }
 
     &.warning {
-      background: linear-gradient(135deg, rgba($color-warning, 0.15) 0%, rgba($color-warning, 0.05) 100%);
+      background: linear-gradient(
+        135deg,
+        rgba($color-warning, 0.15) 0%,
+        rgba($color-warning, 0.05) 100%
+      );
       color: $color-warning;
     }
 
     &.info {
-      background: linear-gradient(135deg, rgba($color-info, 0.15) 0%, rgba($color-info, 0.05) 100%);
+      background: linear-gradient(
+        135deg,
+        rgba($color-info, 0.15) 0%,
+        rgba($color-info, 0.05) 100%
+      );
       color: $color-info;
     }
 
@@ -707,7 +768,7 @@ $shadow-glow: 0 0 40px rgba(16, 185, 129, 0.15);
     flex: 1;
 
     .stat-number {
-      font-family: 'Space Grotesk', 'Inter', sans-serif;
+      font-family: "Space Grotesk", "Inter", sans-serif;
       font-size: 2.25rem;
       font-weight: 700;
       color: $color-text;

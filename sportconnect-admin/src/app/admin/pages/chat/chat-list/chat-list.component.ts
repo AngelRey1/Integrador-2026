@@ -52,7 +52,7 @@ export class ChatListComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   cargarConversaciones(): void {
     this.loading = true;
-    const sub = this.chatService.getConversacionesAdmin().subscribe(
+    const sub = this.chatService.getConversaciones().subscribe(
       (convs: ConversacionAdmin[]) => {
         this.conversaciones = convs;
         this.loading = false;

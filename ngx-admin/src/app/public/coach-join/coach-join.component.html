@@ -149,6 +149,63 @@
         </div>
       </section>
 
+      <!-- SECCIÓN: PLANES Y PRECIOS -->
+      <section class="pricing-section" id="pricing">
+        <div class="container-info">
+          <div class="info-card-large">
+            <h2>Planes y Precios</h2>
+            <p>Comienza a monetizar tu tiempo hoy mismo. Sin ataduras, cancela cuando quieras.</p>
+            
+            <div class="pricing-grid">
+              <!-- Plan Free -->
+              <div class="pricing-card">
+                <div class="tier-name">Prueba el Sistema</div>
+                <div class="tier-price">Gratis<span class="tier-period"> / 30 días</span></div>
+                <p class="tier-desc">Ideal para probar la herramienta de gestión.</p>
+                <div class="tier-divider"></div>
+                <ul class="tier-features">
+                  <li><nb-icon icon="checkmark-outline"></nb-icon> Límite de 5 alumnos activos</li>
+                  <li><nb-icon icon="checkmark-outline"></nb-icon> 0% comisiones por pagos</li>
+                  <li><nb-icon icon="checkmark-outline"></nb-icon> Gestión de horarios y clases</li>
+                  <li><nb-icon icon="checkmark-outline"></nb-icon> Soporte vía email</li>
+                </ul>
+                <button class="btn-tier btn-outline" (click)="seleccionarPlan('free')">Empezar Gratis</button>
+              </div>
+
+              <!-- Plan Pro -->
+              <div class="pricing-card popular">
+                <div class="tier-badge">Recomendado</div>
+                <div class="tier-name">Entrenador Pro</div>
+                <div class="tier-price">$220<span class="tier-period"> MXN / mes</span></div>
+                <p class="tier-desc">Para entrenadores en crecimiento constante.</p>
+                <div class="tier-divider"></div>
+                <ul class="tier-features">
+                  <li><nb-icon icon="checkmark-outline"></nb-icon> <strong>Alumnos ilimitados</strong></li>
+                  <li><nb-icon icon="checkmark-outline"></nb-icon> <strong>0% comisiones. Tu dinero es tuyo</strong></li>
+                  <li><nb-icon icon="checkmark-outline"></nb-icon> Posicionamiento destacado oficial</li>
+                  <li><nb-icon icon="checkmark-outline"></nb-icon> Chat en tiempo real con alumnos</li>
+                </ul>
+                <button class="btn-tier btn-primary" (click)="seleccionarPlan('pro')">Elegir Plan Pro</button>
+              </div>
+
+              <!-- Plan Anual -->
+              <div class="pricing-card">
+                <div class="tier-name">Pro Anual</div>
+                <div class="tier-price">$2,000<span class="tier-period"> MXN / año</span></div>
+                <p class="tier-desc tier-savings">¡Ahorras casi 3 meses de tu plan base!</p>
+                <div class="tier-divider"></div>
+                <ul class="tier-features">
+                  <li><nb-icon icon="checkmark-outline"></nb-icon> <strong>Beneficios del Plan Pro incluidos</strong></li>
+                  <li><nb-icon icon="checkmark-outline"></nb-icon> Único pago al año sin interrupciones</li>
+                  <li><nb-icon icon="checkmark-outline"></nb-icon> Insignia especial de Coach Verificado</li>
+                </ul>
+                <button class="btn-tier btn-outline" (click)="seleccionarPlan('anual')">Ahorrar ahora</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- CTA FINAL -->
       <section class="final-cta">
         <div class="cta-box">

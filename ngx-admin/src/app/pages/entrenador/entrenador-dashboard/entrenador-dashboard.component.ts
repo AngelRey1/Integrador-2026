@@ -41,6 +41,11 @@ export class EntrenadorDashboardComponent implements OnInit, OnDestroy {
   tasaAsistencia = 0;
   totalResenas = 0;
 
+  // Plan y Suscripción
+  planSuscripcion = 'free';
+  limiteAlumnos = 5;
+  diasTrialRestantes: number | null = 30;
+
   // Próximas sesiones
   proximasSesiones: Sesion[] = [];
 
@@ -86,6 +91,9 @@ export class EntrenadorDashboardComponent implements OnInit, OnDestroy {
       this.calificacionPromedio = stats.calificacion;
       this.totalResenas = stats.totalResenas;
       this.tasaAsistencia = stats.tasaAsistencia;
+      this.planSuscripcion = stats.planSuscripcion || 'free';
+      this.limiteAlumnos = stats.limiteAlumnos || 5;
+      this.diasTrialRestantes = stats.diasTrialRestantes;
       this.loading = false;
     });
     this.subscriptions.push(statsSub);
@@ -281,9 +289,31 @@ export class EntrenadorDashboardComponent implements OnInit, OnDestroy {
     return Math.min((this.ingresosSemanales / this.ingresosMes) * 100, 100);
   }
 
+  // Helpers de Suscripción
+  getPlanDisplayName(): string {
+    const nombres: Record<string, string> = {
+      'free': 'Prueba el Sistema',
+      'pro': 'Entrenador Pro',
+      'anual': 'Pro Anual'
+    };
+    return nombres[this.planSuscripcion] || 'Plan Free';
+  }
+
+  getAlumnosProgreso(): number {
+    if (this.limiteAlumnos >= 999999) return 100; // Plan ilimitado
+    return Math.min((this.clientesActivos / this.limiteAlumnos) * 100, 100);
+  }
+
   // Nuevo: Navegación a clientes
   irAClientes(): void {
     this.router.navigate(['/pages/entrenador/clientes']);
+  }
+
+  // Navegación para mejorar plan
+  goToUpgrade(): void {
+    // Navigate to the dashboard billing/subscription segment if exists, 
+    // or just public coach join for now until Phase 4
+    this.router.navigate(['/public/coach-join']);
   }
 
   // Nuevo: Navegación a perfil

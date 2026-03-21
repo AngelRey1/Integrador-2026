@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { AngularFireStorage } from '@angular/fire/compat/storage';
 import { Observable, of, combineLatest } from 'rxjs';
 import { map, switchMap, catchError } from 'rxjs/operators';
 import { Entrenador, Reserva, Review, Pago } from './cliente-firebase.service';
@@ -43,7 +44,8 @@ export class EntrenadorFirebaseService {
 
     constructor(
         private firestore: AngularFirestore,
-        private afAuth: AngularFireAuth
+        private afAuth: AngularFireAuth,
+        private storage: AngularFireStorage
     ) { }
 
     // ==================== PERFIL ENTRENADOR ====================
@@ -519,6 +521,9 @@ export class EntrenadorFirebaseService {
         calificacion: number;
         totalResenas: number;
         tasaAsistencia: number;
+        planSuscripcion: string;
+        limiteAlumnos: number;
+        diasTrialRestantes: number | null;
     }> {
         return this.afAuth.authState.pipe(
             switchMap(user => {
@@ -532,7 +537,10 @@ export class EntrenadorFirebaseService {
                     ingresosMesAnterior: 0,
                     calificacion: 0,
                     totalResenas: 0,
-                    tasaAsistencia: 0
+                    tasaAsistencia: 0,
+                    planSuscripcion: 'free',
+                    limiteAlumnos: 5,
+                    diasTrialRestantes: 30
                 });
 
                 const ahora = new Date();
@@ -613,7 +621,19 @@ export class EntrenadorFirebaseService {
                             ingresosMesAnterior,
                             calificacion: perfil?.calificacionPromedio || 0,
                             totalResenas: perfil?.totalReviews || 0,
-                            tasaAsistencia: total > 0 ? Math.round((completadas / total) * 100) : 100
+                            tasaAsistencia: total > 0 ? Math.round((completadas / total) * 100) : 100,
+                            planSuscripcion: (perfil as any)?.planSuscripcion || 'free',
+                            limiteAlumnos: (perfil as any)?.limiteAlumnos || 5,
+                            diasTrialRestantes: (() => {
+                                const plan = (perfil as any)?.planSuscripcion || 'free';
+                                if (plan !== 'free') return null;
+                                const fechaReg = (perfil as any)?.fechaRegistro;
+                                if (!fechaReg) return 30; // Default if not found
+                                const dateReg = fechaReg instanceof Date ? fechaReg : new Date(fechaReg.seconds * 1000);
+                                const diff = ahora.getTime() - dateReg.getTime();
+                                const diasUsados = Math.floor(diff / (1000 * 60 * 60 * 24));
+                                return Math.max(0, 30 - diasUsados);
+                            })()
                         };
                     })
                 );
@@ -715,5 +735,64 @@ export class EntrenadorFirebaseService {
             console.error('Error:', error);
             return { success: false, message: 'Error al publicar respuesta' };
         }
+    }
+
+    // ==================== PAGOS SUSCRIPCIONES (Fase 5) ====================
+
+    /**
+     * Sube un comprobante de pago y crea la solicitud
+     */
+    async registrarPagoSuscripcion(planId: string, monto: number, archivo: File): Promise<{ success: boolean; message: string }> {
+        try {
+            const user = await this.afAuth.currentUser;
+            if (!user) return { success: false, message: 'No autenticado' };
+
+            // Subir archivo a Storage
+            const timestamp = new Date().getTime();
+            const filename = `${timestamp}_${archivo.name}`;
+            const filePath = `comprobantes_pago/${user.uid}/${filename}`;
+            const fileRef = this.storage.ref(filePath);
+            
+            await this.storage.upload(filePath, archivo);
+            const comprobanteUrl = await fileRef.getDownloadURL().toPromise();
+
+            // Interceptar el nombre del entrenador
+            const perfilDoc = await this.firestore.doc(`entrenadores/${user.uid}`).get().toPromise();
+            const perfil = perfilDoc?.data() as any;
+
+            // Guardar solicitud en Firestore
+            await this.firestore.collection('pagos_suscripciones').add({
+                entrenadorId: user.uid,
+                entrenadorNombre: perfil ? `${perfil.nombre} ${perfil.apellidoPaterno || ''}`.trim() : 'Desconocido',
+                planSolicitado: planId,
+                monto: monto,
+                comprobanteUrl: comprobanteUrl,
+                estado: 'pendiente',
+                fechaSolicitud: new Date()
+            });
+
+            return { success: true, message: 'Comprobante enviado exitosamente para validación' };
+        } catch (error) {
+            console.error('Error al subir comprobante:', error);
+            return { success: false, message: 'Error al procesar el comprobante' };
+        }
+    }
+
+    /**
+     * Monitorea si actualmente hay un pago pendiente de revisión
+     */
+    getPagoSuscripcionPendiente(): Observable<any | null> {
+        return this.afAuth.authState.pipe(
+            switchMap(user => {
+                if (!user) return of(null);
+                return this.firestore.collection('pagos_suscripciones', ref => 
+                    ref.where('entrenadorId', '==', user.uid)
+                       .where('estado', '==', 'pendiente')
+                       .limit(1)
+                ).valueChanges({ idField: 'id' }).pipe(
+                    map(pagos => pagos.length > 0 ? pagos[0] : null)
+                );
+            })
+        );
     }
 }

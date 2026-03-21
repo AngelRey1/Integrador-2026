@@ -1,34 +1,44 @@
 // Import the CSS from the coach dashboard directly so they share exactly the SAME premium look
-@import '../../entrenador/entrenador-dashboard/entrenador-dashboard-pro.scss';
+@import "../../entrenador/entrenador-dashboard/entrenador-dashboard-pro.scss";
 
 // Client specific overrides (e.g. hero color to match Light Pastel app identity)
 .hero-pro.client-hero {
-  background: linear-gradient(135deg, #0288D1 0%, #0369A1 50%, #0F172A 100%);
-  
+  background: linear-gradient(135deg, #0288d1 0%, #0369a1 50%, #0f172a 100%);
+
   .hero-greeting .greeting-badge {
     background: rgba(255, 255, 255, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.3);
   }
 
   .btn-hero-primary {
-    color: #0288D1;
+    color: #0288d1;
   }
 }
 
 // Client Bento variant (re-theming the green icons to blue/sky ones)
-.clients-bento .bento-icon { background: linear-gradient(135deg, #0288D1, #38BDF8); }
-.clients-bento .bento-icon-ring { border-color: #0288D1; }
-.clients-bento .bento-decoration { color: #0288D1; }
+.clients-bento .bento-icon {
+  background: linear-gradient(135deg, #0288d1, #38bdf8);
+}
+.clients-bento .bento-icon-ring {
+  border-color: #0288d1;
+}
+.clients-bento .bento-decoration {
+  color: #0288d1;
+}
 
-.sessions-bento .bento-icon-small.sessions { background: linear-gradient(135deg, #C2185B, #EC4899); }
+.sessions-bento .bento-icon-small.sessions {
+  background: linear-gradient(135deg, #c2185b, #ec4899);
+}
 
 .card-pro .header-icon-badge {
-  background: linear-gradient(135deg, #0288D1, #38BDF8);
-  &.upcoming { background: linear-gradient(135deg, #C2185B, #F472B6); }
+  background: linear-gradient(135deg, #0288d1, #38bdf8);
+  &.upcoming {
+    background: linear-gradient(135deg, #c2185b, #f472b6);
+  }
 }
 
 .quick-action:hover {
-  background: #E0F2FE !important;
+  background: #e0f2fe !important;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }

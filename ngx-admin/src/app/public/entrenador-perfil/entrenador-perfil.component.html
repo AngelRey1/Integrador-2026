@@ -84,11 +84,18 @@
                 <span class="precio-label">Precio por hora</span>
                 <span class="precio-valor">${{ entrenador.precioHora }}</span>
               </div>
-              <button class="btn-reservar" [routerLink]="['/entrenador/reservar', entrenador.id]">
+              <button class="btn-reservar" 
+                      [routerLink]="entrenador.estaLleno ? null : ['/entrenador/reservar', entrenador.id]"
+                      [class.btn-disabled]="entrenador.estaLleno"
+                      [disabled]="entrenador.estaLleno">
                 <i eva-icon="calendar-outline" eva-pack="outline"></i>
-                Reservar
+                {{ entrenador.estaLleno ? 'Cupo Lleno' : 'Reservar' }}
               </button>
             </div>
+            
+            <p *ngIf="entrenador.estaLleno" class="text-danger mt-2 font-weight-bold" style="font-size: 0.85rem">
+              <nb-icon icon="alert-circle-outline"></nb-icon> Este entrenador ha alcanzado su límite de alumnos por ahora.
+            </p>
 
             <button class="btn-compartir" (click)="compartirPerfil()">
               🔗 Compartir perfil

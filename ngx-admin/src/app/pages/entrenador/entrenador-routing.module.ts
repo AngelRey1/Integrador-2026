@@ -8,6 +8,7 @@ import { MisIngresosComponent } from './mis-ingresos/mis-ingresos.component';
 import { PerfilEntrenadorComponent } from './perfil-entrenador/perfil-entrenador.component';
 import { ChatEntrenadorComponent } from './chat/chat.component';
 import { ChatAdminComponent } from './chat-admin/chat-admin.component';
+import { MiSuscripcionComponent } from './mi-suscripcion/mi-suscripcion.component';
 
 const routes: Routes = [
   {
@@ -48,6 +49,10 @@ const routes: Routes = [
     component: PerfilEntrenadorComponent
   },
   {
+    path: 'suscripcion',
+    component: MiSuscripcionComponent
+  },
+  {
     path: '',
     redirectTo: 'dashboard',
     pathMatch: 'full'
@@ -59,3 +64,4 @@ const routes: Routes = [
   exports: [RouterModule]
 })
 export class EntrenadorRoutingModule { }
+

@@ -112,7 +112,11 @@
           </div>
           <div class="info-row" *ngIf="entrenador.estado === 'activo'">
             <nb-icon icon="people-outline"></nb-icon>
-            <span>{{ entrenador.clientes }} clientes</span>
+            <span>{{ entrenador.clientes }} / {{ entrenador.limiteAlumnos === 999999 ? '∞' : entrenador.limiteAlumnos }} clientes</span>
+          </div>
+          <div class="info-row">
+            <nb-icon icon="credit-card-outline"></nb-icon>
+            <span>Plan: <strong style="text-transform: capitalize;">{{ entrenador.planSuscripcion }}</strong></span>
           </div>
           <div class="info-row">
             <nb-icon icon="file-text-outline"></nb-icon>
@@ -129,6 +133,9 @@
           </button>
           <button nbButton ghost size="small" (click)="verDocumentos(entrenador)">
             <nb-icon icon="file-outline"></nb-icon> Docs
+          </button>
+          <button nbButton ghost size="small" status="warning" (click)="cambiarPlan(entrenador)" *ngIf="entrenador.estado === 'activo'">
+            <nb-icon icon="edit-2-outline"></nb-icon> Plan
           </button>
           <ng-container *ngIf="entrenador.estado === 'pendiente'">
             <button nbButton size="small" status="success" (click)="aprobar(entrenador)">

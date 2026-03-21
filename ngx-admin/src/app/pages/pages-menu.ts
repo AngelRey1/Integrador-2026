@@ -105,6 +105,11 @@ const ENTRENADOR_MENU: NbMenuItem[] = [
     link: '/pages/entrenador/mis-ingresos',
   },
   {
+    title: 'Mi Suscripción',
+    icon: 'star-outline',
+    link: '/pages/entrenador/suscripcion',
+  },
+  {
     title: 'COMUNICACIÓN',
     group: true,
   },

@@ -38,6 +38,8 @@ export interface Entrenador {
     whatsapp?: string;
     email?: string;
     direccionEntrenamiento?: string;
+    planSuscripcion?: string;
+    limiteAlumnos?: number;
 }
 
 
@@ -126,16 +128,57 @@ export class ClienteFirebaseService {
     // ==================== ENTRENADORES ====================
 
     /**
-     * Obtener todos los entrenadores verificados y activos
+     * Obtener todos los entrenadores verificados y activos (Filtra cupos llenos y expirados)
      */
     getEntrenadores(): Observable<Entrenador[]> {
         return this.firestore.collection<Entrenador>('entrenadores', ref =>
             ref.where('verificado', '==', true)
                 .where('activo', '==', true)
         ).valueChanges({ idField: 'id' }).pipe(
+            map(entrenadores => {
+                const ahora = new Date();
+                return entrenadores.filter(e => {
+                    const plan = e.planSuscripcion || 'free';
+                    if (plan === 'free') {
+                        const fechaReg = e.fechaRegistro instanceof Date ? e.fechaRegistro : new Date((e.fechaRegistro as any)?.seconds * 1000);
+                        if (!fechaReg) return true; // prevent breaking if missing
+                        const diffDays = (ahora.getTime() - fechaReg.getTime()) / (1000 * 3600 * 24);
+                        if (diffDays > 30) return false; // Trial expired
+                    }
+                    return true;
+                });
+            }),
+            switchMap(entrenadores => {
+                // Verificar que no hayan alcanzado su límite de alumnos
+                if (entrenadores.length === 0) return of([]);
+                
+                const observables = entrenadores.map(e => {
+                    const limite = e.limiteAlumnos || 5;
+                    if (limite >= 999999) return of(e); // Plan ilimitado
+                    
+                    // Cuenta los alumnos únicos
+                    return this.firestore.collection('reservas', ref => ref.where('entrenadorId', '==', e.id))
+                        .get().pipe(
+                            map(snapshot => {
+                                const uniqueClients = new Set();
+                                snapshot.docs.forEach(doc => {
+                                    const data = doc.data() as any;
+                                    uniqueClients.add(data.clienteId);
+                                });
+                                // Si alcanzó su límite, lo ocultamos
+                                if (uniqueClients.size >= limite) return null;
+                                return e;
+                            }),
+                            catchError(() => of(e)) // en fallo, lo mostramos
+                        );
+                });
+                
+                return forkJoin(observables).pipe(
+                    map(results => results.filter(r => r !== null) as Entrenador[])
+                );
+            }),
             tap(entrenadores => {
-                console.log('🔍 Entrenadores encontrados (verificados y activos):', entrenadores.length);
-                entrenadores.forEach(e => console.log(`  - ${e.nombre}: verificado=${e.verificado}, activo=${e.activo}`));
+                console.log('🔍 Entrenadores encontrados (verificados, activos, con cupo y trial válido):', entrenadores.length);
             })
         );
     }
@@ -149,9 +192,37 @@ export class ClienteFirebaseService {
                 map(entrenador => {
                     // Solo devolver si está verificado y activo
                     if (entrenador && entrenador.verificado && entrenador.activo) {
+                        const plan = entrenador.planSuscripcion || 'free';
+                        if (plan === 'free') {
+                            const ahora = new Date();
+                            const fechaReg = entrenador.fechaRegistro instanceof Date ? entrenador.fechaRegistro : new Date((entrenador.fechaRegistro as any)?.seconds * 1000);
+                            if (fechaReg) {
+                                const diffDays = (ahora.getTime() - fechaReg.getTime()) / (1000 * 3600 * 24);
+                                if (diffDays > 30) return undefined; // Trial expired, prevent direct access
+                            }
+                        }
                         return entrenador;
                     }
                     return undefined;
+                }),
+                switchMap(entrenador => {
+                    if (!entrenador) return of(undefined);
+                    
+                    const limite = entrenador.limiteAlumnos || 5;
+                    if (limite >= 999999) return of(entrenador);
+                    
+                    return this.firestore.collection('reservas', ref => ref.where('entrenadorId', '==', entrenador.id))
+                        .get().pipe(
+                            map(snapshot => {
+                                const uniqueClients = new Set();
+                                snapshot.docs.forEach(doc => uniqueClients.add((doc.data() as any).clienteId));
+                                // Aquí podríamos no ocultarlo pero marcarlo como lleno.
+                                // Por simplicidad y UX, para accesos directos por ID no lo ocultaremos completamente.
+                                // O podemos ponerle un field temporal `estaLleno` para deshabilitar reservas.
+                                (entrenador as any).estaLleno = uniqueClients.size >= limite;
+                                return entrenador;
+                            })
+                        );
                 }),
                 catchError(err => {
                     console.error('Error obteniendo entrenador:', err);

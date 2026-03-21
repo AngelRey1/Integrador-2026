@@ -46,6 +46,7 @@ type EntrenadorPerfil = Entrenador & {
   email: string;
   idiomas: string[];
   fotos: string[];
+  estaLleno?: boolean;
 };
 
 @Component({
@@ -218,7 +219,8 @@ export class EntrenadorPerfilComponent implements OnInit, OnDestroy {
       whatsapp: '',
       email: e.email || `${prefijo}@sportconnecta.com`,
       idiomas: ['Español'],
-      fotos: fotosFinales
+      fotos: fotosFinales,
+      estaLleno: (e as any).estaLleno || false
     };
 
     // Cargar reseñas reales desde Firebase

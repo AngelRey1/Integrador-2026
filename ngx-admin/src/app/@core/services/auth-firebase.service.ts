@@ -123,13 +123,14 @@ export class AuthFirebaseService {
     email: string; 
     password: string; 
     rol: string;
+    planSuscripcion?: string;
     documentos?: {
       ine: { nombre: string; tipo: string; base64: string; tamano: number } | null;
       certificacion: { nombre: string; tipo: string; base64: string; tamano: number } | null;
     }
   }): Promise<AuthResult> {
     try {
-      const { nombre, apellido, email, password, rol, documentos } = payload;
+      const { nombre, apellido, email, password, rol, documentos, planSuscripcion } = payload;
       
       // Crear usuario en Firebase Auth
       const credential = await this.afAuth.createUserWithEmailAndPassword(email, password);
@@ -178,6 +179,8 @@ export class AuthFirebaseService {
           activo: false,
           fechaRegistro: new Date(),
           direccionEntrenamiento: '',
+          planSuscripcion: planSuscripcion || 'free',
+          limiteAlumnos: (planSuscripcion === 'pro' || planSuscripcion === 'anual') ? 999999 : 5,
           // Documentos de verificación
           documentos: {
             ine: documentos?.ine || null,

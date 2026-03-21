@@ -1,6 +1,6 @@
 .shared-footer {
-  background: linear-gradient(135deg, #0F172A 0%, #1F2937 100%);
-  color: #FFFFFF;
+  background: linear-gradient(135deg, #0f172a 0%, #1f2937 100%);
+  color: #ffffff;
   padding: 4rem 2rem 2rem;
   border-top: 2px solid rgba(0, 240, 255, 0.2);
 }
@@ -26,7 +26,7 @@
 .footer-heading {
   font-size: 1.1rem;
   font-weight: 800;
-  color: #00F0FF;
+  color: #00f0ff;
   margin: 0;
   letter-spacing: 0.5px;
 }
@@ -54,7 +54,7 @@
     display: inline-block;
 
     &:hover {
-      color: #00F0FF;
+      color: #00f0ff;
       transform: translateX(4px);
     }
   }
@@ -75,7 +75,7 @@
   background: rgba(0, 240, 255, 0.1);
   border: 1px solid rgba(0, 240, 255, 0.3);
   border-radius: 8px;
-  color: #00F0FF;
+  color: #00f0ff;
   transition: all 0.3s ease;
   cursor: pointer;
   text-decoration: none;
@@ -95,7 +95,7 @@
 
   &:hover {
     background: rgba(0, 240, 255, 0.2);
-    border-color: #00F0FF;
+    border-color: #00f0ff;
     transform: scale(1.1);
   }
 }
@@ -117,13 +117,13 @@
 
   nb-icon {
     font-size: 1.1rem;
-    color: #00F0FF;
+    color: #00f0ff;
     flex-shrink: 0;
     margin-top: 0.2rem;
   }
 
   a {
-    color: #00F0FF;
+    color: #00f0ff;
     text-decoration: none;
     transition: all 0.3s ease;
 
@@ -160,12 +160,13 @@
 }
 
 .heart {
-  color: #FF4757;
+  color: #ff4757;
   animation: heartbeat 1.5s ease-in-out infinite;
 }
 
 @keyframes heartbeat {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
   }
   50% {

@@ -2,7 +2,7 @@
 // MIS INGRESOS - DISEÑO PREMIUM SAAS
 // ============================================================
 
-@import '../_premium-base.scss';
+@import "../_premium-base.scss";
 
 // Container
 .ingresos-container {
@@ -46,7 +46,7 @@
 
   // Barra superior de color
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
@@ -66,19 +66,31 @@
   &.primary {
     --accent-color: #{$color-primary};
     --accent-light: #{rgba($color-primary, 0.1)};
-    --accent-gradient: linear-gradient(90deg, #{$color-primary} 0%, #{$color-primary-light} 100%);
+    --accent-gradient: linear-gradient(
+      90deg,
+      #{$color-primary} 0%,
+      #{$color-primary-light} 100%
+    );
   }
 
   &.danger {
     --accent-color: #{$color-danger};
     --accent-light: #{rgba($color-danger, 0.1)};
-    --accent-gradient: linear-gradient(90deg, #{$color-danger} 0%, #f87171 100%);
+    --accent-gradient: linear-gradient(
+      90deg,
+      #{$color-danger} 0%,
+      #f87171 100%
+    );
   }
 
   &.success {
     --accent-color: #{$color-success};
     --accent-light: #{rgba($color-success, 0.1)};
-    --accent-gradient: linear-gradient(90deg, #{$color-success} 0%, #34d399 100%);
+    --accent-gradient: linear-gradient(
+      90deg,
+      #{$color-success} 0%,
+      #34d399 100%
+    );
   }
 
   &.info {
@@ -112,19 +124,35 @@
     background: var(--accent-light);
 
     &.primary {
-      background: linear-gradient(135deg, rgba($color-primary, 0.15) 0%, rgba($color-primary, 0.05) 100%);
+      background: linear-gradient(
+        135deg,
+        rgba($color-primary, 0.15) 0%,
+        rgba($color-primary, 0.05) 100%
+      );
       color: $color-primary;
     }
     &.danger {
-      background: linear-gradient(135deg, rgba($color-danger, 0.15) 0%, rgba($color-danger, 0.05) 100%);
+      background: linear-gradient(
+        135deg,
+        rgba($color-danger, 0.15) 0%,
+        rgba($color-danger, 0.05) 100%
+      );
       color: $color-danger;
     }
     &.success {
-      background: linear-gradient(135deg, rgba($color-success, 0.15) 0%, rgba($color-success, 0.05) 100%);
+      background: linear-gradient(
+        135deg,
+        rgba($color-success, 0.15) 0%,
+        rgba($color-success, 0.05) 100%
+      );
       color: $color-success;
     }
     &.info {
-      background: linear-gradient(135deg, rgba($color-info, 0.15) 0%, rgba($color-info, 0.05) 100%);
+      background: linear-gradient(
+        135deg,
+        rgba($color-info, 0.15) 0%,
+        rgba($color-info, 0.05) 100%
+      );
       color: $color-info;
     }
 
@@ -139,7 +167,7 @@
     gap: 0.375rem;
 
     .stat-number {
-      font-family: 'Space Grotesk', 'Inter', sans-serif;
+      font-family: "Space Grotesk", "Inter", sans-serif;
       font-size: 2rem;
       font-weight: 800;
       color: $color-text;
@@ -189,7 +217,11 @@
     .title-icon {
       width: 42px;
       height: 42px;
-      background: linear-gradient(135deg, $color-primary 0%, $color-secondary 100%);
+      background: linear-gradient(
+        135deg,
+        $color-primary 0%,
+        $color-secondary 100%
+      );
       border-radius: $radius-sm;
       display: flex;
       align-items: center;
@@ -203,7 +235,7 @@
     }
 
     h3 {
-      font-family: 'Space Grotesk', 'Inter', sans-serif;
+      font-family: "Space Grotesk", "Inter", sans-serif;
       font-size: 1.25rem;
       font-weight: 700;
       color: $color-text;
@@ -246,7 +278,7 @@
   }
 
   .bar-value {
-    font-family: 'Space Grotesk', 'Inter', sans-serif;
+    font-family: "Space Grotesk", "Inter", sans-serif;
     font-size: 0.875rem;
     font-weight: 700;
     color: $color-text;
@@ -280,30 +312,39 @@
 
   .bar-fill {
     width: 100%;
-    background: linear-gradient(180deg, $color-primary 0%, $color-primary-light 100%);
+    background: linear-gradient(
+      180deg,
+      $color-primary 0%,
+      $color-primary-light 100%
+    );
     border-radius: $radius-md $radius-md 0 0;
     transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     min-height: 8px;
 
     &::before {
-      content: '';
+      content: "";
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
       height: 50%;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0%, transparent 100%);
+      background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.2) 0%,
+        transparent 100%
+      );
       border-radius: $radius-md $radius-md 0 0;
     }
 
     &::after {
-      content: '';
+      content: "";
       position: absolute;
       inset: 0;
-      background: linear-gradient(90deg, 
-        transparent 0%, 
-        rgba(255, 255, 255, 0.3) 50%, 
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.3) 50%,
         transparent 100%
       );
       background-size: 200% 100%;
@@ -314,7 +355,11 @@
   }
 
   &:hover .bar-fill {
-    background: linear-gradient(180deg, $color-primary-light 0%, $color-primary 100%);
+    background: linear-gradient(
+      180deg,
+      $color-primary-light 0%,
+      $color-primary 100%
+    );
     transform: scaleY(1.02);
 
     &::after {
@@ -349,7 +394,11 @@
   .empty-icon {
     width: 80px;
     height: 80px;
-    background: linear-gradient(135deg, rgba($color-primary, 0.1) 0%, rgba($color-accent, 0.05) 100%);
+    background: linear-gradient(
+      135deg,
+      rgba($color-primary, 0.1) 0%,
+      rgba($color-accent, 0.05) 100%
+    );
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -364,7 +413,7 @@
   }
 
   h4 {
-    font-family: 'Space Grotesk', 'Inter', sans-serif;
+    font-family: "Space Grotesk", "Inter", sans-serif;
     font-size: 1.125rem;
     font-weight: 700;
     color: $color-text;
@@ -411,7 +460,7 @@
 
   // Indicador lateral
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     left: 0;
     top: 0;
@@ -428,9 +477,15 @@
     }
   }
 
-  &:nth-child(1) { --item-color: #{$color-primary}; }
-  &:nth-child(2) { --item-color: #{$color-warning}; }
-  &:nth-child(3) { --item-color: #{$color-success}; }
+  &:nth-child(1) {
+    --item-color: #{$color-primary};
+  }
+  &:nth-child(2) {
+    --item-color: #{$color-warning};
+  }
+  &:nth-child(3) {
+    --item-color: #{$color-success};
+  }
 
   &:hover {
     background: rgba($color-primary, 0.04);
@@ -453,17 +508,29 @@
     transition: transform 0.3s ease;
 
     &.income {
-      background: linear-gradient(135deg, rgba($color-primary, 0.15) 0%, rgba($color-primary, 0.05) 100%);
+      background: linear-gradient(
+        135deg,
+        rgba($color-primary, 0.15) 0%,
+        rgba($color-primary, 0.05) 100%
+      );
       color: $color-primary;
     }
 
     &.commission {
-      background: linear-gradient(135deg, rgba($color-warning, 0.15) 0%, rgba($color-warning, 0.05) 100%);
+      background: linear-gradient(
+        135deg,
+        rgba($color-warning, 0.15) 0%,
+        rgba($color-warning, 0.05) 100%
+      );
       color: $color-warning;
     }
 
     &.net {
-      background: linear-gradient(135deg, rgba($color-success, 0.15) 0%, rgba($color-success, 0.05) 100%);
+      background: linear-gradient(
+        135deg,
+        rgba($color-success, 0.15) 0%,
+        rgba($color-success, 0.05) 100%
+      );
       color: $color-success;
     }
 
@@ -489,7 +556,7 @@
     }
 
     .summary-value {
-      font-family: 'Space Grotesk', 'Inter', sans-serif;
+      font-family: "Space Grotesk", "Inter", sans-serif;
       font-size: 1.75rem;
       font-weight: 800;
       color: $color-text;
@@ -521,7 +588,11 @@
 
 // Info Alert
 .info-alert {
-  background: linear-gradient(135deg, rgba($color-info, 0.08) 0%, rgba($color-info, 0.03) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba($color-info, 0.08) 0%,
+    rgba($color-info, 0.03) 100%
+  );
   border: 1px solid rgba($color-info, 0.2);
   border-radius: $radius-md;
   padding: 1rem 1.5rem;

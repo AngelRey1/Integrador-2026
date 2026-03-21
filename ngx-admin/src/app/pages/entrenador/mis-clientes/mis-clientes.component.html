@@ -7,6 +7,20 @@
     </div>
   </div>
 
+  <!-- Alerta de Límite -->
+  <div class="row mb-4" *ngIf="haAlcanzadoLimite()">
+    <div class="col-12">
+      <nb-alert status="danger" class="d-flex align-items-center justify-content-between">
+        <div>
+          <nb-icon icon="alert-triangle-outline" class="mr-2"></nb-icon>
+          <strong>¡Atención!</strong> Has alcanzado tu límite de {{ limiteAlumnos }} alumnos de tu plan gratis. 
+          No podrás recibir nuevos alumnos en tu agenda.
+        </div>
+        <button nbButton size="small" status="primary" (click)="goToUpgrade()">Mejorar a Pro</button>
+      </nb-alert>
+    </div>
+  </div>
+
   <!-- Estadísticas generales -->
   <div class="row mb-4">
     <div class="col-6 col-md-3 mb-3">

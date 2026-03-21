@@ -15,6 +15,8 @@ interface Entrenador {
   rating: number;
   clientes: number;
   documentos: boolean;
+  planSuscripcion: string;
+  limiteAlumnos: number;
   entrenadorOriginal?: EntrenadorFirebase;
 }
 
@@ -91,6 +93,8 @@ export class EntrenadoresListComponent implements OnInit, OnDestroy {
       rating: e.calificacionPromedio || 0,
       clientes: 0,
       documentos: !!e.documentos?.ine || !!e.documentos?.certificacion,
+      planSuscripcion: e.planSuscripcion || 'free',
+      limiteAlumnos: e.limiteAlumnos || 5,
       entrenadorOriginal: e
     };
   }
@@ -139,6 +143,34 @@ export class EntrenadoresListComponent implements OnInit, OnDestroy {
   verPerfil(entrenador: Entrenador): void {
     // Por ahora abre el diálogo de documentos que también muestra info del perfil
     this.verDocumentos(entrenador);
+  }
+
+  async cambiarPlan(entrenador: Entrenador): Promise<void> {
+    const nuevoPlan = window.prompt(
+      `Actualizar plan para ${entrenador.nombre}\nOpciones válidas: 'free', 'pro', 'anual'\nPlan actual: ${entrenador.planSuscripcion}`, 
+      entrenador.planSuscripcion
+    );
+    
+    if (nuevoPlan) {
+      const planClean = nuevoPlan.toLowerCase().trim();
+      if (['free', 'pro', 'anual'].includes(planClean)) {
+        let limites = 5;
+        if (planClean !== 'free') limites = 999999; // Ilimitado para PRO/Anual
+        
+        const confirm = window.confirm(`¿Estás seguro de asignar el plan '${planClean.toUpperCase()}' a ${entrenador.nombre}?`);
+        if (confirm) {
+          const result = await this.adminFirebase.actualizarPlanSuscripcion(entrenador.id, planClean, limites);
+          if (result.success) {
+            this.toastr.success(result.message, 'Plan Actualizado');
+            this.refrescar();
+          } else {
+            this.toastr.danger(result.message, 'Error');
+          }
+        }
+      } else {
+        this.toastr.warning('Plan no válido. Usa "free", "pro" o "anual".', 'Plan Inválido');
+      }
+    }
   }
 
   verDocumentos(entrenador: Entrenador): void {

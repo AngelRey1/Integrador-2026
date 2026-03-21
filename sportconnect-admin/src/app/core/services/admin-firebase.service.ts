@@ -47,6 +47,8 @@ export interface Entrenador {
     fechaRegistro: Date;
     direccionEntrenamiento?: string;
     documentos?: DocumentosEntrenador;
+    planSuscripcion?: string;
+    limiteAlumnos?: number;
 }
 
 export interface Reserva {
@@ -316,6 +318,19 @@ export class AdminFirebaseService {
         } catch (error) {
             console.error('Error:', error);
             return { success: false, message: 'Error al rechazar entrenador' };
+        }
+    }
+
+    async actualizarPlanSuscripcion(id: string, planSuscripcion: string, limiteAlumnos: number): Promise<{ success: boolean; message: string }> {
+        try {
+            await this.firestore.doc(`entrenadores/${id}`).update({ 
+                planSuscripcion: planSuscripcion,
+                limiteAlumnos: limiteAlumnos
+            });
+            return { success: true, message: `Plan del entrenador actualizado a ${planSuscripcion.toUpperCase()}` };
+        } catch (error) {
+            console.error('Error:', error);
+            return { success: false, message: 'Error al actualizar el plan del entrenador' };
         }
     }
 

@@ -10,6 +10,8 @@ import { MisIngresosComponent } from './mis-ingresos/mis-ingresos.component';
 import { PerfilEntrenadorComponent } from './perfil-entrenador/perfil-entrenador.component';
 import { ChatEntrenadorComponent } from './chat/chat.component';
 import { ChatAdminComponent } from './chat-admin/chat-admin.component';
+import { MiSuscripcionComponent } from './mi-suscripcion/mi-suscripcion.component';
+import { PagoSuscripcionDialogComponent } from './mi-suscripcion/pago-suscripcion-dialog/pago-suscripcion-dialog.component';
 
 // Custom Icons
 import { SportIconsModule } from '../../@theme/components/sport-icons/sport-icons.module';
@@ -51,7 +53,9 @@ import { NbEvaIconsModule } from '@nebular/eva-icons';
     MisIngresosComponent,
     PerfilEntrenadorComponent,
     ChatEntrenadorComponent,
-    ChatAdminComponent
+    ChatAdminComponent,
+    MiSuscripcionComponent,
+    PagoSuscripcionDialogComponent
   ],
   imports: [
     CommonModule,
@@ -86,3 +90,4 @@ import { NbEvaIconsModule } from '@nebular/eva-icons';
   ]
 })
 export class EntrenadorModule { }
+

@@ -1,6 +1,6 @@
-@import '../../styles/themes';
-@import '@nebular/theme/styles/global/breakpoints';
-@import 'bootstrap/scss/mixins/breakpoints';
+@import "../../styles/themes";
+@import "@nebular/theme/styles/global/breakpoints";
+@import "bootstrap/scss/mixins/breakpoints";
 
 @include nb-install-component() {
   width: 100%;
@@ -11,7 +11,7 @@
   .created-by {
     width: 100%;
     text-align: center;
-    color: #8F9BB3;
+    color: #8f9bb3;
     font-size: 0.85rem;
     margin: 0;
     font-weight: 500;

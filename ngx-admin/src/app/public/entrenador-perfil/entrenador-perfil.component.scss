@@ -3,11 +3,11 @@
 // ============================================
 
 :root {
-  --color-primary: #0288D1; // Stronger Sky Blue
-  --color-primary-dark: #C2185B; // Darker Pink
+  --color-primary: #0288d1; // Stronger Sky Blue
+  --color-primary-dark: #c2185b; // Darker Pink
   --color-secondary: #000000; // PURE BLACK
-  --color-background: #E3F2FD; // Clearer Light Blue
-  --color-surface: #FFFFFF;
+  --color-background: #e3f2fd; // Clearer Light Blue
+  --color-surface: #ffffff;
   --color-text-primary: #000000; // PURE BLACK
   --color-text-secondary: #000000; // PURE BLACK
 }
@@ -30,17 +30,17 @@
   background: var(--color-background);
   min-height: 100vh;
   padding-bottom: 100px;
-  font-family: 'Space Grotesk', 'Inter', sans-serif;
+  font-family: "Space Grotesk", "Inter", sans-serif;
   color: var(--color-text-primary);
 }
 
 // ===== HERO SECTION =====
 .perfil-hero {
   // Pastel Gradient Background
-  background: linear-gradient(135deg, #B3E5FC 0%, #E1F5FE 50%, #F8BBD0 100%);
+  background: linear-gradient(135deg, #b3e5fc 0%, #e1f5fe 50%, #f8bbd0 100%);
   padding: 2rem 2rem 3rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  border-bottom: 2px solid #FFFFFF;
+  border-bottom: 2px solid #ffffff;
 }
 
 .hero-header {
@@ -55,9 +55,9 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: #FFFFFF;
-  border: 2px solid #0288D1;
-  color: #01579B;
+  background: #ffffff;
+  border: 2px solid #0288d1;
+  color: #01579b;
   padding: 0.7rem 1.4rem;
   border-radius: 8px;
   font-weight: 800;
@@ -71,7 +71,7 @@
   }
 
   &:hover {
-    background: #E1F5FE;
+    background: #e1f5fe;
     transform: translateX(-4px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
@@ -104,7 +104,7 @@
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-  border: 4px solid #FFFFFF;
+  border: 4px solid #ffffff;
 
   img {
     width: 100%;
@@ -117,9 +117,9 @@
   position: absolute;
   top: 20px;
   left: 20px;
-  background: #FFFFFF;
-  border: 2px solid #00C853;
-  color: #00C853;
+  background: #ffffff;
+  border: 2px solid #00c853;
+  color: #00c853;
   padding: 10px 20px;
   border-radius: 25px;
   font-weight: 800;
@@ -130,18 +130,18 @@
   position: absolute;
   top: 20px;
   right: 20px;
-  background: #FFFFFF;
-  color: #0288D1;
+  background: #ffffff;
+  color: #0288d1;
   padding: 10px 20px;
   border-radius: 25px;
   font-weight: 800;
   font-size: 14px;
-  border: 2px solid #0288D1;
+  border: 2px solid #0288d1;
 
   &.elite {
-    background: #FFFFFF;
-    color: #01579B;
-    border-color: #01579B;
+    background: #ffffff;
+    color: #01579b;
+    border-color: #01579b;
   }
 }
 
@@ -164,7 +164,7 @@
 
   &:hover {
     transform: scale(1.08);
-    border-color: #00D09C;
+    border-color: #00d09c;
     box-shadow: 0 0 0 3px rgba(0, 208, 156, 0.3);
   }
 }
@@ -185,8 +185,12 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .lightbox-container {
@@ -217,8 +221,8 @@
   z-index: 10001;
 
   &:hover {
-    background: #EF4444;
-    border-color: #EF4444;
+    background: #ef4444;
+    border-color: #ef4444;
     transform: scale(1.1);
   }
 }
@@ -239,8 +243,14 @@
 }
 
 @keyframes zoomIn {
-  from { transform: scale(0.8); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .lightbox-nav {
@@ -262,8 +272,8 @@
   z-index: 10001;
 
   &:hover {
-    background: #00D09C;
-    border-color: #00D09C;
+    background: #00d09c;
+    border-color: #00d09c;
     transform: translateY(-50%) scale(1.1);
   }
 
@@ -305,7 +315,7 @@
 
 .entrenador-ubicacion {
   font-size: 20px;
-  color: #455A64; // Dark Grey
+  color: #455a64; // Dark Grey
   margin: 0;
   font-weight: 600;
   display: flex;
@@ -322,7 +332,7 @@
 .estrellas {
   display: flex;
   gap: 5px;
-  color: #D81B60; // Pink
+  color: #d81b60; // Pink
 
   .star {
     font-size: 24px;
@@ -342,11 +352,11 @@
 }
 
 .especialidad-tag {
-  background: #FFFFFF;
-  color: #01579B;
+  background: #ffffff;
+  color: #01579b;
   padding: 8px 18px;
   border-radius: 20px;
-  border: 1px solid #0288D1;
+  border: 1px solid #0288d1;
   font-weight: 700;
   font-size: 14px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
@@ -359,7 +369,7 @@
   background: rgba(255, 255, 255, 0.6);
   padding: 25px;
   border-radius: 15px;
-  border: 1px solid #FFFFFF;
+  border: 1px solid #ffffff;
 }
 
 .info-item {
@@ -369,7 +379,7 @@
 
   .info-icon {
     font-size: 28px;
-    color: #0288D1;
+    color: #0288d1;
   }
 
   div {
@@ -379,7 +389,7 @@
 
   .info-label {
     font-size: 12px;
-    color: #455A64;
+    color: #455a64;
     text-transform: uppercase;
     font-weight: 700;
     letter-spacing: 0.5px;
@@ -396,7 +406,7 @@
   display: flex;
   gap: 20px;
   align-items: center;
-  background: #FFFFFF;
+  background: #ffffff;
   padding: 25px;
   border-radius: 15px;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
@@ -408,20 +418,20 @@
 
   .precio-label {
     font-size: 14px;
-    color: #455A64;
+    color: #455a64;
     font-weight: 600;
   }
 
   .precio-valor {
     font-size: 38px;
     font-weight: 900;
-    color: #01579B; // Deep Blue
+    color: #01579b; // Deep Blue
   }
 }
 
 .btn-reservar {
   flex: 1;
-  background: linear-gradient(135deg, #0288D1, #D81B60);
+  background: linear-gradient(135deg, #0288d1, #d81b60);
   color: white;
   border: none;
   padding: 18px 30px;
@@ -475,8 +485,8 @@
 
 .btn-compartir {
   background: transparent;
-  border: 2px solid #455A64;
-  color: #455A64;
+  border: 2px solid #455a64;
+  color: #455a64;
   padding: 14px 28px;
   border-radius: 25px;
   font-weight: 700;
@@ -487,8 +497,8 @@
   margin-top: 15px;
 
   &:hover {
-    background: #455A64;
-    color: #FFFFFF;
+    background: #455a64;
+    color: #ffffff;
   }
 }
 
@@ -520,7 +530,7 @@
   display: flex;
   gap: 15px;
   margin-bottom: 40px;
-  border-bottom: 3px solid #CFD8DC;
+  border-bottom: 3px solid #cfd8dc;
 
   @media (max-width: 768px) {
     flex-direction: column;
@@ -534,38 +544,38 @@
   padding: 15px 30px;
   font-size: 16px;
   font-weight: 700;
-  color: #78909C;
+  color: #78909c;
   cursor: pointer;
   border-bottom: 3px solid transparent;
   transition: all 0.3s;
 
   &.active {
-    color: #0288D1;
-    border-bottom-color: #0288D1;
+    color: #0288d1;
+    border-bottom-color: #0288d1;
   }
 
   &:hover {
-    color: #01579B;
+    color: #01579b;
   }
 
   @media (max-width: 768px) {
-    border: 2px solid #CFD8DC;
+    border: 2px solid #cfd8dc;
     border-radius: 10px;
 
     &.active {
-      background: #0288D1;
-      color: #FFFFFF;
-      border-color: #0288D1;
+      background: #0288d1;
+      color: #ffffff;
+      border-color: #0288d1;
     }
   }
 }
 
 .tab-content {
-  background: #FFFFFF;
+  background: #ffffff;
   padding: 40px;
   border-radius: 15px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  border: 1px solid #E1F5FE;
+  border: 1px solid #e1f5fe;
 
   h2 {
     font-size: 28px;
@@ -620,16 +630,16 @@
 .check-icon,
 .trophy-icon {
   font-size: 20px;
-  color: #0288D1;
+  color: #0288d1;
 }
 
 .info-box,
 .contacto-box {
-  background: #F8FAFC;
+  background: #f8fafc;
   padding: 25px;
   border-radius: 12px;
   margin-bottom: 20px;
-  border: 1px solid #ECEFF1;
+  border: 1px solid #eceff1;
 }
 
 .beneficios-list {
@@ -655,7 +665,7 @@
 
   .icon {
     font-size: 20px;
-    color: #0288D1;
+    color: #0288d1;
   }
 }
 
@@ -668,16 +678,16 @@
 }
 
 .horario-card {
-  background: #FFFFFF;
+  background: #ffffff;
   padding: 20px;
   border-radius: 12px;
   text-align: center;
-  border: 2px solid #E1F5FE;
+  border: 2px solid #e1f5fe;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
 
   &.no-disponible {
     opacity: 0.6;
-    background: #F5F5F5;
+    background: #f5f5f5;
   }
 }
 
@@ -695,27 +705,27 @@
 }
 
 .horario-tag {
-  background: #E1F5FE;
-  color: #01579B;
+  background: #e1f5fe;
+  color: #01579b;
   padding: 8px 12px;
   border-radius: 8px;
   font-size: 14px;
   font-weight: 700;
-  border: 1px solid #B3E5FC;
+  border: 1px solid #b3e5fc;
 }
 
 .no-disponible-text {
-  color: #78909C;
+  color: #78909c;
   font-style: italic;
   font-weight: 600;
 }
 
 .horarios-nota {
-  background: #E3F2FD;
-  border-left: 4px solid #0288D1;
+  background: #e3f2fd;
+  border-left: 4px solid #0288d1;
   padding: 15px 20px;
   border-radius: 8px;
-  color: #01579B;
+  color: #01579b;
   font-weight: 600;
 }
 
@@ -742,14 +752,14 @@
 .rating-grande {
   font-size: 64px;
   font-weight: 900;
-  color: #0288D1;
+  color: #0288d1;
 }
 
 .estrellas-grandes {
   display: flex;
   gap: 5px;
   margin-bottom: 8px;
-  color: #D81B60;
+  color: #d81b60;
 
   .star {
     font-size: 24px;
@@ -763,10 +773,10 @@
 }
 
 .resena-card {
-  background: #F8FAFC;
+  background: #f8fafc;
   padding: 25px;
   border-radius: 12px;
-  border: 1px solid #ECEFF1;
+  border: 1px solid #eceff1;
 }
 
 .resena-header {
@@ -780,8 +790,8 @@
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background: #B3E5FC;
-  color: #01579B;
+  background: #b3e5fc;
+  color: #01579b;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -803,7 +813,7 @@
 .resena-rating {
   display: flex;
   gap: 3px;
-  color: #D81B60;
+  color: #d81b60;
 
   .star {
     font-size: 16px;
@@ -812,7 +822,7 @@
 
 .resena-fecha {
   font-size: 14px;
-  color: #78909C;
+  color: #78909c;
   font-weight: 600;
 }
 
@@ -830,7 +840,7 @@
   height: 50px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #E1F5FE;
+  border: 2px solid #e1f5fe;
 }
 
 // Respuesta del entrenador
@@ -899,7 +909,7 @@
 
   p {
     margin-top: 1rem;
-    color: #78909C;
+    color: #78909c;
   }
 }
 
@@ -914,7 +924,7 @@
   padding: 15px 20px;
   z-index: 999;
   display: none;
-  border-top: 1px solid #E1F5FE;
+  border-top: 1px solid #e1f5fe;
 
   &.visible {
     display: block;
@@ -940,7 +950,7 @@
 .cta-precio {
   font-size: 32px;
   font-weight: 900;
-  color: #01579B;
+  color: #01579b;
 }
 
 .cta-text {
@@ -950,7 +960,7 @@
 }
 
 .btn-reservar-flotante {
-  background: linear-gradient(135deg, #0288D1, #D81B60);
+  background: linear-gradient(135deg, #0288d1, #d81b60);
   color: white;
   border: none;
   padding: 16px 40px;

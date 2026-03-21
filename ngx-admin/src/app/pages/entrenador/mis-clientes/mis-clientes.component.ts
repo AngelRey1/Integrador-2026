@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NbToastrService } from '@nebular/theme';
 import { EntrenadorFirebaseService, ClienteResumen } from '../../../@core/services/entrenador-firebase.service';
 import { Subscription } from 'rxjs';
@@ -38,10 +38,14 @@ export class MisClientesComponent implements OnInit, OnDestroy {
     ingresosTotales: 0
   };
 
-  private subscription: Subscription | null = null;
+  // Limites
+  limiteAlumnos: number = 5;
+
+  private subscription: Subscription = new Subscription();
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private entrenadorFirebase: EntrenadorFirebaseService,
     private toastrService: NbToastrService
   ) { }
@@ -58,7 +62,14 @@ export class MisClientesComponent implements OnInit, OnDestroy {
 
   cargarClientes(): void {
     this.loading = true;
-    this.subscription = this.entrenadorFirebase.getMisClientes().subscribe({
+
+    // Obtener el límite del dashboard stats
+    const limitSub = this.entrenadorFirebase.getDashboardStats().subscribe(stats => {
+      this.limiteAlumnos = stats.limiteAlumnos || 5;
+    });
+    this.subscription.add(limitSub);
+
+    const clientSub = this.entrenadorFirebase.getMisClientes().subscribe({
       next: (clientes) => {
         this.clientes = clientes.map(c => this.convertirCliente(c));
         this.calcularEstadisticas();
@@ -71,6 +82,15 @@ export class MisClientesComponent implements OnInit, OnDestroy {
         this.toastrService.warning('No se pudieron cargar los clientes', 'Aviso');
       }
     });
+    this.subscription.add(clientSub);
+  }
+
+  haAlcanzadoLimite(): boolean {
+    return this.clientes.length >= this.limiteAlumnos && this.limiteAlumnos < 999999;
+  }
+
+  goToUpgrade(): void {
+    this.router.navigate(['/public/coach-join']);
   }
 
   private convertirCliente(c: ClienteResumen): Cliente {

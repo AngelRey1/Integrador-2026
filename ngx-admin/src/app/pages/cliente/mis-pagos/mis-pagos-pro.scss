@@ -3,7 +3,7 @@
 // Consistente con el panel del cliente
 // ============================================================
 
-@import '../_premium-base-cliente.scss';
+@import "../_premium-base-cliente.scss";
 
 // === HOST ===
 :host {
@@ -24,7 +24,7 @@
 }
 
 .page-title {
-  font-family: 'Space Grotesk', 'Inter', sans-serif;
+  font-family: "Space Grotesk", "Inter", sans-serif;
   font-size: 1.75rem;
   font-weight: 700;
   color: $color-text;
@@ -52,7 +52,7 @@
   overflow: hidden;
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
@@ -84,30 +84,46 @@
     height: 56px;
     border-radius: $radius-sm;
     transition: all 0.3s ease;
-    
+
     nb-icon {
       font-size: 26px;
       color: white;
     }
 
     &.total {
-      background: linear-gradient(135deg, $color-primary 0%, $color-secondary 100%);
-      --accent-gradient: linear-gradient(90deg, $color-primary 0%, $color-accent 100%);
+      background: linear-gradient(
+        135deg,
+        $color-primary 0%,
+        $color-secondary 100%
+      );
+      --accent-gradient: linear-gradient(
+        90deg,
+        $color-primary 0%,
+        $color-accent 100%
+      );
     }
 
     &.pending {
-      background: linear-gradient(135deg, $color-warning 0%, #FBBF24 100%);
-      --accent-gradient: linear-gradient(90deg, $color-warning 0%, #FBBF24 100%);
+      background: linear-gradient(135deg, $color-warning 0%, #fbbf24 100%);
+      --accent-gradient: linear-gradient(
+        90deg,
+        $color-warning 0%,
+        #fbbf24 100%
+      );
     }
 
     &.last {
-      background: linear-gradient(135deg, $color-success 0%, #34D399 100%);
-      --accent-gradient: linear-gradient(90deg, $color-success 0%, #34D399 100%);
+      background: linear-gradient(135deg, $color-success 0%, #34d399 100%);
+      --accent-gradient: linear-gradient(
+        90deg,
+        $color-success 0%,
+        #34d399 100%
+      );
     }
 
     &.completed {
-      background: linear-gradient(135deg, #8B5CF6 0%, #A78BFA 100%);
-      --accent-gradient: linear-gradient(90deg, #8B5CF6 0%, #A78BFA 100%);
+      background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+      --accent-gradient: linear-gradient(90deg, #8b5cf6 0%, #a78bfa 100%);
     }
   }
 
@@ -124,7 +140,7 @@
 
     .stat-value {
       margin: 0;
-      font-family: 'Space Grotesk', 'Inter', sans-serif;
+      font-family: "Space Grotesk", "Inter", sans-serif;
       font-size: 2rem;
       font-weight: 800;
       color: $color-text;
@@ -169,7 +185,7 @@ nb-card.stat-card-wrapper {
       }
 
       span {
-        font-family: 'Space Grotesk', 'Inter', sans-serif;
+        font-family: "Space Grotesk", "Inter", sans-serif;
         font-size: 1.125rem;
         font-weight: 700;
         color: $color-text;
@@ -208,7 +224,7 @@ nb-card.stat-card-wrapper {
     max-width: 100px;
 
     .bar-value {
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: "Space Grotesk", sans-serif;
       font-size: 0.875rem;
       font-weight: 700;
       color: $color-text;
@@ -239,17 +255,22 @@ nb-card.stat-card-wrapper {
         left: 0;
         right: 0;
         height: 100%;
-        background: linear-gradient(180deg, $color-primary-light 0%, $color-primary 100%);
+        background: linear-gradient(
+          180deg,
+          $color-primary-light 0%,
+          $color-primary 100%
+        );
         border-radius: $radius-md $radius-md 0 0;
         transition: all 0.4s ease;
 
         &::after {
-          content: '';
+          content: "";
           position: absolute;
           inset: 0;
-          background: linear-gradient(90deg, 
-            transparent 0%, 
-            rgba(255, 255, 255, 0.3) 50%, 
+          background: linear-gradient(
+            90deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.3) 50%,
             transparent 100%
           );
           background-size: 200% 100%;
@@ -296,7 +317,7 @@ nb-card.stat-card-wrapper {
       padding: 1.5rem 2.5rem;
 
       span {
-        font-family: 'Space Grotesk', 'Inter', sans-serif;
+        font-family: "Space Grotesk", "Inter", sans-serif;
         font-size: 1.125rem;
         font-weight: 700;
         color: $color-text;
@@ -380,17 +401,29 @@ nb-card.stat-card-wrapper {
     flex-shrink: 0;
 
     &.card {
-      background: linear-gradient(135deg, rgba($color-info, 0.15) 0%, rgba($color-info, 0.05) 100%);
+      background: linear-gradient(
+        135deg,
+        rgba($color-info, 0.15) 0%,
+        rgba($color-info, 0.05) 100%
+      );
       color: $color-info;
     }
 
     &.oxxo {
-      background: linear-gradient(135deg, rgba($color-warning, 0.15) 0%, rgba($color-warning, 0.05) 100%);
+      background: linear-gradient(
+        135deg,
+        rgba($color-warning, 0.15) 0%,
+        rgba($color-warning, 0.05) 100%
+      );
       color: $color-warning;
     }
 
     &.transfer {
-      background: linear-gradient(135deg, rgba($color-success, 0.15) 0%, rgba($color-success, 0.05) 100%);
+      background: linear-gradient(
+        135deg,
+        rgba($color-success, 0.15) 0%,
+        rgba($color-success, 0.05) 100%
+      );
       color: $color-success;
     }
 
@@ -421,7 +454,7 @@ nb-card.stat-card-wrapper {
     text-align: right;
 
     .amount {
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: "Space Grotesk", sans-serif;
       font-size: 1.25rem;
       font-weight: 700;
       color: $color-text;
@@ -493,12 +526,16 @@ nb-card.stat-card-wrapper {
 
   thead {
     tr {
-      background: linear-gradient(135deg, rgba($color-primary, 0.05) 0%, rgba($color-secondary, 0.03) 100%);
+      background: linear-gradient(
+        135deg,
+        rgba($color-primary, 0.05) 0%,
+        rgba($color-secondary, 0.03) 100%
+      );
     }
 
     th {
       padding: 1.25rem 1rem;
-      font-family: 'Space Grotesk', 'Inter', sans-serif;
+      font-family: "Space Grotesk", "Inter", sans-serif;
       font-size: 0.8125rem;
       font-weight: 700;
       color: $color-text-secondary;
@@ -547,7 +584,7 @@ nb-card.stat-card-wrapper {
       }
 
       &.transaction-id {
-        font-family: 'Space Grotesk', monospace;
+        font-family: "Space Grotesk", monospace;
         font-weight: 600;
         color: $color-text-secondary;
         font-size: 0.8125rem;
@@ -558,7 +595,7 @@ nb-card.stat-card-wrapper {
       }
 
       &.monto {
-        font-family: 'Space Grotesk', sans-serif;
+        font-family: "Space Grotesk", sans-serif;
         font-weight: 700;
         font-size: 1rem;
         color: $color-text;
@@ -597,7 +634,7 @@ nb-card.stat-card-wrapper {
   }
 
   h5 {
-    font-family: 'Space Grotesk', 'Inter', sans-serif;
+    font-family: "Space Grotesk", "Inter", sans-serif;
     font-size: 1.375rem;
     font-weight: 700;
     color: $color-text;
@@ -622,7 +659,7 @@ nb-card.stat-card-wrapper {
 .table-footer {
   padding-top: 1.5rem;
   border-top: 1px solid $color-border;
-  
+
   .text-hint {
     font-size: 0.875rem;
     color: $color-text-muted;
@@ -645,7 +682,7 @@ nb-card.stat-card-wrapper {
   }
 
   h6 {
-    font-family: 'Space Grotesk', 'Inter', sans-serif;
+    font-family: "Space Grotesk", "Inter", sans-serif;
     font-size: 1.375rem;
     font-weight: 700;
     color: $color-text;
@@ -673,7 +710,7 @@ nb-card.stat-card-wrapper {
 @media (max-width: 768px) {
   .chart-bars {
     gap: 0.75rem;
-    
+
     .bar-wrapper {
       max-width: 60px;
 

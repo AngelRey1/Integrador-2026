@@ -1,4 +1,4 @@
-@import '../../../@theme/styles/themes';
+@import "../../../@theme/styles/themes";
 
 @include nb-install-component() {
   .chat-container {
@@ -23,7 +23,7 @@
       padding: 1rem 1.25rem;
       border-bottom: 1px solid nb-theme(divider-color);
       background: nb-theme(background-basic-color-2);
-      
+
       h5 {
         margin: 0;
         font-weight: 600;
@@ -57,7 +57,11 @@
         width: 48px;
         height: 48px;
         border-radius: 50%;
-        background: linear-gradient(135deg, nb-theme(color-primary-500), nb-theme(color-primary-700));
+        background: linear-gradient(
+          135deg,
+          nb-theme(color-primary-500),
+          nb-theme(color-primary-700)
+        );
         color: #fff;
         display: flex;
         align-items: center;
@@ -164,7 +168,11 @@
         width: 44px;
         height: 44px;
         border-radius: 50%;
-        background: linear-gradient(135deg, nb-theme(color-primary-500), nb-theme(color-primary-700));
+        background: linear-gradient(
+          135deg,
+          nb-theme(color-primary-500),
+          nb-theme(color-primary-700)
+        );
         color: #fff;
         display: flex;
         align-items: center;
@@ -265,12 +273,12 @@
             nb-icon {
               font-size: 1rem;
               &.leido {
-                color: #34B7F1;
+                color: #34b7f1;
               }
             }
           }
         }
-        
+
         &:hover .mensaje-actions {
           display: flex;
         }
@@ -283,10 +291,10 @@
         right: 0;
         background: nb-theme(background-basic-color-1);
         border-radius: 8px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
         padding: 0 2px;
         z-index: 10;
-        
+
         .action-btn {
           width: 30px;
           height: 30px;
@@ -305,7 +313,7 @@
         font-style: italic;
         border: 1px dashed nb-theme(divider-color);
         box-shadow: none !important;
-        
+
         .texto-eliminado {
           display: flex;
           align-items: center;
@@ -348,7 +356,7 @@
       flex-direction: column;
       border-top: 1px solid nb-theme(divider-color);
       background: nb-theme(background-basic-color-2);
-      
+
       &.modo-edicion {
         border-top: 2px solid nb-theme(color-success-500);
       }
@@ -370,7 +378,7 @@
           flex: 1;
           display: flex;
           flex-direction: column;
-          
+
           .titulo {
             font-weight: 600;
             color: nb-theme(color-success-500);

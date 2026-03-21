@@ -1,0 +1,125 @@
+<div class="suscripcion-container">
+  
+  <!-- Carga -->
+  <div *ngIf="loading" class="text-center p-5">
+    <nb-spinner size="giant" status="primary"></nb-spinner>
+  </div>
+
+  <div *ngIf="!loading">
+    <div class="header-section">
+      <h2>Mi Suscripción</h2>
+      <p>Gestiona tu plan actual y desbloquea el crecimiento de tu carrera sin límites.</p>
+    </div>
+
+    <!-- Alerta de Pago Pendiente -->
+    <nb-alert status="warning" *ngIf="pagoPendiente" class="mb-4">
+      <div class="d-flex align-items-center gap-2">
+        <nb-icon icon="clock-outline" class="fs-4"></nb-icon>
+        <div>
+          <strong>Pago en revisión:</strong> Hemos recibido tu comprobante para el plan <strong>{{ pagoPendiente.planSolicitado | uppercase }}</strong>. Lo estamos validando y tu cuenta se actualizará pronto.
+        </div>
+      </div>
+    </nb-alert>
+
+    <div class="row info-row">
+      <!-- Mi Plan Actual -->
+      <div class="col-md-6 mb-4">
+        <nb-card class="status-card">
+          <nb-card-header>Estado Actual</nb-card-header>
+          <nb-card-body>
+            <div class="status-header">
+              <div class="plan-badge" [class.pro]="planSuscripcion !== 'free'">
+                {{ planSuscripcion === 'free' ? 'Prueba el Sistema' : 'PRO (' + planSuscripcion + ')' }}
+              </div>
+              <div class="status-indicator">
+                <span class="dot active-dot"></span> Activo
+              </div>
+            </div>
+
+            <div class="metric-container" *ngIf="planSuscripcion === 'free'">
+              <div class="metric-header">
+                <span>Trial de 30 días</span>
+                <strong [class.text-danger]="diasTrialRestantes <= 5">
+                  {{ diasTrialRestantes > 0 ? diasTrialRestantes + ' días restantes' : 'Expirado' }}
+                </strong>
+              </div>
+              <nb-progress-bar 
+                [value]="getProgresoTrial()" 
+                [status]="diasTrialRestantes <= 5 ? 'danger' : 'primary'"
+                size="tiny">
+              </nb-progress-bar>
+            </div>
+
+            <div class="metric-container mt-4">
+              <div class="metric-header">
+                <span>Cupo de Alumnos Activos</span>
+                <strong>{{ alumnosActivos }} / {{ limiteAlumnos >= 999999 ? '∞' : limiteAlumnos }}</strong>
+              </div>
+              <nb-progress-bar 
+                [value]="getProgresoAlumnos()" 
+                [status]="getProgresoAlumnos() >= 100 ? 'danger' : 'info'"
+                size="tiny">
+              </nb-progress-bar>
+              <p class="alerta-cupo" *ngIf="planSuscripcion === 'free' && getProgresoAlumnos() >= 100">
+                <nb-icon icon="alert-circle-outline"></nb-icon>
+                Has alcanzado el límite de alumnos. ¡Actualiza para seguir creciendo!
+              </p>
+            </div>
+          </nb-card-body>
+        </nb-card>
+      </div>
+
+      <!-- Beneficios Box -->
+      <div class="col-md-6 mb-4">
+        <nb-card class="beneficios-card">
+          <nb-card-header>Beneficios PRO</nb-card-header>
+          <nb-card-body>
+            <ul class="beneficios-list">
+              <li><nb-icon icon="checkmark-circle-outline" status="success"></nb-icon> <strong>Escalabilidad:</strong> Acepta un número ilimitado de alumnos y aumenta tus ingresos de forma exponencial.</li>
+              <li><nb-icon icon="checkmark-circle-outline" status="success"></nb-icon> <strong>Exposición:</strong> Tu perfil aparecerá como Destacado atrayendo más clientes.</li>
+              <li><nb-icon icon="checkmark-circle-outline" status="success"></nb-icon> <strong>Confianza:</strong> Sello de Entrenador Certificado visible para los alumnos.</li>
+              <li><nb-icon icon="checkmark-circle-outline" status="success"></nb-icon> <strong>0% Comisiones Adicionales:</strong> Pagas tu suscripción mensual y te quedas con el total de lo que te pagan los alumnos (próximamente).</li>
+            </ul>
+          </nb-card-body>
+        </nb-card>
+      </div>
+    </div>
+
+    <div class="pricing-section mt-5">
+      <h3 class="text-center mb-5">Elige el mejor plan para ti</h3>
+      <div class="pricing-grid">
+        <div *ngFor="let plan of planes" class="pricing-tier" [class.recommended]="plan.recomendado" [class.active-tier]="plan.activo">
+          <div class="recommended-badge" *ngIf="plan.recomendado">Mejor Valor</div>
+          <div class="actived-badge" *ngIf="plan.activo">Tu Plan Actual</div>
+          
+          <div class="tier-header">
+            <h4>{{ plan.nombre }}</h4>
+            <div class="tier-price">
+              <span class="currency">$</span>
+              <span class="amount">{{ plan.precio }}</span>
+              <span class="period">/{{ plan.periodo }}</span>
+            </div>
+          </div>
+          
+          <div class="tier-features">
+            <ul>
+              <li *ngFor="let feat of plan.caracteristicas">
+                <nb-icon icon="checkmark-outline" status="success"></nb-icon> {{ feat }}
+              </li>
+            </ul>
+          </div>
+          
+          <div class="tier-action">
+            <button nbButton fullWidth 
+                    [status]="plan.activo ? 'basic' : (plan.recomendado ? 'primary' : 'info')"
+                    [disabled]="plan.activo"
+                    (click)="solicitarUpgrade(plan.id)">
+              {{ plan.activo ? 'Plan Actual' : 'Seleccionar ' + plan.nombre }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

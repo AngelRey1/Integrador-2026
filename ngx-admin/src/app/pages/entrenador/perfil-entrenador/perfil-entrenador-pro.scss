@@ -5,74 +5,132 @@
 
 // Variables del diseño
 $color-primary: #047857;
-$color-primary-light: #10B981;
-$color-secondary: #0F766E;
-$color-accent: #14B8A6;
-$color-warning: #F59E0B;
-$color-danger: #EF4444;
-$color-success: #10B981;
-$color-info: #3B82F6;
-$bg-page: linear-gradient(180deg, #F8FAFC 0%, #F1F5F9 100%);
-$text-primary: #1E293B;
-$text-secondary: #64748B;
-$text-muted: #94A3B8;
+$color-primary-light: #10b981;
+$color-secondary: #0f766e;
+$color-accent: #14b8a6;
+$color-warning: #f59e0b;
+$color-danger: #ef4444;
+$color-success: #10b981;
+$color-info: #3b82f6;
+$bg-page: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+$text-primary: #1e293b;
+$text-secondary: #64748b;
+$text-muted: #94a3b8;
 $radius-xl: 24px;
 $radius-lg: 20px;
 $radius-md: 16px;
 $radius-sm: 12px;
-$shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.03);
+$shadow-sm:
+  0 1px 3px rgba(0, 0, 0, 0.04),
+  0 4px 12px rgba(0, 0, 0, 0.03);
 $shadow-md: 0 4px 20px rgba(0, 0, 0, 0.08);
 $shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.12);
-$font-primary: 'Space Grotesk', 'Inter', -apple-system, sans-serif;
+$font-primary:
+  "Space Grotesk",
+  "Inter",
+  -apple-system,
+  sans-serif;
 
 // ============================================
 // ANIMACIONES
 // ============================================
 
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes fadeInScale {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @keyframes slideInLeft {
-  from { opacity: 0; transform: translateX(-20px); }
-  to { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @keyframes slideInRight {
-  from { opacity: 0; transform: translateX(20px); }
-  to { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
 }
 
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 @keyframes gradientMove {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 @keyframes dotPulse {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.3); opacity: 0.7; }
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 0.7;
+  }
 }
 
 @keyframes ringPulse {
-  0% { transform: scale(1); opacity: 0.6; }
-  100% { transform: scale(1.4); opacity: 0; }
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
 }
 
 // ============================================
@@ -109,7 +167,9 @@ $font-primary: 'Space Grotesk', 'Inter', -apple-system, sans-serif;
   }
 
   @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+      transform: rotate(360deg);
+    }
   }
 
   p {
@@ -125,21 +185,26 @@ $font-primary: 'Space Grotesk', 'Inter', -apple-system, sans-serif;
 
 .profile-hero {
   position: relative;
-  background: linear-gradient(135deg, $color-primary 0%, $color-secondary 50%, $color-accent 100%);
+  background: linear-gradient(
+    135deg,
+    $color-primary 0%,
+    $color-secondary 50%,
+    $color-accent 100%
+  );
   background-size: 200% 200%;
   animation: gradientMove 8s ease infinite;
   border-radius: $radius-xl;
   padding: 2.5rem 3rem;
   margin-bottom: 2rem;
   overflow: hidden;
-  box-shadow: 
+  box-shadow:
     0 20px 60px rgba($color-primary, 0.3),
     0 4px 20px rgba(0, 0, 0, 0.1);
 
   // Decoraciones de fondo
   &::before,
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.05);
@@ -193,9 +258,15 @@ $font-primary: 'Space Grotesk', 'Inter', -apple-system, sans-serif;
         border-radius: 50%;
         animation: dotPulse 1.5s ease infinite;
 
-        &.active { background: #4ADE80; }
-        &.pending { background: $color-warning; }
-        &.inactive { background: $color-danger; }
+        &.active {
+          background: #4ade80;
+        }
+        &.pending {
+          background: $color-warning;
+        }
+        &.inactive {
+          background: $color-danger;
+        }
       }
     }
 
@@ -304,22 +375,38 @@ $font-primary: 'Space Grotesk', 'Inter', -apple-system, sans-serif;
   }
 
   &.alert-success {
-    background: linear-gradient(135deg, rgba($color-success, 0.08), rgba($color-success, 0.15));
+    background: linear-gradient(
+      135deg,
+      rgba($color-success, 0.08),
+      rgba($color-success, 0.15)
+    );
     border: 1px solid rgba($color-success, 0.2);
     color: darken($color-success, 15%);
 
     .alert-icon {
-      background: linear-gradient(135deg, $color-success, lighten($color-success, 10%));
+      background: linear-gradient(
+        135deg,
+        $color-success,
+        lighten($color-success, 10%)
+      );
     }
   }
 
   &.alert-warning {
-    background: linear-gradient(135deg, rgba($color-warning, 0.08), rgba($color-warning, 0.15));
+    background: linear-gradient(
+      135deg,
+      rgba($color-warning, 0.08),
+      rgba($color-warning, 0.15)
+    );
     border: 1px solid rgba($color-warning, 0.2);
     color: darken($color-warning, 20%);
 
     .alert-icon {
-      background: linear-gradient(135deg, $color-warning, lighten($color-warning, 10%));
+      background: linear-gradient(
+        135deg,
+        $color-warning,
+        lighten($color-warning, 10%)
+      );
     }
   }
 }
@@ -374,7 +461,11 @@ $font-primary: 'Space Grotesk', 'Inter', -apple-system, sans-serif;
     align-items: center;
     gap: 1rem;
     padding: 1.25rem 1.5rem;
-    background: linear-gradient(to right, rgba($color-primary, 0.03), transparent);
+    background: linear-gradient(
+      to right,
+      rgba($color-primary, 0.03),
+      transparent
+    );
     border-bottom: 1px solid rgba($color-primary, 0.08);
 
     .header-icon {
@@ -455,15 +546,19 @@ $font-primary: 'Space Grotesk', 'Inter', -apple-system, sans-serif;
       height: 140px;
       border-radius: $radius-lg;
       overflow: hidden;
-      background: linear-gradient(135deg, rgba($color-primary, 0.1), rgba($color-accent, 0.1));
-      box-shadow: 
+      background: linear-gradient(
+        135deg,
+        rgba($color-primary, 0.1),
+        rgba($color-accent, 0.1)
+      );
+      box-shadow:
         0 8px 32px rgba($color-primary, 0.15),
         inset 0 0 0 3px rgba($color-primary, 0.1);
       transition: all 0.3s ease;
 
       &:hover {
         transform: scale(1.02);
-        box-shadow: 
+        box-shadow:
           0 12px 40px rgba($color-primary, 0.2),
           inset 0 0 0 3px rgba($color-primary, 0.2);
 
@@ -546,7 +641,11 @@ $font-primary: 'Space Grotesk', 'Inter', -apple-system, sans-serif;
 
         .progress-fill {
           height: 100%;
-          background: linear-gradient(90deg, $color-primary, $color-primary-light);
+          background: linear-gradient(
+            90deg,
+            $color-primary,
+            $color-primary-light
+          );
           border-radius: 3px;
           transition: width 0.3s ease;
         }
@@ -580,7 +679,7 @@ $font-primary: 'Space Grotesk', 'Inter', -apple-system, sans-serif;
     aspect-ratio: 1;
     border-radius: $radius-sm;
     overflow: hidden;
-    background: #F1F5F9;
+    background: #f1f5f9;
     transition: all 0.3s ease;
 
     img {
@@ -642,8 +741,8 @@ $font-primary: 'Space Grotesk', 'Inter', -apple-system, sans-serif;
     }
 
     &.add-item {
-      border: 2px dashed #CBD5E1;
-      background: #F8FAFC;
+      border: 2px dashed #cbd5e1;
+      background: #f8fafc;
       cursor: pointer;
       display: flex;
       flex-direction: column;
@@ -710,7 +809,7 @@ $font-primary: 'Space Grotesk', 'Inter', -apple-system, sans-serif;
   input[nbInput],
   textarea[nbInput] {
     border-radius: $radius-sm !important;
-    border: 1px solid #E2E8F0 !important;
+    border: 1px solid #e2e8f0 !important;
     padding: 0.875rem 1rem !important;
     font-size: 0.9375rem !important;
     transition: all 0.2s ease !important;
@@ -750,7 +849,7 @@ $font-primary: 'Space Grotesk', 'Inter', -apple-system, sans-serif;
   align-items: stretch;
   border-radius: $radius-sm;
   overflow: hidden;
-  border: 1px solid #E2E8F0;
+  border: 1px solid #e2e8f0;
   transition: all 0.2s ease;
 
   &:focus-within {
@@ -761,7 +860,7 @@ $font-primary: 'Space Grotesk', 'Inter', -apple-system, sans-serif;
   .price-prefix,
   .price-suffix {
     padding: 0.875rem 1rem;
-    background: #F8FAFC;
+    background: #f8fafc;
     color: $text-secondary;
     font-weight: 600;
     font-size: 0.875rem;
@@ -798,7 +897,7 @@ $font-primary: 'Space Grotesk', 'Inter', -apple-system, sans-serif;
   gap: 1rem;
   margin-top: 1.5rem;
   padding-top: 1.5rem;
-  border-top: 1px dashed #E2E8F0;
+  border-top: 1px dashed #e2e8f0;
 
   .price-card {
     flex: 1;
@@ -807,7 +906,11 @@ $font-primary: 'Space Grotesk', 'Inter', -apple-system, sans-serif;
     align-items: center;
     padding: 1.5rem;
     border-radius: $radius-md;
-    background: linear-gradient(135deg, rgba($color-success, 0.08), rgba($color-success, 0.15));
+    background: linear-gradient(
+      135deg,
+      rgba($color-success, 0.08),
+      rgba($color-success, 0.15)
+    );
     border: 2px solid rgba($color-success, 0.2);
     transition: all 0.3s ease;
 
@@ -931,7 +1034,7 @@ $font-primary: 'Space Grotesk', 'Inter', -apple-system, sans-serif;
     align-items: center;
     gap: 0.75rem;
     padding: 0.875rem 1rem;
-    background: #F8FAFC;
+    background: #f8fafc;
     border-radius: $radius-sm;
     transition: all 0.2s ease;
     animation: fadeInUp 0.4s ease both;
@@ -951,7 +1054,11 @@ $font-primary: 'Space Grotesk', 'Inter', -apple-system, sans-serif;
       width: 32px;
       height: 32px;
       border-radius: 8px;
-      background: linear-gradient(135deg, $color-success, lighten($color-success, 10%));
+      background: linear-gradient(
+        135deg,
+        $color-success,
+        lighten($color-success, 10%)
+      );
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1005,7 +1112,7 @@ $font-primary: 'Space Grotesk', 'Inter', -apple-system, sans-serif;
     align-items: center;
     gap: 1rem;
     padding: 1rem;
-    background: #F8FAFC;
+    background: #f8fafc;
     border-radius: $radius-sm;
     margin-bottom: 1rem;
 
@@ -1027,7 +1134,7 @@ $font-primary: 'Space Grotesk', 'Inter', -apple-system, sans-serif;
     flex-direction: column;
     gap: 0.75rem;
     padding-top: 1rem;
-    border-top: 1px solid #E2E8F0;
+    border-top: 1px solid #e2e8f0;
 
     .status-item {
       display: flex;
@@ -1082,7 +1189,7 @@ $font-primary: 'Space Grotesk', 'Inter', -apple-system, sans-serif;
     flex-direction: column;
     align-items: center;
     padding: 1.25rem;
-    background: #F8FAFC;
+    background: #f8fafc;
     border-radius: $radius-md;
     transition: all 0.3s ease;
 
@@ -1107,11 +1214,19 @@ $font-primary: 'Space Grotesk', 'Inter', -apple-system, sans-serif;
       }
 
       &.rating {
-        background: linear-gradient(135deg, $color-warning, lighten($color-warning, 10%));
+        background: linear-gradient(
+          135deg,
+          $color-warning,
+          lighten($color-warning, 10%)
+        );
       }
 
       &.reviews {
-        background: linear-gradient(135deg, $color-info, lighten($color-info, 10%));
+        background: linear-gradient(
+          135deg,
+          $color-info,
+          lighten($color-info, 10%)
+        );
       }
     }
 
@@ -1163,16 +1278,20 @@ $font-primary: 'Space Grotesk', 'Inter', -apple-system, sans-serif;
   }
 
   &.btn-secondary {
-    background: #F1F5F9;
+    background: #f1f5f9;
     color: $text-primary;
 
     &:hover {
-      background: #E2E8F0;
+      background: #e2e8f0;
     }
   }
 
   &.btn-success {
-    background: linear-gradient(135deg, $color-success, lighten($color-success, 10%));
+    background: linear-gradient(
+      135deg,
+      $color-success,
+      lighten($color-success, 10%)
+    );
     color: white;
     box-shadow: 0 4px 12px rgba($color-success, 0.3);
 
