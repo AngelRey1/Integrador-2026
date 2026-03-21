@@ -78,25 +78,27 @@
         <p>{{ entrenadoresFiltrados.length }} entrenadores disponibles</p>
       </div>
 
-      <div class="filtros-container-modern">
+      <div class="unified-search-bar">
         <!-- Búsqueda -->
-        <div class="filtro-pill">
+        <div class="filtro-item">
           <i eva-icon="search-outline" eva-pack="outline" class="icon-search"></i>
           <input 
             type="text" 
             [(ngModel)]="searchQuery"
-            (ngModelChange)="aplicarFiltros(true)"
+            (ngModelChange)="onSearchChange()"
             placeholder="Buscar por nombre o deporte..."
             class="input-pill"
           />
         </div>
 
+        <div class="divider hidden-mobile"></div>
+
         <!-- Deporte -->
-        <div class="filtro-pill">
+        <div class="filtro-item">
           <i eva-icon="heart-outline" eva-pack="outline" class="icon-filter"></i>
           <select 
             [(ngModel)]="filtros.deporte"
-            (ngModelChange)="aplicarFiltros(true)"
+            (ngModelChange)="onDeporteChange()"
             class="select-pill"
           >
             <option *ngFor="let deporte of deportes" [value]="deporte.value">
@@ -105,28 +107,32 @@
           </select>
         </div>
 
+        <div class="divider hidden-mobile"></div>
+
         <!-- Precio Máximo -->
-        <div class="filtro-pill">
+        <div class="filtro-item">
           <i eva-icon="pricetags-outline" eva-pack="outline" class="icon-filter"></i>
           <div class="range-wrapper">
             <label class="range-label">Max: ${{ filtros.precioMax }}/h</label>
             <input 
               type="range" 
               [(ngModel)]="filtros.precioMax"
-              (ngModelChange)="aplicarFiltros(true)"
+              (ngModelChange)="aplicarFiltros(false)"
               min="10"
-              max="100"
+              max="500"
               class="range-pill"
             />
           </div>
         </div>
 
+        <div class="divider hidden-mobile"></div>
+
         <!-- Calificación Mínima -->
-        <div class="filtro-pill">
+        <div class="filtro-item">
           <i eva-icon="star-outline" eva-pack="outline" class="icon-filter"></i>
           <select 
             [(ngModel)]="filtros.calificacionMin"
-            (ngModelChange)="aplicarFiltros(true)"
+            (ngModelChange)="aplicarFiltros(false)"
             class="select-pill"
           >
             <option [value]="0">Todas las calificaciones</option>
@@ -169,9 +175,10 @@
 
             <p class="card-especialidad-premium">{{ entrenador.especialidad }}</p>
 
-            <div class="card-modalidad-premium">
-              <span *ngFor="let mod of entrenador.modalidad" class="modalidad-badge-premium">
-                {{ mod }}
+            <div class="card-modalidad-premium" style="display: flex; gap: 8px;">
+              <span class="modalidad-badge-premium" style="background: rgba(0,208,156,0.1); color: #00d09c;">
+                <nb-icon icon="briefcase-outline" style="font-size: 14px; margin-right: 4px;"></nb-icon>
+                {{ entrenador.experiencia || 1 }} año(s) de exp.
               </span>
             </div>
 

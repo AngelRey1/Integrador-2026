@@ -58,6 +58,12 @@ $darker-bg: rgba(10, 15, 30, 0.99);
   font-size: 1.8rem;
 }
 
+.header-logo-img {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+}
+
 .logo-text {
   font-size: 1.4rem;
   font-weight: 900;
@@ -66,31 +72,35 @@ $darker-bg: rgba(10, 15, 30, 0.99);
   -webkit-text-fill-color: transparent;
   background-clip: text;
   letter-spacing: 1px;
+  line-height: 1;
+  display: inline-block;
+  transform: translateY(2px); // Alinea visualmente mejor con el logo
 }
 
 // Boton de menu hamburguesa
 .menu-toggle {
-  background: rgba($primary-cyan, 0.1);
-  border: 1px solid rgba($primary-cyan, 0.3);
-  color: $primary-cyan;
-  padding: 0.6rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #F8FAFC;
+  padding: 0.5rem;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
+  font-size: 1.8rem;
 
   &:hover {
-    background: rgba($primary-cyan, 0.2);
-    border-color: $primary-cyan;
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: $primary-cyan;
     transform: scale(1.05);
   }
 
   &.open {
-    background: rgba($accent-pink, 0.2);
-    border-color: $accent-pink;
+    background: rgba($accent-pink, 0.1);
+    border-color: rgba($accent-pink, 0.2);
     color: $accent-pink;
   }
 }
@@ -141,6 +151,8 @@ $darker-bg: rgba(10, 15, 30, 0.99);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  line-height: 1;
+  transform: translateY(2px); // Alineacion visual con la imagen logo
 }
 
 .sidebar-close {
@@ -462,7 +474,8 @@ $darker-bg: rgba(10, 15, 30, 0.99);
 .user-details-modern {
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  justify-content: center;
+  gap: 0.15rem;
 }
 
 .user-name-large {
@@ -508,12 +521,12 @@ $darker-bg: rgba(10, 15, 30, 0.99);
   }
 
   &.cliente {
-    background: linear-gradient(135deg, $primary-cyan, $primary-green);
+    background: linear-gradient(135deg, #0288D1, #38BDF8);
     color: white;
 
     &:hover {
       transform: translateY(-3px);
-      box-shadow: 0 8px 25px rgba($primary-cyan, 0.5);
+      box-shadow: 0 8px 25px rgba(#0288D1, 0.5);
     }
   }
 
@@ -535,9 +548,9 @@ $darker-bg: rgba(10, 15, 30, 0.99);
   gap: 0.6rem;
   padding: 0.9rem 1.2rem;
   border-radius: 12px;
-  background: rgba($accent-pink, 0.08);
-  border: 1px solid rgba($accent-pink, 0.25);
-  color: $accent-pink;
+  background: rgba(239, 68, 68, 0.08); // Rojo
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: #EF4444; 
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
@@ -548,8 +561,8 @@ $darker-bg: rgba(10, 15, 30, 0.99);
   }
 
   &:hover {
-    background: rgba($accent-pink, 0.18);
-    border-color: $accent-pink;
+    background: rgba(239, 68, 68, 0.18);
+    border-color: #EF4444;
     transform: translateY(-2px);
   }
 }

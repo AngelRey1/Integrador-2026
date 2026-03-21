@@ -57,9 +57,36 @@
           class="mensaje"
           [class.enviado]="mensaje.senderTipo === 'entrenador'"
           [class.recibido]="mensaje.senderTipo === 'cliente'">
-          <div class="mensaje-content">
-            <p>{{ mensaje.texto }}</p>
-            <span class="hora">{{ formatearFecha(mensaje.timestamp) }}</span>
+          <div class="mensaje-content" [class.eliminado-bubble]="mensaje.eliminado">
+            
+            <ng-container *ngIf="mensaje.eliminado; else mensajeNormal">
+              <div class="texto-eliminado">
+                <nb-icon icon="slash-outline"></nb-icon> Este mensaje fue eliminado
+              </div>
+            </ng-container>
+            
+            <ng-template #mensajeNormal>
+              <div class="cuerpo-mensaje">
+                <p>{{ mensaje.texto }}</p>
+                <span class="hora-y-estado">
+                  <span *ngIf="mensaje.editado" class="tag-editado">editado</span>
+                  {{ formatearFecha(mensaje.timestamp) }}
+                  <span class="mensajes-ticks" *ngIf="mensaje.senderId === userId">
+                    <nb-icon [icon]="mensaje.leido ? 'done-all-outline' : 'checkmark-outline'" [class.leido]="mensaje.leido"></nb-icon>
+                  </span>
+                </span>
+              </div>
+              
+              <div class="mensaje-actions" *ngIf="mensaje.senderId === userId">
+                <button nbButton ghost size="tiny" status="basic" (click)="iniciarEdicion(mensaje)" title="Editar" class="action-btn">
+                  <nb-icon icon="edit-2-outline"></nb-icon>
+                </button>
+                <button nbButton ghost size="tiny" status="danger" (click)="eliminarMensaje(mensaje)" title="Eliminar" class="action-btn">
+                  <nb-icon icon="trash-2-outline"></nb-icon>
+                </button>
+              </div>
+            </ng-template>
+
           </div>
         </div>
         
@@ -71,20 +98,54 @@
       </div>
       
       <!-- Input de mensaje -->
-      <div class="input-container">
-        <textarea 
-          [(ngModel)]="nuevoMensaje"
-          placeholder="Escribe un mensaje..."
-          rows="1"
-          (keypress)="onKeyPress($event)"
-          [disabled]="enviando"></textarea>
-        <button 
-          nbButton 
-          status="primary" 
-          [disabled]="!nuevoMensaje.trim() || enviando"
-          (click)="enviarMensaje()">
-          <nb-icon icon="paper-plane-outline"></nb-icon>
-        </button>
+      <div class="input-container" [class.modo-edicion]="mensajeEditando">
+        
+        <div class="edicion-banner" *ngIf="mensajeEditando">
+          <nb-icon icon="edit-2-outline"></nb-icon>
+          <div class="edicion-info">
+            <span class="titulo">Editando mensaje</span>
+            <span class="previo">{{ mensajeEditando.texto }}</span>
+          </div>
+          <button nbButton ghost size="tiny" (click)="cancelarEdicion()">
+            <nb-icon icon="close-outline"></nb-icon>
+          </button>
+        </div>
+
+        <div class="input-row">
+          <textarea 
+            *ngIf="!mensajeEditando"
+            [(ngModel)]="nuevoMensaje"
+            placeholder="Escribe un mensaje..."
+            rows="1"
+            (keypress)="onKeyPress($event)"
+            [disabled]="enviando"></textarea>
+            
+          <textarea 
+            *ngIf="mensajeEditando"
+            [(ngModel)]="textoEdicion"
+            placeholder="Edita tu mensaje..."
+            rows="1"
+            (keypress)="onKeyPress($event)"
+            [disabled]="enviando"></textarea>
+            
+          <button 
+            *ngIf="!mensajeEditando"
+            nbButton 
+            status="primary" 
+            [disabled]="!nuevoMensaje.trim() || enviando"
+            (click)="enviarMensaje()">
+            <nb-icon icon="paper-plane-outline"></nb-icon>
+          </button>
+
+          <button 
+            *ngIf="mensajeEditando"
+            nbButton 
+            status="success" 
+            [disabled]="!textoEdicion.trim() || enviando"
+            (click)="enviarMensaje()">
+            <nb-icon icon="checkmark-outline"></nb-icon>
+          </button>
+        </div>
       </div>
     </ng-container>
     

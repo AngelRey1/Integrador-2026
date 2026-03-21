@@ -239,6 +239,38 @@ $shadow-card: 0 4px 12px 0 rgba(0, 0, 0, 0.05);
       background: $color-surface !important;
       padding: 0 0.5rem !important;
     }
+
+    // Estilos específicos para cuando la barra está contraída (compacted/oculta)
+    &.compacted {
+      .scrollable {
+        padding: 0 0.25rem !important;
+      }
+
+      nb-menu {
+        .menu-item {
+          a {
+            justify-content: center !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            
+            .menu-icon {
+              margin-right: 0 !important;
+              font-size: 1.5rem !important;
+            }
+          }
+          
+          &.menu-group {
+            display: none !important; // Ocultar títulos de grupo en modo compacto
+          }
+
+          // Ajustar indicador de selección en modo compacto
+          &.active > a::before,
+          &.selected > a::before {
+            width: 3px;
+          }
+        }
+      }
+    }
   }
   
   // Menu de navegación Premium

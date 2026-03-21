@@ -45,6 +45,7 @@ export class AgendarSesionComponent implements OnInit, OnDestroy {
 
   // Datos
   entrenadorId: string | null = null;
+  entrenadorQuery: string | null = null;
   entrenadorSeleccionado: Entrenador | null = null;
   
   // Lista de entrenadores desde Firebase
@@ -137,6 +138,14 @@ export class AgendarSesionComponent implements OnInit, OnDestroy {
       }
     });
 
+    // Verificar si viene nombre o ID de entrenador por query parameters
+    this.route.queryParams.subscribe(params => {
+      const entrenador = params['entrenador'];
+      if (entrenador) {
+        this.entrenadorQuery = entrenador;
+      }
+    });
+
     // Listener para calcular precio al cambiar duración
     this.paso3Form.get('duracion')?.valueChanges.subscribe(() => {
       this.calcularPrecio();
@@ -150,10 +159,10 @@ export class AgendarSesionComponent implements OnInit, OnDestroy {
   private cargarEntrenadores(): void {
     this.loadingEntrenadores = true;
     
-    // Primero obtener las reservas para filtrar entrenadores con reservas previas
-    const reservasSub = this.clienteFirebase.getMisReservasSinOrden().subscribe(
-      (reservas) => {
-        // Extraer IDs de entrenadores con cualquier reserva previa
+    // Obtener reservas sin depender de observables que no se completan
+    // Usamos el collection directo para obtener solo los IDs
+    const reservasSub = this.clienteFirebase.getMisReservasSinOrden().subscribe({
+      next: (reservas) => {
         const entrenadoresConReservas = new Set<string>();
         reservas.forEach(r => {
           if (r.entrenadorId) {
@@ -161,10 +170,15 @@ export class AgendarSesionComponent implements OnInit, OnDestroy {
           }
         });
 
-        // Cargar entrenadores y filtrar por los que tienen reservas previas
-        const entrenadorSub = this.clienteFirebase.getEntrenadores().subscribe(
-          (entrenadores) => {
-            // Filtrar solo entrenadores con reservas previas
+        if (entrenadoresConReservas.size === 0) {
+          // Si no hay reservas pasadas, mostramos lista vacía
+          this.entrenadores = [];
+          this.loadingEntrenadores = false;
+          return;
+        }
+
+        const entrenadorSub = this.clienteFirebase.getEntrenadores().subscribe({
+          next: (entrenadores) => {
             const entrenadoresFiltrados = entrenadores.filter(e => 
               e.id && entrenadoresConReservas.has(e.id)
             );
@@ -179,51 +193,48 @@ export class AgendarSesionComponent implements OnInit, OnDestroy {
               total_resenas: e.totalReviews || 0
             }));
             this.loadingEntrenadores = false;
-            
-            // Si venía con ID, seleccionar ahora
-            if (this.entrenadorId) {
-              this.seleccionarEntrenador(this.entrenadorId);
-            }
+            this.procesarSeleccionInicial();
           },
-          (error) => {
+          error: (error) => {
             console.error('Error cargando entrenadores:', error);
             this.loadingEntrenadores = false;
             this.toastr.danger('Error al cargar entrenadores', 'Error');
           }
-        );
+        });
         this.subscriptions.push(entrenadorSub);
       },
-      (error) => {
+      error: (error) => {
         console.error('Error cargando reservas:', error);
         this.loadingEntrenadores = false;
-        // En caso de error, cargar todos los entrenadores como fallback
-        this.cargarTodosEntrenadores();
+        // Si hay error al cargar reservas, dejamos la lista vacía en lugar de mostrar todos
+        this.entrenadores = [];
       }
-    );
+    });
     this.subscriptions.push(reservasSub);
   }
 
-  private cargarTodosEntrenadores(): void {
-    const entrenadorSub = this.clienteFirebase.getEntrenadores().subscribe(
-      (entrenadores) => {
-        this.entrenadores = entrenadores.map(e => ({
-          id: e.id || '',
-          nombre_completo: `${e.nombre} ${e.apellidoPaterno || ''}`.trim(),
-          foto_url: e.foto || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(`${e.nombre} ${e.apellidoPaterno || ''}`.trim()) + '&background=00D09C&color=fff&size=100',
-          especialidad: e.deportes?.join(', ') || 'Entrenamiento',
-          tarifa_por_hora: e.precio || 300,
-          calificacion: e.calificacionPromedio || 5.0,
-          total_resenas: e.totalReviews || 0
-        }));
-        this.loadingEntrenadores = false;
-      },
-      (error) => {
-        console.error('Error cargando entrenadores:', error);
-        this.loadingEntrenadores = false;
-        this.toastr.danger('Error al cargar entrenadores', 'Error');
+  // Ya no cargamos todos los entrenadores como fallback para forzar la regla de diseño
+  // private cargarTodosEntrenadores(): void { ... }
+
+  private procesarSeleccionInicial(): void {
+    if (this.entrenadorId) {
+      this.seleccionarEntrenador(this.entrenadorId);
+    } else if (this.entrenadorQuery) {
+      // Buscar por ID o por nombre
+      const queryLower = this.entrenadorQuery.toLowerCase();
+      const entrenadorEncontrado = this.entrenadores.find(e => 
+        e.id === this.entrenadorQuery || 
+        e.nombre_completo.toLowerCase().includes(queryLower)
+      );
+      
+      if (entrenadorEncontrado) {
+        this.seleccionarEntrenador(entrenadorEncontrado.id);
+        // Avanzar automáticamente al paso de fecha/hora
+        setTimeout(() => {
+          this.pasoActual = 1;
+        }, 100);
       }
-    );
-    this.subscriptions.push(entrenadorSub);
+    }
   }
 
   // Paso 1: Selección de entrenador

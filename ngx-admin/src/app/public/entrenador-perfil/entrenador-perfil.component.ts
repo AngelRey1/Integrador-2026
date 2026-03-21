@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
@@ -289,6 +289,27 @@ export class EntrenadorPerfilComponent implements OnInit, OnDestroy {
   cerrarLightbox(): void {
     this.lightboxAbierto = false;
     document.body.style.overflow = ''; // Restaurar scroll
+  }
+
+  @HostListener('window:keydown.esc')
+  onEsc() {
+    if (this.lightboxAbierto) {
+      this.cerrarLightbox();
+    }
+  }
+
+  @HostListener('window:keydown.ArrowRight')
+  onArrowRight() {
+    if (this.lightboxAbierto) {
+      this.lightboxSiguiente();
+    }
+  }
+
+  @HostListener('window:keydown.ArrowLeft')
+  onArrowLeft() {
+    if (this.lightboxAbierto) {
+      this.lightboxAnterior();
+    }
   }
 
   /**

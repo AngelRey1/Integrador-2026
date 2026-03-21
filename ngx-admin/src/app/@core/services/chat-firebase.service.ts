@@ -12,6 +12,8 @@ export interface Mensaje {
   senderTipo: 'cliente' | 'entrenador';
   timestamp: Date;
   leido: boolean;
+  editado?: boolean;
+  eliminado?: boolean;
 }
 
 export interface Conversacion {
@@ -25,6 +27,8 @@ export interface Conversacion {
   noLeidosCliente: number;
   noLeidosEntrenador: number;
   activa: boolean;
+  tipoConversacion?: 'cliente-entrenador' | 'soporte-cliente' | 'soporte-entrenador';
+  participantes?: string[];
 }
 
 @Injectable({
@@ -67,7 +71,9 @@ export class ChatFirebaseService {
       ultimoMensajeTimestamp: new Date(),
       noLeidosCliente: 0,
       noLeidosEntrenador: 0,
-      activa: true
+      activa: true,
+      tipoConversacion: 'cliente-entrenador',
+      participantes: [user.uid, entrenadorId]
     };
 
     const docRef = await this.firestore.collection('conversaciones').add(conversacion);
@@ -148,7 +154,9 @@ export class ChatFirebaseService {
       senderNombre,
       senderTipo,
       timestamp: new Date(),
-      leido: false
+      leido: false,
+      editado: false,
+      eliminado: false
     };
 
     // Añadir mensaje
@@ -171,6 +179,30 @@ export class ChatFirebaseService {
     }
 
     await this.firestore.collection('conversaciones').doc(conversacionId).update(updateData);
+  }
+
+  // Editar un mensaje
+  async editarMensaje(conversacionId: string, mensajeId: string, nuevoTexto: string): Promise<void> {
+    await this.firestore.collection('conversaciones')
+      .doc(conversacionId)
+      .collection('mensajes')
+      .doc(mensajeId)
+      .update({
+        texto: nuevoTexto,
+        editado: true
+      });
+  }
+
+  // Eliminar lógicamente un mensaje
+  async eliminarMensaje(conversacionId: string, mensajeId: string): Promise<void> {
+    await this.firestore.collection('conversaciones')
+      .doc(conversacionId)
+      .collection('mensajes')
+      .doc(mensajeId)
+      .update({
+        texto: 'Este mensaje fue eliminado',
+        eliminado: true
+      });
   }
 
   private async getNoLeidos(conversacionId: string, tipo: 'cliente' | 'entrenador'): Promise<number> {
@@ -246,7 +278,9 @@ export class ChatFirebaseService {
       ultimoMensajeTimestamp: new Date(),
       noLeidosCliente: 0,
       noLeidosEntrenador: 0,
-      activa: true
+      activa: true,
+      tipoConversacion: 'soporte-cliente',
+      participantes: [user.uid, adminId]
     };
 
     const docRef = await this.firestore.collection('conversaciones').add(conversacion);

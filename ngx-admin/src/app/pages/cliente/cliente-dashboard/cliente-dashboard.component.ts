@@ -77,9 +77,15 @@ export class ClienteDashboardComponent implements OnInit, OnDestroy {
 
   getGreeting(): string {
     const hora = new Date().getHours();
-    if (hora < 12) return 'Buenos días';
-    if (hora < 19) return 'Buenas tardes';
-    return 'Buenas noches';
+    if (hora < 12) return '¡Buenos días';
+    if (hora < 19) return '¡Buenas tardes';
+    return '¡Buenas noches';
+  }
+
+  getFechaFormateada(): string {
+    const opciones: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    const fecha = new Date().toLocaleDateString('es-ES', opciones);
+    return fecha.charAt(0).toUpperCase() + fecha.slice(1);
   }
 
   getDeporteIcon(deporte: string): string {

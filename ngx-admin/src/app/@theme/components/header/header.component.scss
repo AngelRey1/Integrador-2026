@@ -58,6 +58,8 @@
       @include nb-rtl(border-right, 1px solid nb-theme(divider-color));
       white-space: nowrap;
       text-decoration: none;
+      color: #00D09C !important;
+      font-weight: 700;
     }
     
     // Theme selector styling

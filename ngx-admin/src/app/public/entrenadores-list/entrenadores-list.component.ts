@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { ClienteFirebaseService, Entrenador as EntrenadorFirebase } from '../../@core/services/cliente-firebase.service';
+import Fuse from 'fuse.js';
 
 interface Entrenador {
   id: string;
@@ -18,6 +19,7 @@ interface Entrenador {
   nivel: 'BASICO' | 'PROFESIONAL' | 'ELITE';
   modalidad: string[];
   descripcion: string;
+  experiencia?: number;
 }
 
 @Component({
@@ -88,9 +90,32 @@ export class EntrenadoresListComponent implements OnInit, OnDestroy {
       next: (entrenadoresFirebase) => {
         console.log('🔥 Entrenadores cargados desde Firebase:', entrenadoresFirebase.length);
         
-        // Transformar datos de Firebase al formato del componente
+        // 1) Transformar datos
         this.entrenadores = entrenadoresFirebase.map(e => this.transformarEntrenador(e));
         
+        // 2) Extraer deportes disponibles dinámicamente para el filtro superior
+        const deportesSet = new Set<string>();
+        this.entrenadores.forEach(e => {
+          if (e.deportes && Array.isArray(e.deportes)) {
+            e.deportes.forEach(d => deportesSet.add(d.trim()));
+          } else if (e.especialidad) {
+            deportesSet.add(e.especialidad.trim());
+          }
+        });
+        
+        const deportesDinamicos = Array.from(deportesSet)
+          .filter(d => d.length > 0)
+          .map(d => ({
+            value: this.normalizarDeporte(d),
+            label: d
+          }))
+          .sort((a,b) => a.label.localeCompare(b.label));
+
+        this.deportes = [
+          { value: 'todos', label: 'Todos los deportes' },
+          ...deportesDinamicos
+        ];
+
         this.entrenadoresFiltrados = [...this.entrenadores];
         this.loading = false;
         
@@ -139,7 +164,8 @@ export class EntrenadoresListComponent implements OnInit, OnDestroy {
       destacado: e.verificado && (e.calificacionPromedio >= 4.5 || e.totalReviews >= 10),
       nivel: this.determinarNivel(e),
       modalidad: e.modalidades || ['Presencial'],
-      descripcion: e.bio || e.descripcion || 'Entrenador profesional'
+      descripcion: e.bio || e.descripcion || 'Entrenador profesional',
+      experiencia: e.experiencia || 1
     };
   }
 
@@ -210,8 +236,21 @@ export class EntrenadoresListComponent implements OnInit, OnDestroy {
     }
   }
 
-  aplicarFiltros(triggerScroll: boolean = true) {
-    // Actualizar deporte actual si cambió el filtro
+  onSearchChange() {
+    // Al tipear, no borramos el deporte para permitir AND natural, pero 
+    // en aplicarFiltros manejaremos mejor Fus.js
+    this.aplicarFiltros(false);
+  }
+
+  onDeporteChange() {
+    // Si cambia el deporte con el dropdown, borramos el "searchQuery" si es que fue un error
+    // para evitar que queden trabados. (Ej: escribe futbol, selecciona basket -> 0 resultados).
+    // Lo más intuitivo es resetear la búsqueda manual si usan el dropdown.
+    this.searchQuery = '';
+    this.aplicarFiltros(false);
+  }
+
+  aplicarFiltros(triggerScroll: boolean = false) {
     if (this.filtros.deporte !== 'todos' && this.filtros.deporte !== this.deporteActual) {
       this.deporteActual = this.filtros.deporte;
       this.actualizarDestacados();
@@ -220,41 +259,51 @@ export class EntrenadoresListComponent implements OnInit, OnDestroy {
       this.actualizarDestacados();
     }
 
-    this.entrenadoresFiltrados = this.entrenadores.filter(e => {
-      // Filtro de búsqueda
-      if (this.searchQuery) {
-        const query = this.searchQuery.toLowerCase();
-        const match = e.nombre.toLowerCase().includes(query) ||
-                     e.especialidad.toLowerCase().includes(query) ||
-                     e.deportes.some(d => d.toLowerCase().includes(query));
-        if (!match) return false;
-      }
+    let resultados = [...this.entrenadores];
 
-      // Filtro de deporte
+    // Filtro de búsqueda (Fuse.js + Fallback manual)
+    if (this.searchQuery && this.searchQuery.trim() !== '') {
+      const queryTrimmed = this.searchQuery.trim();
+      const queryLower = queryTrimmed.toLowerCase();
+      
+      const fuse = new Fuse(resultados, {
+        keys: ['nombre', 'especialidad', 'deportes'],
+        threshold: 0.3,
+        ignoreLocation: true,
+        includeScore: false
+      });
+      
+      let resFuse = fuse.search(queryTrimmed).map(res => res.item);
+      
+      // Fallback manual por si FuseJS es muy estricto
+      if (resFuse.length === 0) {
+        resFuse = resultados.filter(e => {
+          const nombreMatch = e.nombre.toLowerCase().includes(queryLower);
+          const espMatch = e.especialidad.toLowerCase().includes(queryLower);
+          const deportesMatch = e.deportes.some(d => d.toLowerCase().includes(queryLower));
+          return nombreMatch || espMatch || deportesMatch;
+        });
+      }
+      
+      resultados = resFuse;
+    }
+
+    this.entrenadoresFiltrados = resultados.filter(e => {
+      // Filtro de deporte estricto (solo si dropdown no es 'todos')
       if (this.filtros.deporte !== 'todos') {
         const deporteNormalizado = this.filtros.deporte;
         const match = e.deportes.some(d => this.normalizarDeporte(d) === deporteNormalizado);
         if (!match) return false;
       }
 
-      // Filtro de precio
-      if (e.precioHora > this.filtros.precioMax) {
-        return false;
-      }
-
-      // Filtro de calificación
-      if (e.calificacion < this.filtros.calificacionMin) {
-        return false;
-      }
+      if (e.precioHora > this.filtros.precioMax) return false;
+      if (e.calificacion < this.filtros.calificacionMin) return false;
 
       return true;
     });
 
-    // Scroll suave a la sección de filtros/resultados solo cuando viene de interacción del usuario
     if (triggerScroll) {
-      setTimeout(() => {
-        this.scrollToFiltros();
-      }, 100);
+      setTimeout(() => this.scrollToFiltros(), 100);
     }
   }
 

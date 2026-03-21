@@ -49,17 +49,17 @@
             <!-- Hero Stats (Minimalist) -->
             <div class="hero-stats-minimal">
               <div class="stat-minimal">
-                <span class="stat-value">500+</span>
+                <span class="stat-value">{{ totalCoaches > 0 ? totalCoaches + '+' : '...' }}</span>
                 <span class="stat-label">Coaches</span>
               </div>
               <div class="stat-divider"></div>
               <div class="stat-minimal">
-                <span class="stat-value">42K</span>
+                <span class="stat-value">{{ totalSesiones > 0 ? (totalSesiones | number) : '...' }}</span>
                 <span class="stat-label">Sesiones</span>
               </div>
               <div class="stat-divider"></div>
               <div class="stat-minimal">
-                <span class="stat-value">4.9★</span>
+                <span class="stat-value">{{ calificacionPromedio }}★</span>
                 <span class="stat-label">Rating</span>
               </div>
             </div>
@@ -284,11 +284,11 @@
 
             <div class="join-stats">
               <div class="stat-block">
-                <span class="stat-value">500+</span>
+                <span class="stat-value">{{ totalCoaches > 0 ? totalCoaches + '+' : '...' }}</span>
                 <span class="stat-label">coaches activos</span>
               </div>
               <div class="stat-block">
-                <span class="stat-value">4.9★</span>
+                <span class="stat-value">{{ calificacionPromedio }}★</span>
                 <span class="stat-label">calificación promedio</span>
               </div>
               <div class="stat-block">

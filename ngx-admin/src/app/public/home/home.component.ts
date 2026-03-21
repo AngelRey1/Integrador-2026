@@ -19,6 +19,10 @@ interface EntrenadorDestacado {
   reviews: number;
   precio: number;
   verificado: boolean;
+  experiencia?: number;
+  lat?: number;
+  lng?: number;
+  distancia?: number;
 }
 
 @Component({
@@ -33,6 +37,15 @@ export class PublicHomeComponent implements OnInit, OnDestroy {
   private currentIndex = 0;
   private subscription: Subscription;
   loadingEntrenadores = true;
+
+  // Variables para estadísticas dinámicas
+  totalCoaches: number = 0;
+  totalSesiones: number = 0;
+  calificacionPromedio: number = 4.9;
+  
+  // Variables de Geolocalización
+  userUbicacion: { lat: number; lng: number } | null = null;
+  ubicacionActiva: boolean = false;
 
   pasosEntrenador = [
     {
@@ -53,17 +66,17 @@ export class PublicHomeComponent implements OnInit, OnDestroy {
   ];
 
   deportes: Deporte[] = [
-    { nombre: 'Fútbol', icon: 'futbol', slug: 'futbol', entrenadores: 152 },
-    { nombre: 'CrossFit', icon: 'crossfit', slug: 'crossfit', entrenadores: 98 },
-    { nombre: 'Yoga', icon: 'yoga', slug: 'yoga', entrenadores: 124 },
-    { nombre: 'Natación', icon: 'natacion', slug: 'natacion', entrenadores: 76 },
-    { nombre: 'Running', icon: 'running', slug: 'running', entrenadores: 89 },
-    { nombre: 'Boxeo', icon: 'boxeo', slug: 'boxeo', entrenadores: 65 },
-    { nombre: 'Ciclismo', icon: 'ciclismo', slug: 'ciclismo', entrenadores: 54 },
-    { nombre: 'Tenis', icon: 'tenis', slug: 'tenis', entrenadores: 43 },
-    { nombre: 'Béisbol', icon: 'beisbol', slug: 'beisbol', entrenadores: 38 },
-    { nombre: 'Basketball', icon: 'basketball', slug: 'basketball', entrenadores: 67 },
-    { nombre: 'Softball', icon: 'softball', slug: 'softball', entrenadores: 29 },
+    { nombre: 'Fútbol', icon: 'futbol', slug: 'futbol', entrenadores: 0 },
+    { nombre: 'CrossFit', icon: 'crossfit', slug: 'crossfit', entrenadores: 0 },
+    { nombre: 'Yoga', icon: 'yoga', slug: 'yoga', entrenadores: 0 },
+    { nombre: 'Natación', icon: 'natacion', slug: 'natacion', entrenadores: 0 },
+    { nombre: 'Running', icon: 'running', slug: 'running', entrenadores: 0 },
+    { nombre: 'Boxeo', icon: 'boxeo', slug: 'boxeo', entrenadores: 0 },
+    { nombre: 'Ciclismo', icon: 'ciclismo', slug: 'ciclismo', entrenadores: 0 },
+    { nombre: 'Tenis', icon: 'tenis', slug: 'tenis', entrenadores: 0 },
+    { nombre: 'Béisbol', icon: 'beisbol', slug: 'beisbol', entrenadores: 0 },
+    { nombre: 'Basketball', icon: 'basketball', slug: 'basketball', entrenadores: 0 },
+    { nombre: 'Softball', icon: 'softball', slug: 'softball', entrenadores: 0 },
   ];
 
   imagenesAccion = [
@@ -106,8 +119,29 @@ export class PublicHomeComponent implements OnInit, OnDestroy {
       this.actualizarDeportesVisibles();
     }, 20000);
 
-    // Cargar entrenadores destacados desde Firebase
-    this.cargarEntrenadoresDestacados();
+    // Obtener Geolocalización del usuario antes de cargar entrenadores
+    this.solicitarUbicacion();
+  }
+
+  private solicitarUbicacion(): void {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          this.userUbicacion = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+          this.ubicacionActiva = true;
+          this.cargarEntrenadoresDestacados(); // Carga y ordena con ubicación
+        },
+        (error) => {
+          console.warn('Ubicación denegada o error:', error);
+          this.cargarEntrenadoresDestacados(); // Carga normal si falla
+        }
+      );
+    } else {
+      this.cargarEntrenadoresDestacados();
+    }
   }
 
   private cargarEntrenadoresDestacados(): void {
@@ -115,11 +149,51 @@ export class PublicHomeComponent implements OnInit, OnDestroy {
     this.subscription = this.clienteFirebase.getEntrenadores().subscribe({
       next: (entrenadoresFirebase) => {
         if (entrenadoresFirebase && entrenadoresFirebase.length > 0) {
-          // Transformar y ordenar por calificación
-          this.entrenadoresDestacados = entrenadoresFirebase
-            .map(e => this.transformarEntrenador(e))
-            .sort((a, b) => b.estrellas - a.estrellas)
-            .slice(0, 15); // Máximo 15 destacados
+          // Obtener métricas reales básicas
+          this.totalCoaches = entrenadoresFirebase.length;
+          this.totalSesiones = this.totalCoaches * /*estimado de sesiones por coach*/ 84; 
+          
+          const totalRating = entrenadoresFirebase.reduce((sum, e) => sum + (e.calificacionPromedio || 5), 0);
+          this.calificacionPromedio = Number((totalRating / this.totalCoaches).toFixed(1));
+
+          // Resetear conteos de entrenadores por disciplina
+          this.deportes.forEach(d => d.entrenadores = 0);
+
+          // Calcular conteo real desde la base de datos
+          entrenadoresFirebase.forEach(e => {
+            if (e.deportes && Array.isArray(e.deportes)) {
+              e.deportes.forEach(dep => {
+                const depLimpiado = dep.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                const deporteEncontrado = this.deportes.find(d => 
+                  d.slug === depLimpiado || 
+                  d.nombre.toLowerCase() === dep.toLowerCase()
+                );
+                if (deporteEncontrado) {
+                  deporteEncontrado.entrenadores++;
+                }
+              });
+            }
+          });
+
+          // Transformar entrenadores
+          let transformados = entrenadoresFirebase.map(e => this.transformarEntrenador(e));
+          
+          // Si tenemos ubicación, calculamos distancia y ordenamos por cercanía
+          if (this.userUbicacion && this.ubicacionActiva) {
+            transformados = transformados.map(e => {
+              if (e.lat && e.lng) {
+                e.distancia = this.calcularDistancia(this.userUbicacion!.lat, this.userUbicacion!.lng, e.lat, e.lng);
+              } else {
+                e.distancia = 9999; // Muy lejos si no tiene coord
+              }
+              return e;
+            }).sort((a, b) => (a.distancia || 9999) - (b.distancia || 9999));
+          } else {
+            // Si no hay ubicación, ordenar por calificación (default)
+            transformados = transformados.sort((a, b) => b.estrellas - a.estrellas);
+          }
+
+          this.entrenadoresDestacados = transformados.slice(0, 15); // Máximo 15 destacados
         }
         // Solo datos reales de Firebase
         this.loadingEntrenadores = false;
@@ -133,6 +207,23 @@ export class PublicHomeComponent implements OnInit, OnDestroy {
     });
   }
 
+  // Fórmula de Haversine para calcular distancia en km
+  private calcularDistancia(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    const R = 6371; // Radio de la Tierra en km
+    const dLat = this.deg2rad(lat2 - lat1);
+    const dLon = this.deg2rad(lon2 - lon1);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(this.deg2rad(lat1)) * Math.cos(this.deg2rad(lat2)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c; // Distancia en km
+  }
+
+  private deg2rad(deg: number): number {
+    return deg * (Math.PI / 180);
+  }
+
   private transformarEntrenador(e: EntrenadorFirebase): EntrenadorDestacado {
     return {
       id: e.id || '',
@@ -142,7 +233,10 @@ export class PublicHomeComponent implements OnInit, OnDestroy {
       estrellas: e.calificacionPromedio || 5.0,
       reviews: e.totalReviews || 0,
       precio: e.precio || 300,
-      verificado: e.verificado
+      verificado: e.verificado,
+      experiencia: e.experiencia || 1,
+      lat: e.ubicacion?.lat,
+      lng: e.ubicacion?.lng
     };
   }
 

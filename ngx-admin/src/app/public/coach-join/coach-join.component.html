@@ -3,14 +3,19 @@
     <ngx-shared-header></ngx-shared-header>
 
     <div class="coach-join-page">
+      <div class="mesh-bg"></div>
+      
       <!-- HERO SECTION -->
+      <div class="top-actions">
+        <button class="btn-back" (click)="volverAlInicio()">
+          <nb-icon icon="arrow-back-outline"></nb-icon> Volver
+        </button>
+      </div>
+      
       <section class="hero-coach">
         <div class="hero-content">
-          <button class="btn-back" (click)="volverAlInicio()">
-            <i eva-icon="arrow-back-outline" eva-pack="outline"></i> Volver
-          </button>
           <h1>Únete como Entrenador a Sportconnecta</h1>
-          <p class="hero-lead">Conecta con cientos de alumnos que buscan exactamente tus servicios. Sin comisiones ocultas, sin burocracia.</p>
+          <p class="hero-lead">Conecta con cientos de alumnos que buscan exactamente tus servicios. Sin comisiones ocultas, cobras y agendas libremente.</p>
           <button class="btn-cta-hero" (click)="irARegistro()">Comenzar ahora</button>
         </div>
       </section>
@@ -20,23 +25,23 @@
         <div class="container-info">
           <div class="info-card-large">
             <h2>Quién puede aplicar</h2>
-            <p>Estamos buscando entrenadores certificados o con experiencia comprobable en disciplinas deportivas o bienestar. Ya sea que tengas experiencia formal (con títulos reconocidos) o experiencia práctica documentada, queremos conocerte.</p>
+            <p>Buscamos profesionales verificados, apasionados por el bienestar y listos para multiplicar su cartera de clientes presenciales u online.</p>
             <div class="checklist">
               <div class="check-item">
                 <span class="check-icon">✓</span>
-                <span>Certificación o experiencia comprobable en tu disciplina</span>
+                <span>Certificación o experiencia comprobable en tu disciplina.</span>
               </div>
               <div class="check-item">
                 <span class="check-icon">✓</span>
-                <span>Disponibilidad para recibir alumnos en presencial u online</span>
+                <span>Disponibilidad comprobada para agendar y asistir a las citas.</span>
               </div>
               <div class="check-item">
                 <span class="check-icon">✓</span>
-                <span>Zona geográfica clara (a nivel de ciudad o sector)</span>
+                <span>Zona geográfica clara (para sesiones presenciales).</span>
               </div>
               <div class="check-item">
                 <span class="check-icon">✓</span>
-                <span>Disposición para obtener badge verificado (validación simple)</span>
+                <span>Disposición para obtener el badge azul de seguridad validada.</span>
               </div>
             </div>
           </div>
@@ -48,30 +53,30 @@
         <div class="container-info">
           <div class="info-card-large">
             <h2>Cómo funciona el sistema</h2>
-            <p>Te simplificamos todo el proceso para que solo te dediques a lo que sabes hacer: entrenar.</p>
+            <p>Te simplificamos todo el proceso tecnológico para que tú solo te dediques a entrenar.</p>
             <div class="process-flow">
               <div class="process-step">
                 <span class="step-num">1</span>
                 <h4>Completa tu perfil</h4>
-                <p>Foto, disciplinas, zona de cobertura, horarios disponibles y tarifa por sesión.</p>
+                <p>Agrega foto, deportes, zonas, horarios y tu tarifa neta.</p>
+                <div class="flow-connector"></div>
               </div>
-              <div class="flow-connector"></div>
               <div class="process-step">
                 <span class="step-num">2</span>
-                <h4>Validación en 24-48h</h4>
-                <p>Nuestro equipo verifica tus credenciales y activa tu perfil como "Coach Verificado".</p>
+                <h4>Validación rápida</h4>
+                <p>Nuestro equipo revisa tus credenciales en 24h y recibes el badge.</p>
+                <div class="flow-connector"></div>
               </div>
-              <div class="flow-connector"></div>
               <div class="process-step">
                 <span class="step-num">3</span>
                 <h4>Recibe solicitudes</h4>
-                <p>Los alumnos te ven, te contactan por chat y reservan directamente desde tu agenda.</p>
+                <p>Los alumnos acceden a tu agenda, la bloquean según su cupo y pagan.</p>
+                <div class="flow-connector"></div>
               </div>
-              <div class="flow-connector"></div>
               <div class="process-step">
                 <span class="step-num">4</span>
-                <h4>Cobra seguro</h4>
-                <p>El pago llega a tu cuenta. Tú defines políticas de cancelación, nosotros manejamos la seguridad.</p>
+                <h4>Cobra directo</h4>
+                <p>Tú defines tus tarifas completas. Protegemos al alumno y a tu tiempo de trabajo.</p>
               </div>
             </div>
           </div>
@@ -83,55 +88,37 @@
         <div class="container-info">
           <div class="info-card-large">
             <h2>Tus beneficios</h2>
-            <p>Diseñado para que ganes más y trabajes menos administrativamente.</p>
+            <p>Diseñado estratégicamente para resolver los principales cuellos de botella del fitness.</p>
             <div class="benefits-grid">
               <div class="benefit-box">
-                <div class="benefit-icon"><nb-icon icon="credit-card-outline"></nb-icon></div>
-                <h4>Control total de tarifas</h4>
-                <p>Fijas el precio que cobras por sesión, sin comisiones ocultas ni porcentajes sorpresa.</p>
+                <nb-icon class="benefit-icon" icon="credit-card-outline"></nb-icon>
+                <h4>Cobra 100% de lo pactado</h4>
+                <p>Sin tarifas retenidas o comisiones fantasmas. El alumno paga tu setup fijo desde la misma aplicación web de inmediato.</p>
               </div>
               <div class="benefit-box">
-                <div class="benefit-icon"><nb-icon icon="checkmark-circle-outline"></nb-icon></div>
-                <h4>Badge Verificado</h4>
-                <p>Destacas en búsquedas con un badge que dice "Coach Verificado", genera confianza.</p>
+                <nb-icon class="benefit-icon" icon="checkmark-circle-outline"></nb-icon>
+                <h4>Posicionamiento Oficial</h4>
+                <p>El badge verificado te empuja primero en las búsquedas cuando los clientes en Mérida buscan tu clase particular.</p>
               </div>
               <div class="benefit-box">
-                <div class="benefit-icon"><nb-icon icon="star-outline"></nb-icon></div>
-                <h4>Reseñas auténticas</h4>
-                <p>Tus alumnos dejan comentarios verificados. Las reseñas que subes posicionan tu perfil.</p>
+                <nb-icon class="benefit-icon" icon="star-outline"></nb-icon>
+                <h4>Testimonios inalterables</h4>
+                <p>Tu reputación es 100% transparente. Cada alumno da su review 5 estrellas terminando el bloque contigo.</p>
               </div>
               <div class="benefit-box">
-                <div class="benefit-icon"><nb-icon icon="smartphone-outline"></nb-icon></div>
-                <h4>Chat y disponibilidad</h4>
-                <p>Habla directo con tus alumnos. Ellos ven tu agenda en tiempo real y reservan solos.</p>
+                <nb-icon class="benefit-icon" icon="message-square-outline"></nb-icon>
+                <h4>Chat Empresarial Integrado</h4>
+                <p>Maneja tus comunicaciones directas desde la app, conservando profesionalismo y agilidad.</p>
               </div>
               <div class="benefit-box">
-                <div class="benefit-icon"><nb-icon icon="shield-outline"></nb-icon></div>
-                <h4>Protección ante cancelaciones</h4>
-                <p>Si un alumno cancela última hora, tienes políticas de no-show, y te resguardamos.</p>
+                <nb-icon class="benefit-icon" icon="shield-outline"></nb-icon>
+                <h4>Seguridad Anti-No Show</h4>
+                <p>Todos tienen su tarjeta conectada; si el alumno no llega sin previo aviso, estás cubierto.</p>
               </div>
               <div class="benefit-box">
-                <div class="benefit-icon"><nb-icon icon="bar-chart-outline"></nb-icon></div>
-                <h4>Panel de control</h4>
-                <p>Gana cientos de pesos por mes sin salir de tu casa. Acceso a reportes y estadísticas.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- SECCIÓN: PASOS A SEGUIR -->
-      <section class="info-section">
-        <div class="container-info">
-          <div class="info-card-large">
-            <h2>Así te unes en 3 pasos</h2>
-            <div class="steps-vertical">
-              <div class="step-card" *ngFor="let paso of pasosEntrenador">
-                <span class="step-number">{{ paso.numero }}</span>
-                <div>
-                  <h4>{{ paso.titulo }}</h4>
-                  <p>{{ paso.descripcion }}</p>
-                </div>
+                <nb-icon class="benefit-icon" icon="bar-chart-outline"></nb-icon>
+                <h4>Panel Analítico</h4>
+                <p>Un centro de mando en tu cuenta de Angular propio. Visualizas ingresos reales por fecha, reservaciones, todo en vivo.</p>
               </div>
             </div>
           </div>
@@ -144,19 +131,19 @@
           <div class="stats-grid">
             <div class="stat-block">
               <span class="stat-number">500+</span>
-              <span class="stat-label">coaches activos en Sportconnecta</span>
+              <span class="stat-label">Coaches activos</span>
             </div>
             <div class="stat-block">
               <span class="stat-number">4.9★</span>
-              <span class="stat-label">calificación promedio de coaches</span>
+              <span class="stat-label">Rating promedio</span>
             </div>
             <div class="stat-block">
               <span class="stat-number">48h</span>
-              <span class="stat-label">tiempo promedio para conseguir primer alumno</span>
+              <span class="stat-label">Para tu 1er alumno</span>
             </div>
             <div class="stat-block">
               <span class="stat-number">10K+</span>
-              <span class="stat-label">sesiones reservadas este mes</span>
+              <span class="stat-label">Sesiones/mes</span>
             </div>
           </div>
         </div>
@@ -165,13 +152,13 @@
       <!-- CTA FINAL -->
       <section class="final-cta">
         <div class="cta-box">
-          <h2>¿Listo para ganar más con Sportconnecta?</h2>
-          <p>Únete a la comunidad de entrenadores que generan ingresos sin límite, sin comisiones ocultas.</p>
+          <h2>¿Listo para multiplicar tu volumen?</h2>
+          <p>La comunidad élite de entrenadores personales al alcance de un par de clics.</p>
           <button class="btn-primary-xl" (click)="irARegistro()">
-            <i eva-icon="person-add-outline" eva-pack="outline"></i>
-            Crear mi perfil de coach
+            <nb-icon icon="person-add-outline"></nb-icon>
+            Crear mi cuenta y ser visible
           </button>
-          <p class="disclaimer">Validación en 24-48 horas. Sin cuotas de alta.</p>
+          <p class="disclaimer">Alta 100% gratuita. Proceso de verificación acelerado (máx 24hs).</p>
         </div>
       </section>
     </div>

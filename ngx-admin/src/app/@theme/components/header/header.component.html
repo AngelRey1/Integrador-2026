@@ -3,19 +3,10 @@
     <a (click)="toggleSidebar()" href="#" class="sidebar-toggle">
       <nb-icon icon="menu-2-outline"></nb-icon>
     </a>
-    <a class="logo" href="#" (click)="navigateHome()">Sportconnecta</a>
-    <!-- Botón para volver a Sportconnecta (solo clientes) -->
-    <button 
-      *ngIf="userRole && userRole.toLowerCase() === 'cliente'" 
-      class="btn-volver-home"
-      (click)="volverASportconnecta()"
-      nbButton
-      status="primary"
-      size="small"
-      outline>
-      <nb-icon icon="home-outline"></nb-icon>
-      <span class="btn-text">Volver a Sportconnecta</span>
-    </button>
+    <a class="logo" href="#" (click)="volverASportconnecta()" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
+      <img src="assets/images/Logo.png" alt="Sportconnecta" style="height: 32px; width: auto; object-fit: contain; transform: translateY(-2px);">
+      Sportconnecta
+    </a>
   </div>
 </div>
 

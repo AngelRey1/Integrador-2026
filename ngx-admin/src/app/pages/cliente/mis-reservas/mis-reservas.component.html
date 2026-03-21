@@ -175,6 +175,10 @@
                     <nb-icon icon="close-circle-outline"></nb-icon>
                     Cancelar
                   </button>
+                  <button nbButton ghost size="small" status="success" *ngIf="esPasada(reserva.fecha)" (click)="dejarResena(reserva)">
+                    <nb-icon icon="star-outline"></nb-icon>
+                    Dejar Reseña
+                  </button>
                   <button nbButton ghost size="small" status="basic" (click)="descargarRecibo(reserva)">
                     <nb-icon icon="download-outline"></nb-icon>
                     Recibo

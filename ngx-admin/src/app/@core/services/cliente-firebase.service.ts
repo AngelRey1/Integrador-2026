@@ -3,6 +3,7 @@ import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/comp
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { Observable, of, combineLatest, forkJoin } from 'rxjs';
 import { map, switchMap, catchError, tap, take } from 'rxjs/operators';
+import { NotificacionesFirebaseService } from './notificaciones-firebase.service';
 
 export interface Entrenador {
     id?: string;
@@ -14,6 +15,7 @@ export interface Entrenador {
     bio?: string;
     deportes: string[];
     especialidades: string[];
+    experiencia?: number;
     certificaciones?: string[];
     precio: number;
     precioOnline: number;
@@ -112,7 +114,8 @@ export class ClienteFirebaseService {
 
     constructor(
         private firestore: AngularFirestore,
-        private afAuth: AngularFireAuth
+        private afAuth: AngularFireAuth,
+        private notificacionesService: NotificacionesFirebaseService
     ) {
         this.entrenadoresRef = this.firestore.collection('entrenadores');
         this.reservasRef = this.firestore.collection('reservas');
@@ -402,6 +405,23 @@ export class ClienteFirebaseService {
             };
 
             const docRef = await this.reservasRef.add(nuevaReserva);
+
+            try {
+                // Enviar la notificación silenciosamente en segundo plano
+                const fechaFormateada = reserva.fecha instanceof Date
+                    ? reserva.fecha.toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' })
+                    : new Date(reserva.fecha).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' });
+                
+                await this.notificacionesService.notificarNuevaReserva(
+                    reserva.entrenadorId,
+                    nombreCliente,
+                    fechaFormateada
+                );
+                console.log('✅ Notificación de nueva reserva enviada al entrenador');
+            } catch (err) {
+                console.error('⚠️ Error enviando notificación de reserva:', err);
+                // No rompemos el flujo principal por un error de notificación
+            }
 
             return {
                 success: true,

@@ -15,6 +15,8 @@ export class ChatEntrenadorComponent implements OnInit, OnDestroy, AfterViewChec
   conversacionActiva: Conversacion | null = null;
   mensajes: Mensaje[] = [];
   nuevoMensaje = '';
+  textoEdicion = '';
+  mensajeEditando: Mensaje | null = null;
   loading = true;
   enviando = false;
   userId = '';
@@ -28,6 +30,13 @@ export class ChatEntrenadorComponent implements OnInit, OnDestroy, AfterViewChec
   ) { }
 
   ngOnInit(): void {
+    // Obtener UID del entrenador actual
+    this.chatService['afAuth'].authState.subscribe(user => {
+      if (user) {
+        this.userId = user.uid;
+      }
+    });
+
     this.cargarConversaciones();
   }
 
@@ -94,9 +103,23 @@ export class ChatEntrenadorComponent implements OnInit, OnDestroy, AfterViewChec
   }
 
   async enviarMensaje(): Promise<void> {
-    if (!this.nuevoMensaje.trim() || !this.conversacionActiva?.id || this.enviando) {
+    if (this.enviando) return;
+
+    if (this.mensajeEditando) {
+      if (!this.textoEdicion.trim()) return;
+      this.enviando = true;
+      try {
+        await this.chatService.editarMensaje(this.conversacionActiva!.id!, this.mensajeEditando.id!, this.textoEdicion.trim());
+        this.cancelarEdicion();
+      } catch (error) {
+        this.toastr.danger('No se pudo editar el mensaje', 'Error');
+      } finally {
+        this.enviando = false;
+      }
       return;
     }
+
+    if (!this.nuevoMensaje.trim() || !this.conversacionActiva?.id) return;
 
     this.enviando = true;
     const texto = this.nuevoMensaje.trim();
@@ -111,6 +134,27 @@ export class ChatEntrenadorComponent implements OnInit, OnDestroy, AfterViewChec
       this.nuevoMensaje = texto; // Restaurar el mensaje
     } finally {
       this.enviando = false;
+    }
+  }
+
+  iniciarEdicion(mensaje: Mensaje) {
+    this.mensajeEditando = mensaje;
+    this.textoEdicion = mensaje.texto;
+  }
+
+  cancelarEdicion() {
+    this.mensajeEditando = null;
+    this.textoEdicion = '';
+  }
+
+  async eliminarMensaje(mensaje: Mensaje) {
+    if (!this.conversacionActiva?.id || !mensaje.id) return;
+    if (confirm('¿Estás seguro de eliminar este mensaje para todos?')) {
+      try {
+        await this.chatService.eliminarMensaje(this.conversacionActiva.id, mensaje.id);
+      } catch (e) {
+        this.toastr.danger('Error al eliminar mensaje');
+      }
     }
   }
 

@@ -303,5 +303,10 @@ export class MisReservasComponent implements OnInit, OnDestroy {
     const dias = diff / (1000 * 60 * 60 * 24);
     return dias > 0 && dias <= 7;
   }
+
+  esPasada(fecha: Date): boolean {
+    const hoy = new Date();
+    return fecha.getTime() < hoy.getTime();
+  }
 }
 

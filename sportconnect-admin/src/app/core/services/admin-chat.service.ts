@@ -12,6 +12,8 @@ export interface MensajeAdmin {
   senderTipo: 'admin' | 'entrenador';
   timestamp: Date;
   leido: boolean;
+  editado?: boolean;
+  eliminado?: boolean;
 }
 
 export interface ConversacionAdmin {
@@ -25,6 +27,8 @@ export interface ConversacionAdmin {
   noLeidosAdmin: number;
   noLeidosEntrenador: number;
   activa: boolean;
+  tipoConversacion?: 'cliente-entrenador' | 'soporte-cliente' | 'soporte-entrenador';
+  participantes?: string[];
 }
 
 @Injectable({
@@ -43,7 +47,7 @@ export class AdminChatService {
     if (!user) throw new Error('Usuario no autenticado');
 
     // Buscar conversación existente
-    const existente = await this.firestore.collection('conversacionesAdmin', ref =>
+    const existente = await this.firestore.collection('conversaciones', ref =>
       ref.where('entrenadorId', '==', entrenadorId)
     ).get().toPromise();
 
@@ -61,16 +65,18 @@ export class AdminChatService {
       ultimoMensajeTimestamp: new Date(),
       noLeidosAdmin: 0,
       noLeidosEntrenador: 0,
-      activa: true
+      activa: true,
+      tipoConversacion: 'soporte-entrenador',
+      participantes: [user.uid, entrenadorId]
     };
 
-    const docRef = await this.firestore.collection('conversacionesAdmin').add(conversacion);
+    const docRef = await this.firestore.collection('conversaciones').add(conversacion);
     return docRef.id;
   }
 
   // Obtener conversaciones del admin
-  getConversacionesAdmin(): Observable<ConversacionAdmin[]> {
-    return this.firestore.collection<ConversacionAdmin>('conversacionesAdmin', ref =>
+  getConversaciones(): Observable<ConversacionAdmin[]> {
+    return this.firestore.collection<ConversacionAdmin>('conversaciones', ref =>
       ref.where('activa', '==', true)
          .orderBy('ultimoMensajeTimestamp', 'desc')
     ).snapshotChanges().pipe(
@@ -87,7 +93,7 @@ export class AdminChatService {
     return this.afAuth.authState.pipe(
       switchMap(user => {
         if (!user) return of([]);
-        return this.firestore.collection<ConversacionAdmin>('conversacionesAdmin', ref =>
+        return this.firestore.collection<ConversacionAdmin>('conversaciones', ref =>
           ref.where('entrenadorId', '==', user.uid)
              .where('activa', '==', true)
              .orderBy('ultimoMensajeTimestamp', 'desc')
@@ -104,7 +110,7 @@ export class AdminChatService {
 
   // Obtener mensajes de una conversación
   getMensajes(conversacionId: string): Observable<MensajeAdmin[]> {
-    return this.firestore.collection('conversacionesAdmin')
+    return this.firestore.collection('conversaciones')
       .doc(conversacionId)
       .collection<MensajeAdmin>('mensajes', ref =>
         ref.orderBy('timestamp', 'asc')
@@ -128,20 +134,22 @@ export class AdminChatService {
       senderNombre: 'Administrador',
       senderTipo: 'admin',
       timestamp: new Date(),
-      leido: false
+      leido: false,
+      editado: false,
+      eliminado: false
     };
 
     // Añadir mensaje
-    await this.firestore.collection('conversacionesAdmin')
+    await this.firestore.collection('conversaciones')
       .doc(conversacionId)
       .collection('mensajes')
       .add(mensaje);
 
     // Actualizar conversación
-    const doc = await this.firestore.collection('conversacionesAdmin').doc(conversacionId).get().toPromise();
+    const doc = await this.firestore.collection('conversaciones').doc(conversacionId).get().toPromise();
     const data = doc?.data() as ConversacionAdmin;
 
-    await this.firestore.collection('conversacionesAdmin').doc(conversacionId).update({
+    await this.firestore.collection('conversaciones').doc(conversacionId).update({
       ultimoMensaje: texto,
       ultimoMensajeTimestamp: new Date(),
       noLeidosEntrenador: (data?.noLeidosEntrenador || 0) + 1
@@ -163,34 +171,60 @@ export class AdminChatService {
       senderNombre: entrenadorNombre,
       senderTipo: 'entrenador',
       timestamp: new Date(),
-      leido: false
+      leido: false,
+      editado: false,
+      eliminado: false
     };
 
     // Añadir mensaje
-    await this.firestore.collection('conversacionesAdmin')
+    await this.firestore.collection('conversaciones')
       .doc(conversacionId)
       .collection('mensajes')
       .add(mensaje);
 
     // Actualizar conversación
-    const doc = await this.firestore.collection('conversacionesAdmin').doc(conversacionId).get().toPromise();
+    const doc = await this.firestore.collection('conversaciones').doc(conversacionId).get().toPromise();
     const data = doc?.data() as ConversacionAdmin;
 
-    await this.firestore.collection('conversacionesAdmin').doc(conversacionId).update({
+    await this.firestore.collection('conversaciones').doc(conversacionId).update({
       ultimoMensaje: texto,
       ultimoMensajeTimestamp: new Date(),
       noLeidosAdmin: (data?.noLeidosAdmin || 0) + 1
     });
   }
 
+  // Editar un mensaje
+  async editarMensaje(conversacionId: string, mensajeId: string, nuevoTexto: string): Promise<void> {
+    await this.firestore.collection('conversaciones')
+      .doc(conversacionId)
+      .collection('mensajes')
+      .doc(mensajeId)
+      .update({
+        texto: nuevoTexto,
+        editado: true
+      });
+  }
+
+  // Eliminar lógicamente un mensaje
+  async eliminarMensaje(conversacionId: string, mensajeId: string): Promise<void> {
+    await this.firestore.collection('conversaciones')
+      .doc(conversacionId)
+      .collection('mensajes')
+      .doc(mensajeId)
+      .update({
+        texto: 'Este mensaje fue eliminado',
+        eliminado: true
+      });
+  }
+
   // Marcar como leído
   async marcarComoLeido(conversacionId: string): Promise<void> {
-    await this.firestore.collection('conversacionesAdmin').doc(conversacionId).update({
+    await this.firestore.collection('conversaciones').doc(conversacionId).update({
       noLeidosAdmin: 0
     });
 
     // Marcar mensajes como leídos
-    const mensajes = await this.firestore.collection('conversacionesAdmin')
+    const mensajes = await this.firestore.collection('conversaciones')
       .doc(conversacionId)
       .collection('mensajes', ref => ref.where('leido', '==', false).where('senderTipo', '==', 'entrenador'))
       .get()
@@ -205,12 +239,12 @@ export class AdminChatService {
 
   // Marcar como leído para entrenador
   async marcarComoLeidoEntrenador(conversacionId: string): Promise<void> {
-    await this.firestore.collection('conversacionesAdmin').doc(conversacionId).update({
+    await this.firestore.collection('conversaciones').doc(conversacionId).update({
       noLeidosEntrenador: 0
     });
 
     // Marcar mensajes como leídos
-    const mensajes = await this.firestore.collection('conversacionesAdmin')
+    const mensajes = await this.firestore.collection('conversaciones')
       .doc(conversacionId)
       .collection('mensajes', ref => ref.where('leido', '==', false).where('senderTipo', '==', 'admin'))
       .get()

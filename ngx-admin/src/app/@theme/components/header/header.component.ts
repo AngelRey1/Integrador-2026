@@ -188,6 +188,37 @@ export class HeaderComponent implements OnInit, OnDestroy {
     if (notificacion.id && !notificacion.leida) {
       await this.notificacionesService.marcarComoLeida(notificacion.id);
     }
+    this.cerrarNotificaciones();
+    this.navegarDesdeNotificacion(notificacion);
+  }
+
+  navegarDesdeNotificacion(notificacion: Notificacion): void {
+    const rol = this.currentRole;
+    if (notificacion.tipo === 'reserva') {
+        if (rol === 'entrenador') {
+            this.router.navigate(['/pages/entrenador/dashboard']);
+        } else {
+            this.router.navigate(['/pages/cliente/mis-reservas']);
+        }
+    } else if (notificacion.tipo === 'review') {
+        if (rol === 'entrenador') {
+            this.router.navigate(['/pages/entrenador/perfil']);
+        } else {
+            this.router.navigate(['/pages/cliente/mis-resenas']);
+        }
+    } else if (notificacion.tipo === 'pago') {
+        if (rol === 'entrenador') {
+            this.router.navigate(['/pages/entrenador/mis-ingresos']);
+        } else {
+            this.router.navigate(['/pages/cliente/mis-pagos']);
+        }
+    } else {
+        if (rol === 'entrenador') {
+            this.router.navigate(['/pages/entrenador/dashboard']);
+        } else {
+            this.router.navigate(['/pages/cliente/cliente-dashboard']);
+        }
+    }
   }
 
   async marcarTodasComoLeidas(): Promise<void> {
