@@ -221,5 +221,19 @@ service cloud.firestore {
     match /reportes/{reporteId} {
       allow read, write: if isAdmin();
     }
+    // ===========================================
+    // PAGOS SUSCRIPCIONES - Comprobantes Fase 5
+    // ===========================================
+    match /pagos_suscripciones/{pagoId} {
+      // El entrenador puede crear su propia solicitud y leer la suya
+      allow create: if isAuthenticated();
+      allow read: if isAuthenticated() && (
+        resource.data.entrenadorId == request.auth.uid ||
+        isAdmin()
+      );
+      // Solo admin puede aprobar o rechazar (actualizar estado)
+      allow update: if isAdmin();
+      allow delete: if false;
+    }
   }
 }

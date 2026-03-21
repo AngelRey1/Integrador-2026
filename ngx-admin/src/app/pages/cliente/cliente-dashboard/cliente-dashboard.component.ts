@@ -57,7 +57,7 @@ export class ClienteDashboardComponent implements OnInit, OnDestroy {
   constructor(
     private clienteFirebase: ClienteFirebaseService,
     private authFirebase: AuthFirebaseService,
-    private router: Router
+    public router: Router
   ) { }
 
   ngOnInit(): void {

@@ -9,6 +9,7 @@ import { PerfilEntrenadorComponent } from './perfil-entrenador/perfil-entrenador
 import { ChatEntrenadorComponent } from './chat/chat.component';
 import { ChatAdminComponent } from './chat-admin/chat-admin.component';
 import { MiSuscripcionComponent } from './mi-suscripcion/mi-suscripcion.component';
+import { MisResenasEntrenadorComponent } from './mis-resenas-entrenador/mis-resenas-entrenador.component';
 
 const routes: Routes = [
   {
@@ -51,6 +52,10 @@ const routes: Routes = [
   {
     path: 'suscripcion',
     component: MiSuscripcionComponent
+  },
+  {
+    path: 'mis-resenas',
+    component: MisResenasEntrenadorComponent
   },
   {
     path: '',

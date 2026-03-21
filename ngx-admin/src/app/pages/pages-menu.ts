@@ -1,7 +1,8 @@
 import { NbMenuItem } from '@nebular/theme';
 
-// Menú para CLIENTES
-// Arquitectura UX: Inicio unificado → Gestión → Historial → Perfil
+// =============================================
+// MENÚ PARA CLIENTES — Organizado por contexto
+// =============================================
 const CLIENTE_MENU: NbMenuItem[] = [
   {
     title: 'PRINCIPAL',
@@ -11,35 +12,32 @@ const CLIENTE_MENU: NbMenuItem[] = [
     title: 'Inicio',
     icon: 'home-outline',
     link: '/pages/cliente/dashboard',
-    home: true,  // Vista unificada: próxima sesión + stats + acceso rápido
+    home: true,
   },
   {
     title: 'Mis Sesiones',
     icon: 'calendar-outline',
     link: '/pages/cliente/mis-reservas',
   },
+
   {
-    title: 'ACCIONES',
+    title: 'EXPLORAR',
     group: true,
+  },
+  {
+    title: 'Buscar Entrenadores',
+    icon: 'search-outline',
+    link: '/entrenadores',
   },
   {
     title: 'Agendar Sesión',
     icon: 'plus-circle-outline',
     link: '/pages/cliente/agendar-sesion',
   },
+
   {
-    title: 'HISTORIAL',
+    title: 'CUENTA',
     group: true,
-  },
-  {
-    title: 'Pagos',
-    icon: 'credit-card-outline',
-    link: '/pages/cliente/mis-pagos',
-  },
-  {
-    title: 'Reseñas',
-    icon: 'star-outline',
-    link: '/pages/cliente/mis-resenas',
   },
   {
     title: 'Mensajes',
@@ -47,47 +45,35 @@ const CLIENTE_MENU: NbMenuItem[] = [
     link: '/pages/cliente/chat',
   },
   {
-    title: 'CUENTA',
-    group: true,
+    title: 'Mis Pagos',
+    icon: 'credit-card-outline',
+    link: '/pages/cliente/mis-pagos',
+  },
+  {
+    title: 'Mis Reseñas',
+    icon: 'star-outline',
+    link: '/pages/cliente/mis-resenas',
   },
   {
     title: 'Mi Perfil',
     icon: 'person-outline',
     link: '/pages/cliente/perfil',
   },
-  {
-    title: 'NAVEGACIÓN',
-    group: true,
-  },
-  {
-    title: 'Ir a Página Principal',
-    icon: 'globe-outline',
-    link: '/home',
-    pathMatch: 'full',
-  },
 ];
 
-// Menú para ENTRENADORES
+// =============================================
+// MENÚ PARA ENTRENADORES — Organizado por área
+// =============================================
 const ENTRENADOR_MENU: NbMenuItem[] = [
   {
-    title: 'ENTRENADOR',
+    title: 'GESTIÓN',
     group: true,
   },
   {
-    title: 'Dashboard Entrenador',
-    icon: 'activity-outline',
+    title: 'Inicio',
+    icon: 'home-outline',
     link: '/pages/entrenador/dashboard',
     home: true,
-  },
-  {
-    title: 'Mi Perfil',
-    icon: 'person-outline',
-    link: '/pages/entrenador/perfil',
-  },
-  {
-    title: 'Gestión de Clases',
-    icon: 'calendar-outline',
-    link: '/pages/entrenador/gestion-clases',
   },
   {
     title: 'Mis Clientes',
@@ -95,9 +81,19 @@ const ENTRENADOR_MENU: NbMenuItem[] = [
     link: '/pages/entrenador/mis-clientes',
   },
   {
-    title: 'Calendario Disponibilidad',
+    title: 'Mis Sesiones',
+    icon: 'calendar-outline',
+    link: '/pages/entrenador/gestion-clases',
+  },
+  {
+    title: 'Disponibilidad',
     icon: 'clock-outline',
     link: '/pages/entrenador/calendario',
+  },
+
+  {
+    title: 'FINANZAS',
+    group: true,
   },
   {
     title: 'Mis Ingresos',
@@ -109,12 +105,13 @@ const ENTRENADOR_MENU: NbMenuItem[] = [
     icon: 'star-outline',
     link: '/pages/entrenador/suscripcion',
   },
+
   {
     title: 'COMUNICACIÓN',
     group: true,
   },
   {
-    title: 'Mensajes Clientes',
+    title: 'Chat con Clientes',
     icon: 'message-circle-outline',
     link: '/pages/entrenador/chat',
   },
@@ -123,12 +120,23 @@ const ENTRENADOR_MENU: NbMenuItem[] = [
     icon: 'shield-outline',
     link: '/pages/entrenador/chat-admin',
   },
+
   {
-    title: 'NAVEGACIÓN',
+    title: 'MI CUENTA',
     group: true,
   },
   {
-    title: 'Ir a Página Principal',
+    title: 'Mi Perfil',
+    icon: 'person-outline',
+    link: '/pages/entrenador/perfil',
+  },
+  {
+    title: 'Mis Reseñas',
+    icon: 'star-outline',
+    link: '/pages/entrenador/mis-resenas',
+  },
+  {
+    title: 'Ir al Sitio Público',
     icon: 'globe-outline',
     link: '/home',
     pathMatch: 'full',
@@ -136,15 +144,9 @@ const ENTRENADOR_MENU: NbMenuItem[] = [
 ];
 
 // Función para obtener el menú según el rol del usuario
-// El rol se obtiene automáticamente del token JWT después del login
 export function getMenuByRole(role: string | null): NbMenuItem[] {
-  if (!role) {
-    return CLIENTE_MENU; // Por defecto si no hay rol
-  }
-  
-  // Normalizar el rol a minúsculas para comparación
+  if (!role) return CLIENTE_MENU;
   const roleLower = role.toLowerCase();
-  
   switch (roleLower) {
     case 'cliente':
     case 'client':
@@ -153,10 +155,9 @@ export function getMenuByRole(role: string | null): NbMenuItem[] {
     case 'trainer':
       return ENTRENADOR_MENU;
     default:
-      return CLIENTE_MENU; // Por defecto muestra el menú de cliente
+      return CLIENTE_MENU;
   }
 }
 
-// Exportación por defecto (temporal para compatibilidad)
+// Exportación por defecto (compatibilidad)
 export const MENU_ITEMS: NbMenuItem[] = CLIENTE_MENU;
-

@@ -55,6 +55,9 @@ export class EntrenadorDashboardComponent implements OnInit, OnDestroy {
   // Últimos clientes
   ultimosClientes: ClienteResumen[] = [];
 
+  // Reservas pendientes de confirmación (solicitudes nuevas)
+  reservasPendientes: any[] = [];
+
   // Estadísticas mensuales
   estadisticasMensuales: EstadisticasMensuales[] = [];
 
@@ -128,9 +131,14 @@ export class EntrenadorDashboardComponent implements OnInit, OnDestroy {
     });
     this.subscriptions.push(estadsSub);
 
-    // Cargar reservas pendientes como notificaciones
+    // Cargar reservas pendientes como notificaciones y sidebar card
     const pendientesSub = this.entrenadorFirebase.getMisReservas('PENDIENTE').subscribe(reservas => {
       this.notificacionesPendientes = reservas.length;
+      this.reservasPendientes = reservas.map(r => ({
+        ...r,
+        fecha: r.fecha instanceof Date ? r.fecha : new Date((r.fecha as any)?.seconds * 1000),
+        clienteFoto: `https://ui-avatars.com/api/?name=${encodeURIComponent(r.clienteNombre || 'C')}&background=F59E0B&color=fff&size=60`
+      }));
     });
     this.subscriptions.push(pendientesSub);
   }

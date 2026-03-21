@@ -1,0 +1,183 @@
+<!-- MIS RESEÑAS - ENTRENADOR -->
+<div class="resenas-page">
+
+  <!-- HEADER HERO -->
+  <section class="resenas-hero">
+    <div class="hero-content">
+      <div class="hero-title-block">
+        <h1 class="hero-title">Mis Reseñas</h1>
+        <p class="hero-subtitle">El feedback de tus clientes sobre tus sesiones</p>
+      </div>
+    </div>
+
+    <!-- STATS RÁPIDAS -->
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <span class="hero-stat-val">{{ calificacionPromedio || '–' }}</span>
+        <div class="stars-row">
+          <svg *ngFor="let s of getEstrellas(5)" viewBox="0 0 24 24" width="14" height="14"
+               [style.fill]="s <= calificacionPromedio ? '#F59E0B' : 'none'"
+               [style.stroke]="'#F59E0B'" stroke-width="2">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
+        </div>
+        <span class="hero-stat-label">Promedio</span>
+      </div>
+      <div class="hero-stat-divider"></div>
+      <div class="hero-stat">
+        <span class="hero-stat-val">{{ totalResenas }}</span>
+        <span class="hero-stat-label">Reseñas Totales</span>
+      </div>
+      <div class="hero-stat-divider"></div>
+      <div class="hero-stat">
+        <span class="hero-stat-val">{{ porcentajePositivas }}%</span>
+        <span class="hero-stat-label">Positivas (≥4★)</span>
+      </div>
+      <div class="hero-stat-divider"></div>
+      <div class="hero-stat">
+        <span class="hero-stat-val" [class.highlight-warn]="sinResponder > 0">{{ sinResponder }}</span>
+        <span class="hero-stat-label">Sin responder</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <div class="resenas-body">
+
+    <!-- COLUMNA IZQUIERDA: Distribución + Filtros -->
+    <aside class="resenas-sidebar">
+
+      <!-- Distribución de estrellas -->
+      <div class="sidebar-card">
+        <h3 class="sidebar-card-title">Distribución</h3>
+        <div class="star-dist-list">
+          <div class="star-dist-row" *ngFor="let item of distribucionEstrellas">
+            <span class="star-dist-label">{{ item.estrellas }}★</span>
+            <div class="star-dist-bar-wrap">
+              <div class="star-dist-bar" [style.width]="item.porcentaje + '%'"></div>
+            </div>
+            <span class="star-dist-count">{{ item.count }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filtros -->
+      <div class="sidebar-card">
+        <h3 class="sidebar-card-title">Filtrar</h3>
+        <div class="filter-group">
+          <label class="filter-label">Por calificación</label>
+          <div class="filter-stars">
+            <button class="filter-star-btn" [class.active]="filtroCalificacion === 0" (click)="filtroCalificacion = 0; aplicarFiltros()">
+              Todas
+            </button>
+            <button class="filter-star-btn" *ngFor="let s of [5,4,3,2,1]"
+                    [class.active]="filtroCalificacion === s"
+                    (click)="filtroCalificacion = s; aplicarFiltros()">
+              {{ s }}★
+            </button>
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label">Buscar</label>
+          <div class="search-input-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input class="search-input" [(ngModel)]="filtroBusqueda" (input)="aplicarFiltros()" placeholder="Nombre o comentario...">
+          </div>
+        </div>
+
+        <button class="btn-reset-filters" (click)="limpiarFiltros()" *ngIf="filtroCalificacion > 0 || filtroBusqueda">
+          Limpiar filtros
+        </button>
+      </div>
+    </aside>
+
+    <!-- COLUMNA DERECHA: Lista de reseñas -->
+    <main class="resenas-list-area">
+
+      <!-- Loading -->
+      <div *ngIf="loading" class="loading-state">
+        <div class="spinner"></div>
+        <span>Cargando reseñas...</span>
+      </div>
+
+      <!-- Empty state -->
+      <div *ngIf="!loading && resenasFiltradas.length === 0" class="empty-state-resenas">
+        <div class="empty-illustration">
+          <svg viewBox="0 0 120 100" fill="none" width="100" height="80">
+            <rect x="20" y="25" width="80" height="55" rx="8" stroke="currentColor" stroke-width="2" opacity="0.3"/>
+            <path d="M40 45 h40 M40 55 h30" stroke="currentColor" stroke-width="2" opacity="0.3" stroke-linecap="round"/>
+            <polygon points="60,10 63,17 71,17 65,22 67,30 60,25 53,30 55,22 49,17 57,17" fill="#F59E0B" opacity="0.5"/>
+          </svg>
+        </div>
+        <p class="empty-title">{{ filtroBusqueda || filtroCalificacion ? 'Sin resultados' : 'Aún sin reseñas' }}</p>
+        <p class="empty-subtitle">{{ filtroBusqueda || filtroCalificacion ? 'Prueba con otros filtros.' : 'Cuando tus clientes completen sesiones contigo, sus reseñas aparecerán aquí.' }}</p>
+        <button *ngIf="filtroCalificacion || filtroBusqueda" class="btn-reset-filters sm" (click)="limpiarFiltros()">Ver todas</button>
+      </div>
+
+      <!-- Reseñas -->
+      <div class="resena-card" *ngFor="let resena of resenasFiltradas; let i = index" [style.animation-delay]="i * 0.05 + 's'">
+        <div class="resena-header">
+          <img [src]="resena.clienteFoto" [alt]="resena.clienteNombre" class="resena-avatar">
+          <div class="resena-meta">
+            <span class="resena-nombre">{{ resena.clienteNombre }}</span>
+            <div class="resena-stars">
+              <svg *ngFor="let s of getEstrellas(5)" viewBox="0 0 24 24" width="16" height="16"
+                   [style.fill]="s <= resena.calificacion ? '#F59E0B' : 'none'"
+                   [style.stroke]="'#F59E0B'" stroke-width="2">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+              </svg>
+              <span class="resena-num">{{ resena.calificacion }}/5</span>
+            </div>
+          </div>
+          <div class="resena-fecha-area">
+            <span class="resena-fecha">{{ formatearFechaRelativa(resena.fecha) }}</span>
+            <span class="resena-deporte-tag">{{ resena.deporte }}</span>
+          </div>
+        </div>
+
+        <p class="resena-comentario">"{{ resena.comentario }}"</p>
+
+        <!-- Respuesta existente -->
+        <div class="resena-respuesta" *ngIf="resena.respuesta && respondiendo !== resena.id">
+          <div class="respuesta-header">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+              <polyline points="9 14 4 9 9 4"></polyline>
+              <path d="M20 20v-7a4 4 0 0 0-4-4H4"></path>
+            </svg>
+            <span>Tu respuesta</span>
+          </div>
+          <p class="respuesta-texto">{{ resena.respuesta }}</p>
+          <button class="btn-edit-respuesta" (click)="iniciarRespuesta(resena)">Editar</button>
+        </div>
+
+        <!-- Formulario de respuesta -->
+        <div class="resena-reply-form" *ngIf="respondiendo === resena.id">
+          <textarea class="reply-textarea" [(ngModel)]="textoRespuesta"
+                    placeholder="Escribe tu respuesta al cliente..." rows="3" maxlength="500"></textarea>
+          <div class="reply-actions">
+            <button class="btn-cancel-reply" (click)="cancelarRespuesta()">Cancelar</button>
+            <button class="btn-send-reply" (click)="guardarRespuesta(resena)" [disabled]="guardandoRespuesta || !textoRespuesta.trim()">
+              {{ guardandoRespuesta ? 'Guardando...' : 'Publicar Respuesta' }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Botón responder si no hay respuesta -->
+        <div class="resena-actions" *ngIf="!resena.respuesta && respondiendo !== resena.id">
+          <button class="btn-responder" (click)="iniciarRespuesta(resena)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+              <polyline points="9 14 4 9 9 4"></polyline>
+              <path d="M20 20v-7a4 4 0 0 0-4-4H4"></path>
+            </svg>
+            Responder
+          </button>
+          <span class="no-respuesta-badge">Sin responder</span>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>

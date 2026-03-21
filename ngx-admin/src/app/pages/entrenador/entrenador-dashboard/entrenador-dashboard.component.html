@@ -404,40 +404,90 @@
         </button>
       </div>
 
+      <!-- SOLICITUDES PENDIENTES (MUY VISIBLE) -->
+      <div class="card-pro pending-requests-card" *ngIf="reservasPendientes?.length > 0">
+        <div class="card-header-pro compact">
+          <div class="header-left">
+            <div class="pending-badge-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+                <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+                <line x1="6" y1="1" x2="6" y2="4"></line>
+                <line x1="10" y1="1" x2="10" y2="4"></line>
+                <line x1="14" y1="1" x2="14" y2="4"></line>
+              </svg>
+            </div>
+            <div>
+              <h3 style="margin:0; font-size: 0.95rem;">Solicitudes</h3>
+              <span class="pending-count-label">{{ reservasPendientes?.length }} pendiente{{ reservasPendientes?.length !== 1 ? 's' : '' }}</span>
+            </div>
+          </div>
+          <span class="pulse-badge">{{ reservasPendientes?.length }}</span>
+        </div>
+
+        <div class="pending-list">
+          <div class="pending-item" *ngFor="let res of reservasPendientes?.slice(0,3)">
+            <img [src]="res.clienteFoto || 'https://ui-avatars.com/api/?name=' + (res.clienteNombre || 'C') + '&background=10B981&color=fff&size=60'"
+                 [alt]="res.clienteNombre" class="pending-avatar">
+            <div class="pending-info">
+              <span class="pending-name">{{ res.clienteNombre || 'Cliente' }}</span>
+              <span class="pending-time">{{ res.fecha | date:'dd MMM · HH:mm' }}</span>
+            </div>
+            <button class="btn-confirm" (click)="irAClases()">Ver</button>
+          </div>
+        </div>
+
+        <button class="btn-details-pro" style="margin-top: 0.75rem;" (click)="irAClases()">
+          <span>Ver Todas</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </button>
+      </div>
+
       <!-- QUICK ACTIONS -->
       <div class="card-pro quick-actions-card">
-        <h4 class="quick-title">Acciones Rápidas</h4>
+        <h4 class="section-title">Acciones Rápidas</h4>
         <div class="quick-actions-grid">
-          <button class="quick-action" (click)="irACalendario()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-              <line x1="16" y1="2" x2="16" y2="6"></line>
-              <line x1="8" y1="2" x2="8" y2="6"></line>
-              <line x1="3" y1="10" x2="21" y2="10"></line>
-            </svg>
+          <button class="quick-action-btn" (click)="irACalendario()">
+            <div class="qa-icon blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+            </div>
             <span>Calendario</span>
           </button>
-          <button class="quick-action" (click)="irAClases()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-            </svg>
-            <span>Clases</span>
+          <button class="quick-action-btn" (click)="irAClases()">
+            <div class="qa-icon purple">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+              </svg>
+            </div>
+            <span>Sesiones</span>
           </button>
-          <button class="quick-action" (click)="irAPerfil()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
+          <button class="quick-action-btn" (click)="irAPerfil()">
+            <div class="qa-icon orange">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </div>
             <span>Perfil</span>
           </button>
-          <button class="quick-action" (click)="irAIngresos()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="18" y1="20" x2="18" y2="10"></line>
-              <line x1="12" y1="20" x2="12" y2="4"></line>
-              <line x1="6" y1="20" x2="6" y2="14"></line>
-            </svg>
-            <span>Estadísticas</span>
+          <button class="quick-action-btn" (click)="irAIngresos()">
+            <div class="qa-icon green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+                <line x1="18" y1="20" x2="18" y2="10"></line>
+                <line x1="12" y1="20" x2="12" y2="4"></line>
+                <line x1="6" y1="20" x2="6" y2="14"></line>
+              </svg>
+            </div>
+            <span>Ingresos</span>
           </button>
         </div>
       </div>
@@ -445,3 +495,4 @@
   </div>
 
 </div>
+

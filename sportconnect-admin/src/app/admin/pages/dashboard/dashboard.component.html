@@ -129,6 +129,79 @@
   </div>
 </div>
 
+<!-- SUSCRIPCIONES KPIs -->
+<div class="suscripciones-section">
+  <div class="sus-header">
+    <div>
+      <h3 class="sus-title">Suscripciones</h3>
+      <span class="sus-subtitle">Estado actual de los planes de entrenadores</span>
+    </div>
+    <a class="sus-btn-action" routerLink="/admin/pagos/suscripciones">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+      </svg>
+      Validar pagos {{ suscripcionesPendientes > 0 ? '(' + suscripcionesPendientes + ')' : '' }}
+    </a>
+  </div>
+
+  <div class="sus-kpi-grid">
+    <div class="sus-kpi-card free">
+      <div class="sus-kpi-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M12 6v6l4 2"></path>
+        </svg>
+      </div>
+      <div class="sus-kpi-data">
+        <span class="sus-kpi-val">{{ planFreeCount }}</span>
+        <span class="sus-kpi-label">Plan Free (Trial)</span>
+      </div>
+      <span class="sus-kpi-badge free-badge">GRATIS</span>
+    </div>
+
+    <div class="sus-kpi-card pro">
+      <div class="sus-kpi-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+        </svg>
+      </div>
+      <div class="sus-kpi-data">
+        <span class="sus-kpi-val">{{ planProCount }}</span>
+        <span class="sus-kpi-label">Plan Pro</span>
+      </div>
+      <span class="sus-kpi-badge pro-badge">PRO</span>
+    </div>
+
+    <div class="sus-kpi-card anual">
+      <div class="sus-kpi-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        </svg>
+      </div>
+      <div class="sus-kpi-data">
+        <span class="sus-kpi-val">{{ planAnualCount }}</span>
+        <span class="sus-kpi-label">Plan Anual</span>
+      </div>
+      <span class="sus-kpi-badge anual-badge">ANUAL</span>
+    </div>
+
+    <div class="sus-kpi-card pending" [class.alert]="suscripcionesPendientes > 0" routerLink="/admin/pagos/suscripciones">
+      <div class="sus-kpi-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+      </div>
+      <div class="sus-kpi-data">
+        <span class="sus-kpi-val">{{ suscripcionesPendientes }}</span>
+        <span class="sus-kpi-label">Pendientes</span>
+      </div>
+      <span class="sus-kpi-badge pend-badge" *ngIf="suscripcionesPendientes > 0">REVISAR</span>
+    </div>
+  </div>
+</div>
+
 <div class="admin-dashboard-container">
   <!-- LEFT COLUMN: Pending & Transactions -->
   <div class="admin-main">

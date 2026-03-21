@@ -465,4 +465,58 @@ export class AdminFirebaseService {
             })
         );
     }
+
+    // ==================== PAGOS SUSCRIPCIONES (Fase 5) ====================
+
+    /** Lista todos los pagos de suscripción por estado */
+    getPagosSuscripcion(estado: 'pendiente' | 'aprobado' | 'rechazado' | 'todos' = 'todos'): Observable<any[]> {
+        return this.firestore.collection('pagos_suscripciones', ref => {
+            if (estado === 'todos') return ref.orderBy('fechaSolicitud', 'desc');
+            return ref.where('estado', '==', estado).orderBy('fechaSolicitud', 'desc');
+        }).valueChanges({ idField: 'id' });
+    }
+
+    /** Aprueba un comprobante: actualiza el plan del entrenador y marca el pago */
+    async aprobarPagoSuscripcion(pagoId: string, entrenadorId: string, planId: string): Promise<{ success: boolean; message: string }> {
+        try {
+            const limites: { [key: string]: number } = { 'free': 5, 'pro_mensual': 999999, 'pro_anual': 999999 };
+            const limite = limites[planId] ?? 999999;
+
+            const batch = this.firestore.firestore.batch();
+
+            // Actualizar pago
+            const pagoRef = this.firestore.firestore.collection('pagos_suscripciones').doc(pagoId);
+            batch.update(pagoRef, { estado: 'aprobado', fechaAprobacion: new Date() });
+
+            // Actualizar plan del entrenador
+            const entrenadorRef = this.firestore.firestore.collection('entrenadores').doc(entrenadorId);
+            batch.update(entrenadorRef, {
+                planSuscripcion: planId,
+                limiteAlumnos: limite,
+                fechaInicioSuscripcion: new Date()
+            });
+
+            await batch.commit();
+            return { success: true, message: `Plan actualizado a ${planId} correctamente` };
+        } catch (error) {
+            console.error('Error al aprobar pago:', error);
+            return { success: false, message: 'Error al aprobar el pago de suscripción' };
+        }
+    }
+
+    /** Rechaza un comprobante y opcionalmente notifica la razón */
+    async rechazarPagoSuscripcion(pagoId: string, motivo: string): Promise<{ success: boolean; message: string }> {
+        try {
+            await this.firestore.doc(`pagos_suscripciones/${pagoId}`).update({
+                estado: 'rechazado',
+                motivoRechazo: motivo,
+                fechaRechazo: new Date()
+            });
+            return { success: true, message: 'Pago rechazado y notificado al entrenador' };
+        } catch (error) {
+            console.error('Error al rechazar pago:', error);
+            return { success: false, message: 'Error al rechazar el pago' };
+        }
+    }
 }
+

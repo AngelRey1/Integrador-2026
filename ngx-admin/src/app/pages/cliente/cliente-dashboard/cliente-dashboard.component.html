@@ -1,38 +1,37 @@
-<!-- DASHBOARD PROFESIONAL - BENTO GRID LAYOUT (CLIENTE) -->
+<!-- DASHBOARD CLIENTE - LIMPIO Y ORGANIZADO -->
 <div class="dashboard-pro">
-  
-  <!-- HERO SECTION - Bienvenida Personalizada -->
+
+  <!-- HERO SECTION -->
   <section class="hero-pro client-hero">
-    <!-- Elementos decorativos de fondo -->
     <div class="hero-bg-shapes">
       <div class="shape shape-1"></div>
       <div class="shape shape-2"></div>
       <div class="shape shape-3"></div>
     </div>
-    
+
     <div class="hero-main-content">
       <div class="hero-greeting">
         <span class="greeting-badge">
           <span class="pulse-dot"></span>
-          Cliente Premium
+          Bienvenido de vuelta
         </span>
         <h1 class="greeting-title">{{ getGreeting() }}, {{ cliente?.nombre || 'Atleta' }}!</h1>
         <p class="greeting-date">{{ getFechaFormateada() }}</p>
       </div>
-      
+
       <div class="hero-quick-stats">
         <div class="quick-stat">
-          <span class="quick-stat-value">{{ racha || 0 }}</span>
-          <span class="quick-stat-label">Días en Racha</span>
+          <span class="quick-stat-value">{{ totalSesionesMes || 0 }}</span>
+          <span class="quick-stat-label">Sesiones</span>
         </div>
         <div class="stat-divider"></div>
         <div class="quick-stat">
-          <span class="quick-stat-value">{{ logrosDesbloqueados || 0 }}</span>
-          <span class="quick-stat-label">Logros</span>
+          <span class="quick-stat-value">{{ totalHorasMes || 0 }}h</span>
+          <span class="quick-stat-label">Entrenadas</span>
         </div>
       </div>
     </div>
-    
+
     <div class="hero-action-area">
       <button class="btn-hero-primary" (click)="buscarEntrenadores()">
         <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -48,9 +47,9 @@
     </div>
   </section>
 
-  <!-- BENTO GRID - Métricas Premium -->
+  <!-- BENTO GRID - Métricas Reales -->
   <div class="bento-grid">
-    <!-- Card Grande: Sesiones Totales -->
+    <!-- Sesiones del mes -->
     <div class="bento-card bento-large clients-bento" (click)="verHistorial()">
       <div class="bento-card-inner">
         <div class="bento-icon-wrap">
@@ -66,18 +65,11 @@
         </div>
         <div class="bento-data">
           <span class="bento-value">{{ totalSesionesMes || 0 }}</span>
-          <span class="bento-label">Sesiones este mes</span>
+          <span class="bento-label">Sesiones Completadas</span>
         </div>
         <div class="bento-footer">
-          <span class="bento-trend positive" *ngIf="tendenciaSesiones > 0">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
-              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-              <polyline points="17 6 23 6 23 12"></polyline>
-            </svg>
-            +{{ tendenciaSesiones }}%
-          </span>
+          <span class="bento-sub">Toca para ver historial</span>
         </div>
-        <!-- Decoración visual -->
         <div class="bento-decoration">
           <svg viewBox="0 0 120 60" preserveAspectRatio="none">
             <defs>
@@ -92,7 +84,7 @@
       </div>
     </div>
 
-    <!-- Card: Horas de entrenamiento -->
+    <!-- Horas -->
     <div class="bento-card sessions-bento">
       <div class="bento-card-inner">
         <div class="bento-header-row">
@@ -102,33 +94,35 @@
               <polyline points="12 6 12 12 16 14"></polyline>
             </svg>
           </div>
-          <span class="bento-trend positive">+{{ progresoMes || 0 }}%</span>
         </div>
         <div class="bento-data-compact">
-          <span class="bento-value">{{ totalHorasMes || 0 }}</span>
+          <span class="bento-value">{{ totalHorasMes || 0 }}h</span>
           <span class="bento-label">Horas Totales</span>
         </div>
       </div>
     </div>
 
-    <!-- Card: Deportes / Calorias -->
+    <!-- Deportes -->
     <div class="bento-card income-bento">
       <div class="bento-card-inner">
         <div class="bento-header-row">
-          <div class="bento-icon-small income" style="background: linear-gradient(135deg, #F59E0B, #D97706);">
+          <div class="bento-icon-small income" style="background: linear-gradient(135deg, #10B981, #059669);">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 2c0 0-5 8-5 12s5 8 5 8 5-4 5-8-5-12-5-12Z"></path>
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
             </svg>
           </div>
         </div>
         <div class="bento-data-compact">
-          <span class="bento-value">{{ caloriasQuemadas || 0 }}</span>
-          <span class="bento-label">Kcal Quemadas</span>
+          <span class="bento-value">{{ deportesPracticados || 0 }}</span>
+          <span class="bento-label">Deportes</span>
+        </div>
+        <div *ngIf="deportesLista.length > 0" class="bento-tags">
+          <span *ngFor="let d of deportesLista.slice(0,2)" class="bento-tag">{{ d }}</span>
         </div>
       </div>
     </div>
 
-    <!-- Card: Entrenadores Contactados -->
+    <!-- Entrenadores -->
     <div class="bento-card rating-bento">
       <div class="bento-card-inner">
         <div class="rating-display-pro">
@@ -136,19 +130,19 @@
         </div>
         <div class="rating-meta">
           <span class="rating-reviews">Entrenadores</span>
-          <span class="rating-assist">Contactados</span>
+          <span class="rating-assist">Con quienes has entrenado</span>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- CONTENIDO PRINCIPAL - 2 Columnas -->
+  <!-- CONTENIDO PRINCIPAL -->
   <div class="main-content-pro">
-    
-    <!-- COLUMNA IZQUIERDA: Sesiones -->
+
+    <!-- COLUMNA IZQUIERDA -->
     <div class="content-column main-column">
-      
-      <!-- PRÓXIMA SESIÓN DESTACADA -->
+
+      <!-- PRÓXIMA SESIÓN -->
       <div class="card-pro sessions-today-card" *ngIf="proximaSesion">
         <div class="card-header-pro">
           <div class="header-left">
@@ -171,7 +165,7 @@
         </div>
 
         <div class="sessions-list-pro">
-          <div class="session-item-pro" style="background: white; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid #E2E8F0;">
+          <div class="session-item-featured">
             <div class="session-time-block">
               <span class="session-hour">{{ toDate(proximaSesion.fecha_hora) | date:'HH:mm' }}</span>
               <span class="session-duration">{{ proximaSesion.duracion }}min</span>
@@ -180,32 +174,36 @@
               <div class="connector-line"></div>
               <div class="connector-dot"></div>
             </div>
-            <div class="session-content" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-              <div class="session-main-info" style="display: flex; gap: 1rem; align-items: center;">
-                <img [src]="proximaSesion.entrenador?.foto" [alt]="proximaSesion.entrenador?.nombre" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #3B82F6;">
+            <div class="session-info-block">
+              <div class="session-trainer-row">
+                <img [src]="proximaSesion.entrenador?.foto"
+                     [alt]="proximaSesion.entrenador?.nombre"
+                     class="trainer-avatar-sm">
                 <div>
-                  <h4 class="client-name-pro" style="margin: 0; font-size: 1.1rem;">{{ proximaSesion.entrenador?.nombre }}</h4>
-                  <div class="session-tags" style="margin-top: 0.25rem;">
-                    <span class="tag-sport" style="background: #F1F5F9; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: 600; color: #64748B;">{{ proximaSesion.deporte }}</span>
-                    <span *ngIf="proximaSesion.ubicacion" style="font-size: 0.8rem; color: #64748B; display: inline-flex; align-items: center; gap: 0.2rem;"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> {{ proximaSesion.ubicacion }}</span>
+                  <h4 class="trainer-name">{{ proximaSesion.entrenador?.nombre }}</h4>
+                  <div class="session-meta-tags">
+                    <span class="tag-sport">{{ proximaSesion.deporte }}</span>
+                    <span *ngIf="proximaSesion.ubicacion" class="tag-location">
+                      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                      </svg>
+                      {{ proximaSesion.ubicacion }}
+                    </span>
                   </div>
                 </div>
               </div>
-              <div class="session-actions-pro" style="display: flex; gap: 0.5rem;">
-                <button class="action-btn view" (click)="verSesion(proximaSesion)" style="background: #E0F2FE; color: #0288D1; border: none; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; cursor: pointer;">
-                  Entrar
-                </button>
-                <button class="action-btn" (click)="contactarEntrenador(proximaSesion.entrenador)" style="background: transparent; color: #64748B; border: 1px solid #CBD5E1; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; cursor: pointer;">
-                  Mensaje
-                </button>
+              <div class="session-action-row">
+                <button class="btn-session-primary" (click)="verSesion(proximaSesion)">Ver Sesión</button>
+                <button class="btn-session-secondary" (click)="contactarEntrenador(proximaSesion.entrenador)">Mensaje</button>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ESTADO VACÍO PROXIMA SESION -->
-      <div class="card-pro sessions-today-card" *ngIf="!proximaSesion">
+      <!-- ESTADO VACÍO PRÓXIMA SESIÓN -->
+      <div class="card-pro sessions-today-card empty-session-card" *ngIf="!proximaSesion">
         <div class="empty-state-pro">
           <div class="empty-illustration">
             <svg viewBox="0 0 120 100" fill="none">
@@ -215,13 +213,13 @@
             </svg>
           </div>
           <p class="empty-title">Agenda Libre</p>
-          <p class="empty-subtitle">No tienes sesiones reservadas próximamente.</p>
-          <button (click)="buscarEntrenadores()" style="margin-top: 1rem; background: #0288D1; color: white; border: none; padding: 0.5rem 1.5rem; border-radius: 20px; font-weight: bold; cursor: pointer;">Encontrar Entrenador</button>
+          <p class="empty-subtitle">No tienes sesiones próximas reservadas.</p>
+          <button class="btn-empty-action" (click)="buscarEntrenadores()">Encontrar Entrenador</button>
         </div>
       </div>
 
-      <!-- HISTORIAL Y OTRAS SESIONES -->
-      <div class="card-pro upcoming-card">
+      <!-- SESIONES PROGRAMADAS -->
+      <div class="card-pro upcoming-card" *ngIf="proximasSesiones?.length > 0">
         <div class="card-header-pro">
           <div class="header-left">
             <div class="header-icon-badge" style="background: linear-gradient(135deg, #64748B, #475569);">
@@ -237,91 +235,109 @@
           </div>
         </div>
 
-        <div *ngIf="(!proximasSesiones || proximasSesiones.length === 0) && (!historialSesiones || historialSesiones.length === 0)" class="empty-state-pro small">
-          <p class="empty-subtitle">No hay historial de sesiones</p>
-        </div>
-
-        <div *ngIf="proximasSesiones?.length > 0 || historialSesiones?.length > 0" class="upcoming-list-pro" style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem;">
-          
-          <div class="upcoming-item-pro" *ngFor="let sesion of proximasSesiones; let i = index" [style.animation-delay]="i * 0.08 + 's'" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem; background: #F8FAFC; border-radius: 12px;">
-            <div style="display: flex; align-items: center; gap: 1rem;">
-              <div class="upcoming-date-box" style="background: white; padding: 0.5rem; border-radius: 8px; text-align: center; border: 1px solid #E2E8F0; min-width: 50px;">
-                <span class="date-day" style="display: block; font-weight: bold; font-size: 1.2rem; color: #0288D1;">{{ toDate(sesion.fecha_hora) | date:'dd' }}</span>
-                <span class="date-month" style="display: block; font-size: 0.7rem; color: #64748B; text-transform: uppercase;">{{ toDate(sesion.fecha_hora) | date:'MMM' }}</span>
-              </div>
-              <div class="upcoming-details" style="display: flex; flex-direction: column;">
-                <span class="upcoming-client" style="font-weight: bold; color: #1E293B;">{{ sesion.entrenador?.nombre }}</span>
-                <span class="upcoming-sport" style="font-size: 0.8rem; color: #64748B;">{{ sesion.deporte }} • {{ toDate(sesion.fecha_hora) | date:'HH:mm' }}</span>
-              </div>
+        <div class="upcoming-list-pro">
+          <div class="upcoming-item-pro"
+               *ngFor="let sesion of proximasSesiones; let i = index"
+               [style.animation-delay]="i * 0.08 + 's'">
+            <div class="upcoming-date-box">
+              <span class="date-day">{{ toDate(sesion.fecha_hora) | date:'dd' }}</span>
+              <span class="date-month">{{ toDate(sesion.fecha_hora) | date:'MMM' }}</span>
             </div>
-            <div class="upcoming-time-badge" style="background: rgba(2, 136, 209, 0.1); color: #0288D1; padding: 0.3rem 0.8rem; border-radius: 20px; font-weight: bold; font-size: 0.8rem;">
+            <div class="upcoming-details">
+              <span class="upcoming-client">{{ sesion.entrenador?.nombre }}</span>
+              <span class="upcoming-sport">{{ sesion.deporte }} • {{ toDate(sesion.fecha_hora) | date:'HH:mm' }}</span>
+            </div>
+            <div class="upcoming-status-badge" [class]="'status-' + sesion.estado?.toLowerCase()">
               {{ sesion.estado }}
             </div>
           </div>
-
         </div>
       </div>
     </div>
 
-    <!-- COLUMNA DERECHA: Sidebar -->
+    <!-- COLUMNA DERECHA -->
     <div class="content-column side-column">
-      
-      <!-- LOGROS -->
-      <div class="card-pro clients-card">
-        <div class="card-header-pro compact">
-          <div class="header-left">
-            <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #F59E0B;">
-              <path d="M12 15l-3 3 1.5-6L6 8h6l3-6 3 6h6l-4.5 4 1.5 6-3-3z"></path>
-            </svg>
-            <h3>Tus Logros</h3>
-          </div>
-        </div>
 
-        <div *ngIf="!logrosRecientes || logrosRecientes.length === 0" class="empty-state-pro mini">
-          <p>Aún no hay logros</p>
-        </div>
-
-        <div *ngIf="logrosRecientes?.length > 0" class="clients-list-pro">
-          <div class="client-item-pro" *ngFor="let logro of logrosRecientes; let i = index"
-               [style.animation-delay]="i * 0.1 + 's'" style="display: flex; align-items: center; gap: 1rem; padding: 0.8rem; background: #FFFBEB; border-radius: 12px; margin-bottom: 0.5rem; border: 1px solid rgba(245, 158, 11, 0.2);">
-            <div style="width: 40px; height: 40px; background: #F59E0B; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">
-              <ngx-sport-icon [name]="logro.icono || 'trophy'" [size]="20" color="#fff"></ngx-sport-icon>
+      <!-- ACCESOS RÁPIDOS -->
+      <div class="card-pro quick-actions-card">
+        <h4 class="section-title">Accesos Rápidos</h4>
+        <div class="quick-actions-grid">
+          <button class="quick-action-btn" (click)="buscarEntrenadores()">
+            <div class="qa-icon blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
             </div>
-            <div class="client-info-pro">
-              <span class="client-name-pro" style="font-weight: bold; color: #92400E; display: block;">{{ logro.nombre }}</span>
-              <span class="client-stats" style="font-size: 0.8rem; color: #D97706;">Desbloqueado</span>
+            <span>Buscar</span>
+          </button>
+          <button class="quick-action-btn" (click)="verHistorial()">
+            <div class="qa-icon purple">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+              </svg>
             </div>
-          </div>
+            <span>Historial</span>
+          </button>
+          <button class="quick-action-btn" (click)="router.navigate(['/pages/cliente/chat'])">
+            <div class="qa-icon green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </div>
+            <span>Mensajes</span>
+          </button>
+          <button class="quick-action-btn" (click)="verPerfil()">
+            <div class="qa-icon orange">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </div>
+            <span>Perfil</span>
+          </button>
         </div>
       </div>
 
-      <!-- QUICK ACTIONS -->
-      <div class="card-pro quick-actions-card">
-        <h4 class="quick-title" style="font-size: 1rem; font-weight: bold; margin-bottom: 1rem; color: #1E293B;">Atajos Rápidos</h4>
-        <div class="quick-actions-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem;">
-          <button class="quick-action" (click)="buscarEntrenadores()" style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 1rem; background: #F1F5F9; border: none; border-radius: 12px; cursor: pointer; transition: all 0.2s;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24" style="color: #0288D1;">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      <!-- DEPORTES QUE PRACTICO -->
+      <div class="card-pro clients-card" *ngIf="deportesLista.length > 0">
+        <div class="card-header-pro compact">
+          <div class="header-left">
+            <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #10B981;">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
             </svg>
-            <span style="font-size: 0.85rem; font-weight: 600; color: #475569;">Explorar</span>
-          </button>
-          <button class="quick-action" (click)="verHistorial()" style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 1rem; background: #F1F5F9; border: none; border-radius: 12px; cursor: pointer; transition: all 0.2s;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24" style="color: #0288D1;">
-              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+            <h3>Mis Deportes</h3>
+          </div>
+        </div>
+        <div class="deportes-list">
+          <span class="deporte-chip" *ngFor="let deporte of deportesLista">
+            {{ deporte }}
+          </span>
+        </div>
+      </div>
+
+      <!-- HISTORIAL RECIENTE -->
+      <div class="card-pro clients-card" *ngIf="historialSesiones.length > 0">
+        <div class="card-header-pro compact">
+          <div class="header-left">
+            <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #6366F1;">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
             </svg>
-            <span style="font-size: 0.85rem; font-weight: 600; color: #475569;">Historial</span>
-          </button>
-          <button class="quick-action" (click)="verPerfil()" style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 1rem; background: #F1F5F9; border: none; border-radius: 12px; cursor: pointer; transition: all 0.2s; grid-column: span 2;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24" style="color: #0288D1;">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-            <span style="font-size: 0.85rem; font-weight: 600; color: #475569;">Mi Perfil</span>
-          </button>
+            <h3>Historial Reciente</h3>
+          </div>
+        </div>
+        <div class="clients-list-pro">
+          <div class="client-item-pro" *ngFor="let sesion of historialSesiones.slice(0,4); let i = index" [style.animation-delay]="i * 0.1 + 's'">
+            <img [src]="sesion.entrenador?.foto" [alt]="sesion.entrenador?.nombre" class="client-avatar">
+            <div class="client-info-pro">
+              <span class="client-name-pro">{{ sesion.entrenador?.nombre }}</span>
+              <span class="client-stats">{{ sesion.deporte }} • {{ toDate(sesion.fecha_hora) | date:'dd MMM' }}</span>
+            </div>
+            <div class="status-dot" [class]="'dot-' + sesion.estado?.toLowerCase()"></div>
+          </div>
         </div>
       </div>
     </div>
   </div>
-
 </div>

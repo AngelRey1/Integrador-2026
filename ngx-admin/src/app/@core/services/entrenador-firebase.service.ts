@@ -795,4 +795,33 @@ export class EntrenadorFirebaseService {
             })
         );
     }
+
+    /**
+     * Obtiene todas las reseñas que los clientes han dejado al entrenador autenticado
+     */
+    getMisResenasRecibidas(): Observable<any[]> {
+        return this.afAuth.authState.pipe(
+            switchMap(user => {
+                if (!user) return of([]);
+                return this.firestore
+                    .collection('reviews', ref =>
+                        ref.where('entrenadorId', '==', user.uid)
+                           .orderBy('fecha', 'desc')
+                    )
+                    .valueChanges({ idField: 'id' });
+            }),
+            catchError(() => of([]))
+        );
+    }
+
+    /**
+     * Guarda la respuesta del entrenador a una reseña
+     */
+    async responderResena(resenaId: string, respuesta: string): Promise<void> {
+        await this.firestore
+            .collection('reviews')
+            .doc(resenaId)
+            .update({ respuestaEntrenador: respuesta, fechaRespuesta: new Date() });
+    }
 }
+

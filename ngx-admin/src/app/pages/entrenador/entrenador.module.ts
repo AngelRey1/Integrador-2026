@@ -12,6 +12,7 @@ import { ChatEntrenadorComponent } from './chat/chat.component';
 import { ChatAdminComponent } from './chat-admin/chat-admin.component';
 import { MiSuscripcionComponent } from './mi-suscripcion/mi-suscripcion.component';
 import { PagoSuscripcionDialogComponent } from './mi-suscripcion/pago-suscripcion-dialog/pago-suscripcion-dialog.component';
+import { MisResenasEntrenadorComponent } from './mis-resenas-entrenador/mis-resenas-entrenador.component';
 
 // Custom Icons
 import { SportIconsModule } from '../../@theme/components/sport-icons/sport-icons.module';
@@ -55,7 +56,8 @@ import { NbEvaIconsModule } from '@nebular/eva-icons';
     ChatEntrenadorComponent,
     ChatAdminComponent,
     MiSuscripcionComponent,
-    PagoSuscripcionDialogComponent
+    PagoSuscripcionDialogComponent,
+    MisResenasEntrenadorComponent
   ],
   imports: [
     CommonModule,

@@ -50,6 +50,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
   recentTransactions: Transaction[] = [];
   reports: any[] = [];
 
+  // Subscription KPIs
+  planFreeCount = 0;
+  planProCount = 0;
+  planAnualCount = 0;
+  suscripcionesPendientes = 0;
+
   private subscriptions: Subscription[] = [];
 
   constructor(
@@ -149,6 +155,20 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.stats.activeSports = deportes.filter(d => d.activo).length;
     });
     this.subscriptions.push(deportesSub);
+
+    // KPIs de suscripciones - conteo por plan
+    const susPlansSub = this.adminFirebase.getEntrenadores().subscribe(entrenadores => {
+      this.planFreeCount  = entrenadores.filter(e => !e.planSuscripcion || e.planSuscripcion === 'free').length;
+      this.planProCount   = entrenadores.filter(e => e.planSuscripcion === 'pro').length;
+      this.planAnualCount = entrenadores.filter(e => e.planSuscripcion === 'anual').length;
+    });
+    this.subscriptions.push(susPlansSub);
+
+    // Pagos de suscripción pendientes de validación
+    const susPendSub = this.adminFirebase.getPagosSuscripcion('pendiente').subscribe(pagos => {
+      this.suscripcionesPendientes = pagos.length;
+    });
+    this.subscriptions.push(susPendSub);
   }
 
   private convertirFecha(fecha: any): Date {

@@ -16,14 +16,18 @@ export class AppComponent implements OnInit, OnDestroy {
   private destroy$: Subject<void> = new Subject<void>();
   title = 'Sportconnecta Admin';
   userPictureOnly: boolean = false;
-  
+
   // Admin user data
   adminUser: { name: string; picture: string } = {
     name: 'Admin',
     picture: ''
   };
 
-  // Temas disponibles (igual que entrenador)
+  // Badge counts (reactivos)
+  badgeEntrenadores = 0;
+  badgePagosSuscripciones = 0;
+
+  // Temas disponibles
   themes = [
     { value: 'default', name: 'Light' },
     { value: 'dark', name: 'Dark' },
@@ -32,7 +36,7 @@ export class AppComponent implements OnInit, OnDestroy {
   ];
   currentTheme = 'default';
 
-  // Menú del sidebar (sin badges hardcodeados)
+  // Menú del sidebar
   menuItems: NbMenuItem[] = [
     {
       title: 'Dashboard',
@@ -66,7 +70,18 @@ export class AppComponent implements OnInit, OnDestroy {
     {
       title: 'Pagos',
       icon: 'credit-card-outline',
-      link: '/admin/pagos'
+      link: '/admin/pagos',
+      children: [
+        {
+          title: 'Historial de Pagos',
+          link: '/admin/pagos',
+        },
+        {
+          title: 'Validar Suscripciones',
+          icon: 'checkmark-circle-outline',
+          link: '/admin/pagos/suscripciones',
+        }
+      ]
     },
     {
       title: 'Chat',
@@ -109,10 +124,10 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.currentTheme = this.themeService.currentTheme;
-    
+
     // Forzar sidebar expandido al inicio
     this.sidebarService.expand('menu-sidebar');
-    
+
     // Cargar datos del admin desde localStorage
     this.loadAdminUser();
 
@@ -136,6 +151,36 @@ export class AppComponent implements OnInit, OnDestroy {
           this.logout();
         }
       });
+
+    // ─── BADGES DINÁMICOS ───────────────────────────────────
+    // Badge: Entrenadores sin verificar → amarillo en "Entrenadores"
+    this.adminService.getEntrenadores()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(entrenadores => {
+        const pendientes = entrenadores.filter(e => !e.verificado).length;
+        this.badgeEntrenadores = pendientes;
+        const item = this.menuItems.find(m => m.title === 'Entrenadores');
+        if (item) {
+          item.badge = pendientes > 0 ? { text: String(pendientes), status: 'warning' } : undefined;
+          this.menuItems = [...this.menuItems];
+        }
+      });
+
+    // Badge: Pagos de suscripción pendientes → rojo en "Validar Suscripciones"
+    this.adminService.getPagosSuscripcion('pendiente')
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(pagos => {
+        const pendientes = pagos.length;
+        this.badgePagosSuscripciones = pendientes;
+        const pagosItem = this.menuItems.find(m => m.title === 'Pagos');
+        if (pagosItem?.children) {
+          const subItem = pagosItem.children.find(c => c.title === 'Validar Suscripciones');
+          if (subItem) {
+            subItem.badge = pendientes > 0 ? { text: String(pendientes), status: 'danger' } : undefined;
+            this.menuItems = [...this.menuItems];
+          }
+        }
+      });
   }
 
   ngOnDestroy(): void {
@@ -144,11 +189,9 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   loadAdminUser(): void {
-    // Cargar datos del admin desde Firebase
     this.afAuth.authState.pipe(
       switchMap(user => {
         if (!user) {
-          // Si no hay usuario autenticado, usar datos de localStorage
           const adminUserStr = localStorage.getItem('admin_user');
           if (adminUserStr) {
             const adminData = JSON.parse(adminUserStr);
@@ -164,8 +207,6 @@ export class AppComponent implements OnInit, OnDestroy {
           }
           return of(null);
         }
-        
-        // Buscar datos del admin en Firestore (colección users con tipo admin)
         return this.firestore.doc(`users/${user.uid}`).valueChanges();
       }),
       takeUntil(this.destroy$)
@@ -174,23 +215,17 @@ export class AppComponent implements OnInit, OnDestroy {
         const nombre = userData.nombre || userData.email || 'Admin';
         const apellido = userData.apellidoPaterno || userData.apellido || '';
         const displayName = apellido ? `${nombre} ${apellido}` : nombre;
-        
-        // Usar foto real si existe
         const fotoUrl = userData.fotoUrl || userData.foto || '';
-        
         this.adminUser = {
           name: displayName,
           picture: fotoUrl || this.generateAvatar(displayName)
         };
-        
-        // Actualizar localStorage también
         localStorage.setItem('admin_user', JSON.stringify(userData));
       }
     });
   }
 
   generateAvatar(name: string): string {
-    // Usar UI Avatars para generar avatar
     const encodedName = encodeURIComponent(name);
     return `https://ui-avatars.com/api/?name=${encodedName}&background=00D09C&color=ffffff&size=128`;
   }
@@ -200,7 +235,6 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   toggleSidebar(): boolean {
-    // false = toggle entre expandido y colapsado (no compacto)
     this.sidebarService.toggle(false, 'menu-sidebar');
     return false;
   }

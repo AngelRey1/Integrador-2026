@@ -1,0 +1,104 @@
+<div class="validar-container">
+  <div class="page-header">
+    <h2>Validar Pagos de Suscripción</h2>
+    <p>Revisa y aprueba los comprobantes de transferencia enviados por los entrenadores.</p>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-row">
+    <div class="stat-card warning">
+      <span class="stat-value">{{ stats.pendientes }}</span>
+      <span class="stat-label">Pendientes</span>
+    </div>
+    <div class="stat-card success">
+      <span class="stat-value">{{ stats.aprobados }}</span>
+      <span class="stat-label">Aprobados</span>
+    </div>
+    <div class="stat-card danger">
+      <span class="stat-value">{{ stats.rechazados }}</span>
+      <span class="stat-label">Rechazados</span>
+    </div>
+  </div>
+
+  <!-- Filter -->
+  <div class="filter-row mb-3">
+    <button nbButton size="small" [status]="filterEstado === 'pendiente' ? 'warning' : 'basic'" (click)="onFilterChange('pendiente')">Pendientes</button>
+    <button nbButton size="small" [status]="filterEstado === 'aprobado'  ? 'success' : 'basic'" (click)="onFilterChange('aprobado')">Aprobados</button>
+    <button nbButton size="small" [status]="filterEstado === 'rechazado' ? 'danger'  : 'basic'" (click)="onFilterChange('rechazado')">Rechazados</button>
+    <button nbButton size="small" [status]="filterEstado === 'todos'     ? 'primary' : 'basic'" (click)="onFilterChange('todos')">Todos</button>
+  </div>
+
+  <!-- Loading spinner -->
+  <div *ngIf="loading" class="text-center p-5">
+    <nb-spinner size="large" status="primary"></nb-spinner>
+  </div>
+
+  <!-- Empty state -->
+  <nb-card *ngIf="!loading && filteredPagos.length === 0">
+    <nb-card-body class="text-center p-5">
+      <nb-icon icon="checkmark-circle-outline" status="success" style="font-size: 3rem;"></nb-icon>
+      <h4 class="mt-3">Sin solicitudes {{ filterEstado === 'todos' ? '' : filterEstado + 's' }}</h4>
+      <p class="text-hint">No hay comprobantes {{ filterEstado === 'todos' ? 'registrados' : 'en estado ' + filterEstado }}.</p>
+    </nb-card-body>
+  </nb-card>
+
+  <!-- Payments Table -->
+  <nb-card *ngIf="!loading && filteredPagos.length > 0">
+    <nb-card-body class="p-0">
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Entrenador</th>
+              <th>Plan Solicitado</th>
+              <th>Monto</th>
+              <th>Fecha Solicitud</th>
+              <th>Estado</th>
+              <th>Comprobante</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let pago of filteredPagos">
+              <td>
+                <div class="entrenador-info">
+                  <strong>{{ pago.entrenadorNombre }}</strong>
+                  <small class="text-hint">{{ pago.entrenadorId }}</small>
+                </div>
+              </td>
+              <td>
+                <nb-badge [text]="getNombrePlan(pago.planSolicitado)" [status]="pago.planSolicitado === 'pro_anual' ? 'primary' : 'info'"></nb-badge>
+              </td>
+              <td><strong>${{ pago.monto | number:'1.0-0' }} MXN</strong></td>
+              <td>{{ formatFecha(pago.fechaSolicitud) }}</td>
+              <td>
+                <nb-badge [text]="pago.estado | uppercase" [status]="getBadgeStatus(pago.estado)"></nb-badge>
+                <p *ngIf="pago.motivoRechazo" class="motivo-rechazo">{{ pago.motivoRechazo }}</p>
+              </td>
+              <td>
+                <button nbButton size="tiny" status="info" outline (click)="verComprobante(pago.comprobanteUrl)">
+                  <nb-icon icon="eye-outline"></nb-icon> Ver Ticket
+                </button>
+              </td>
+              <td>
+                <div class="actions-cell" *ngIf="pago.estado === 'pendiente'">
+                  <button nbButton size="tiny" status="success" 
+                          [nbSpinner]="procesando[pago.id]"
+                          (click)="aprobar(pago)">
+                    <nb-icon icon="checkmark-outline"></nb-icon> Aprobar
+                  </button>
+                  <button nbButton size="tiny" status="danger" outline
+                          [nbSpinner]="procesando[pago.id]"
+                          (click)="rechazar(pago)">
+                    <nb-icon icon="close-outline"></nb-icon> Rechazar
+                  </button>
+                </div>
+                <span *ngIf="pago.estado !== 'pendiente'" class="text-hint">—</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </nb-card-body>
+  </nb-card>
+</div>

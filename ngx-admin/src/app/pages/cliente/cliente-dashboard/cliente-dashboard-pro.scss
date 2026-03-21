@@ -42,3 +42,82 @@
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
+
+// === Solicitudes Pendientes Card ===
+.pending-requests-card {
+  border-left: 4px solid #F59E0B !important;
+
+  .pending-badge-icon {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, #F59E0B, #D97706);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .pending-count-label {
+    font-size: 0.75rem;
+    color: #D97706;
+    font-weight: 600;
+  }
+
+  .pulse-badge {
+    background: #EF4444;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 0.2rem 0.55rem;
+    border-radius: 20px;
+    animation: pulse 2s infinite;
+  }
+
+  .pending-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-top: 0.75rem;
+  }
+
+  .pending-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem;
+    background: rgba(245, 158, 11, 0.06);
+    border-radius: 10px;
+  }
+
+  .pending-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .pending-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    .pending-name { font-weight: 700; font-size: 0.85rem; color: var(--text-basic-color); }
+    .pending-time { font-size: 0.72rem; color: var(--text-hint-color); }
+  }
+
+  .btn-confirm {
+    background: #F59E0B;
+    color: white;
+    border: none;
+    padding: 0.3rem 0.7rem;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.75rem;
+    cursor: pointer;
+    flex-shrink: 0;
+    &:hover { background: #D97706; }
+  }
+}
