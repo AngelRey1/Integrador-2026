@@ -44,7 +44,7 @@ export class EntrenadorDashboardComponent implements OnInit, OnDestroy {
   // Plan y Suscripción
   planSuscripcion = 'free';
   limiteAlumnos = 5;
-  diasTrialRestantes: number | null = 30;
+  diasTrialRestantes: number | null = 15;
 
   // Próximas sesiones
   proximasSesiones: Sesion[] = [];

@@ -143,7 +143,7 @@ export class ClienteFirebaseService {
                         const fechaReg = e.fechaRegistro instanceof Date ? e.fechaRegistro : new Date((e.fechaRegistro as any)?.seconds * 1000);
                         if (!fechaReg) return true; // prevent breaking if missing
                         const diffDays = (ahora.getTime() - fechaReg.getTime()) / (1000 * 3600 * 24);
-                        if (diffDays > 30) return false; // Trial expired
+                        if (diffDays > 15) return false; // Trial expired
                     }
                     return true;
                 });
@@ -198,7 +198,7 @@ export class ClienteFirebaseService {
                             const fechaReg = entrenador.fechaRegistro instanceof Date ? entrenador.fechaRegistro : new Date((entrenador.fechaRegistro as any)?.seconds * 1000);
                             if (fechaReg) {
                                 const diffDays = (ahora.getTime() - fechaReg.getTime()) / (1000 * 3600 * 24);
-                                if (diffDays > 30) return undefined; // Trial expired, prevent direct access
+                                if (diffDays > 15) return undefined; // Trial expired, prevent direct access
                             }
                         }
                         return entrenador;

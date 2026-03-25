@@ -540,7 +540,7 @@ export class EntrenadorFirebaseService {
                     tasaAsistencia: 0,
                     planSuscripcion: 'free',
                     limiteAlumnos: 5,
-                    diasTrialRestantes: 30
+                    diasTrialRestantes: 15
                 });
 
                 const ahora = new Date();
@@ -628,11 +628,11 @@ export class EntrenadorFirebaseService {
                                 const plan = (perfil as any)?.planSuscripcion || 'free';
                                 if (plan !== 'free') return null;
                                 const fechaReg = (perfil as any)?.fechaRegistro;
-                                if (!fechaReg) return 30; // Default if not found
+                                if (!fechaReg) return 15; // Default if not found
                                 const dateReg = fechaReg instanceof Date ? fechaReg : new Date(fechaReg.seconds * 1000);
                                 const diff = ahora.getTime() - dateReg.getTime();
                                 const diasUsados = Math.floor(diff / (1000 * 60 * 60 * 24));
-                                return Math.max(0, 30 - diasUsados);
+                                return Math.max(0, 15 - diasUsados);
                             })()
                         };
                     })

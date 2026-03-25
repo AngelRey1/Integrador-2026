@@ -25,7 +25,7 @@ export class MiSuscripcionComponent implements OnInit, OnDestroy {
       id: 'free',
       nombre: 'Prueba el Sistema',
       precio: 0,
-      periodo: '30 días',
+      periodo: '15 días',
       limite: 5,
       caracteristicas: ['Hasta 5 alumnos activos', 'Perfil público básico', 'Soporte estándar'],
       activo: false
@@ -86,7 +86,7 @@ export class MiSuscripcionComponent implements OnInit, OnDestroy {
 
   getProgresoTrial(): number {
     if (this.diasTrialRestantes === null || this.diasTrialRestantes < 0) return 100;
-    return ((30 - this.diasTrialRestantes) / 30) * 100;
+    return ((15 - this.diasTrialRestantes) / 15) * 100;
   }
 
   getProgresoAlumnos(): number {
