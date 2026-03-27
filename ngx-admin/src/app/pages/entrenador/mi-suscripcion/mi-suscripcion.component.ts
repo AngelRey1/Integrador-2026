@@ -33,7 +33,7 @@ export class MiSuscripcionComponent implements OnInit, OnDestroy {
     {
       id: 'pro',
       nombre: 'Pro Mensual',
-      precio: 220,
+      precio: 299,
       periodo: 'mes',
       limite: 'Ilimitado',
       caracteristicas: ['Alumnos ilimitados', 'Perfil destacado prioritario', 'Soporte VIP', 'Estadísticas avanzadas'],
@@ -42,10 +42,10 @@ export class MiSuscripcionComponent implements OnInit, OnDestroy {
     {
       id: 'anual',
       nombre: 'Pro Anual',
-      precio: 2000,
+      precio: 2999,
       periodo: 'año',
       limite: 'Ilimitado',
-      caracteristicas: ['Alumnos ilimitados', 'Ahorro de $640 MXN', 'Perfil súper destacado', 'Asesoría de crecimiento'],
+      caracteristicas: ['Alumnos ilimitados', 'Ahorro de $589 MXN', 'Perfil súper destacado', 'Asesoría de crecimiento'],
       activo: false,
       recomendado: true
     }
